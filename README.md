@@ -316,3 +316,34 @@ For issues, questions, or feature requests:
 ---
 
 **Built with ❤️ for cardiovascular disease research**
+
+---
+
+## Open Source
+
+CardioXNet is built entirely with **100% open source tools** and technologies:
+
+### Core Technologies
+- **Python** - Programming language
+- **FastAPI** - Web framework
+- **React** - Frontend library
+- **TypeScript** - Type-safe JavaScript
+- **Material-UI** - Component library
+- **Vite** - Build tool
+- **MySQL/TiDB** - Database
+
+### Scientific Tools
+- **STRING Database** - Protein-protein interactions (open API)
+- **g:Profiler** - Pathway enrichment analysis (open source)
+- **NCBI PubMed** - Literature database (public domain)
+- **GTEx** - Gene expression data (open access)
+- **GO, KEGG, Reactome, WikiPathways** - Pathway databases (open access)
+
+### Development Tools
+- **Git** - Version control
+- **GitHub** - Code hosting
+- **Playwright** - Browser automation
+- **Pandas, NumPy** - Data analysis
+- **Matplotlib, Plotly** - Visualization
+
+CardioXNet is committed to open science and reproducible research. All code, algorithms, and documentation are freely available under the MIT License.
