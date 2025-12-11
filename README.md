@@ -8,7 +8,7 @@ CardioXNet implements the **NETS (Neighborhood Enrichment Triage and Scoring)** 
 
 ## 📸 Demo: Sample Analysis Walkthrough
 
-See CardioXNet in action with a sample cardiomyopathy gene set: **TTN, MYH7, MYBPC3, TNNT2, LMNA**
+See CardioXNet in action with a sample gene set: **PIK3R1, ITGB1, SRC**
 
 ### 1. Gene Input
 Enter your seed genes on the home page and configure analysis parameters.
@@ -30,25 +30,25 @@ Identify genes at pathway intersections using weighted scoring algorithm.
 
 ![Key Genes](docs/screenshots/04-key-genes.png)
 
-### 5. Final Pathways Table
+### 5. Important Genes
+View top genes ranked by importance score across all discovered pathways.
+
+![Important Genes](docs/screenshots/05-important-genes.png)
+
+### 6. Final Pathways Table
 Browse discovered pathways with sortable columns for NES score, clinical impact, evidence genes, and literature support.
 
-![Pathways Table](docs/screenshots/05-pathways-table.png)
+![Pathways Table](docs/screenshots/06-pathways-table.png)
 
-### 6. Pathway Details
+### 7. Pathway Details
 Explore detailed pathway information including NES scores, clinical impact, and gene lists.
 
-![Pathway Details](docs/screenshots/06-details-page.png)
+![Pathway Details](docs/screenshots/07-details-page.png)
 
-### 7. Pathway Discovery Lineage
-Visualize how pathways were discovered through network expansion and aggregation.
+### 8. Pathway Genes & Literature Evidence
+View pathway genes and access clickable PubMed links for cardiovascular disease literature validation.
 
-![Pathway Lineage](docs/screenshots/07-pathway-lineage.png)
-
-### 8. Literature Evidence
-Access clickable PubMed links for cardiovascular disease literature validation.
-
-![Literature Evidence](docs/screenshots/08-literature-evidence.png)
+![Pathway Genes & Literature](docs/screenshots/08-pathway-genes-literature.png)
 
 ---
 
@@ -144,8 +144,8 @@ POST http://localhost:8000/api/fast-analysis
 Content-Type: application/json
 
 {
-  "seed_genes": ["TTN", "MYH7", "MYBPC3", "TNNT2", "LMNA"],
-  "disease_context": "cardiomyopathy"
+  "seed_genes": ["PIK3R1", "ITGB1", "SRC"],
+  "disease_context": "cardiovascular"
 }
 ```
 
