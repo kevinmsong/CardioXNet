@@ -6,49 +6,69 @@ CardioXNet implements the **NETS (Neighborhood Enrichment Triage and Scoring)** 
 
 ---
 
-## 📸 Demo: Sample Analysis Walkthrough
+## 📸 Demo: Diabetic Cardiomyopathy Analysis
 
-See CardioXNet in action with a sample gene set: **PIK3R1, ITGB1, SRC**
+See CardioXNet in action with a **diabetic cardiomyopathy** gene set:
+
+**Seed Genes**: INS, INSR, AKT1, PPARG, SLC2A4, AGER, TNF, IL6, MAPK1, NFKB1
+
+This gene set represents key pathways in diabetic cardiomyopathy including insulin signaling, metabolic dysfunction, AGE-RAGE axis, inflammation, and stress signaling.
 
 ### 1. Gene Input
 Enter your seed genes on the home page and configure analysis parameters.
 
 ![Home Page - Gene Input](docs/screenshots/01-home-input.png)
 
+*Example showing 10 diabetic cardiomyopathy genes covering insulin signaling (INS, INSR, AKT1), glucose metabolism (PPARG, SLC2A4), AGE-RAGE pathway (AGER), and inflammatory responses (TNF, IL6, MAPK1, NFKB1).*
+
 ### 2. Analysis Progress
 Track real-time progress through the 9-stage NETS pipeline.
 
 ![Progress Tracking](docs/screenshots/02-progress.png)
+
+*Real-time monitoring of network expansion, pathway enrichment, semantic filtering, NES scoring, and literature validation stages.*
 
 ### 3. Results Overview
 View comprehensive results including pathway rankings, NES scores, and clinical impact metrics.
 
 ![Results Overview](docs/screenshots/03-results-overview.png)
 
+*Analysis summary showing seed genes, discovered pathways, and key metrics from the NETS algorithm.*
+
 ### 4. Key Genes Discovery
 Identify genes at pathway intersections using weighted scoring algorithm.
 
 ![Key Genes](docs/screenshots/04-key-genes.png)
+
+*Genes appearing across multiple pathways, ranked by frequency, average NES score, and pathway quality. Higher scores indicate genes central to multiple cardiovascular processes.*
 
 ### 5. Important Genes
 View top genes ranked by importance score across all discovered pathways.
 
 ![Important Genes](docs/screenshots/05-important-genes.png)
 
+*Comprehensive gene ranking combining network centrality, pathway enrichment, and literature support. Includes druggability annotations for therapeutic target identification.*
+
 ### 6. Final Pathways Table
 Browse discovered pathways with sortable columns for NES score, clinical impact, evidence genes, and literature support.
 
 ![Pathways Table](docs/screenshots/06-pathways-table.png)
+
+*Interactive table of cardiac-relevant pathways discovered through network expansion. Each pathway includes NES score, clinical impact rating, gene count, and PubMed citation count.*
 
 ### 7. Pathway Details
 Explore detailed pathway information including NES scores, clinical impact, and gene lists.
 
 ![Pathway Details](docs/screenshots/07-details-page.png)
 
+*Detailed view showing pathway metrics, evidence genes, seed genes, and pathway discovery lineage through network expansion.*
+
 ### 8. Pathway Genes & Literature Evidence
 View pathway genes and access clickable PubMed links for cardiovascular disease literature validation.
 
 ![Pathway Genes & Literature](docs/screenshots/08-pathway-genes-literature.png)
+
+*Complete gene list from pathway database and literature citations grouped by seed gene with direct PubMed links for validation.*
 
 ---
 
@@ -140,12 +160,12 @@ CardioXNet processes gene lists through a 9-stage pipeline:
 ### Start Analysis
 
 ```bash
-POST http://localhost:8000/api/fast-analysis
+POST http://localhost:8000/api/v1/analysis
 Content-Type: application/json
 
 {
-  "seed_genes": ["PIK3R1", "ITGB1", "SRC"],
-  "disease_context": "cardiovascular"
+  "seed_genes": ["INS", "INSR", "AKT1", "PPARG", "SLC2A4", "AGER", "TNF", "IL6", "MAPK1", "NFKB1"],
+  "disease_context": "diabetic_cardiomyopathy"
 }
 ```
 
@@ -156,6 +176,22 @@ GET http://localhost:8000/api/v1/analysis/{analysis_id}/results
 ```
 
 See full API documentation at `http://localhost:3000/api-reference`
+
+---
+
+## Example Use Cases
+
+### Diabetic Cardiomyopathy
+**Seed Genes**: INS, INSR, AKT1, PPARG, SLC2A4, AGER, TNF, IL6, MAPK1, NFKB1  
+**Focus**: Insulin signaling, metabolic dysfunction, inflammation
+
+### Hypertrophic Cardiomyopathy
+**Seed Genes**: MYH7, MYBPC3, TNNT2, TNNI3, TPM1, MYL2, MYL3, ACTC1, TNNC1, TTN  
+**Focus**: Sarcomere proteins, contractile dysfunction
+
+### Heart Failure
+**Seed Genes**: ACE, AGT, AGTR1, REN, NOS3, EDN1, ADRB1, ADRB2, GRK5, NPPA  
+**Focus**: RAAS system, adrenergic signaling, natriuretic peptides
 
 ---
 
@@ -220,6 +256,11 @@ Identifies genes at pathway intersections using weighted scoring:
 ```
 Score = (Frequency × 0.4) + (Avg NES × 0.4) + (Rank Quality × 0.2)
 ```
+
+Where:
+- **Frequency**: Number of pathways containing the gene
+- **Avg NES**: Average quality of pathways containing the gene
+- **Rank Quality**: Average rank of pathways (lower rank = better)
 
 ---
 
