@@ -1,0 +1,1701 @@
+{
+  "analysis_id": "analysis_20251209_122732",
+  "timestamp": "2025-12-09T12:38:34.205861",
+  "input_summary": {
+    "total_seed_genes": 4,
+    "valid_genes": 4,
+    "invalid_genes": 0,
+    "gene_list": [
+      "PDK4",
+      "LIPE",
+      "IGF1R",
+      "BCL2L1"
+    ],
+    "warnings": [
+      "Filtered 1 seed genes with insufficient connectivity (minimum 3 connections required)"
+    ]
+  },
+  "stage_1": {
+    "fn_size": 258,
+    "seed_count": 4,
+    "neighbor_count": 254,
+    "contributions": {
+      "PDK4": 19,
+      "LIPE": 52,
+      "IGF1R": 87,
+      "BCL2L1": 96
+    }
+  },
+  "stage_2a": {
+    "primary_pathways_count": 4533,
+    "known_pathways_filtered": 53,
+    "top_pathways": [
+      {
+        "name": "response to stimulus",
+        "nes": 15145.0,
+        "p_adj": 1.7527994715479185e-59
+      },
+      {
+        "name": "cellular response to stimulus",
+        "nes": 14690.0,
+        "p_adj": 1.2780594017722325e-69
+      },
+      {
+        "name": "signaling",
+        "nes": 13715.0,
+        "p_adj": 3.8302032147761235e-64
+      },
+      {
+        "name": "cell communication",
+        "nes": 13715.0,
+        "p_adj": 6.934229143136116e-64
+      },
+      {
+        "name": "signal transduction",
+        "nes": 13585.0,
+        "p_adj": 6.290177398689056e-69
+      }
+    ]
+  },
+  "stage_2b": {
+    "total_secondary_pathways": 5564,
+    "union_genes_processed": 0,
+    "genes_successfully_processed": 0,
+    "literature_stats": {
+      "primaries_processed": 20,
+      "total_secondaries": 92985,
+      "unique_secondaries": 5564
+    }
+  },
+  "stage_2c": {
+    "final_pathways_count": 5564,
+    "aggregation_strategy": "rigorous_statistical",
+    "min_support_threshold": 1
+  },
+  "stage_3": {
+    "total_hypotheses": 9,
+    "top_nes_score": 3.6812574328129437
+  },
+  "stage_4_topology": {},
+  "stage_4_literature": {
+    "GO:0007165": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "40052435",
+          "title": "Therapeutic Targeting of Decr1 Ameliorates Cardiomyopathy by Suppressing Mitochondrial Fatty Acid Oxidation in Diabetic Mice.",
+          "year": 2025,
+          "relevance": 0.5125
+        },
+        {
+          "pmid": "37477020",
+          "title": "EGFR/IGF1R Signaling Modulates Relaxation in Hypertrophic Cardiomyopathy.",
+          "year": 2023,
+          "relevance": 0.5125
+        },
+        {
+          "pmid": "34399835",
+          "title": "Multiple functions of autophagy in vascular calcification.",
+          "year": 2021,
+          "relevance": 0.47916666666666663
+        }
+      ]
+    },
+    "GO:0007166": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "38961143",
+          "title": "Identification of hub genes associated with diabetic cardiomyopathy using integrated bioinformatics analysis.",
+          "year": 2024,
+          "relevance": 0.6166666666666666
+        },
+        {
+          "pmid": "38664790",
+          "title": "Single-cell insights: pioneering an integrated atlas of chromatin accessibility and transcriptomic landscapes in diabetic cardiomyopathy.",
+          "year": 2024,
+          "relevance": 0.5375
+        },
+        {
+          "pmid": "37477020",
+          "title": "EGFR/IGF1R Signaling Modulates Relaxation in Hypertrophic Cardiomyopathy.",
+          "year": 2023,
+          "relevance": 0.5375
+        }
+      ]
+    },
+    "GO:0009653": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "34399835",
+          "title": "Multiple functions of autophagy in vascular calcification.",
+          "year": 2021,
+          "relevance": 0.4375
+        },
+        {
+          "pmid": "36281857",
+          "title": "Protein PDK4 Interacts with HMGCS2 to Facilitate High Glucoseinduced Myocardial Injuries.",
+          "year": 2023,
+          "relevance": 0.4041666666666667
+        },
+        {
+          "pmid": "38664790",
+          "title": "Single-cell insights: pioneering an integrated atlas of chromatin accessibility and transcriptomic landscapes in diabetic cardiomyopathy.",
+          "year": 2024,
+          "relevance": 0.38749999999999996
+        }
+      ]
+    },
+    "GO:0048856": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "34399835",
+          "title": "Multiple functions of autophagy in vascular calcification.",
+          "year": 2021,
+          "relevance": 0.5208333333333334
+        },
+        {
+          "pmid": "38664790",
+          "title": "Single-cell insights: pioneering an integrated atlas of chromatin accessibility and transcriptomic landscapes in diabetic cardiomyopathy.",
+          "year": 2024,
+          "relevance": 0.4708333333333333
+        },
+        {
+          "pmid": "36866436",
+          "title": "Pyruvate dehydrogenase kinase regulates vascular inflammation in atherosclerosis and increases cardiovascular risk.",
+          "year": 2023,
+          "relevance": 0.4041666666666667
+        }
+      ]
+    },
+    "GO:0048519": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "36726122",
+          "title": "Role of mitochondrial metabolic disorder and immune infiltration in diabetic cardiomyopathy: new insights from bioinformatics analysis.",
+          "year": 2023,
+          "relevance": 0.5041666666666667
+        },
+        {
+          "pmid": "38664790",
+          "title": "Single-cell insights: pioneering an integrated atlas of chromatin accessibility and transcriptomic landscapes in diabetic cardiomyopathy.",
+          "year": 2024,
+          "relevance": 0.48750000000000004
+        },
+        {
+          "pmid": "40473955",
+          "title": "Epistasis regulates genetic control of cardiac hypertrophy.",
+          "year": 2025,
+          "relevance": 0.4708333333333333
+        }
+      ]
+    },
+    "KEGG:04151": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "38961143",
+          "title": "Identification of hub genes associated with diabetic cardiomyopathy using integrated bioinformatics analysis.",
+          "year": 2024,
+          "relevance": 0.6499999999999999
+        },
+        {
+          "pmid": "34399835",
+          "title": "Multiple functions of autophagy in vascular calcification.",
+          "year": 2021,
+          "relevance": 0.5208333333333334
+        },
+        {
+          "pmid": "40222696",
+          "title": "Cardiac PDK4 promotes neutrophilic PFKL methylation and drives the innate immune response in diabetic myocardial infarction.",
+          "year": 2025,
+          "relevance": 0.48749999999999993
+        }
+      ]
+    },
+    "GO:0042221": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "32617517",
+          "title": "Mitochondrial Substrate Utilization Regulates Cardiomyocyte Cell Cycle Progression.",
+          "year": 2020,
+          "relevance": 0.4041666666666667
+        },
+        {
+          "pmid": "40222696",
+          "title": "Cardiac PDK4 promotes neutrophilic PFKL methylation and drives the innate immune response in diabetic myocardial infarction.",
+          "year": 2025,
+          "relevance": 0.4041666666666667
+        },
+        {
+          "pmid": "37001183",
+          "title": "LCZ696 (sacubitril/valsartan) inhibits pulmonary hypertension induced right ventricular remodeling by targeting pyruvate dehydrogenase kinase 4.",
+          "year": 2023,
+          "relevance": 0.4041666666666667
+        }
+      ]
+    },
+    "GO:0016310": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "40052435",
+          "title": "Therapeutic Targeting of Decr1 Ameliorates Cardiomyopathy by Suppressing Mitochondrial Fatty Acid Oxidation in Diabetic Mice.",
+          "year": 2025,
+          "relevance": 0.6375000000000001
+        },
+        {
+          "pmid": "39467114",
+          "title": "Dexmedetomidine Ameliorates Myocardial Ischemia-Reperfusion Injury by Inhibiting MDH2 Lactylation via Regulating Metabolic Reprogramming.",
+          "year": 2024,
+          "relevance": 0.6041666666666666
+        },
+        {
+          "pmid": "32617517",
+          "title": "Mitochondrial Substrate Utilization Regulates Cardiomyocyte Cell Cycle Progression.",
+          "year": 2020,
+          "relevance": 0.5708333333333333
+        }
+      ]
+    },
+    "GO:0080090": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "36726122",
+          "title": "Role of mitochondrial metabolic disorder and immune infiltration in diabetic cardiomyopathy: new insights from bioinformatics analysis.",
+          "year": 2023,
+          "relevance": 0.5041666666666667
+        },
+        {
+          "pmid": "38664790",
+          "title": "Single-cell insights: pioneering an integrated atlas of chromatin accessibility and transcriptomic landscapes in diabetic cardiomyopathy.",
+          "year": 2024,
+          "relevance": 0.48750000000000004
+        },
+        {
+          "pmid": "40052435",
+          "title": "Therapeutic Targeting of Decr1 Ameliorates Cardiomyopathy by Suppressing Mitochondrial Fatty Acid Oxidation in Diabetic Mice.",
+          "year": 2025,
+          "relevance": 0.48750000000000004
+        }
+      ]
+    },
+    "GO:1902531": {
+      "citation_count": 0,
+      "top_citations": []
+    },
+    "GO:0006950": {
+      "citation_count": 0,
+      "top_citations": []
+    },
+    "GO:0019538": {
+      "citation_count": 0,
+      "top_citations": []
+    },
+    "GO:0007169": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "38961143",
+          "title": "Identification of hub genes associated with diabetic cardiomyopathy using integrated bioinformatics analysis.",
+          "year": 2024,
+          "relevance": 0.6291666666666667
+        },
+        {
+          "pmid": "37477020",
+          "title": "EGFR/IGF1R Signaling Modulates Relaxation in Hypertrophic Cardiomyopathy.",
+          "year": 2023,
+          "relevance": 0.5750000000000001
+        },
+        {
+          "pmid": "39613849",
+          "title": "IGFBP5 affects cardiomyocyte survival and functional recovery in mice following myocardial ischemia.",
+          "year": 2024,
+          "relevance": 0.5125
+        }
+      ]
+    },
+    "GO:0051179": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "39004737",
+          "title": "Unveiling the PDK4-centered rituximab-resistant mechanism in DLBCL: the potential of the \"Smart\" exosome nanoparticle therapy.",
+          "year": 2024,
+          "relevance": 0.4708333333333333
+        },
+        {
+          "pmid": "34957921",
+          "title": "Role of lncRNA LIPE-AS1 in adipogenesis.",
+          "year": 2022,
+          "relevance": 0.4708333333333333
+        },
+        {
+          "pmid": "37834331",
+          "title": "The IGF1 Signaling Pathway: From Basic Concepts to Therapeutic Opportunities.",
+          "year": 2023,
+          "relevance": 0.4375
+        }
+      ]
+    },
+    "GO:0012501": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "36726122",
+          "title": "Role of mitochondrial metabolic disorder and immune infiltration in diabetic cardiomyopathy: new insights from bioinformatics analysis.",
+          "year": 2023,
+          "relevance": 0.5208333333333334
+        },
+        {
+          "pmid": "38664790",
+          "title": "Single-cell insights: pioneering an integrated atlas of chromatin accessibility and transcriptomic landscapes in diabetic cardiomyopathy.",
+          "year": 2024,
+          "relevance": 0.4708333333333333
+        },
+        {
+          "pmid": "40052435",
+          "title": "Therapeutic Targeting of Decr1 Ameliorates Cardiomyopathy by Suppressing Mitochondrial Fatty Acid Oxidation in Diabetic Mice.",
+          "year": 2025,
+          "relevance": 0.4708333333333333
+        }
+      ]
+    },
+    "GO:0048584": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "37477020",
+          "title": "EGFR/IGF1R Signaling Modulates Relaxation in Hypertrophic Cardiomyopathy.",
+          "year": 2023,
+          "relevance": 0.4708333333333333
+        },
+        {
+          "pmid": "36726122",
+          "title": "Role of mitochondrial metabolic disorder and immune infiltration in diabetic cardiomyopathy: new insights from bioinformatics analysis.",
+          "year": 2023,
+          "relevance": 0.4375
+        },
+        {
+          "pmid": "40052435",
+          "title": "Therapeutic Targeting of Decr1 Ameliorates Cardiomyopathy by Suppressing Mitochondrial Fatty Acid Oxidation in Diabetic Mice.",
+          "year": 2025,
+          "relevance": 0.4291666666666667
+        }
+      ]
+    },
+    "GO:0008283": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "38664790",
+          "title": "Single-cell insights: pioneering an integrated atlas of chromatin accessibility and transcriptomic landscapes in diabetic cardiomyopathy.",
+          "year": 2024,
+          "relevance": 0.6375000000000001
+        },
+        {
+          "pmid": "38739695",
+          "title": "Metabolic Reprogramming: A Byproduct or a Driver of Cardiomyocyte Proliferation?",
+          "year": 2024,
+          "relevance": 0.48749999999999993
+        },
+        {
+          "pmid": "32617517",
+          "title": "Mitochondrial Substrate Utilization Regulates Cardiomyocyte Cell Cycle Progression.",
+          "year": 2020,
+          "relevance": 0.48749999999999993
+        }
+      ]
+    },
+    "KEGG:04014": {
+      "citation_count": 0,
+      "top_citations": []
+    },
+    "GO:0048513": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "34399835",
+          "title": "Multiple functions of autophagy in vascular calcification.",
+          "year": 2021,
+          "relevance": 0.5208333333333334
+        },
+        {
+          "pmid": "38664790",
+          "title": "Single-cell insights: pioneering an integrated atlas of chromatin accessibility and transcriptomic landscapes in diabetic cardiomyopathy.",
+          "year": 2024,
+          "relevance": 0.4708333333333333
+        },
+        {
+          "pmid": "36726122",
+          "title": "Role of mitochondrial metabolic disorder and immune infiltration in diabetic cardiomyopathy: new insights from bioinformatics analysis.",
+          "year": 2023,
+          "relevance": 0.4375
+        }
+      ]
+    },
+    "GO:0050793": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "36726122",
+          "title": "Role of mitochondrial metabolic disorder and immune infiltration in diabetic cardiomyopathy: new insights from bioinformatics analysis.",
+          "year": 2023,
+          "relevance": 0.47916666666666663
+        },
+        {
+          "pmid": "38664790",
+          "title": "Single-cell insights: pioneering an integrated atlas of chromatin accessibility and transcriptomic landscapes in diabetic cardiomyopathy.",
+          "year": 2024,
+          "relevance": 0.44999999999999996
+        },
+        {
+          "pmid": "40052435",
+          "title": "Therapeutic Targeting of Decr1 Ameliorates Cardiomyopathy by Suppressing Mitochondrial Fatty Acid Oxidation in Diabetic Mice.",
+          "year": 2025,
+          "relevance": 0.44999999999999996
+        }
+      ]
+    },
+    "GO:0009719": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "38664790",
+          "title": "Single-cell insights: pioneering an integrated atlas of chromatin accessibility and transcriptomic landscapes in diabetic cardiomyopathy.",
+          "year": 2024,
+          "relevance": 0.38749999999999996
+        },
+        {
+          "pmid": "40052435",
+          "title": "Therapeutic Targeting of Decr1 Ameliorates Cardiomyopathy by Suppressing Mitochondrial Fatty Acid Oxidation in Diabetic Mice.",
+          "year": 2025,
+          "relevance": 0.38749999999999996
+        },
+        {
+          "pmid": "37477020",
+          "title": "EGFR/IGF1R Signaling Modulates Relaxation in Hypertrophic Cardiomyopathy.",
+          "year": 2023,
+          "relevance": 0.38749999999999996
+        }
+      ]
+    },
+    "GO:0097190": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "38961143",
+          "title": "Identification of hub genes associated with diabetic cardiomyopathy using integrated bioinformatics analysis.",
+          "year": 2024,
+          "relevance": 0.6499999999999999
+        },
+        {
+          "pmid": "34399835",
+          "title": "Multiple functions of autophagy in vascular calcification.",
+          "year": 2021,
+          "relevance": 0.6041666666666666
+        },
+        {
+          "pmid": "36036015",
+          "title": "Exercise-induced signaling pathways to counteracting cardiac apoptotic processes.",
+          "year": 2022,
+          "relevance": 0.55
+        }
+      ]
+    },
+    "GO:0051239": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "36726122",
+          "title": "Role of mitochondrial metabolic disorder and immune infiltration in diabetic cardiomyopathy: new insights from bioinformatics analysis.",
+          "year": 2023,
+          "relevance": 0.4541666666666667
+        },
+        {
+          "pmid": "38664790",
+          "title": "Single-cell insights: pioneering an integrated atlas of chromatin accessibility and transcriptomic landscapes in diabetic cardiomyopathy.",
+          "year": 2024,
+          "relevance": 0.4375
+        },
+        {
+          "pmid": "40052435",
+          "title": "Therapeutic Targeting of Decr1 Ameliorates Cardiomyopathy by Suppressing Mitochondrial Fatty Acid Oxidation in Diabetic Mice.",
+          "year": 2025,
+          "relevance": 0.4375
+        }
+      ]
+    },
+    "KEGG:04010": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "36036015",
+          "title": "Exercise-induced signaling pathways to counteracting cardiac apoptotic processes.",
+          "year": 2022,
+          "relevance": 0.55
+        },
+        {
+          "pmid": "34399835",
+          "title": "Multiple functions of autophagy in vascular calcification.",
+          "year": 2021,
+          "relevance": 0.5208333333333334
+        },
+        {
+          "pmid": "40222696",
+          "title": "Cardiac PDK4 promotes neutrophilic PFKL methylation and drives the innate immune response in diabetic myocardial infarction.",
+          "year": 2025,
+          "relevance": 0.48749999999999993
+        }
+      ]
+    },
+    "KEGG:04015": {
+      "citation_count": 0,
+      "top_citations": []
+    },
+    "GO:0065008": {
+      "citation_count": 0,
+      "top_citations": []
+    },
+    "KEGG:04910": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "35616058",
+          "title": "Fine-Tuning Cardiac Insulin-Like Growth Factor 1 Receptor Signaling to Promote Health and Longevity.",
+          "year": 2022,
+          "relevance": 0.5708333333333333
+        },
+        {
+          "pmid": "37477020",
+          "title": "EGFR/IGF1R Signaling Modulates Relaxation in Hypertrophic Cardiomyopathy.",
+          "year": 2023,
+          "relevance": 0.5541666666666667
+        },
+        {
+          "pmid": "39613849",
+          "title": "IGFBP5 affects cardiomyocyte survival and functional recovery in mice following myocardial ischemia.",
+          "year": 2024,
+          "relevance": 0.5541666666666667
+        }
+      ]
+    },
+    "GO:0009056": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "38664790",
+          "title": "Single-cell insights: pioneering an integrated atlas of chromatin accessibility and transcriptomic landscapes in diabetic cardiomyopathy.",
+          "year": 2024,
+          "relevance": 0.5125
+        },
+        {
+          "pmid": "36726122",
+          "title": "Role of mitochondrial metabolic disorder and immune infiltration in diabetic cardiomyopathy: new insights from bioinformatics analysis.",
+          "year": 2023,
+          "relevance": 0.47916666666666663
+        },
+        {
+          "pmid": "34399835",
+          "title": "Multiple functions of autophagy in vascular calcification.",
+          "year": 2021,
+          "relevance": 0.47916666666666663
+        }
+      ]
+    },
+    "GO:0035239": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "38664790",
+          "title": "Single-cell insights: pioneering an integrated atlas of chromatin accessibility and transcriptomic landscapes in diabetic cardiomyopathy.",
+          "year": 2024,
+          "relevance": 0.38749999999999996
+        },
+        {
+          "pmid": "40052435",
+          "title": "Therapeutic Targeting of Decr1 Ameliorates Cardiomyopathy by Suppressing Mitochondrial Fatty Acid Oxidation in Diabetic Mice.",
+          "year": 2025,
+          "relevance": 0.38749999999999996
+        },
+        {
+          "pmid": "37477020",
+          "title": "EGFR/IGF1R Signaling Modulates Relaxation in Hypertrophic Cardiomyopathy.",
+          "year": 2023,
+          "relevance": 0.38749999999999996
+        }
+      ]
+    },
+    "GO:0009888": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "38664790",
+          "title": "Single-cell insights: pioneering an integrated atlas of chromatin accessibility and transcriptomic landscapes in diabetic cardiomyopathy.",
+          "year": 2024,
+          "relevance": 0.6375000000000001
+        },
+        {
+          "pmid": "37477020",
+          "title": "EGFR/IGF1R Signaling Modulates Relaxation in Hypertrophic Cardiomyopathy.",
+          "year": 2023,
+          "relevance": 0.5125
+        },
+        {
+          "pmid": "34399835",
+          "title": "Multiple functions of autophagy in vascular calcification.",
+          "year": 2021,
+          "relevance": 0.47916666666666663
+        }
+      ]
+    },
+    "GO:0042592": {
+      "citation_count": 0,
+      "top_citations": []
+    },
+    "GO:0048468": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "38664790",
+          "title": "Single-cell insights: pioneering an integrated atlas of chromatin accessibility and transcriptomic landscapes in diabetic cardiomyopathy.",
+          "year": 2024,
+          "relevance": 0.6375000000000001
+        },
+        {
+          "pmid": "34399835",
+          "title": "Multiple functions of autophagy in vascular calcification.",
+          "year": 2021,
+          "relevance": 0.6041666666666666
+        },
+        {
+          "pmid": "36866436",
+          "title": "Pyruvate dehydrogenase kinase regulates vascular inflammation in atherosclerosis and increases cardiovascular risk.",
+          "year": 2023,
+          "relevance": 0.5708333333333333
+        }
+      ]
+    },
+    "GO:0002376": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "36866436",
+          "title": "Pyruvate dehydrogenase kinase regulates vascular inflammation in atherosclerosis and increases cardiovascular risk.",
+          "year": 2023,
+          "relevance": 0.5708333333333333
+        },
+        {
+          "pmid": "36726122",
+          "title": "Role of mitochondrial metabolic disorder and immune infiltration in diabetic cardiomyopathy: new insights from bioinformatics analysis.",
+          "year": 2023,
+          "relevance": 0.5208333333333334
+        },
+        {
+          "pmid": "40222696",
+          "title": "Cardiac PDK4 promotes neutrophilic PFKL methylation and drives the innate immune response in diabetic myocardial infarction.",
+          "year": 2025,
+          "relevance": 0.48749999999999993
+        }
+      ]
+    },
+    "GO:0070848": {
+      "citation_count": 0,
+      "top_citations": []
+    },
+    "GO:0048646": {
+      "citation_count": 0,
+      "top_citations": []
+    },
+    "GO:1901701": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "37477020",
+          "title": "EGFR/IGF1R Signaling Modulates Relaxation in Hypertrophic Cardiomyopathy.",
+          "year": 2023,
+          "relevance": 0.4375
+        },
+        {
+          "pmid": "34399835",
+          "title": "Multiple functions of autophagy in vascular calcification.",
+          "year": 2021,
+          "relevance": 0.4041666666666667
+        },
+        {
+          "pmid": "38664790",
+          "title": "Single-cell insights: pioneering an integrated atlas of chromatin accessibility and transcriptomic landscapes in diabetic cardiomyopathy.",
+          "year": 2024,
+          "relevance": 0.38749999999999996
+        }
+      ]
+    },
+    "GO:0009891": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "36726122",
+          "title": "Role of mitochondrial metabolic disorder and immune infiltration in diabetic cardiomyopathy: new insights from bioinformatics analysis.",
+          "year": 2023,
+          "relevance": 0.5041666666666667
+        },
+        {
+          "pmid": "37477020",
+          "title": "EGFR/IGF1R Signaling Modulates Relaxation in Hypertrophic Cardiomyopathy.",
+          "year": 2023,
+          "relevance": 0.48750000000000004
+        },
+        {
+          "pmid": "38664790",
+          "title": "Single-cell insights: pioneering an integrated atlas of chromatin accessibility and transcriptomic landscapes in diabetic cardiomyopathy.",
+          "year": 2024,
+          "relevance": 0.4375
+        }
+      ]
+    },
+    "GO:0051128": {
+      "citation_count": 0,
+      "top_citations": []
+    },
+    "GO:0009605": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "38664790",
+          "title": "Single-cell insights: pioneering an integrated atlas of chromatin accessibility and transcriptomic landscapes in diabetic cardiomyopathy.",
+          "year": 2024,
+          "relevance": 0.38749999999999996
+        },
+        {
+          "pmid": "40052435",
+          "title": "Therapeutic Targeting of Decr1 Ameliorates Cardiomyopathy by Suppressing Mitochondrial Fatty Acid Oxidation in Diabetic Mice.",
+          "year": 2025,
+          "relevance": 0.38749999999999996
+        },
+        {
+          "pmid": "37477020",
+          "title": "EGFR/IGF1R Signaling Modulates Relaxation in Hypertrophic Cardiomyopathy.",
+          "year": 2023,
+          "relevance": 0.38749999999999996
+        }
+      ]
+    },
+    "GO:0043069": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "36726122",
+          "title": "Role of mitochondrial metabolic disorder and immune infiltration in diabetic cardiomyopathy: new insights from bioinformatics analysis.",
+          "year": 2023,
+          "relevance": 0.5208333333333334
+        },
+        {
+          "pmid": "40052435",
+          "title": "Therapeutic Targeting of Decr1 Ameliorates Cardiomyopathy by Suppressing Mitochondrial Fatty Acid Oxidation in Diabetic Mice.",
+          "year": 2025,
+          "relevance": 0.4708333333333333
+        },
+        {
+          "pmid": "37477020",
+          "title": "EGFR/IGF1R Signaling Modulates Relaxation in Hypertrophic Cardiomyopathy.",
+          "year": 2023,
+          "relevance": 0.4708333333333333
+        }
+      ]
+    },
+    "GO:0000165": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "36036015",
+          "title": "Exercise-induced signaling pathways to counteracting cardiac apoptotic processes.",
+          "year": 2022,
+          "relevance": 0.42500000000000004
+        },
+        {
+          "pmid": "38664790",
+          "title": "Single-cell insights: pioneering an integrated atlas of chromatin accessibility and transcriptomic landscapes in diabetic cardiomyopathy.",
+          "year": 2024,
+          "relevance": 0.38749999999999996
+        },
+        {
+          "pmid": "40052435",
+          "title": "Therapeutic Targeting of Decr1 Ameliorates Cardiomyopathy by Suppressing Mitochondrial Fatty Acid Oxidation in Diabetic Mice.",
+          "year": 2025,
+          "relevance": 0.38749999999999996
+        }
+      ]
+    },
+    "KEGG:05410": {
+      "citation_count": 0,
+      "top_citations": []
+    },
+    "KEGG:05414": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "33135971",
+          "title": "Assessment of <i>PDK4</i> and <i>TTN</i> gene variants in 48 Doberman Pinschers with dilated cardiomyopathy.",
+          "year": 2020,
+          "relevance": 0.6041666666666666
+        },
+        {
+          "pmid": "38664790",
+          "title": "Single-cell insights: pioneering an integrated atlas of chromatin accessibility and transcriptomic landscapes in diabetic cardiomyopathy.",
+          "year": 2024,
+          "relevance": 0.5125
+        },
+        {
+          "pmid": "40052435",
+          "title": "Therapeutic Targeting of Decr1 Ameliorates Cardiomyopathy by Suppressing Mitochondrial Fatty Acid Oxidation in Diabetic Mice.",
+          "year": 2025,
+          "relevance": 0.5125
+        }
+      ]
+    },
+    "WP:WP2118": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "33135971",
+          "title": "Assessment of <i>PDK4</i> and <i>TTN</i> gene variants in 48 Doberman Pinschers with dilated cardiomyopathy.",
+          "year": 2020,
+          "relevance": 0.47916666666666663
+        },
+        {
+          "pmid": "38664790",
+          "title": "Single-cell insights: pioneering an integrated atlas of chromatin accessibility and transcriptomic landscapes in diabetic cardiomyopathy.",
+          "year": 2024,
+          "relevance": 0.44999999999999996
+        },
+        {
+          "pmid": "40052435",
+          "title": "Therapeutic Targeting of Decr1 Ameliorates Cardiomyopathy by Suppressing Mitochondrial Fatty Acid Oxidation in Diabetic Mice.",
+          "year": 2025,
+          "relevance": 0.44999999999999996
+        }
+      ]
+    },
+    "WP:WP2456": {
+      "citation_count": 0,
+      "top_citations": []
+    },
+    "GO:0060411": {
+      "citation_count": 0,
+      "top_citations": []
+    },
+    "WP:WP2406": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "38664790",
+          "title": "Single-cell insights: pioneering an integrated atlas of chromatin accessibility and transcriptomic landscapes in diabetic cardiomyopathy.",
+          "year": 2024,
+          "relevance": 0.4708333333333333
+        },
+        {
+          "pmid": "40052435",
+          "title": "Therapeutic Targeting of Decr1 Ameliorates Cardiomyopathy by Suppressing Mitochondrial Fatty Acid Oxidation in Diabetic Mice.",
+          "year": 2025,
+          "relevance": 0.4708333333333333
+        },
+        {
+          "pmid": "39613849",
+          "title": "IGFBP5 affects cardiomyocyte survival and functional recovery in mice following myocardial ischemia.",
+          "year": 2024,
+          "relevance": 0.4708333333333333
+        }
+      ]
+    },
+    "WP:WP1559": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "38664790",
+          "title": "Single-cell insights: pioneering an integrated atlas of chromatin accessibility and transcriptomic landscapes in diabetic cardiomyopathy.",
+          "year": 2024,
+          "relevance": 0.5125
+        },
+        {
+          "pmid": "40052435",
+          "title": "Therapeutic Targeting of Decr1 Ameliorates Cardiomyopathy by Suppressing Mitochondrial Fatty Acid Oxidation in Diabetic Mice.",
+          "year": 2025,
+          "relevance": 0.5125
+        },
+        {
+          "pmid": "36726122",
+          "title": "Role of mitochondrial metabolic disorder and immune infiltration in diabetic cardiomyopathy: new insights from bioinformatics analysis.",
+          "year": 2023,
+          "relevance": 0.5104166666666666
+        }
+      ]
+    },
+    "WP:WP1528": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "40052435",
+          "title": "Therapeutic Targeting of Decr1 Ameliorates Cardiomyopathy by Suppressing Mitochondrial Fatty Acid Oxidation in Diabetic Mice.",
+          "year": 2025,
+          "relevance": 0.45892857142857146
+        },
+        {
+          "pmid": "39613849",
+          "title": "IGFBP5 affects cardiomyocyte survival and functional recovery in mice following myocardial ischemia.",
+          "year": 2024,
+          "relevance": 0.45892857142857146
+        },
+        {
+          "pmid": "38664790",
+          "title": "Single-cell insights: pioneering an integrated atlas of chromatin accessibility and transcriptomic landscapes in diabetic cardiomyopathy.",
+          "year": 2024,
+          "relevance": 0.42321428571428577
+        }
+      ]
+    },
+    "GO:0060978": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "39613849",
+          "title": "IGFBP5 affects cardiomyocyte survival and functional recovery in mice following myocardial ischemia.",
+          "year": 2024,
+          "relevance": 0.4708333333333333
+        },
+        {
+          "pmid": "36726122",
+          "title": "Role of mitochondrial metabolic disorder and immune infiltration in diabetic cardiomyopathy: new insights from bioinformatics analysis.",
+          "year": 2023,
+          "relevance": 0.4375
+        },
+        {
+          "pmid": "37477020",
+          "title": "EGFR/IGF1R Signaling Modulates Relaxation in Hypertrophic Cardiomyopathy.",
+          "year": 2023,
+          "relevance": 0.4291666666666667
+        }
+      ]
+    }
+  },
+  "ranked_hypotheses": [
+    {
+      "rank": 614,
+      "pathway_id": "KEGG:05410",
+      "pathway_name": "Hypertrophic cardiomyopathy",
+      "source_db": "KEGG",
+      "nes_score": 3.6812574328129437,
+      "p_adj": 3.6822559124072285e-07,
+      "evidence_count": 14,
+      "support_count": 20,
+      "seed_genes": [
+        "BCL2L1",
+        "IGF1R",
+        "PDK4"
+      ],
+      "literature_support": false,
+      "citations": [],
+      "citation_count": 0,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0050896",
+        "GO:0051716",
+        "GO:0023052",
+        "GO:0007154",
+        "GO:0007165",
+        "GO:0048518",
+        "GO:0048522",
+        "GO:0048583",
+        "GO:0035556",
+        "GO:0042221",
+        "GO:0065007",
+        "GO:0023051",
+        "GO:0010646",
+        "GO:0050789",
+        "GO:0050794",
+        "GO:0009966",
+        "KEGG:05200",
+        "GO:0007166",
+        "GO:0032501",
+        "GO:0012501"
+      ]
+    },
+    {
+      "rank": 1305,
+      "pathway_id": "KEGG:05414",
+      "pathway_name": "Dilated cardiomyopathy",
+      "source_db": "KEGG",
+      "nes_score": 2.9986591436596775,
+      "p_adj": 0.000497308828226295,
+      "evidence_count": 10,
+      "support_count": 20,
+      "seed_genes": [
+        "BCL2L1",
+        "IGF1R",
+        "PDK4"
+      ],
+      "literature_support": false,
+      "citations": [
+        {
+          "pmid": "33135971",
+          "title": "Assessment of <i>PDK4</i> and <i>TTN</i> gene variants in 48 Doberman Pinschers with dilated cardiomyopathy.",
+          "year": 2020,
+          "relevance": 0.6041666666666666
+        },
+        {
+          "pmid": "38664790",
+          "title": "Single-cell insights: pioneering an integrated atlas of chromatin accessibility and transcriptomic landscapes in diabetic cardiomyopathy.",
+          "year": 2024,
+          "relevance": 0.5125
+        },
+        {
+          "pmid": "40052435",
+          "title": "Therapeutic Targeting of Decr1 Ameliorates Cardiomyopathy by Suppressing Mitochondrial Fatty Acid Oxidation in Diabetic Mice.",
+          "year": 2025,
+          "relevance": 0.5125
+        }
+      ],
+      "citation_count": 25,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0050896",
+        "GO:0051716",
+        "GO:0023052",
+        "GO:0007154",
+        "GO:0007165",
+        "GO:0048518",
+        "GO:0048522",
+        "GO:0048583",
+        "GO:0035556",
+        "GO:0042221",
+        "GO:0065007",
+        "GO:0023051",
+        "GO:0010646",
+        "GO:0050789",
+        "GO:0050794",
+        "GO:0009966",
+        "KEGG:05200",
+        "GO:0007166",
+        "GO:0032501",
+        "GO:0012501"
+      ]
+    },
+    {
+      "rank": 1551,
+      "pathway_id": "WP:WP2118",
+      "pathway_name": "Arrhythmogenic right ventricular cardiomyopathy",
+      "source_db": "WP",
+      "nes_score": 2.812560216472275,
+      "p_adj": 1.2001483933321566e-06,
+      "evidence_count": 5,
+      "support_count": 8,
+      "seed_genes": [
+        "BCL2L1",
+        "IGF1R"
+      ],
+      "literature_support": false,
+      "citations": [
+        {
+          "pmid": "33135971",
+          "title": "Assessment of <i>PDK4</i> and <i>TTN</i> gene variants in 48 Doberman Pinschers with dilated cardiomyopathy.",
+          "year": 2020,
+          "relevance": 0.47916666666666663
+        },
+        {
+          "pmid": "38664790",
+          "title": "Single-cell insights: pioneering an integrated atlas of chromatin accessibility and transcriptomic landscapes in diabetic cardiomyopathy.",
+          "year": 2024,
+          "relevance": 0.44999999999999996
+        },
+        {
+          "pmid": "40052435",
+          "title": "Therapeutic Targeting of Decr1 Ameliorates Cardiomyopathy by Suppressing Mitochondrial Fatty Acid Oxidation in Diabetic Mice.",
+          "year": 2025,
+          "relevance": 0.44999999999999996
+        }
+      ],
+      "citation_count": 25,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0048518",
+        "GO:0048522",
+        "GO:0048583",
+        "GO:0042221",
+        "GO:0009966",
+        "GO:0007166",
+        "GO:0032501",
+        "GO:0012501"
+      ]
+    },
+    {
+      "rank": 1685,
+      "pathway_id": "WP:WP2456",
+      "pathway_name": "HIF1A and PPARG in hypertrophic cardiomyopathy",
+      "source_db": "WP",
+      "nes_score": 2.720159731098387,
+      "p_adj": 2.02171612784241e-13,
+      "evidence_count": 2,
+      "support_count": 18,
+      "seed_genes": [
+        "BCL2L1",
+        "IGF1R",
+        "PDK4"
+      ],
+      "literature_support": false,
+      "citations": [],
+      "citation_count": 0,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0050896",
+        "GO:0051716",
+        "GO:0023052",
+        "GO:0007154",
+        "GO:0007165",
+        "GO:0048518",
+        "GO:0048522",
+        "GO:0048583",
+        "GO:0035556",
+        "GO:0042221",
+        "GO:0065007",
+        "GO:0023051",
+        "GO:0010646",
+        "GO:0050789",
+        "GO:0050794",
+        "GO:0009966",
+        "GO:0007166",
+        "GO:0032501"
+      ]
+    },
+    {
+      "rank": 2023,
+      "pathway_id": "GO:0060411",
+      "pathway_name": "cardiac septum morphogenesis",
+      "source_db": "GO:BP",
+      "nes_score": 2.515912494993927,
+      "p_adj": 2.507834451215274e-08,
+      "evidence_count": 3,
+      "support_count": 11,
+      "seed_genes": [
+        "BCL2L1",
+        "IGF1R"
+      ],
+      "literature_support": false,
+      "citations": [],
+      "citation_count": 0,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0048518",
+        "GO:0048522",
+        "GO:0048583",
+        "GO:0035556",
+        "GO:0042221",
+        "GO:0023051",
+        "GO:0010646",
+        "GO:0009966",
+        "KEGG:05200",
+        "GO:0032501",
+        "GO:0012501"
+      ]
+    },
+    {
+      "rank": 3195,
+      "pathway_id": "WP:WP2406",
+      "pathway_name": "Cardiac progenitor differentiation",
+      "source_db": "WP",
+      "nes_score": 2.0272804757166765,
+      "p_adj": 0.01913553651270239,
+      "evidence_count": 5,
+      "support_count": 20,
+      "seed_genes": [
+        "BCL2L1",
+        "IGF1R",
+        "PDK4"
+      ],
+      "literature_support": false,
+      "citations": [
+        {
+          "pmid": "38664790",
+          "title": "Single-cell insights: pioneering an integrated atlas of chromatin accessibility and transcriptomic landscapes in diabetic cardiomyopathy.",
+          "year": 2024,
+          "relevance": 0.4708333333333333
+        },
+        {
+          "pmid": "40052435",
+          "title": "Therapeutic Targeting of Decr1 Ameliorates Cardiomyopathy by Suppressing Mitochondrial Fatty Acid Oxidation in Diabetic Mice.",
+          "year": 2025,
+          "relevance": 0.4708333333333333
+        },
+        {
+          "pmid": "39613849",
+          "title": "IGFBP5 affects cardiomyocyte survival and functional recovery in mice following myocardial ischemia.",
+          "year": 2024,
+          "relevance": 0.4708333333333333
+        }
+      ],
+      "citation_count": 25,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0050896",
+        "GO:0051716",
+        "GO:0023052",
+        "GO:0007154",
+        "GO:0007165",
+        "GO:0048518",
+        "GO:0048522",
+        "GO:0048583",
+        "GO:0035556",
+        "GO:0042221",
+        "GO:0065007",
+        "GO:0023051",
+        "GO:0010646",
+        "GO:0050789",
+        "GO:0050794",
+        "GO:0009966",
+        "KEGG:05200",
+        "GO:0007166",
+        "GO:0032501",
+        "GO:0012501"
+      ]
+    },
+    {
+      "rank": 3293,
+      "pathway_id": "WP:WP1559",
+      "pathway_name": "Transcription factors regulate miRNAs related to cardiac hypertrophy",
+      "source_db": "WP",
+      "nes_score": 1.983717946014568,
+      "p_adj": 0.0025678775977804325,
+      "evidence_count": 3,
+      "support_count": 20,
+      "seed_genes": [
+        "BCL2L1",
+        "IGF1R",
+        "PDK4"
+      ],
+      "literature_support": false,
+      "citations": [
+        {
+          "pmid": "38664790",
+          "title": "Single-cell insights: pioneering an integrated atlas of chromatin accessibility and transcriptomic landscapes in diabetic cardiomyopathy.",
+          "year": 2024,
+          "relevance": 0.5125
+        },
+        {
+          "pmid": "40052435",
+          "title": "Therapeutic Targeting of Decr1 Ameliorates Cardiomyopathy by Suppressing Mitochondrial Fatty Acid Oxidation in Diabetic Mice.",
+          "year": 2025,
+          "relevance": 0.5125
+        },
+        {
+          "pmid": "36726122",
+          "title": "Role of mitochondrial metabolic disorder and immune infiltration in diabetic cardiomyopathy: new insights from bioinformatics analysis.",
+          "year": 2023,
+          "relevance": 0.5104166666666666
+        }
+      ],
+      "citation_count": 25,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0050896",
+        "GO:0051716",
+        "GO:0023052",
+        "GO:0007154",
+        "GO:0007165",
+        "GO:0048518",
+        "GO:0048522",
+        "GO:0048583",
+        "GO:0035556",
+        "GO:0042221",
+        "GO:0065007",
+        "GO:0023051",
+        "GO:0010646",
+        "GO:0050789",
+        "GO:0050794",
+        "GO:0009966",
+        "KEGG:05200",
+        "GO:0007166",
+        "GO:0032501",
+        "GO:0012501"
+      ]
+    },
+    {
+      "rank": 5321,
+      "pathway_id": "WP:WP1528",
+      "pathway_name": "Physiological and pathological hypertrophy of the heart",
+      "source_db": "WP",
+      "nes_score": 1.0491741354453368,
+      "p_adj": 0.04657324469224622,
+      "evidence_count": 2,
+      "support_count": 1,
+      "seed_genes": [
+        "BCL2L1",
+        "IGF1R"
+      ],
+      "literature_support": false,
+      "citations": [
+        {
+          "pmid": "40052435",
+          "title": "Therapeutic Targeting of Decr1 Ameliorates Cardiomyopathy by Suppressing Mitochondrial Fatty Acid Oxidation in Diabetic Mice.",
+          "year": 2025,
+          "relevance": 0.45892857142857146
+        },
+        {
+          "pmid": "39613849",
+          "title": "IGFBP5 affects cardiomyocyte survival and functional recovery in mice following myocardial ischemia.",
+          "year": 2024,
+          "relevance": 0.45892857142857146
+        },
+        {
+          "pmid": "38664790",
+          "title": "Single-cell insights: pioneering an integrated atlas of chromatin accessibility and transcriptomic landscapes in diabetic cardiomyopathy.",
+          "year": 2024,
+          "relevance": 0.42321428571428577
+        }
+      ],
+      "citation_count": 25,
+      "key_nodes": [],
+      "source_primaries": [
+        "KEGG:05200"
+      ]
+    },
+    {
+      "rank": 5340,
+      "pathway_id": "GO:0060978",
+      "pathway_name": "angiogenesis involved in coronary vascular morphogenesis",
+      "source_db": "GO:BP",
+      "nes_score": 0.9147683780061898,
+      "p_adj": 0.014174985898145365,
+      "evidence_count": 1,
+      "support_count": 2,
+      "seed_genes": [
+        "BCL2L1",
+        "IGF1R"
+      ],
+      "literature_support": false,
+      "citations": [
+        {
+          "pmid": "39613849",
+          "title": "IGFBP5 affects cardiomyocyte survival and functional recovery in mice following myocardial ischemia.",
+          "year": 2024,
+          "relevance": 0.4708333333333333
+        },
+        {
+          "pmid": "36726122",
+          "title": "Role of mitochondrial metabolic disorder and immune infiltration in diabetic cardiomyopathy: new insights from bioinformatics analysis.",
+          "year": 2023,
+          "relevance": 0.4375
+        },
+        {
+          "pmid": "37477020",
+          "title": "EGFR/IGF1R Signaling Modulates Relaxation in Hypertrophic Cardiomyopathy.",
+          "year": 2023,
+          "relevance": 0.4291666666666667
+        }
+      ],
+      "citation_count": 25,
+      "key_nodes": [],
+      "source_primaries": [
+        "KEGG:05200",
+        "GO:0012501"
+      ]
+    }
+  ],
+  "testable_hypotheses": [
+    {
+      "hypothesis": "Pathway 'Hypertrophic cardiomyopathy' is involved in cardiovascular disease and phenotype processes",
+      "pathway_id": "KEGG:05410",
+      "nes_score": 3.6812574328129437,
+      "experimental_approaches": [
+        "Functional enrichment analysis in cardiac tissue",
+        "Gene expression profiling",
+        "Pathway perturbation studies"
+      ]
+    },
+    {
+      "hypothesis": "Pathway 'Dilated cardiomyopathy' is involved in cardiovascular disease and phenotype processes",
+      "pathway_id": "KEGG:05414",
+      "nes_score": 2.9986591436596775,
+      "experimental_approaches": [
+        "Functional enrichment analysis in cardiac tissue",
+        "Gene expression profiling",
+        "Pathway perturbation studies"
+      ]
+    },
+    {
+      "hypothesis": "Pathway 'Arrhythmogenic right ventricular cardiomyopathy' is involved in cardiovascular disease and phenotype processes",
+      "pathway_id": "WP:WP2118",
+      "nes_score": 2.812560216472275,
+      "experimental_approaches": [
+        "Functional enrichment analysis in cardiac tissue",
+        "Gene expression profiling",
+        "Pathway perturbation studies"
+      ]
+    },
+    {
+      "hypothesis": "Pathway 'HIF1A and PPARG in hypertrophic cardiomyopathy' is involved in cardiovascular disease and phenotype processes",
+      "pathway_id": "WP:WP2456",
+      "nes_score": 2.720159731098387,
+      "experimental_approaches": [
+        "Functional enrichment analysis in cardiac tissue",
+        "Gene expression profiling",
+        "Pathway perturbation studies"
+      ]
+    },
+    {
+      "hypothesis": "Pathway 'cardiac septum morphogenesis' is involved in cardiovascular disease and phenotype processes",
+      "pathway_id": "GO:0060411",
+      "nes_score": 2.515912494993927,
+      "experimental_approaches": [
+        "Functional enrichment analysis in cardiac tissue",
+        "Gene expression profiling",
+        "Pathway perturbation studies"
+      ]
+    }
+  ],
+  "conclusion": "Analysis identified 9 novel pathway hypotheses. The top-ranked hypothesis is 'Hypertrophic cardiomyopathy' (NES: 3.68), which shows strong evidence for involvement in cardiovascular disease and phenotype processes based on functional network analysis and literature mining.",
+  "top_genes": [
+    {
+      "gene": "ITGB3",
+      "pathway_count": 3,
+      "importance_score": 3.0,
+      "druggability_tier": "high",
+      "is_druggable": false,
+      "is_fda_approved": true,
+      "is_clinical_trial": false,
+      "centrality": 0.0,
+      "disgenet_cardiac_score": 0.0,
+      "final_score": 6.0
+    },
+    {
+      "gene": "IGF1",
+      "pathway_count": 3,
+      "importance_score": 2.94,
+      "druggability_tier": "unknown",
+      "is_druggable": true,
+      "is_fda_approved": false,
+      "is_clinical_trial": false,
+      "centrality": 0.0,
+      "disgenet_cardiac_score": 0.0,
+      "final_score": 3.675
+    },
+    {
+      "gene": "TNF",
+      "pathway_count": 2,
+      "importance_score": 2.02,
+      "druggability_tier": "medium",
+      "is_druggable": true,
+      "is_fda_approved": false,
+      "is_clinical_trial": true,
+      "centrality": 0.0,
+      "disgenet_cardiac_score": 0.0,
+      "final_score": 3.0300000000000002
+    },
+    {
+      "gene": "ACTB",
+      "pathway_count": 3,
+      "importance_score": 3.0,
+      "druggability_tier": "unknown",
+      "is_druggable": false,
+      "is_fda_approved": false,
+      "is_clinical_trial": false,
+      "centrality": 0.0,
+      "disgenet_cardiac_score": 0.0,
+      "final_score": 3.0
+    },
+    {
+      "gene": "ITGB1",
+      "pathway_count": 3,
+      "importance_score": 3.0,
+      "druggability_tier": "unknown",
+      "is_druggable": false,
+      "is_fda_approved": false,
+      "is_clinical_trial": false,
+      "centrality": 0.0,
+      "disgenet_cardiac_score": 0.0,
+      "final_score": 3.0
+    },
+    {
+      "gene": "ITGAV",
+      "pathway_count": 3,
+      "importance_score": 3.0,
+      "druggability_tier": "unknown",
+      "is_druggable": false,
+      "is_fda_approved": false,
+      "is_clinical_trial": false,
+      "centrality": 0.0,
+      "disgenet_cardiac_score": 0.0,
+      "final_score": 3.0
+    },
+    {
+      "gene": "FGF2",
+      "pathway_count": 2,
+      "importance_score": 1.78,
+      "druggability_tier": "unknown",
+      "is_druggable": true,
+      "is_fda_approved": false,
+      "is_clinical_trial": false,
+      "centrality": 0.0,
+      "disgenet_cardiac_score": 0.0,
+      "final_score": 2.225
+    },
+    {
+      "gene": "STAT3",
+      "pathway_count": 2,
+      "importance_score": 1.78,
+      "druggability_tier": "unknown",
+      "is_druggable": true,
+      "is_fda_approved": false,
+      "is_clinical_trial": false,
+      "centrality": 0.0,
+      "disgenet_cardiac_score": 0.0,
+      "final_score": 2.225
+    },
+    {
+      "gene": "CTNNB1",
+      "pathway_count": 1,
+      "importance_score": 0.98,
+      "druggability_tier": "unknown",
+      "is_druggable": true,
+      "is_fda_approved": false,
+      "is_clinical_trial": false,
+      "centrality": 0.0,
+      "disgenet_cardiac_score": 0.7,
+      "final_score": 1.7394999999999998
+    },
+    {
+      "gene": "PRKAG2",
+      "pathway_count": 1,
+      "importance_score": 1.02,
+      "druggability_tier": "unknown",
+      "is_druggable": false,
+      "is_fda_approved": false,
+      "is_clinical_trial": false,
+      "centrality": 0.0,
+      "disgenet_cardiac_score": 0.82,
+      "final_score": 1.6473
+    },
+    {
+      "gene": "IL6",
+      "pathway_count": 1,
+      "importance_score": 1.02,
+      "druggability_tier": "medium",
+      "is_druggable": true,
+      "is_fda_approved": false,
+      "is_clinical_trial": true,
+      "centrality": 0.0,
+      "disgenet_cardiac_score": 0.0,
+      "final_score": 1.53
+    },
+    {
+      "gene": "PPARG",
+      "pathway_count": 1,
+      "importance_score": 0.96,
+      "druggability_tier": "medium",
+      "is_druggable": true,
+      "is_fda_approved": false,
+      "is_clinical_trial": true,
+      "centrality": 0.0,
+      "disgenet_cardiac_score": 0.0,
+      "final_score": 1.44
+    },
+    {
+      "gene": "PRKAA2",
+      "pathway_count": 1,
+      "importance_score": 1.02,
+      "druggability_tier": "unknown",
+      "is_druggable": true,
+      "is_fda_approved": false,
+      "is_clinical_trial": false,
+      "centrality": 0.0,
+      "disgenet_cardiac_score": 0.0,
+      "final_score": 1.275
+    },
+    {
+      "gene": "PRKAA1",
+      "pathway_count": 1,
+      "importance_score": 1.02,
+      "druggability_tier": "unknown",
+      "is_druggable": true,
+      "is_fda_approved": false,
+      "is_clinical_trial": false,
+      "centrality": 0.0,
+      "disgenet_cardiac_score": 0.0,
+      "final_score": 1.275
+    },
+    {
+      "gene": "PRKACA",
+      "pathway_count": 1,
+      "importance_score": 1.0,
+      "druggability_tier": "unknown",
+      "is_druggable": true,
+      "is_fda_approved": false,
+      "is_clinical_trial": false,
+      "centrality": 0.0,
+      "disgenet_cardiac_score": 0.0,
+      "final_score": 1.25
+    },
+    {
+      "gene": "TP53",
+      "pathway_count": 1,
+      "importance_score": 0.94,
+      "druggability_tier": "unknown",
+      "is_druggable": true,
+      "is_fda_approved": false,
+      "is_clinical_trial": false,
+      "centrality": 0.0,
+      "disgenet_cardiac_score": 0.0,
+      "final_score": 1.1749999999999998
+    },
+    {
+      "gene": "INS",
+      "pathway_count": 1,
+      "importance_score": 0.92,
+      "druggability_tier": "unknown",
+      "is_druggable": true,
+      "is_fda_approved": false,
+      "is_clinical_trial": false,
+      "centrality": 0.0,
+      "disgenet_cardiac_score": 0.0,
+      "final_score": 1.1500000000000001
+    },
+    {
+      "gene": "GSK3B",
+      "pathway_count": 1,
+      "importance_score": 0.92,
+      "druggability_tier": "unknown",
+      "is_druggable": true,
+      "is_fda_approved": false,
+      "is_clinical_trial": false,
+      "centrality": 0.0,
+      "disgenet_cardiac_score": 0.0,
+      "final_score": 1.1500000000000001
+    },
+    {
+      "gene": "IGF2",
+      "pathway_count": 1,
+      "importance_score": 0.92,
+      "druggability_tier": "unknown",
+      "is_druggable": true,
+      "is_fda_approved": false,
+      "is_clinical_trial": false,
+      "centrality": 0.0,
+      "disgenet_cardiac_score": 0.0,
+      "final_score": 1.1500000000000001
+    },
+    {
+      "gene": "AKT1",
+      "pathway_count": 1,
+      "importance_score": 0.9,
+      "druggability_tier": "unknown",
+      "is_druggable": true,
+      "is_fda_approved": false,
+      "is_clinical_trial": false,
+      "centrality": 0.0,
+      "disgenet_cardiac_score": 0.0,
+      "final_score": 1.125
+    }
+  ]
+}

@@ -1,0 +1,2046 @@
+{
+  "analysis_id": "analysis_20251209_122545",
+  "timestamp": "2025-12-09T12:34:53.626803",
+  "input_summary": {
+    "total_seed_genes": 2,
+    "valid_genes": 2,
+    "invalid_genes": 0,
+    "gene_list": [
+      "APOE",
+      "APP"
+    ],
+    "warnings": []
+  },
+  "stage_1": {
+    "fn_size": 177,
+    "seed_count": 2,
+    "neighbor_count": 175,
+    "contributions": {
+      "APOE": 99,
+      "APP": 76
+    }
+  },
+  "stage_2a": {
+    "primary_pathways_count": 3317,
+    "known_pathways_filtered": 54,
+    "top_pathways": [
+      {
+        "name": "multicellular organismal process",
+        "nes": 5098.747652094023,
+        "p_adj": 2.3519805898782643e-29
+      },
+      {
+        "name": "transport",
+        "nes": 5027.757450523885,
+        "p_adj": 2.3416144050593303e-34
+      },
+      {
+        "name": "localization",
+        "nes": 5015.783085751073,
+        "p_adj": 7.668674630006108e-32
+      },
+      {
+        "name": "establishment of localization",
+        "nes": 4997.97062804621,
+        "p_adj": 4.926035715039361e-33
+      },
+      {
+        "name": "protein metabolic process",
+        "nes": 4480.024966193008,
+        "p_adj": 5.894023105977399e-31
+      }
+    ]
+  },
+  "stage_2b": {
+    "total_secondary_pathways": 4687,
+    "union_genes_processed": 0,
+    "genes_successfully_processed": 0,
+    "literature_stats": {
+      "primaries_processed": 20,
+      "total_secondaries": 73274,
+      "unique_secondaries": 4687
+    }
+  },
+  "stage_2c": {
+    "final_pathways_count": 4687,
+    "aggregation_strategy": "rigorous_statistical",
+    "min_support_threshold": 1
+  },
+  "stage_3": {
+    "total_hypotheses": 10,
+    "top_nes_score": 3.600291789537157
+  },
+  "stage_4_topology": {},
+  "stage_4_literature": {
+    "GO:0065007": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "30282955",
+          "title": "Current and Emerging Reconstituted HDL-apoA-I and HDL-apoE Approaches to Treat Atherosclerosis.",
+          "year": 2018,
+          "relevance": 0.6083333333333334
+        },
+        {
+          "pmid": "28340945",
+          "title": "Plasma levels of apolipoprotein E, APOE genotype and risk of dementia and ischemic heart disease: A review.",
+          "year": 2016,
+          "relevance": 0.5750000000000001
+        },
+        {
+          "pmid": "39580475",
+          "title": "Dysregulated RBM24 phosphorylation impairs APOE translation underlying psychological stress-induced cardiovascular disease.",
+          "year": 2024,
+          "relevance": 0.5
+        }
+      ]
+    },
+    "GO:0048731": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "30282955",
+          "title": "Current and Emerging Reconstituted HDL-apoA-I and HDL-apoE Approaches to Treat Atherosclerosis.",
+          "year": 2018,
+          "relevance": 0.6083333333333334
+        },
+        {
+          "pmid": "37391266",
+          "title": "Wearable technology and the cardiovascular system: the future of patient assessment.",
+          "year": 2023,
+          "relevance": 0.6
+        },
+        {
+          "pmid": "36099852",
+          "title": "Pro-oxidative priming but maintained cardiac function in a broad spectrum of murine models of chronic kidney disease.",
+          "year": 2022,
+          "relevance": 0.5666666666666667
+        }
+      ]
+    },
+    "GO:0030154": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "35165707",
+          "title": "Galectin 3 enhances platelet aggregation and thrombosis via Dectin-1 activation: a translational study.",
+          "year": 2022,
+          "relevance": 0.6
+        },
+        {
+          "pmid": "37941454",
+          "title": "Autoantibodies against the chemokine receptor 3 predict cardiovascular risk.",
+          "year": 2023,
+          "relevance": 0.6
+        },
+        {
+          "pmid": "38126199",
+          "title": "Single-Cell RNA Sequencing Reveals Metabolic Stress-Dependent Activation of Cardiac Macrophages in a Model of Dyslipidemia-Induced Diastolic Dysfunction.",
+          "year": 2024,
+          "relevance": 0.5333333333333333
+        }
+      ]
+    },
+    "GO:0007166": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "35165707",
+          "title": "Galectin 3 enhances platelet aggregation and thrombosis via Dectin-1 activation: a translational study.",
+          "year": 2022,
+          "relevance": 0.5750000000000001
+        },
+        {
+          "pmid": "37941454",
+          "title": "Autoantibodies against the chemokine receptor 3 predict cardiovascular risk.",
+          "year": 2023,
+          "relevance": 0.5750000000000001
+        },
+        {
+          "pmid": "36970211",
+          "title": "Compound Danshen Dripping Pill inhibits hypercholesterolemia/atherosclerosis-induced heart failure in ApoE and LDLR dual deficient mice <i>via</i> multiple mechanisms.",
+          "year": 2023,
+          "relevance": 0.5750000000000001
+        }
+      ]
+    },
+    "GO:0009653": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "30282955",
+          "title": "Current and Emerging Reconstituted HDL-apoA-I and HDL-apoE Approaches to Treat Atherosclerosis.",
+          "year": 2018,
+          "relevance": 0.4833333333333333
+        },
+        {
+          "pmid": "35165707",
+          "title": "Galectin 3 enhances platelet aggregation and thrombosis via Dectin-1 activation: a translational study.",
+          "year": 2022,
+          "relevance": 0.475
+        },
+        {
+          "pmid": "37941454",
+          "title": "Autoantibodies against the chemokine receptor 3 predict cardiovascular risk.",
+          "year": 2023,
+          "relevance": 0.475
+        }
+      ]
+    },
+    "GO:0019538": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "37926268",
+          "title": "Activation of GPBAR1 attenuates vascular inflammation and atherosclerosis in a mouse model of NAFLD-related cardiovascular disease.",
+          "year": 2023,
+          "relevance": 0.7666666666666666
+        },
+        {
+          "pmid": "37172880",
+          "title": "Association of Deja vu With Cardiovascular Diseases.",
+          "year": 2023,
+          "relevance": 0.575
+        },
+        {
+          "pmid": "30282955",
+          "title": "Current and Emerging Reconstituted HDL-apoA-I and HDL-apoE Approaches to Treat Atherosclerosis.",
+          "year": 2018,
+          "relevance": 0.5666666666666667
+        }
+      ]
+    },
+    "GO:0051239": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "37926268",
+          "title": "Activation of GPBAR1 attenuates vascular inflammation and atherosclerosis in a mouse model of NAFLD-related cardiovascular disease.",
+          "year": 2023,
+          "relevance": 0.6
+        },
+        {
+          "pmid": "30282955",
+          "title": "Current and Emerging Reconstituted HDL-apoA-I and HDL-apoE Approaches to Treat Atherosclerosis.",
+          "year": 2018,
+          "relevance": 0.4833333333333333
+        },
+        {
+          "pmid": "35165707",
+          "title": "Galectin 3 enhances platelet aggregation and thrombosis via Dectin-1 activation: a translational study.",
+          "year": 2022,
+          "relevance": 0.475
+        }
+      ]
+    },
+    "GO:0042221": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "37926268",
+          "title": "Activation of GPBAR1 attenuates vascular inflammation and atherosclerosis in a mouse model of NAFLD-related cardiovascular disease.",
+          "year": 2023,
+          "relevance": 0.6
+        },
+        {
+          "pmid": "37941454",
+          "title": "Autoantibodies against the chemokine receptor 3 predict cardiovascular risk.",
+          "year": 2023,
+          "relevance": 0.5583333333333333
+        },
+        {
+          "pmid": "36099852",
+          "title": "Pro-oxidative priming but maintained cardiac function in a broad spectrum of murine models of chronic kidney disease.",
+          "year": 2022,
+          "relevance": 0.525
+        }
+      ]
+    },
+    "GO:0009889": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "37926268",
+          "title": "Activation of GPBAR1 attenuates vascular inflammation and atherosclerosis in a mouse model of NAFLD-related cardiovascular disease.",
+          "year": 2023,
+          "relevance": 0.6
+        },
+        {
+          "pmid": "35165707",
+          "title": "Galectin 3 enhances platelet aggregation and thrombosis via Dectin-1 activation: a translational study.",
+          "year": 2022,
+          "relevance": 0.475
+        },
+        {
+          "pmid": "37273155",
+          "title": "SR-B1-/-ApoE-R61h/h Mice Mimic Human Coronary Heart Disease.",
+          "year": 2024,
+          "relevance": 0.475
+        }
+      ]
+    },
+    "GO:0023051": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "37926268",
+          "title": "Activation of GPBAR1 attenuates vascular inflammation and atherosclerosis in a mouse model of NAFLD-related cardiovascular disease.",
+          "year": 2023,
+          "relevance": 0.6
+        },
+        {
+          "pmid": "39580475",
+          "title": "Dysregulated RBM24 phosphorylation impairs APOE translation underlying psychological stress-induced cardiovascular disease.",
+          "year": 2024,
+          "relevance": 0.5416666666666666
+        },
+        {
+          "pmid": "36099852",
+          "title": "Pro-oxidative priming but maintained cardiac function in a broad spectrum of murine models of chronic kidney disease.",
+          "year": 2022,
+          "relevance": 0.525
+        }
+      ]
+    },
+    "GO:0033036": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "30282955",
+          "title": "Current and Emerging Reconstituted HDL-apoA-I and HDL-apoE Approaches to Treat Atherosclerosis.",
+          "year": 2018,
+          "relevance": 0.4833333333333333
+        },
+        {
+          "pmid": "35165707",
+          "title": "Galectin 3 enhances platelet aggregation and thrombosis via Dectin-1 activation: a translational study.",
+          "year": 2022,
+          "relevance": 0.475
+        },
+        {
+          "pmid": "37941454",
+          "title": "Autoantibodies against the chemokine receptor 3 predict cardiovascular risk.",
+          "year": 2023,
+          "relevance": 0.475
+        }
+      ]
+    },
+    "GO:0009893": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "37926268",
+          "title": "Activation of GPBAR1 attenuates vascular inflammation and atherosclerosis in a mouse model of NAFLD-related cardiovascular disease.",
+          "year": 2023,
+          "relevance": 0.6499999999999999
+        },
+        {
+          "pmid": "35165707",
+          "title": "Galectin 3 enhances platelet aggregation and thrombosis via Dectin-1 activation: a translational study.",
+          "year": 2022,
+          "relevance": 0.525
+        },
+        {
+          "pmid": "30282955",
+          "title": "Current and Emerging Reconstituted HDL-apoA-I and HDL-apoE Approaches to Treat Atherosclerosis.",
+          "year": 2018,
+          "relevance": 0.4833333333333333
+        }
+      ]
+    },
+    "GO:0006950": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "40450296",
+          "title": "Early transcriptional and cellular abnormalities in choroid plexus of a mouse model of Alzheimer's disease.",
+          "year": 2025,
+          "relevance": 0.6333333333333333
+        },
+        {
+          "pmid": "36099852",
+          "title": "Pro-oxidative priming but maintained cardiac function in a broad spectrum of murine models of chronic kidney disease.",
+          "year": 2022,
+          "relevance": 0.6083333333333333
+        },
+        {
+          "pmid": "37926268",
+          "title": "Activation of GPBAR1 attenuates vascular inflammation and atherosclerosis in a mouse model of NAFLD-related cardiovascular disease.",
+          "year": 2023,
+          "relevance": 0.6
+        }
+      ]
+    },
+    "GO:0065008": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "37926268",
+          "title": "Activation of GPBAR1 attenuates vascular inflammation and atherosclerosis in a mouse model of NAFLD-related cardiovascular disease.",
+          "year": 2023,
+          "relevance": 0.6
+        },
+        {
+          "pmid": "30282955",
+          "title": "Current and Emerging Reconstituted HDL-apoA-I and HDL-apoE Approaches to Treat Atherosclerosis.",
+          "year": 2018,
+          "relevance": 0.5458333333333333
+        },
+        {
+          "pmid": "28340945",
+          "title": "Plasma levels of apolipoprotein E, APOE genotype and risk of dementia and ischemic heart disease: A review.",
+          "year": 2016,
+          "relevance": 0.5125
+        }
+      ]
+    },
+    "GO:0032879": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "37926268",
+          "title": "Activation of GPBAR1 attenuates vascular inflammation and atherosclerosis in a mouse model of NAFLD-related cardiovascular disease.",
+          "year": 2023,
+          "relevance": 0.6
+        },
+        {
+          "pmid": "30282955",
+          "title": "Current and Emerging Reconstituted HDL-apoA-I and HDL-apoE Approaches to Treat Atherosclerosis.",
+          "year": 2018,
+          "relevance": 0.4833333333333333
+        },
+        {
+          "pmid": "35165707",
+          "title": "Galectin 3 enhances platelet aggregation and thrombosis via Dectin-1 activation: a translational study.",
+          "year": 2022,
+          "relevance": 0.475
+        }
+      ]
+    },
+    "GO:0051128": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "37926268",
+          "title": "Activation of GPBAR1 attenuates vascular inflammation and atherosclerosis in a mouse model of NAFLD-related cardiovascular disease.",
+          "year": 2023,
+          "relevance": 0.6499999999999999
+        },
+        {
+          "pmid": "30282955",
+          "title": "Current and Emerging Reconstituted HDL-apoA-I and HDL-apoE Approaches to Treat Atherosclerosis.",
+          "year": 2018,
+          "relevance": 0.5333333333333333
+        },
+        {
+          "pmid": "35165707",
+          "title": "Galectin 3 enhances platelet aggregation and thrombosis via Dectin-1 activation: a translational study.",
+          "year": 2022,
+          "relevance": 0.525
+        }
+      ]
+    },
+    "GO:0035556": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "36099852",
+          "title": "Pro-oxidative priming but maintained cardiac function in a broad spectrum of murine models of chronic kidney disease.",
+          "year": 2022,
+          "relevance": 0.525
+        },
+        {
+          "pmid": "39113703",
+          "title": "Antirheumatic drug leflunomide attenuates atherosclerosis by regulating lipid metabolism and endothelial dysfunction via DHODH/AMPK signaling pathway.",
+          "year": 2024,
+          "relevance": 0.4916666666666666
+        },
+        {
+          "pmid": "30282955",
+          "title": "Current and Emerging Reconstituted HDL-apoA-I and HDL-apoE Approaches to Treat Atherosclerosis.",
+          "year": 2018,
+          "relevance": 0.4833333333333333
+        }
+      ]
+    },
+    "GO:0051641": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "35165707",
+          "title": "Galectin 3 enhances platelet aggregation and thrombosis via Dectin-1 activation: a translational study.",
+          "year": 2022,
+          "relevance": 0.6
+        },
+        {
+          "pmid": "39580475",
+          "title": "Dysregulated RBM24 phosphorylation impairs APOE translation underlying psychological stress-induced cardiovascular disease.",
+          "year": 2024,
+          "relevance": 0.5
+        },
+        {
+          "pmid": "30282955",
+          "title": "Current and Emerging Reconstituted HDL-apoA-I and HDL-apoE Approaches to Treat Atherosclerosis.",
+          "year": 2018,
+          "relevance": 0.4833333333333333
+        }
+      ]
+    },
+    "GO:0045595": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "37926268",
+          "title": "Activation of GPBAR1 attenuates vascular inflammation and atherosclerosis in a mouse model of NAFLD-related cardiovascular disease.",
+          "year": 2023,
+          "relevance": 0.6625
+        },
+        {
+          "pmid": "35165707",
+          "title": "Galectin 3 enhances platelet aggregation and thrombosis via Dectin-1 activation: a translational study.",
+          "year": 2022,
+          "relevance": 0.5375
+        },
+        {
+          "pmid": "37941454",
+          "title": "Autoantibodies against the chemokine receptor 3 predict cardiovascular risk.",
+          "year": 2023,
+          "relevance": 0.5375
+        }
+      ]
+    },
+    "GO:0009892": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "37926268",
+          "title": "Activation of GPBAR1 attenuates vascular inflammation and atherosclerosis in a mouse model of NAFLD-related cardiovascular disease.",
+          "year": 2023,
+          "relevance": 0.6499999999999999
+        },
+        {
+          "pmid": "35165707",
+          "title": "Galectin 3 enhances platelet aggregation and thrombosis via Dectin-1 activation: a translational study.",
+          "year": 2022,
+          "relevance": 0.475
+        },
+        {
+          "pmid": "37273155",
+          "title": "SR-B1-/-ApoE-R61h/h Mice Mimic Human Coronary Heart Disease.",
+          "year": 2024,
+          "relevance": 0.475
+        }
+      ]
+    },
+    "GO:0002376": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "30598326",
+          "title": "Apolipoprotein E in lipoprotein metabolism, health and cardiovascular disease.",
+          "year": 2019,
+          "relevance": 0.7166666666666667
+        },
+        {
+          "pmid": "38126199",
+          "title": "Single-Cell RNA Sequencing Reveals Metabolic Stress-Dependent Activation of Cardiac Macrophages in a Model of Dyslipidemia-Induced Diastolic Dysfunction.",
+          "year": 2024,
+          "relevance": 0.575
+        },
+        {
+          "pmid": "37941454",
+          "title": "Autoantibodies against the chemokine receptor 3 predict cardiovascular risk.",
+          "year": 2023,
+          "relevance": 0.5583333333333333
+        }
+      ]
+    },
+    "GO:0048584": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "37926268",
+          "title": "Activation of GPBAR1 attenuates vascular inflammation and atherosclerosis in a mouse model of NAFLD-related cardiovascular disease.",
+          "year": 2023,
+          "relevance": 0.6
+        },
+        {
+          "pmid": "35165707",
+          "title": "Galectin 3 enhances platelet aggregation and thrombosis via Dectin-1 activation: a translational study.",
+          "year": 2022,
+          "relevance": 0.5166666666666666
+        },
+        {
+          "pmid": "37941454",
+          "title": "Autoantibodies against the chemokine receptor 3 predict cardiovascular risk.",
+          "year": 2023,
+          "relevance": 0.5166666666666666
+        }
+      ]
+    },
+    "GO:0006915": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "37172880",
+          "title": "Association of Deja vu With Cardiovascular Diseases.",
+          "year": 2023,
+          "relevance": 0.5333333333333333
+        },
+        {
+          "pmid": "38824159",
+          "title": "Regulation of cardiac ferroptosis in diabetic human heart failure: uncovering molecular pathways and key targets.",
+          "year": 2024,
+          "relevance": 0.5
+        },
+        {
+          "pmid": "30282955",
+          "title": "Current and Emerging Reconstituted HDL-apoA-I and HDL-apoE Approaches to Treat Atherosclerosis.",
+          "year": 2018,
+          "relevance": 0.4833333333333333
+        }
+      ]
+    },
+    "GO:0003008": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "30598326",
+          "title": "Apolipoprotein E in lipoprotein metabolism, health and cardiovascular disease.",
+          "year": 2019,
+          "relevance": 0.675
+        },
+        {
+          "pmid": "37391266",
+          "title": "Wearable technology and the cardiovascular system: the future of patient assessment.",
+          "year": 2023,
+          "relevance": 0.6
+        },
+        {
+          "pmid": "34907968",
+          "title": "Dietary fat and carbohydrate affect the metabolism of protein-based high-density lipoprotein subspecies.",
+          "year": 2022,
+          "relevance": 0.5916666666666667
+        }
+      ]
+    },
+    "GO:0009605": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "37926268",
+          "title": "Activation of GPBAR1 attenuates vascular inflammation and atherosclerosis in a mouse model of NAFLD-related cardiovascular disease.",
+          "year": 2023,
+          "relevance": 0.6
+        },
+        {
+          "pmid": "37941454",
+          "title": "Autoantibodies against the chemokine receptor 3 predict cardiovascular risk.",
+          "year": 2023,
+          "relevance": 0.5375
+        },
+        {
+          "pmid": "36099852",
+          "title": "Pro-oxidative priming but maintained cardiac function in a broad spectrum of murine models of chronic kidney disease.",
+          "year": 2022,
+          "relevance": 0.5041666666666667
+        }
+      ]
+    },
+    "GO:0008283": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "37941454",
+          "title": "Autoantibodies against the chemokine receptor 3 predict cardiovascular risk.",
+          "year": 2023,
+          "relevance": 0.6416666666666667
+        },
+        {
+          "pmid": "38126199",
+          "title": "Single-Cell RNA Sequencing Reveals Metabolic Stress-Dependent Activation of Cardiac Macrophages in a Model of Dyslipidemia-Induced Diastolic Dysfunction.",
+          "year": 2024,
+          "relevance": 0.575
+        },
+        {
+          "pmid": "35165707",
+          "title": "Galectin 3 enhances platelet aggregation and thrombosis via Dectin-1 activation: a translational study.",
+          "year": 2022,
+          "relevance": 0.5583333333333333
+        }
+      ]
+    },
+    "GO:0042592": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "37172880",
+          "title": "Association of Deja vu With Cardiovascular Diseases.",
+          "year": 2023,
+          "relevance": 0.5333333333333333
+        },
+        {
+          "pmid": "30282955",
+          "title": "Current and Emerging Reconstituted HDL-apoA-I and HDL-apoE Approaches to Treat Atherosclerosis.",
+          "year": 2018,
+          "relevance": 0.4833333333333333
+        },
+        {
+          "pmid": "35165707",
+          "title": "Galectin 3 enhances platelet aggregation and thrombosis via Dectin-1 activation: a translational study.",
+          "year": 2022,
+          "relevance": 0.475
+        }
+      ]
+    },
+    "GO:0051240": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "37926268",
+          "title": "Activation of GPBAR1 attenuates vascular inflammation and atherosclerosis in a mouse model of NAFLD-related cardiovascular disease.",
+          "year": 2023,
+          "relevance": 0.6
+        },
+        {
+          "pmid": "35165707",
+          "title": "Galectin 3 enhances platelet aggregation and thrombosis via Dectin-1 activation: a translational study.",
+          "year": 2022,
+          "relevance": 0.5166666666666666
+        },
+        {
+          "pmid": "37273155",
+          "title": "SR-B1-/-ApoE-R61h/h Mice Mimic Human Coronary Heart Disease.",
+          "year": 2024,
+          "relevance": 0.475
+        }
+      ]
+    },
+    "GO:0065009": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "37941454",
+          "title": "Autoantibodies against the chemokine receptor 3 predict cardiovascular risk.",
+          "year": 2023,
+          "relevance": 0.6
+        },
+        {
+          "pmid": "37926268",
+          "title": "Activation of GPBAR1 attenuates vascular inflammation and atherosclerosis in a mouse model of NAFLD-related cardiovascular disease.",
+          "year": 2023,
+          "relevance": 0.6
+        },
+        {
+          "pmid": "36099852",
+          "title": "Pro-oxidative priming but maintained cardiac function in a broad spectrum of murine models of chronic kidney disease.",
+          "year": 2022,
+          "relevance": 0.5666666666666667
+        }
+      ]
+    },
+    "GO:0009056": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "37172880",
+          "title": "Association of Deja vu With Cardiovascular Diseases.",
+          "year": 2023,
+          "relevance": 0.5333333333333333
+        },
+        {
+          "pmid": "30282955",
+          "title": "Current and Emerging Reconstituted HDL-apoA-I and HDL-apoE Approaches to Treat Atherosclerosis.",
+          "year": 2018,
+          "relevance": 0.4833333333333333
+        },
+        {
+          "pmid": "35165707",
+          "title": "Galectin 3 enhances platelet aggregation and thrombosis via Dectin-1 activation: a translational study.",
+          "year": 2022,
+          "relevance": 0.475
+        }
+      ]
+    },
+    "GO:2000026": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "37926268",
+          "title": "Activation of GPBAR1 attenuates vascular inflammation and atherosclerosis in a mouse model of NAFLD-related cardiovascular disease.",
+          "year": 2023,
+          "relevance": 0.6
+        },
+        {
+          "pmid": "24754513",
+          "title": "The role of apolipoprotein E in neurodegeneration and cardiovascular disease.",
+          "year": 2014,
+          "relevance": 0.4833333333333333
+        },
+        {
+          "pmid": "35165707",
+          "title": "Galectin 3 enhances platelet aggregation and thrombosis via Dectin-1 activation: a translational study.",
+          "year": 2022,
+          "relevance": 0.475
+        }
+      ]
+    },
+    "GO:0016192": {
+      "citation_count": 0,
+      "top_citations": []
+    },
+    "GO:0051094": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "37926268",
+          "title": "Activation of GPBAR1 attenuates vascular inflammation and atherosclerosis in a mouse model of NAFLD-related cardiovascular disease.",
+          "year": 2023,
+          "relevance": 0.6
+        },
+        {
+          "pmid": "35165707",
+          "title": "Galectin 3 enhances platelet aggregation and thrombosis via Dectin-1 activation: a translational study.",
+          "year": 2022,
+          "relevance": 0.525
+        },
+        {
+          "pmid": "37273155",
+          "title": "SR-B1-/-ApoE-R61h/h Mice Mimic Human Coronary Heart Disease.",
+          "year": 2024,
+          "relevance": 0.475
+        }
+      ]
+    },
+    "GO:0009719": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "37926268",
+          "title": "Activation of GPBAR1 attenuates vascular inflammation and atherosclerosis in a mouse model of NAFLD-related cardiovascular disease.",
+          "year": 2023,
+          "relevance": 0.6
+        },
+        {
+          "pmid": "37941454",
+          "title": "Autoantibodies against the chemokine receptor 3 predict cardiovascular risk.",
+          "year": 2023,
+          "relevance": 0.5375
+        },
+        {
+          "pmid": "36099852",
+          "title": "Pro-oxidative priming but maintained cardiac function in a broad spectrum of murine models of chronic kidney disease.",
+          "year": 2022,
+          "relevance": 0.5041666666666667
+        }
+      ]
+    },
+    "GO:0051241": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "37926268",
+          "title": "Activation of GPBAR1 attenuates vascular inflammation and atherosclerosis in a mouse model of NAFLD-related cardiovascular disease.",
+          "year": 2023,
+          "relevance": 0.6
+        },
+        {
+          "pmid": "30282955",
+          "title": "Current and Emerging Reconstituted HDL-apoA-I and HDL-apoE Approaches to Treat Atherosclerosis.",
+          "year": 2018,
+          "relevance": 0.4833333333333333
+        },
+        {
+          "pmid": "35165707",
+          "title": "Galectin 3 enhances platelet aggregation and thrombosis via Dectin-1 activation: a translational study.",
+          "year": 2022,
+          "relevance": 0.475
+        }
+      ]
+    },
+    "GO:0051093": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "37926268",
+          "title": "Activation of GPBAR1 attenuates vascular inflammation and atherosclerosis in a mouse model of NAFLD-related cardiovascular disease.",
+          "year": 2023,
+          "relevance": 0.6
+        },
+        {
+          "pmid": "30282955",
+          "title": "Current and Emerging Reconstituted HDL-apoA-I and HDL-apoE Approaches to Treat Atherosclerosis.",
+          "year": 2018,
+          "relevance": 0.4833333333333333
+        },
+        {
+          "pmid": "35165707",
+          "title": "Galectin 3 enhances platelet aggregation and thrombosis via Dectin-1 activation: a translational study.",
+          "year": 2022,
+          "relevance": 0.475
+        }
+      ]
+    },
+    "GO:0006629": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "34907968",
+          "title": "Dietary fat and carbohydrate affect the metabolism of protein-based high-density lipoprotein subspecies.",
+          "year": 2022,
+          "relevance": 0.5916666666666667
+        },
+        {
+          "pmid": "38126199",
+          "title": "Single-Cell RNA Sequencing Reveals Metabolic Stress-Dependent Activation of Cardiac Macrophages in a Model of Dyslipidemia-Induced Diastolic Dysfunction.",
+          "year": 2024,
+          "relevance": 0.575
+        },
+        {
+          "pmid": "30282955",
+          "title": "Current and Emerging Reconstituted HDL-apoA-I and HDL-apoE Approaches to Treat Atherosclerosis.",
+          "year": 2018,
+          "relevance": 0.5666666666666667
+        }
+      ]
+    },
+    "GO:1901698": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "37926268",
+          "title": "Activation of GPBAR1 attenuates vascular inflammation and atherosclerosis in a mouse model of NAFLD-related cardiovascular disease.",
+          "year": 2023,
+          "relevance": 0.6
+        },
+        {
+          "pmid": "37941454",
+          "title": "Autoantibodies against the chemokine receptor 3 predict cardiovascular risk.",
+          "year": 2023,
+          "relevance": 0.5375
+        },
+        {
+          "pmid": "37273155",
+          "title": "SR-B1-/-ApoE-R61h/h Mice Mimic Human Coronary Heart Disease.",
+          "year": 2024,
+          "relevance": 0.5375
+        }
+      ]
+    },
+    "GO:0051247": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "37926268",
+          "title": "Activation of GPBAR1 attenuates vascular inflammation and atherosclerosis in a mouse model of NAFLD-related cardiovascular disease.",
+          "year": 2023,
+          "relevance": 0.6833333333333332
+        },
+        {
+          "pmid": "35165707",
+          "title": "Galectin 3 enhances platelet aggregation and thrombosis via Dectin-1 activation: a translational study.",
+          "year": 2022,
+          "relevance": 0.5583333333333333
+        },
+        {
+          "pmid": "37941454",
+          "title": "Autoantibodies against the chemokine receptor 3 predict cardiovascular risk.",
+          "year": 2023,
+          "relevance": 0.5166666666666666
+        }
+      ]
+    },
+    "GO:0048585": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "37926268",
+          "title": "Activation of GPBAR1 attenuates vascular inflammation and atherosclerosis in a mouse model of NAFLD-related cardiovascular disease.",
+          "year": 2023,
+          "relevance": 0.6
+        },
+        {
+          "pmid": "37941454",
+          "title": "Autoantibodies against the chemokine receptor 3 predict cardiovascular risk.",
+          "year": 2023,
+          "relevance": 0.5166666666666666
+        },
+        {
+          "pmid": "30282955",
+          "title": "Current and Emerging Reconstituted HDL-apoA-I and HDL-apoE Approaches to Treat Atherosclerosis.",
+          "year": 2018,
+          "relevance": 0.4833333333333333
+        }
+      ]
+    },
+    "GO:0007417": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "30598326",
+          "title": "Apolipoprotein E in lipoprotein metabolism, health and cardiovascular disease.",
+          "year": 2019,
+          "relevance": 0.8
+        },
+        {
+          "pmid": "30282955",
+          "title": "Current and Emerging Reconstituted HDL-apoA-I and HDL-apoE Approaches to Treat Atherosclerosis.",
+          "year": 2018,
+          "relevance": 0.5458333333333333
+        },
+        {
+          "pmid": "37391266",
+          "title": "Wearable technology and the cardiovascular system: the future of patient assessment.",
+          "year": 2023,
+          "relevance": 0.5375
+        }
+      ]
+    },
+    "GO:0044281": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "39113703",
+          "title": "Antirheumatic drug leflunomide attenuates atherosclerosis by regulating lipid metabolism and endothelial dysfunction via DHODH/AMPK signaling pathway.",
+          "year": 2024,
+          "relevance": 0.5333333333333333
+        },
+        {
+          "pmid": "30282955",
+          "title": "Current and Emerging Reconstituted HDL-apoA-I and HDL-apoE Approaches to Treat Atherosclerosis.",
+          "year": 2018,
+          "relevance": 0.4833333333333333
+        },
+        {
+          "pmid": "35165707",
+          "title": "Galectin 3 enhances platelet aggregation and thrombosis via Dectin-1 activation: a translational study.",
+          "year": 2022,
+          "relevance": 0.475
+        }
+      ]
+    },
+    "GO:0007267": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "36099852",
+          "title": "Pro-oxidative priming but maintained cardiac function in a broad spectrum of murine models of chronic kidney disease.",
+          "year": 2022,
+          "relevance": 0.5666666666666667
+        },
+        {
+          "pmid": "39113703",
+          "title": "Antirheumatic drug leflunomide attenuates atherosclerosis by regulating lipid metabolism and endothelial dysfunction via DHODH/AMPK signaling pathway.",
+          "year": 2024,
+          "relevance": 0.5333333333333333
+        },
+        {
+          "pmid": "39580475",
+          "title": "Dysregulated RBM24 phosphorylation impairs APOE translation underlying psychological stress-induced cardiovascular disease.",
+          "year": 2024,
+          "relevance": 0.5
+        }
+      ]
+    },
+    "GO:1901701": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "35165707",
+          "title": "Galectin 3 enhances platelet aggregation and thrombosis via Dectin-1 activation: a translational study.",
+          "year": 2022,
+          "relevance": 0.525
+        },
+        {
+          "pmid": "37941454",
+          "title": "Autoantibodies against the chemokine receptor 3 predict cardiovascular risk.",
+          "year": 2023,
+          "relevance": 0.525
+        },
+        {
+          "pmid": "37273155",
+          "title": "SR-B1-/-ApoE-R61h/h Mice Mimic Human Coronary Heart Disease.",
+          "year": 2024,
+          "relevance": 0.525
+        }
+      ]
+    },
+    "GO:0051130": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "37926268",
+          "title": "Activation of GPBAR1 attenuates vascular inflammation and atherosclerosis in a mouse model of NAFLD-related cardiovascular disease.",
+          "year": 2023,
+          "relevance": 0.6416666666666666
+        },
+        {
+          "pmid": "35165707",
+          "title": "Galectin 3 enhances platelet aggregation and thrombosis via Dectin-1 activation: a translational study.",
+          "year": 2022,
+          "relevance": 0.5583333333333333
+        },
+        {
+          "pmid": "30282955",
+          "title": "Current and Emerging Reconstituted HDL-apoA-I and HDL-apoE Approaches to Treat Atherosclerosis.",
+          "year": 2018,
+          "relevance": 0.525
+        }
+      ]
+    },
+    "KEGG:05410": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "38390337",
+          "title": "MSC exosomes attenuate sterile inflammation and necroptosis associated with TAK1-pJNK-NFKB mediated cardiomyopathy in diabetic ApoE KO mice.",
+          "year": 2024,
+          "relevance": 0.6
+        },
+        {
+          "pmid": "36705579",
+          "title": "Patient experiences of implantable cardiac monitoring in hypertrophic cardiomyopathy: an exploratory study.",
+          "year": 2023,
+          "relevance": 0.5916666666666667
+        },
+        {
+          "pmid": "36099852",
+          "title": "Pro-oxidative priming but maintained cardiac function in a broad spectrum of murine models of chronic kidney disease.",
+          "year": 2022,
+          "relevance": 0.5666666666666667
+        }
+      ]
+    },
+    "GO:0060411": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "37941454",
+          "title": "Autoantibodies against the chemokine receptor 3 predict cardiovascular risk.",
+          "year": 2023,
+          "relevance": 0.5583333333333333
+        },
+        {
+          "pmid": "36099852",
+          "title": "Pro-oxidative priming but maintained cardiac function in a broad spectrum of murine models of chronic kidney disease.",
+          "year": 2022,
+          "relevance": 0.525
+        },
+        {
+          "pmid": "38126199",
+          "title": "Single-Cell RNA Sequencing Reveals Metabolic Stress-Dependent Activation of Cardiac Macrophages in a Model of Dyslipidemia-Induced Diastolic Dysfunction.",
+          "year": 2024,
+          "relevance": 0.4916666666666666
+        }
+      ]
+    },
+    "WP:WP2456": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "37926268",
+          "title": "Activation of GPBAR1 attenuates vascular inflammation and atherosclerosis in a mouse model of NAFLD-related cardiovascular disease.",
+          "year": 2023,
+          "relevance": 0.6
+        },
+        {
+          "pmid": "30598326",
+          "title": "Apolipoprotein E in lipoprotein metabolism, health and cardiovascular disease.",
+          "year": 2019,
+          "relevance": 0.55
+        },
+        {
+          "pmid": "36099852",
+          "title": "Pro-oxidative priming but maintained cardiac function in a broad spectrum of murine models of chronic kidney disease.",
+          "year": 2022,
+          "relevance": 0.4833333333333333
+        }
+      ]
+    },
+    "GO:0060412": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "37941454",
+          "title": "Autoantibodies against the chemokine receptor 3 predict cardiovascular risk.",
+          "year": 2023,
+          "relevance": 0.5583333333333333
+        },
+        {
+          "pmid": "36099852",
+          "title": "Pro-oxidative priming but maintained cardiac function in a broad spectrum of murine models of chronic kidney disease.",
+          "year": 2022,
+          "relevance": 0.525
+        },
+        {
+          "pmid": "30282955",
+          "title": "Current and Emerging Reconstituted HDL-apoA-I and HDL-apoE Approaches to Treat Atherosclerosis.",
+          "year": 2018,
+          "relevance": 0.4833333333333333
+        }
+      ]
+    },
+    "GO:0003252": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "37926268",
+          "title": "Activation of GPBAR1 attenuates vascular inflammation and atherosclerosis in a mouse model of NAFLD-related cardiovascular disease.",
+          "year": 2023,
+          "relevance": 0.625
+        },
+        {
+          "pmid": "30598326",
+          "title": "Apolipoprotein E in lipoprotein metabolism, health and cardiovascular disease.",
+          "year": 2019,
+          "relevance": 0.5750000000000001
+        },
+        {
+          "pmid": "35165707",
+          "title": "Galectin 3 enhances platelet aggregation and thrombosis via Dectin-1 activation: a translational study.",
+          "year": 2022,
+          "relevance": 0.525
+        }
+      ]
+    },
+    "GO:0060978": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "37926268",
+          "title": "Activation of GPBAR1 attenuates vascular inflammation and atherosclerosis in a mouse model of NAFLD-related cardiovascular disease.",
+          "year": 2023,
+          "relevance": 0.6416666666666666
+        },
+        {
+          "pmid": "30598326",
+          "title": "Apolipoprotein E in lipoprotein metabolism, health and cardiovascular disease.",
+          "year": 2019,
+          "relevance": 0.5916666666666667
+        },
+        {
+          "pmid": "30282955",
+          "title": "Current and Emerging Reconstituted HDL-apoA-I and HDL-apoE Approaches to Treat Atherosclerosis.",
+          "year": 2018,
+          "relevance": 0.5666666666666667
+        }
+      ]
+    },
+    "WP:WP2406": {
+      "citation_count": 0,
+      "top_citations": []
+    },
+    "GO:0003180": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "39113703",
+          "title": "Antirheumatic drug leflunomide attenuates atherosclerosis by regulating lipid metabolism and endothelial dysfunction via DHODH/AMPK signaling pathway.",
+          "year": 2024,
+          "relevance": 0.4916666666666666
+        },
+        {
+          "pmid": "30282955",
+          "title": "Current and Emerging Reconstituted HDL-apoA-I and HDL-apoE Approaches to Treat Atherosclerosis.",
+          "year": 2018,
+          "relevance": 0.4833333333333333
+        },
+        {
+          "pmid": "35165707",
+          "title": "Galectin 3 enhances platelet aggregation and thrombosis via Dectin-1 activation: a translational study.",
+          "year": 2022,
+          "relevance": 0.475
+        }
+      ]
+    },
+    "WP:WP1559": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "37926268",
+          "title": "Activation of GPBAR1 attenuates vascular inflammation and atherosclerosis in a mouse model of NAFLD-related cardiovascular disease.",
+          "year": 2023,
+          "relevance": 0.63125
+        },
+        {
+          "pmid": "37941454",
+          "title": "Autoantibodies against the chemokine receptor 3 predict cardiovascular risk.",
+          "year": 2023,
+          "relevance": 0.56875
+        },
+        {
+          "pmid": "36099852",
+          "title": "Pro-oxidative priming but maintained cardiac function in a broad spectrum of murine models of chronic kidney disease.",
+          "year": 2022,
+          "relevance": 0.5354166666666667
+        }
+      ]
+    },
+    "GO:0003223": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "37941454",
+          "title": "Autoantibodies against the chemokine receptor 3 predict cardiovascular risk.",
+          "year": 2023,
+          "relevance": 0.5375
+        },
+        {
+          "pmid": "36099852",
+          "title": "Pro-oxidative priming but maintained cardiac function in a broad spectrum of murine models of chronic kidney disease.",
+          "year": 2022,
+          "relevance": 0.5041666666666667
+        },
+        {
+          "pmid": "30282955",
+          "title": "Current and Emerging Reconstituted HDL-apoA-I and HDL-apoE Approaches to Treat Atherosclerosis.",
+          "year": 2018,
+          "relevance": 0.4833333333333333
+        }
+      ]
+    }
+  },
+  "ranked_hypotheses": [
+    {
+      "rank": 359,
+      "pathway_id": "KEGG:05410",
+      "pathway_name": "Hypertrophic cardiomyopathy",
+      "source_db": "KEGG",
+      "nes_score": 3.600291789537157,
+      "p_adj": 1.1102230246251565e-16,
+      "evidence_count": 5,
+      "support_count": 20,
+      "seed_genes": [
+        "APOE",
+        "APP"
+      ],
+      "literature_support": false,
+      "citations": [
+        {
+          "pmid": "38390337",
+          "title": "MSC exosomes attenuate sterile inflammation and necroptosis associated with TAK1-pJNK-NFKB mediated cardiomyopathy in diabetic ApoE KO mice.",
+          "year": 2024,
+          "relevance": 0.6
+        },
+        {
+          "pmid": "36705579",
+          "title": "Patient experiences of implantable cardiac monitoring in hypertrophic cardiomyopathy: an exploratory study.",
+          "year": 2023,
+          "relevance": 0.5916666666666667
+        },
+        {
+          "pmid": "36099852",
+          "title": "Pro-oxidative priming but maintained cardiac function in a broad spectrum of murine models of chronic kidney disease.",
+          "year": 2022,
+          "relevance": 0.5666666666666667
+        }
+      ],
+      "citation_count": 25,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0032501",
+        "GO:0006810",
+        "GO:0051179",
+        "GO:0051234",
+        "GO:0019538",
+        "GO:0048518",
+        "GO:0033036",
+        "GO:0032879",
+        "GO:0050896",
+        "GO:0051239",
+        "GO:0048522",
+        "GO:0042221",
+        "GO:0048519",
+        "GO:0032502",
+        "GO:0051246",
+        "GO:0050789",
+        "GO:1901700",
+        "GO:0065007",
+        "GO:0051716",
+        "GO:0048731"
+      ]
+    },
+    {
+      "rank": 706,
+      "pathway_id": "GO:0060411",
+      "pathway_name": "cardiac septum morphogenesis",
+      "source_db": "GO:BP",
+      "nes_score": 2.895043818624413,
+      "p_adj": 2.275957200481571e-14,
+      "evidence_count": 3,
+      "support_count": 17,
+      "seed_genes": [
+        "APOE",
+        "APP"
+      ],
+      "literature_support": false,
+      "citations": [
+        {
+          "pmid": "37941454",
+          "title": "Autoantibodies against the chemokine receptor 3 predict cardiovascular risk.",
+          "year": 2023,
+          "relevance": 0.5583333333333333
+        },
+        {
+          "pmid": "36099852",
+          "title": "Pro-oxidative priming but maintained cardiac function in a broad spectrum of murine models of chronic kidney disease.",
+          "year": 2022,
+          "relevance": 0.525
+        },
+        {
+          "pmid": "38126199",
+          "title": "Single-Cell RNA Sequencing Reveals Metabolic Stress-Dependent Activation of Cardiac Macrophages in a Model of Dyslipidemia-Induced Diastolic Dysfunction.",
+          "year": 2024,
+          "relevance": 0.4916666666666666
+        }
+      ],
+      "citation_count": 25,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0032501",
+        "GO:0006810",
+        "GO:0051179",
+        "GO:0051234",
+        "GO:0048518",
+        "GO:0032879",
+        "GO:0050896",
+        "GO:0051239",
+        "GO:0048522",
+        "GO:0042221",
+        "GO:0048519",
+        "GO:0032502",
+        "GO:0050789",
+        "GO:1901700",
+        "GO:0065007",
+        "GO:0051716",
+        "GO:0048731"
+      ]
+    },
+    {
+      "rank": 1038,
+      "pathway_id": "WP:WP2456",
+      "pathway_name": "HIF1A and PPARG in hypertrophic cardiomyopathy",
+      "source_db": "WP",
+      "nes_score": 2.5920182370848055,
+      "p_adj": 3.593669806178923e-11,
+      "evidence_count": 2,
+      "support_count": 12,
+      "seed_genes": [
+        "APOE",
+        "APP"
+      ],
+      "literature_support": false,
+      "citations": [
+        {
+          "pmid": "37926268",
+          "title": "Activation of GPBAR1 attenuates vascular inflammation and atherosclerosis in a mouse model of NAFLD-related cardiovascular disease.",
+          "year": 2023,
+          "relevance": 0.6
+        },
+        {
+          "pmid": "30598326",
+          "title": "Apolipoprotein E in lipoprotein metabolism, health and cardiovascular disease.",
+          "year": 2019,
+          "relevance": 0.55
+        },
+        {
+          "pmid": "36099852",
+          "title": "Pro-oxidative priming but maintained cardiac function in a broad spectrum of murine models of chronic kidney disease.",
+          "year": 2022,
+          "relevance": 0.4833333333333333
+        }
+      ],
+      "citation_count": 25,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0032501",
+        "GO:0019538",
+        "GO:0048518",
+        "GO:0050896",
+        "GO:0051239",
+        "GO:0048522",
+        "GO:0042221",
+        "GO:0048519",
+        "GO:0051246",
+        "GO:0050789",
+        "GO:0065007",
+        "GO:0051716"
+      ]
+    },
+    {
+      "rank": 1401,
+      "pathway_id": "GO:0060412",
+      "pathway_name": "ventricular septum morphogenesis",
+      "source_db": "GO:BP",
+      "nes_score": 2.36491822990197,
+      "p_adj": 6.436827737488215e-10,
+      "evidence_count": 2,
+      "support_count": 15,
+      "seed_genes": [
+        "APOE",
+        "APP"
+      ],
+      "literature_support": false,
+      "citations": [
+        {
+          "pmid": "37941454",
+          "title": "Autoantibodies against the chemokine receptor 3 predict cardiovascular risk.",
+          "year": 2023,
+          "relevance": 0.5583333333333333
+        },
+        {
+          "pmid": "36099852",
+          "title": "Pro-oxidative priming but maintained cardiac function in a broad spectrum of murine models of chronic kidney disease.",
+          "year": 2022,
+          "relevance": 0.525
+        },
+        {
+          "pmid": "30282955",
+          "title": "Current and Emerging Reconstituted HDL-apoA-I and HDL-apoE Approaches to Treat Atherosclerosis.",
+          "year": 2018,
+          "relevance": 0.4833333333333333
+        }
+      ],
+      "citation_count": 25,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0032501",
+        "GO:0006810",
+        "GO:0051179",
+        "GO:0051234",
+        "GO:0048518",
+        "GO:0032879",
+        "GO:0050896",
+        "GO:0051239",
+        "GO:0048522",
+        "GO:0042221",
+        "GO:0048519",
+        "GO:0032502",
+        "GO:1901700",
+        "GO:0051716",
+        "GO:0048731"
+      ]
+    },
+    {
+      "rank": 1544,
+      "pathway_id": "GO:0003252",
+      "pathway_name": "negative regulation of cell proliferation involved in heart valve morphogenesis",
+      "source_db": "GO:BP",
+      "nes_score": 2.299226912701341,
+      "p_adj": 1.1213252548714081e-14,
+      "evidence_count": 1,
+      "support_count": 19,
+      "seed_genes": [
+        "APOE",
+        "APP"
+      ],
+      "literature_support": false,
+      "citations": [
+        {
+          "pmid": "37926268",
+          "title": "Activation of GPBAR1 attenuates vascular inflammation and atherosclerosis in a mouse model of NAFLD-related cardiovascular disease.",
+          "year": 2023,
+          "relevance": 0.625
+        },
+        {
+          "pmid": "30598326",
+          "title": "Apolipoprotein E in lipoprotein metabolism, health and cardiovascular disease.",
+          "year": 2019,
+          "relevance": 0.5750000000000001
+        },
+        {
+          "pmid": "35165707",
+          "title": "Galectin 3 enhances platelet aggregation and thrombosis via Dectin-1 activation: a translational study.",
+          "year": 2022,
+          "relevance": 0.525
+        }
+      ],
+      "citation_count": 25,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0032501",
+        "GO:0006810",
+        "GO:0051179",
+        "GO:0051234",
+        "GO:0019538",
+        "GO:0048518",
+        "GO:0033036",
+        "GO:0032879",
+        "GO:0050896",
+        "GO:0051239",
+        "GO:0048522",
+        "GO:0042221",
+        "GO:0048519",
+        "GO:0032502",
+        "GO:0050789",
+        "GO:1901700",
+        "GO:0065007",
+        "GO:0051716",
+        "GO:0048731"
+      ]
+    },
+    {
+      "rank": 2431,
+      "pathway_id": "GO:0060978",
+      "pathway_name": "angiogenesis involved in coronary vascular morphogenesis",
+      "source_db": "GO:BP",
+      "nes_score": 1.9311918524685838,
+      "p_adj": 2.1795385496403696e-09,
+      "evidence_count": 1,
+      "support_count": 16,
+      "seed_genes": [
+        "APOE",
+        "APP"
+      ],
+      "literature_support": false,
+      "citations": [
+        {
+          "pmid": "37926268",
+          "title": "Activation of GPBAR1 attenuates vascular inflammation and atherosclerosis in a mouse model of NAFLD-related cardiovascular disease.",
+          "year": 2023,
+          "relevance": 0.6416666666666666
+        },
+        {
+          "pmid": "30598326",
+          "title": "Apolipoprotein E in lipoprotein metabolism, health and cardiovascular disease.",
+          "year": 2019,
+          "relevance": 0.5916666666666667
+        },
+        {
+          "pmid": "30282955",
+          "title": "Current and Emerging Reconstituted HDL-apoA-I and HDL-apoE Approaches to Treat Atherosclerosis.",
+          "year": 2018,
+          "relevance": 0.5666666666666667
+        }
+      ],
+      "citation_count": 25,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0006810",
+        "GO:0051179",
+        "GO:0051234",
+        "GO:0019538",
+        "GO:0048518",
+        "GO:0033036",
+        "GO:0032879",
+        "GO:0051239",
+        "GO:0048522",
+        "GO:0042221",
+        "GO:0048519",
+        "GO:0032502",
+        "GO:0051246",
+        "GO:1901700",
+        "GO:0051716",
+        "GO:0048731"
+      ]
+    },
+    {
+      "rank": 2650,
+      "pathway_id": "WP:WP2406",
+      "pathway_name": "Cardiac progenitor differentiation",
+      "source_db": "WP",
+      "nes_score": 1.8602012098288403,
+      "p_adj": 0.022328009846928065,
+      "evidence_count": 4,
+      "support_count": 20,
+      "seed_genes": [
+        "APOE",
+        "APP"
+      ],
+      "literature_support": false,
+      "citations": [],
+      "citation_count": 0,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0032501",
+        "GO:0006810",
+        "GO:0051179",
+        "GO:0051234",
+        "GO:0019538",
+        "GO:0048518",
+        "GO:0033036",
+        "GO:0032879",
+        "GO:0050896",
+        "GO:0051239",
+        "GO:0048522",
+        "GO:0042221",
+        "GO:0048519",
+        "GO:0032502",
+        "GO:0051246",
+        "GO:0050789",
+        "GO:1901700",
+        "GO:0065007",
+        "GO:0051716",
+        "GO:0048731"
+      ]
+    },
+    {
+      "rank": 2894,
+      "pathway_id": "GO:0003180",
+      "pathway_name": "aortic valve morphogenesis",
+      "source_db": "GO:BP",
+      "nes_score": 1.7612210306711893,
+      "p_adj": 0.005696060244266832,
+      "evidence_count": 3,
+      "support_count": 19,
+      "seed_genes": [
+        "APOE",
+        "APP"
+      ],
+      "literature_support": false,
+      "citations": [
+        {
+          "pmid": "39113703",
+          "title": "Antirheumatic drug leflunomide attenuates atherosclerosis by regulating lipid metabolism and endothelial dysfunction via DHODH/AMPK signaling pathway.",
+          "year": 2024,
+          "relevance": 0.4916666666666666
+        },
+        {
+          "pmid": "30282955",
+          "title": "Current and Emerging Reconstituted HDL-apoA-I and HDL-apoE Approaches to Treat Atherosclerosis.",
+          "year": 2018,
+          "relevance": 0.4833333333333333
+        },
+        {
+          "pmid": "35165707",
+          "title": "Galectin 3 enhances platelet aggregation and thrombosis via Dectin-1 activation: a translational study.",
+          "year": 2022,
+          "relevance": 0.475
+        }
+      ],
+      "citation_count": 25,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0032501",
+        "GO:0006810",
+        "GO:0051179",
+        "GO:0051234",
+        "GO:0019538",
+        "GO:0048518",
+        "GO:0033036",
+        "GO:0032879",
+        "GO:0050896",
+        "GO:0051239",
+        "GO:0048522",
+        "GO:0042221",
+        "GO:0048519",
+        "GO:0032502",
+        "GO:0050789",
+        "GO:1901700",
+        "GO:0065007",
+        "GO:0051716",
+        "GO:0048731"
+      ]
+    },
+    {
+      "rank": 3676,
+      "pathway_id": "WP:WP1559",
+      "pathway_name": "Transcription factors regulate miRNAs related to cardiac hypertrophy",
+      "source_db": "WP",
+      "nes_score": 1.4497613912085083,
+      "p_adj": 0.022328009846928065,
+      "evidence_count": 2,
+      "support_count": 19,
+      "seed_genes": [
+        "APOE",
+        "APP"
+      ],
+      "literature_support": false,
+      "citations": [
+        {
+          "pmid": "37926268",
+          "title": "Activation of GPBAR1 attenuates vascular inflammation and atherosclerosis in a mouse model of NAFLD-related cardiovascular disease.",
+          "year": 2023,
+          "relevance": 0.63125
+        },
+        {
+          "pmid": "37941454",
+          "title": "Autoantibodies against the chemokine receptor 3 predict cardiovascular risk.",
+          "year": 2023,
+          "relevance": 0.56875
+        },
+        {
+          "pmid": "36099852",
+          "title": "Pro-oxidative priming but maintained cardiac function in a broad spectrum of murine models of chronic kidney disease.",
+          "year": 2022,
+          "relevance": 0.5354166666666667
+        }
+      ],
+      "citation_count": 25,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0032501",
+        "GO:0006810",
+        "GO:0051179",
+        "GO:0051234",
+        "GO:0019538",
+        "GO:0048518",
+        "GO:0033036",
+        "GO:0032879",
+        "GO:0050896",
+        "GO:0051239",
+        "GO:0048522",
+        "GO:0042221",
+        "GO:0048519",
+        "GO:0032502",
+        "GO:0051246",
+        "GO:0050789",
+        "GO:1901700",
+        "GO:0065007",
+        "GO:0051716"
+      ]
+    },
+    {
+      "rank": 4433,
+      "pathway_id": "GO:0003223",
+      "pathway_name": "ventricular compact myocardium morphogenesis",
+      "source_db": "GO:BP",
+      "nes_score": 0.9026687408331449,
+      "p_adj": 0.015091422873741878,
+      "evidence_count": 1,
+      "support_count": 2,
+      "seed_genes": [
+        "APOE",
+        "APP"
+      ],
+      "literature_support": false,
+      "citations": [
+        {
+          "pmid": "37941454",
+          "title": "Autoantibodies against the chemokine receptor 3 predict cardiovascular risk.",
+          "year": 2023,
+          "relevance": 0.5375
+        },
+        {
+          "pmid": "36099852",
+          "title": "Pro-oxidative priming but maintained cardiac function in a broad spectrum of murine models of chronic kidney disease.",
+          "year": 2022,
+          "relevance": 0.5041666666666667
+        },
+        {
+          "pmid": "30282955",
+          "title": "Current and Emerging Reconstituted HDL-apoA-I and HDL-apoE Approaches to Treat Atherosclerosis.",
+          "year": 2018,
+          "relevance": 0.4833333333333333
+        }
+      ],
+      "citation_count": 25,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0051239",
+        "GO:0051246"
+      ]
+    }
+  ],
+  "testable_hypotheses": [
+    {
+      "hypothesis": "Pathway 'Hypertrophic cardiomyopathy' is involved in cardiovascular disease and phenotype processes",
+      "pathway_id": "KEGG:05410",
+      "nes_score": 3.600291789537157,
+      "experimental_approaches": [
+        "Functional enrichment analysis in cardiac tissue",
+        "Gene expression profiling",
+        "Pathway perturbation studies"
+      ]
+    },
+    {
+      "hypothesis": "Pathway 'cardiac septum morphogenesis' is involved in cardiovascular disease and phenotype processes",
+      "pathway_id": "GO:0060411",
+      "nes_score": 2.895043818624413,
+      "experimental_approaches": [
+        "Functional enrichment analysis in cardiac tissue",
+        "Gene expression profiling",
+        "Pathway perturbation studies"
+      ]
+    },
+    {
+      "hypothesis": "Pathway 'HIF1A and PPARG in hypertrophic cardiomyopathy' is involved in cardiovascular disease and phenotype processes",
+      "pathway_id": "WP:WP2456",
+      "nes_score": 2.5920182370848055,
+      "experimental_approaches": [
+        "Functional enrichment analysis in cardiac tissue",
+        "Gene expression profiling",
+        "Pathway perturbation studies"
+      ]
+    },
+    {
+      "hypothesis": "Pathway 'ventricular septum morphogenesis' is involved in cardiovascular disease and phenotype processes",
+      "pathway_id": "GO:0060412",
+      "nes_score": 2.36491822990197,
+      "experimental_approaches": [
+        "Functional enrichment analysis in cardiac tissue",
+        "Gene expression profiling",
+        "Pathway perturbation studies"
+      ]
+    },
+    {
+      "hypothesis": "Pathway 'negative regulation of cell proliferation involved in heart valve morphogenesis' is involved in cardiovascular disease and phenotype processes",
+      "pathway_id": "GO:0003252",
+      "nes_score": 2.299226912701341,
+      "experimental_approaches": [
+        "Functional enrichment analysis in cardiac tissue",
+        "Gene expression profiling",
+        "Pathway perturbation studies"
+      ]
+    }
+  ],
+  "conclusion": "Analysis identified 10 novel pathway hypotheses. The top-ranked hypothesis is 'Hypertrophic cardiomyopathy' (NES: 3.60), which shows strong evidence for involvement in cardiovascular disease and phenotype processes based on functional network analysis and literature mining.",
+  "top_genes": [
+    {
+      "gene": "NOTCH1",
+      "pathway_count": 5,
+      "importance_score": 4.68,
+      "druggability_tier": "medium",
+      "is_druggable": true,
+      "is_fda_approved": false,
+      "is_clinical_trial": true,
+      "centrality": 0.0,
+      "disgenet_cardiac_score": 0.85,
+      "final_score": 10.0035
+    },
+    {
+      "gene": "TGFB1",
+      "pathway_count": 4,
+      "importance_score": 3.6599999999999997,
+      "druggability_tier": "medium",
+      "is_druggable": true,
+      "is_fda_approved": false,
+      "is_clinical_trial": true,
+      "centrality": 0.0,
+      "disgenet_cardiac_score": 0.0,
+      "final_score": 5.489999999999999
+    },
+    {
+      "gene": "ACE",
+      "pathway_count": 2,
+      "importance_score": 1.94,
+      "druggability_tier": "high",
+      "is_druggable": true,
+      "is_fda_approved": true,
+      "is_clinical_trial": false,
+      "centrality": 0.0,
+      "disgenet_cardiac_score": 0.0,
+      "final_score": 3.88
+    },
+    {
+      "gene": "NOS3",
+      "pathway_count": 3,
+      "importance_score": 2.84,
+      "druggability_tier": "unknown",
+      "is_druggable": true,
+      "is_fda_approved": false,
+      "is_clinical_trial": false,
+      "centrality": 0.0,
+      "disgenet_cardiac_score": 0.0,
+      "final_score": 3.55
+    },
+    {
+      "gene": "LRP2",
+      "pathway_count": 2,
+      "importance_score": 1.8399999999999999,
+      "druggability_tier": "unknown",
+      "is_druggable": false,
+      "is_fda_approved": false,
+      "is_clinical_trial": false,
+      "centrality": 0.0,
+      "disgenet_cardiac_score": 0.0,
+      "final_score": 1.8399999999999999
+    },
+    {
+      "gene": "IL6",
+      "pathway_count": 1,
+      "importance_score": 1.02,
+      "druggability_tier": "medium",
+      "is_druggable": true,
+      "is_fda_approved": false,
+      "is_clinical_trial": true,
+      "centrality": 0.0,
+      "disgenet_cardiac_score": 0.0,
+      "final_score": 1.53
+    },
+    {
+      "gene": "TNF",
+      "pathway_count": 1,
+      "importance_score": 1.02,
+      "druggability_tier": "medium",
+      "is_druggable": true,
+      "is_fda_approved": false,
+      "is_clinical_trial": true,
+      "centrality": 0.0,
+      "disgenet_cardiac_score": 0.0,
+      "final_score": 1.53
+    },
+    {
+      "gene": "INS",
+      "pathway_count": 1,
+      "importance_score": 0.9,
+      "druggability_tier": "unknown",
+      "is_druggable": true,
+      "is_fda_approved": false,
+      "is_clinical_trial": false,
+      "centrality": 0.0,
+      "disgenet_cardiac_score": 0.0,
+      "final_score": 1.125
+    },
+    {
+      "gene": "GSK3B",
+      "pathway_count": 1,
+      "importance_score": 0.9,
+      "druggability_tier": "unknown",
+      "is_druggable": true,
+      "is_fda_approved": false,
+      "is_clinical_trial": false,
+      "centrality": 0.0,
+      "disgenet_cardiac_score": 0.0,
+      "final_score": 1.125
+    },
+    {
+      "gene": "NFKB1",
+      "pathway_count": 1,
+      "importance_score": 0.86,
+      "druggability_tier": "unknown",
+      "is_druggable": true,
+      "is_fda_approved": false,
+      "is_clinical_trial": false,
+      "centrality": 0.0,
+      "disgenet_cardiac_score": 0.0,
+      "final_score": 1.075
+    },
+    {
+      "gene": "AGT",
+      "pathway_count": 1,
+      "importance_score": 1.02,
+      "druggability_tier": "unknown",
+      "is_druggable": false,
+      "is_fda_approved": false,
+      "is_clinical_trial": false,
+      "centrality": 0.0,
+      "disgenet_cardiac_score": 0.0,
+      "final_score": 1.02
+    },
+    {
+      "gene": "CD36",
+      "pathway_count": 1,
+      "importance_score": 0.98,
+      "druggability_tier": "unknown",
+      "is_druggable": false,
+      "is_fda_approved": false,
+      "is_clinical_trial": false,
+      "centrality": 0.0,
+      "disgenet_cardiac_score": 0.0,
+      "final_score": 0.98
+    },
+    {
+      "gene": "GAPDH",
+      "pathway_count": 1,
+      "importance_score": 0.98,
+      "druggability_tier": "unknown",
+      "is_druggable": false,
+      "is_fda_approved": false,
+      "is_clinical_trial": false,
+      "centrality": 0.0,
+      "disgenet_cardiac_score": 0.0,
+      "final_score": 0.98
+    }
+  ]
+}

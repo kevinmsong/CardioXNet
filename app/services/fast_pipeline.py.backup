@@ -1,0 +1,504 @@
+"""Fast pipeline - all stages required, no fallbacks, optimized for speed."""
+
+import logging
+import asyncio
+import time
+from typing import List, Dict, Any, Optional, Callable
+from datetime import datetime
+from pathlib import Path
+
+from app.models import GeneInfo, ValidationResult, FunctionalNeighborhood
+from app.core.lightweight_config import get_fast_settings
+
+logger = logging.getLogger(__name__)
+
+
+class FastPipelineError(Exception):
+    """Pipeline error - fail fast, no fallbacks."""
+    pass
+
+
+class FastPipeline:
+    """
+    Lightweight, fast pipeline - ALL stages required.
+    
+    Features:
+    - No lazy loading
+    - No fallbacks or graceful degradation
+    - Fail fast on any error
+    - Optimized for speed
+    - All analyses are mandatory
+    """
+    
+    def __init__(self, analysis_id: Optional[str] = None, config_overrides: Optional[Dict[str, Any]] = None):
+        """Initialize fast pipeline.
+
+        Args:
+            analysis_id: Optional analysis identifier
+            config_overrides: Optional configuration overrides from API/frontend
+        """
+        self.analysis_id = analysis_id or self._generate_analysis_id()
+        self.settings = get_fast_settings()
+        self.results = {}
+        self.timings = {}
+        # Apply config overrides if provided (allow passing disease_context from frontend)
+        self.config_overrides = config_overrides or {}
+        self.disease_context = self.config_overrides.get('disease_context', 'cardiovascular')
+
+        logger.info(f"FastPipeline initialized (ID: {self.analysis_id}) with overrides: {self.config_overrides}")
+    
+    async def run(
+        self,
+        seed_genes: List[str],
+        progress_callback: Optional[Callable] = None,
+        disease_context: Optional[str] = None
+    ) -> Dict[str, Any]:
+        """
+        Run complete pipeline - all stages required.
+        
+        Args:
+            seed_genes: List of seed gene identifiers
+            progress_callback: Optional progress callback
+            disease_context: Disease context for semantic filtering (default: cardiovascular)
+            
+        Returns:
+            Complete analysis results
+            
+        Raises:
+            FastPipelineError: If any stage fails
+        """
+        pipeline_start = time.time()
+        
+        logger.info(f"Starting FastPipeline (ID: {self.analysis_id}) with {len(seed_genes)} genes")
+        
+        try:
+            # Import services here to avoid circular imports
+            from app.services.fast_service_init import get_service_fast
+            
+            # Stage 0: Input Validation (REQUIRED)
+            stage_start = time.time()
+            if progress_callback:
+                await progress_callback("validation", 0, "Validating genes")
+            
+            # Determine disease_context: prefer explicit argument, then instance override, then default
+            disease_context = disease_context or getattr(self, 'disease_context', 'cardiovascular')
+
+            validator = get_service_fast("input_validator")
+            validation_result = validator.validate_input(seed_genes)
+            
+            if not validation_result.valid_genes:
+                raise FastPipelineError("No valid genes provided")
+            
+            self.timings["validation"] = time.time() - stage_start
+            self.results["validation"] = {
+                "valid_count": len(validation_result.valid_genes),
+                "invalid_count": len(validation_result.invalid_genes)
+            }
+            
+            # Stage 1: Functional Neighborhood (REQUIRED)
+            stage_start = time.time()
+            if progress_callback:
+                await progress_callback("functional_neighborhood", 10, "Building network")
+            
+            fn_builder = get_service_fast("functional_neighborhood_builder")
+            fn_result = fn_builder.build_neighborhood(validation_result.valid_genes)
+            
+            self.timings["functional_neighborhood"] = time.time() - stage_start
+            self.results["functional_neighborhood"] = {
+                "size": fn_result.size,
+                "neighbors": len(fn_result.neighbors)
+            }
+            
+            # Stage 2a: Primary Pathways (REQUIRED)
+            stage_start = time.time()
+            if progress_callback:
+                await progress_callback("primary_pathways", 25, "Primary pathway analysis")
+            
+            primary_analyzer = get_service_fast("primary_pathway_analyzer")
+            primary_result = primary_analyzer.analyze(fn_result)
+            
+            self.timings["primary_pathways"] = time.time() - stage_start
+            self.results["primary_pathways"] = {
+                "pathway_count": len(primary_result.primary_pathways)
+            }
+            
+            # Stage 2b: Secondary Pathways (REQUIRED)
+            stage_start = time.time()
+            if progress_callback:
+                await progress_callback("secondary_pathways", 40, "Secondary pathway analysis")
+            
+            secondary_analyzer = get_service_fast("secondary_pathway_analyzer")
+            secondary_result = secondary_analyzer.analyze(
+                primary_result,
+                validation_result.valid_genes
+            )
+            
+            self.timings["secondary_pathways"] = time.time() - stage_start
+            self.results["secondary_pathways"] = {
+                "pathway_count": len(secondary_result.aggregated_pathways)
+            }
+            
+            # Stage 3: Pathway Aggregation (REQUIRED)
+            stage_start = time.time()
+            if progress_callback:
+                await progress_callback("aggregation", 50, "Aggregating pathways")
+            
+            aggregator = get_service_fast("pathway_aggregator")
+            aggregated_result = aggregator.aggregate(
+                secondary_result,
+                primary_result=primary_result
+            )
+            
+            print(f"[PIPELINE DEBUG] Aggregation complete: {len(aggregated_result.final_pathways)} final pathways")
+            print(f"[PIPELINE DEBUG] Input to aggregation: {len(secondary_result.aggregated_pathways)} aggregated pathways")
+            
+            self.timings["aggregation"] = time.time() - stage_start
+            self.results["aggregation"] = {
+                "pathway_count": len(aggregated_result.final_pathways)
+            }
+            
+            # Stage 4: NES Scoring (REQUIRED - Enhanced with Network Centrality)
+            stage_start = time.time()
+            if progress_callback:
+                await progress_callback("scoring", 60, "Scoring hypotheses")
+            
+            scorer = get_service_fast("nes_scorer")
+            # Pass fn_result for proximity scoring (will be used later after topology)
+            scored_hypotheses = scorer.score(
+                aggregated_result,
+                fn_result=fn_result,
+                topology_result=None  # Topology not computed yet
+            )
+            
+            print(f"[PIPELINE DEBUG] Scoring complete: {len(scored_hypotheses.hypotheses)} scored hypotheses")
+            
+            self.timings["scoring"] = time.time() - stage_start
+            self.results["scoring"] = {
+                "hypothesis_count": len(scored_hypotheses.hypotheses)
+            }
+            
+            # Stage 5: Semantic Filtering (REQUIRED - RE-ENABLED with Adaptive Thresholding)
+            stage_start = time.time()
+            if progress_callback:
+                await progress_callback("semantic_filtering", 70, "Semantic filtering")
+            
+            print(f"[PIPELINE DEBUG] Before semantic filtering: {len(scored_hypotheses.hypotheses)} hypotheses")
+            
+            semantic_filter = get_service_fast("semantic_filter")
+            filtered_hypotheses = semantic_filter.apply_intelligent_filtering(
+                scored_hypotheses.hypotheses,
+                max_results=150,
+                disease_context=disease_context
+            )
+            
+            print(f"[PIPELINE DEBUG] After adaptive semantic filtering: {len(filtered_hypotheses)} hypotheses")
+            
+            self.timings["semantic_filtering"] = time.time() - stage_start
+            self.results["semantic_filtering"] = {
+                "hypothesis_count": len(filtered_hypotheses)
+            }
+            
+            # Stage 6: Literature Mining (REQUIRED)
+            stage_start = time.time()
+            if progress_callback:
+                await progress_callback("literature", 80, "Mining literature")
+            
+            print(f"[PIPELINE DEBUG] Before literature mining: {len(filtered_hypotheses)} hypotheses")
+            
+            literature_miner = get_service_fast("literature_miner")
+            literature_result = literature_miner.validate_hypotheses(
+                filtered_hypotheses,
+                validation_result.valid_genes
+            )
+            
+            print(f"[PIPELINE DEBUG] After literature mining: {len(filtered_hypotheses)} hypotheses")
+            
+            self.timings["literature"] = time.time() - stage_start
+            self.results["literature"] = {
+                "evidence_count": len(literature_result.hypothesis_citations)
+            }
+            
+            # Stage 7: Topology Analysis (REQUIRED)
+            stage_start = time.time()
+            if progress_callback:
+                await progress_callback("topology", 85, "Topology analysis")
+            
+            topology_analyzer = get_service_fast("topology_analyzer")
+            topology_result = topology_analyzer.analyze(
+                filtered_hypotheses,
+                fn_result,
+                primary_result.primary_pathways
+            )
+            
+            self.timings["topology"] = time.time() - stage_start
+            self.results["topology"] = {
+                "network_count": len(topology_result.hypothesis_networks)
+            }
+            
+            # Stage 7b: Re-score with Network Centrality (ENHANCEMENT)
+            # Now that we have topology data, recalculate NES with centrality bonus
+            print(f"[PIPELINE DEBUG] Re-scoring {len(filtered_hypotheses)} pathways with network centrality")
+            for hypothesis in filtered_hypotheses:
+                if hasattr(hypothesis, 'aggregated_pathway'):
+                    # Recalculate NES with topology data
+                    new_nes, new_components = scorer._calculate_nes(
+                        hypothesis.aggregated_pathway,
+                        fn_result=fn_result,
+                        topology_result=topology_result,
+                        seed_neighbors_1hop=scorer._get_seed_neighbors_1hop(fn_result) if fn_result else None
+                    )
+                    hypothesis.nes_score = new_nes
+                    if hypothesis.score_components:
+                        hypothesis.score_components.update(new_components)
+                    else:
+                        hypothesis.score_components = new_components
+            
+            # Re-sort by updated NES scores
+            filtered_hypotheses.sort(key=lambda h: h.nes_score, reverse=True)
+            for i, hyp in enumerate(filtered_hypotheses, 1):
+                hyp.rank = i
+            
+            print(f"[PIPELINE DEBUG] Re-scoring complete, top NES: {filtered_hypotheses[0].nes_score:.2f}" if filtered_hypotheses else "[PIPELINE DEBUG] No hypotheses to re-score")
+            
+            # Stage 8: Druggability Analysis (REQUIRED)
+            stage_start = time.time()
+            if progress_callback:
+                await progress_callback("druggability", 88, "Druggability analysis")
+            
+            druggability_analyzer = get_service_fast("druggability_analyzer")
+            druggability_result = druggability_analyzer.annotate_pathways_with_druggability(filtered_hypotheses)
+            
+            self.timings["druggability"] = time.time() - stage_start
+            self.results["druggability"] = {
+                "annotated_pathways": len(druggability_result) if druggability_result else 0
+            }
+            
+            # Generate Top Genes from druggability and topology data
+            top_genes = self._generate_top_genes(
+                filtered_hypotheses,
+                druggability_analyzer,
+                topology_result,
+                fn_result,
+                top_n=5
+            )
+            self.results["top_genes"] = top_genes
+            print(f"[PIPELINE DEBUG] Generated {len(top_genes)} top genes")
+            
+            # Stage 9: Permutation Testing (REQUIRED)
+            stage_start = time.time()
+            if progress_callback:
+                await progress_callback("permutation", 92, "Statistical validation")
+            
+            permutation_tester = get_service_fast("permutation_tester")
+            
+            # Extract all genes from functional neighborhood
+            all_fn_genes = [g.symbol for g in fn_result.seed_genes] + [g.symbol for g in fn_result.neighbors]
+            
+            permutation_result = permutation_tester.adjust_pvalues_with_permutation(
+                filtered_hypotheses,
+                all_fn_genes,
+                all_fn_genes  # all_genes is the functional neighborhood
+            )
+            
+            self.timings["permutation"] = time.time() - stage_start
+            self.results["permutation"] = {
+                "tested_count": len(permutation_result) if permutation_result else 0
+            }
+            
+            # Stage 10: Tissue Expression (REQUIRED)
+            stage_start = time.time()
+            if progress_callback:
+                await progress_callback("tissue_expression", 96, "Tissue validation")
+            
+            tissue_validator = get_service_fast("tissue_expression_validator")
+            tissue_result = await tissue_validator.annotate_pathways_with_expression(filtered_hypotheses)
+            
+            self.timings["tissue_expression"] = time.time() - stage_start
+            self.results["tissue_expression"] = {
+                "annotated_pathways": len(tissue_result) if tissue_result else 0
+            }
+            
+            # Stage 11: Report Generation (REQUIRED)
+            stage_start = time.time()
+            if progress_callback:
+                await progress_callback("report", 98, "Generating report")
+            
+            report_generator = get_service_fast("report_generator")
+            
+            # Create a ScoredHypotheses wrapper if we have filtered hypotheses
+            from app.models import ScoredHypotheses
+            scored_hyps = ScoredHypotheses(
+                hypotheses=filtered_hypotheses if filtered_hypotheses else [],
+                total_count=len(filtered_hypotheses) if filtered_hypotheses else 0
+            )
+            
+            report = report_generator.generate_report(
+                analysis_id=self.analysis_id,
+                seed_genes=validation_result.valid_genes,
+                validation_result=validation_result,
+                fn_result=fn_result,
+                primary_result=primary_result,
+                secondary_result=secondary_result,
+                final_result=aggregated_result,
+                scored_hypotheses=scored_hyps,
+                topology_result=topology_result,
+                literature_evidence=literature_result
+            )
+            
+            self.timings["report"] = time.time() - stage_start
+            self.results["report"] = {
+                "format": "json"
+            }
+            
+            # Complete
+            total_time = time.time() - pipeline_start
+            
+            if progress_callback:
+                await progress_callback("complete", 100, "Analysis complete")
+            
+            return {
+                "analysis_id": self.analysis_id,
+                "status": "completed",
+                "total_time": total_time,
+                "timings": self.timings,
+                "results": self.results,
+                "top_genes": self.results.get("top_genes", []),
+                "stages": {
+                    "validation": validation_result.model_dump(),
+                    "functional_neighborhood": fn_result.model_dump(),
+                    "primary_pathways": primary_result.model_dump(),
+                    "secondary_pathways": secondary_result.model_dump(),
+                    "aggregated_pathways": aggregated_result.model_dump(),
+                    "scored_hypotheses": scored_hyps.model_dump(),
+                    "literature": literature_result.model_dump(),
+                    "topology": topology_result.model_dump(),
+                    "druggability": [h.model_dump() if hasattr(h, 'model_dump') else {} for h in (druggability_result or [])],
+                    "permutation": [h.model_dump() if hasattr(h, 'model_dump') else {} for h in (permutation_result or [])],
+                    "tissue_expression": [h.model_dump() if hasattr(h, 'model_dump') else {} for h in (tissue_result or [])],
+                    "report": report
+                }
+            }
+            
+        except Exception as e:
+            error_msg = f"Pipeline failed: {str(e)}"
+            logger.error(error_msg)
+            raise FastPipelineError(error_msg) from e
+    
+    def _generate_analysis_id(self) -> str:
+        """Generate unique analysis ID."""
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        return f"fast_analysis_{timestamp}"
+
+
+    def _generate_top_genes(
+        self,
+        hypotheses: List,
+        druggability_analyzer,
+        topology_result,
+        fn_result,
+        top_n: int = 5
+    ) -> List[Dict[str, Any]]:
+        """
+        Generate top therapeutic target candidates from druggability and topology data.
+        
+        Args:
+            hypotheses: List of scored hypotheses
+            druggability_analyzer: Druggability analyzer instance
+            topology_result: Topology analysis result
+            fn_result: Functional neighborhood result
+            top_n: Number of top genes to return
+            
+        Returns:
+            List of top gene dictionaries with druggability and topology metrics
+        """
+        # Collect all genes with their metrics
+        gene_scores = {}
+        
+        # Extract genes from top pathways
+        for i, hyp in enumerate(hypotheses[:50]):  # Top 50 pathways
+            pathway_genes = []
+            if hasattr(hyp, 'aggregated_pathway') and hyp.aggregated_pathway:
+                if hasattr(hyp.aggregated_pathway, 'pathway') and hyp.aggregated_pathway.pathway:
+                    pathway_genes = hyp.aggregated_pathway.pathway.evidence_genes
+                elif hasattr(hyp.aggregated_pathway, 'evidence_genes'):
+                    pathway_genes = hyp.aggregated_pathway.evidence_genes
+            elif hasattr(hyp, 'evidence_genes'):
+                pathway_genes = hyp.evidence_genes
+            elif hasattr(hyp, 'genes'):
+                pathway_genes = hyp.genes
+            
+            # Score each gene
+            for gene in pathway_genes:
+                gene_symbol = gene if isinstance(gene, str) else gene.symbol if hasattr(gene, 'symbol') else str(gene)
+                
+                if gene_symbol not in gene_scores:
+                    gene_scores[gene_symbol] = {
+                        'gene': gene_symbol,
+                        'pathway_count': 0,
+                        'importance_score': 0.0,
+                        'druggability_tier': 'unknown',
+                        'is_druggable': False,
+                        'is_fda_approved': False,
+                        'is_clinical_trial': False,
+                        'centrality': 0.0
+                    }
+                
+                # Increment pathway count
+                gene_scores[gene_symbol]['pathway_count'] += 1
+                
+                # Add importance based on pathway rank (top pathways = more important)
+                gene_scores[gene_symbol]['importance_score'] += (51 - i) / 50.0
+        
+        # Add druggability information
+        if druggability_analyzer:
+            for gene_symbol in gene_scores:
+                if gene_symbol in druggability_analyzer.druggable_genes:
+                    gene_scores[gene_symbol]['is_druggable'] = True
+                    
+                if gene_symbol in druggability_analyzer.approved_drug_targets:
+                    gene_scores[gene_symbol]['is_fda_approved'] = True
+                    gene_scores[gene_symbol]['druggability_tier'] = 'high'
+                    
+                if gene_symbol in druggability_analyzer.clinical_trial_targets:
+                    gene_scores[gene_symbol]['is_clinical_trial'] = True
+                    if gene_scores[gene_symbol]['druggability_tier'] == 'unknown':
+                        gene_scores[gene_symbol]['druggability_tier'] = 'medium'
+        
+        # Add topology/centrality information
+        if topology_result and hasattr(topology_result, 'hypothesis_networks'):
+            for pathway_id, network_data in topology_result.hypothesis_networks.items():
+                if hasattr(network_data, 'hub_genes'):
+                    for hub_gene in network_data.hub_genes:
+                        gene_symbol = hub_gene.gene if hasattr(hub_gene, 'gene') else str(hub_gene)
+                        if gene_symbol in gene_scores:
+                            centrality = hub_gene.centrality if hasattr(hub_gene, 'centrality') else 0.5
+                            gene_scores[gene_symbol]['centrality'] = max(
+                                gene_scores[gene_symbol]['centrality'],
+                                centrality
+                            )
+        
+        # Calculate final score: importance * (1 + druggability_bonus + centrality_bonus)
+        for gene_symbol in gene_scores:
+            druggability_bonus = 0.0
+            if gene_scores[gene_symbol]['is_fda_approved']:
+                druggability_bonus = 1.0
+            elif gene_scores[gene_symbol]['is_clinical_trial']:
+                druggability_bonus = 0.5
+            elif gene_scores[gene_symbol]['is_druggable']:
+                druggability_bonus = 0.25
+            
+            centrality_bonus = gene_scores[gene_symbol]['centrality'] * 0.5
+            
+            gene_scores[gene_symbol]['final_score'] = gene_scores[gene_symbol]['importance_score'] * (
+                1.0 + druggability_bonus + centrality_bonus
+            )
+        
+        # Sort by final score and return top N
+        sorted_genes = sorted(
+            gene_scores.values(),
+            key=lambda x: x['final_score'],
+            reverse=True
+        )
+        
+        return sorted_genes[:top_n]
+

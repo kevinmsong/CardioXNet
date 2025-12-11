@@ -1,0 +1,4058 @@
+{
+  "analysis_id": "analysis_20251209_124120",
+  "timestamp": "2025-12-11T06:13:15.321058",
+  "input_summary": {
+    "total_seed_genes": 20,
+    "valid_genes": 20,
+    "invalid_genes": 0,
+    "gene_list": [
+      "PDK4",
+      "LIPE",
+      "SERPINE1",
+      "IGF1R",
+      "BCL2L1",
+      "CYP1A1",
+      "NPPA",
+      "IGFBP5",
+      "C3",
+      "MMP2",
+      "TNF",
+      "TGFB1",
+      "HDAC5",
+      "HDAC9",
+      "ATP2A2",
+      "PLN",
+      "CYBB",
+      "RETNLA",
+      "ETNPPL",
+      "ACSBG1"
+    ],
+    "warnings": [
+      "Filtered 1 seed genes with insufficient connectivity (minimum 3 connections required)"
+    ]
+  },
+  "stage_1": {
+    "fn_size": 908,
+    "seed_count": 20,
+    "neighbor_count": 888,
+    "contributions": {
+      "PDK4": 15,
+      "LIPE": 56,
+      "SERPINE1": 57,
+      "IGF1R": 96,
+      "BCL2L1": 83,
+      "CYP1A1": 99,
+      "NPPA": 38,
+      "IGFBP5": 5,
+      "C3": 76,
+      "MMP2": 48,
+      "TNF": 69,
+      "TGFB1": 48,
+      "HDAC5": 30,
+      "HDAC9": 53,
+      "ATP2A2": 34,
+      "PLN": 11,
+      "CYBB": 42,
+      "RETNLA": 8,
+      "ETNPPL": 7,
+      "ACSBG1": 13
+    }
+  },
+  "stage_2a": {
+    "primary_pathways_count": 6097,
+    "known_pathways_filtered": 4,
+    "top_pathways": [
+      {
+        "name": "biological regulation",
+        "nes": 50895.0,
+        "p_adj": 8.523241294501459e-82
+      },
+      {
+        "name": "response to stimulus",
+        "nes": 49075.0,
+        "p_adj": 2.2416475230519754e-159
+      },
+      {
+        "name": "regulation of biological process",
+        "nes": 48555.0,
+        "p_adj": 6.187758172399162e-66
+      },
+      {
+        "name": "regulation of cellular process",
+        "nes": 46345.0,
+        "p_adj": 5.253425612579812e-54
+      },
+      {
+        "name": "cellular response to stimulus",
+        "nes": 43875.0,
+        "p_adj": 3.864857588665409e-145
+      }
+    ]
+  },
+  "stage_2b": {
+    "total_secondary_pathways": 7388,
+    "union_genes_processed": 0,
+    "genes_successfully_processed": 0,
+    "literature_stats": {
+      "primaries_processed": 20,
+      "total_secondaries": 124508,
+      "unique_secondaries": 7388
+    }
+  },
+  "stage_2c": {
+    "final_pathways_count": 7388,
+    "aggregation_strategy": "rigorous_statistical",
+    "min_support_threshold": 1
+  },
+  "stage_3": {
+    "total_hypotheses": 28,
+    "top_nes_score": 5.729071559806401
+  },
+  "stage_4_topology": {},
+  "stage_4_literature": {
+    "GO:0065007": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "40473955",
+          "title": "Epistasis regulates genetic control of cardiac hypertrophy.",
+          "year": 2025,
+          "relevance": 0.5008333333333334
+        },
+        {
+          "pmid": "40052435",
+          "title": "Therapeutic Targeting of Decr1 Ameliorates Cardiomyopathy by Suppressing Mitochondrial Fatty Acid Oxidation in Diabetic Mice.",
+          "year": 2025,
+          "relevance": 0.4766666666666667
+        },
+        {
+          "pmid": "39613849",
+          "title": "IGFBP5 affects cardiomyocyte survival and functional recovery in mice following myocardial ischemia.",
+          "year": 2024,
+          "relevance": 0.4766666666666667
+        }
+      ]
+    },
+    "GO:0007166": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "36036015",
+          "title": "Exercise-induced signaling pathways to counteracting cardiac apoptotic processes.",
+          "year": 2022,
+          "relevance": 0.5175
+        },
+        {
+          "pmid": "37477020",
+          "title": "EGFR/IGF1R Signaling Modulates Relaxation in Hypertrophic Cardiomyopathy.",
+          "year": 2023,
+          "relevance": 0.5016666666666667
+        },
+        {
+          "pmid": "34399835",
+          "title": "Multiple functions of autophagy in vascular calcification.",
+          "year": 2021,
+          "relevance": 0.4683333333333334
+        }
+      ]
+    },
+    "GO:0032502": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "34399835",
+          "title": "Multiple functions of autophagy in vascular calcification.",
+          "year": 2021,
+          "relevance": 0.44333333333333336
+        },
+        {
+          "pmid": "36036015",
+          "title": "Exercise-induced signaling pathways to counteracting cardiac apoptotic processes.",
+          "year": 2022,
+          "relevance": 0.4425
+        },
+        {
+          "pmid": "36726122",
+          "title": "Role of mitochondrial metabolic disorder and immune infiltration in diabetic cardiomyopathy: new insights from bioinformatics analysis.",
+          "year": 2023,
+          "relevance": 0.4091666666666667
+        }
+      ]
+    },
+    "GO:0009653": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "34399835",
+          "title": "Multiple functions of autophagy in vascular calcification.",
+          "year": 2021,
+          "relevance": 0.4016666666666666
+        },
+        {
+          "pmid": "40052435",
+          "title": "Therapeutic Targeting of Decr1 Ameliorates Cardiomyopathy by Suppressing Mitochondrial Fatty Acid Oxidation in Diabetic Mice.",
+          "year": 2025,
+          "relevance": 0.3516666666666667
+        },
+        {
+          "pmid": "37477020",
+          "title": "EGFR/IGF1R Signaling Modulates Relaxation in Hypertrophic Cardiomyopathy.",
+          "year": 2023,
+          "relevance": 0.3516666666666667
+        }
+      ]
+    },
+    "GO:0019222": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "40052435",
+          "title": "Therapeutic Targeting of Decr1 Ameliorates Cardiomyopathy by Suppressing Mitochondrial Fatty Acid Oxidation in Diabetic Mice.",
+          "year": 2025,
+          "relevance": 0.4766666666666667
+        },
+        {
+          "pmid": "36726122",
+          "title": "Role of mitochondrial metabolic disorder and immune infiltration in diabetic cardiomyopathy: new insights from bioinformatics analysis.",
+          "year": 2023,
+          "relevance": 0.4716666666666667
+        },
+        {
+          "pmid": "37477020",
+          "title": "EGFR/IGF1R Signaling Modulates Relaxation in Hypertrophic Cardiomyopathy.",
+          "year": 2023,
+          "relevance": 0.4141666666666667
+        }
+      ]
+    },
+    "GO:0048519": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "36726122",
+          "title": "Role of mitochondrial metabolic disorder and immune infiltration in diabetic cardiomyopathy: new insights from bioinformatics analysis.",
+          "year": 2023,
+          "relevance": 0.4341666666666667
+        },
+        {
+          "pmid": "36036015",
+          "title": "Exercise-induced signaling pathways to counteracting cardiac apoptotic processes.",
+          "year": 2022,
+          "relevance": 0.4175
+        },
+        {
+          "pmid": "40052435",
+          "title": "Therapeutic Targeting of Decr1 Ameliorates Cardiomyopathy by Suppressing Mitochondrial Fatty Acid Oxidation in Diabetic Mice.",
+          "year": 2025,
+          "relevance": 0.4016666666666666
+        }
+      ]
+    },
+    "GO:0048583": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "40052435",
+          "title": "Therapeutic Targeting of Decr1 Ameliorates Cardiomyopathy by Suppressing Mitochondrial Fatty Acid Oxidation in Diabetic Mice.",
+          "year": 2025,
+          "relevance": 0.4016666666666666
+        },
+        {
+          "pmid": "37477020",
+          "title": "EGFR/IGF1R Signaling Modulates Relaxation in Hypertrophic Cardiomyopathy.",
+          "year": 2023,
+          "relevance": 0.4016666666666666
+        },
+        {
+          "pmid": "33439236",
+          "title": "Identification of Cardiac Fibrosis in Young Adults With a Homozygous Frameshift Variant in SERPINE1.",
+          "year": 2021,
+          "relevance": 0.36750000000000005
+        }
+      ]
+    },
+    "GO:0042221": {
+      "citation_count": 24,
+      "top_citations": [
+        {
+          "pmid": "36036015",
+          "title": "Exercise-induced signaling pathways to counteracting cardiac apoptotic processes.",
+          "year": 2022,
+          "relevance": 0.4008333333333334
+        },
+        {
+          "pmid": "40052435",
+          "title": "Therapeutic Targeting of Decr1 Ameliorates Cardiomyopathy by Suppressing Mitochondrial Fatty Acid Oxidation in Diabetic Mice.",
+          "year": 2025,
+          "relevance": 0.3516666666666667
+        },
+        {
+          "pmid": "37477020",
+          "title": "EGFR/IGF1R Signaling Modulates Relaxation in Hypertrophic Cardiomyopathy.",
+          "year": 2023,
+          "relevance": 0.3516666666666667
+        }
+      ]
+    },
+    "GO:0035556": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "40052435",
+          "title": "Therapeutic Targeting of Decr1 Ameliorates Cardiomyopathy by Suppressing Mitochondrial Fatty Acid Oxidation in Diabetic Mice.",
+          "year": 2025,
+          "relevance": 0.43499999999999994
+        },
+        {
+          "pmid": "37477020",
+          "title": "EGFR/IGF1R Signaling Modulates Relaxation in Hypertrophic Cardiomyopathy.",
+          "year": 2023,
+          "relevance": 0.43499999999999994
+        },
+        {
+          "pmid": "34399835",
+          "title": "Multiple functions of autophagy in vascular calcification.",
+          "year": 2021,
+          "relevance": 0.4016666666666666
+        }
+      ]
+    },
+    "GO:0006950": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "36036015",
+          "title": "Exercise-induced signaling pathways to counteracting cardiac apoptotic processes.",
+          "year": 2022,
+          "relevance": 0.48416666666666663
+        },
+        {
+          "pmid": "37432746",
+          "title": "Stress-enhanced cardiac lncRNA Morrbid protects hearts from acute myocardial infarction.",
+          "year": 2023,
+          "relevance": 0.4008333333333334
+        },
+        {
+          "pmid": "40052435",
+          "title": "Therapeutic Targeting of Decr1 Ameliorates Cardiomyopathy by Suppressing Mitochondrial Fatty Acid Oxidation in Diabetic Mice.",
+          "year": 2025,
+          "relevance": 0.3516666666666667
+        }
+      ]
+    },
+    "GO:0051239": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "40052435",
+          "title": "Therapeutic Targeting of Decr1 Ameliorates Cardiomyopathy by Suppressing Mitochondrial Fatty Acid Oxidation in Diabetic Mice.",
+          "year": 2025,
+          "relevance": 0.4016666666666666
+        },
+        {
+          "pmid": "37477020",
+          "title": "EGFR/IGF1R Signaling Modulates Relaxation in Hypertrophic Cardiomyopathy.",
+          "year": 2023,
+          "relevance": 0.4016666666666666
+        },
+        {
+          "pmid": "39613849",
+          "title": "IGFBP5 affects cardiomyocyte survival and functional recovery in mice following myocardial ischemia.",
+          "year": 2024,
+          "relevance": 0.4016666666666666
+        }
+      ]
+    },
+    "GO:0048513": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "34399835",
+          "title": "Multiple functions of autophagy in vascular calcification.",
+          "year": 2021,
+          "relevance": 0.485
+        },
+        {
+          "pmid": "36726122",
+          "title": "Role of mitochondrial metabolic disorder and immune infiltration in diabetic cardiomyopathy: new insights from bioinformatics analysis.",
+          "year": 2023,
+          "relevance": 0.36750000000000005
+        },
+        {
+          "pmid": "40052435",
+          "title": "Therapeutic Targeting of Decr1 Ameliorates Cardiomyopathy by Suppressing Mitochondrial Fatty Acid Oxidation in Diabetic Mice.",
+          "year": 2025,
+          "relevance": 0.3516666666666667
+        }
+      ]
+    },
+    "GO:0019538": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "34399835",
+          "title": "Multiple functions of autophagy in vascular calcification.",
+          "year": 2021,
+          "relevance": 0.485
+        },
+        {
+          "pmid": "36036015",
+          "title": "Exercise-induced signaling pathways to counteracting cardiac apoptotic processes.",
+          "year": 2022,
+          "relevance": 0.48416666666666663
+        },
+        {
+          "pmid": "36726122",
+          "title": "Role of mitochondrial metabolic disorder and immune infiltration in diabetic cardiomyopathy: new insights from bioinformatics analysis.",
+          "year": 2023,
+          "relevance": 0.4508333333333333
+        }
+      ]
+    },
+    "GO:0051179": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "39004737",
+          "title": "Unveiling the PDK4-centered rituximab-resistant mechanism in DLBCL: the potential of the \"Smart\" exosome nanoparticle therapy.",
+          "year": 2024,
+          "relevance": 0.4008333333333334
+        },
+        {
+          "pmid": "34957921",
+          "title": "Role of lncRNA LIPE-AS1 in adipogenesis.",
+          "year": 2022,
+          "relevance": 0.4008333333333334
+        },
+        {
+          "pmid": "37834331",
+          "title": "The IGF1 Signaling Pathway: From Basic Concepts to Therapeutic Opportunities.",
+          "year": 2023,
+          "relevance": 0.36750000000000005
+        }
+      ]
+    },
+    "GO:0065008": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "40052435",
+          "title": "Therapeutic Targeting of Decr1 Ameliorates Cardiomyopathy by Suppressing Mitochondrial Fatty Acid Oxidation in Diabetic Mice.",
+          "year": 2025,
+          "relevance": 0.4141666666666667
+        },
+        {
+          "pmid": "37477020",
+          "title": "EGFR/IGF1R Signaling Modulates Relaxation in Hypertrophic Cardiomyopathy.",
+          "year": 2023,
+          "relevance": 0.4141666666666667
+        },
+        {
+          "pmid": "39613849",
+          "title": "IGFBP5 affects cardiomyocyte survival and functional recovery in mice following myocardial ischemia.",
+          "year": 2024,
+          "relevance": 0.4141666666666667
+        }
+      ]
+    },
+    "GO:0008283": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "40052435",
+          "title": "Therapeutic Targeting of Decr1 Ameliorates Cardiomyopathy by Suppressing Mitochondrial Fatty Acid Oxidation in Diabetic Mice.",
+          "year": 2025,
+          "relevance": 0.43499999999999994
+        },
+        {
+          "pmid": "37477020",
+          "title": "EGFR/IGF1R Signaling Modulates Relaxation in Hypertrophic Cardiomyopathy.",
+          "year": 2023,
+          "relevance": 0.43499999999999994
+        },
+        {
+          "pmid": "39613849",
+          "title": "IGFBP5 affects cardiomyocyte survival and functional recovery in mice following myocardial ischemia.",
+          "year": 2024,
+          "relevance": 0.43499999999999994
+        }
+      ]
+    },
+    "GO:0050793": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "40052435",
+          "title": "Therapeutic Targeting of Decr1 Ameliorates Cardiomyopathy by Suppressing Mitochondrial Fatty Acid Oxidation in Diabetic Mice.",
+          "year": 2025,
+          "relevance": 0.4141666666666667
+        },
+        {
+          "pmid": "37477020",
+          "title": "EGFR/IGF1R Signaling Modulates Relaxation in Hypertrophic Cardiomyopathy.",
+          "year": 2023,
+          "relevance": 0.4141666666666667
+        },
+        {
+          "pmid": "39613849",
+          "title": "IGFBP5 affects cardiomyocyte survival and functional recovery in mice following myocardial ischemia.",
+          "year": 2024,
+          "relevance": 0.4141666666666667
+        }
+      ]
+    },
+    "GO:0010604": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "36726122",
+          "title": "Role of mitochondrial metabolic disorder and immune infiltration in diabetic cardiomyopathy: new insights from bioinformatics analysis.",
+          "year": 2023,
+          "relevance": 0.4508333333333333
+        },
+        {
+          "pmid": "40052435",
+          "title": "Therapeutic Targeting of Decr1 Ameliorates Cardiomyopathy by Suppressing Mitochondrial Fatty Acid Oxidation in Diabetic Mice.",
+          "year": 2025,
+          "relevance": 0.43499999999999994
+        },
+        {
+          "pmid": "37477020",
+          "title": "EGFR/IGF1R Signaling Modulates Relaxation in Hypertrophic Cardiomyopathy.",
+          "year": 2023,
+          "relevance": 0.43499999999999994
+        }
+      ]
+    },
+    "GO:0009605": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "36036015",
+          "title": "Exercise-induced signaling pathways to counteracting cardiac apoptotic processes.",
+          "year": 2022,
+          "relevance": 0.38
+        },
+        {
+          "pmid": "40052435",
+          "title": "Therapeutic Targeting of Decr1 Ameliorates Cardiomyopathy by Suppressing Mitochondrial Fatty Acid Oxidation in Diabetic Mice.",
+          "year": 2025,
+          "relevance": 0.3516666666666667
+        },
+        {
+          "pmid": "37477020",
+          "title": "EGFR/IGF1R Signaling Modulates Relaxation in Hypertrophic Cardiomyopathy.",
+          "year": 2023,
+          "relevance": 0.3516666666666667
+        }
+      ]
+    },
+    "GO:0002376": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "36866436",
+          "title": "Pyruvate dehydrogenase kinase regulates vascular inflammation in atherosclerosis and increases cardiovascular risk.",
+          "year": 2023,
+          "relevance": 0.5008333333333334
+        },
+        {
+          "pmid": "36726122",
+          "title": "Role of mitochondrial metabolic disorder and immune infiltration in diabetic cardiomyopathy: new insights from bioinformatics analysis.",
+          "year": 2023,
+          "relevance": 0.4508333333333333
+        },
+        {
+          "pmid": "40222696",
+          "title": "Cardiac PDK4 promotes neutrophilic PFKL methylation and drives the innate immune response in diabetic myocardial infarction.",
+          "year": 2025,
+          "relevance": 0.4175
+        }
+      ]
+    },
+    "GO:0016310": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "40052435",
+          "title": "Therapeutic Targeting of Decr1 Ameliorates Cardiomyopathy by Suppressing Mitochondrial Fatty Acid Oxidation in Diabetic Mice.",
+          "year": 2025,
+          "relevance": 0.6016666666666667
+        },
+        {
+          "pmid": "36036015",
+          "title": "Exercise-induced signaling pathways to counteracting cardiac apoptotic processes.",
+          "year": 2022,
+          "relevance": 0.5675
+        },
+        {
+          "pmid": "39467114",
+          "title": "Dexmedetomidine Ameliorates Myocardial Ischemia-Reperfusion Injury by Inhibiting MDH2 Lactylation via Regulating Metabolic Reprogramming.",
+          "year": 2024,
+          "relevance": 0.5341666666666667
+        }
+      ]
+    },
+    "GO:0048646": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "34399835",
+          "title": "Multiple functions of autophagy in vascular calcification.",
+          "year": 2021,
+          "relevance": 0.4016666666666666
+        },
+        {
+          "pmid": "37477020",
+          "title": "EGFR/IGF1R Signaling Modulates Relaxation in Hypertrophic Cardiomyopathy.",
+          "year": 2023,
+          "relevance": 0.3933333333333333
+        },
+        {
+          "pmid": "39613849",
+          "title": "IGFBP5 affects cardiomyocyte survival and functional recovery in mice following myocardial ischemia.",
+          "year": 2024,
+          "relevance": 0.3933333333333333
+        }
+      ]
+    },
+    "GO:0007167": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "36036015",
+          "title": "Exercise-induced signaling pathways to counteracting cardiac apoptotic processes.",
+          "year": 2022,
+          "relevance": 0.5175
+        },
+        {
+          "pmid": "37477020",
+          "title": "EGFR/IGF1R Signaling Modulates Relaxation in Hypertrophic Cardiomyopathy.",
+          "year": 2023,
+          "relevance": 0.5016666666666667
+        },
+        {
+          "pmid": "39613849",
+          "title": "IGFBP5 affects cardiomyocyte survival and functional recovery in mice following myocardial ischemia.",
+          "year": 2024,
+          "relevance": 0.5016666666666667
+        }
+      ]
+    },
+    "GO:0009967": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "37477020",
+          "title": "EGFR/IGF1R Signaling Modulates Relaxation in Hypertrophic Cardiomyopathy.",
+          "year": 2023,
+          "relevance": 0.5016666666666667
+        },
+        {
+          "pmid": "40052435",
+          "title": "Therapeutic Targeting of Decr1 Ameliorates Cardiomyopathy by Suppressing Mitochondrial Fatty Acid Oxidation in Diabetic Mice.",
+          "year": 2025,
+          "relevance": 0.45166666666666666
+        },
+        {
+          "pmid": "39613849",
+          "title": "IGFBP5 affects cardiomyocyte survival and functional recovery in mice following myocardial ischemia.",
+          "year": 2024,
+          "relevance": 0.4016666666666666
+        }
+      ]
+    },
+    "GO:0008219": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "37432746",
+          "title": "Stress-enhanced cardiac lncRNA Morrbid protects hearts from acute myocardial infarction.",
+          "year": 2023,
+          "relevance": 0.5675
+        },
+        {
+          "pmid": "36036015",
+          "title": "Exercise-induced signaling pathways to counteracting cardiac apoptotic processes.",
+          "year": 2022,
+          "relevance": 0.5675
+        },
+        {
+          "pmid": "36726122",
+          "title": "Role of mitochondrial metabolic disorder and immune infiltration in diabetic cardiomyopathy: new insights from bioinformatics analysis.",
+          "year": 2023,
+          "relevance": 0.5341666666666667
+        }
+      ]
+    },
+    "GO:0048468": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "34399835",
+          "title": "Multiple functions of autophagy in vascular calcification.",
+          "year": 2021,
+          "relevance": 0.5683333333333334
+        },
+        {
+          "pmid": "36866436",
+          "title": "Pyruvate dehydrogenase kinase regulates vascular inflammation in atherosclerosis and increases cardiovascular risk.",
+          "year": 2023,
+          "relevance": 0.5008333333333334
+        },
+        {
+          "pmid": "40052435",
+          "title": "Therapeutic Targeting of Decr1 Ameliorates Cardiomyopathy by Suppressing Mitochondrial Fatty Acid Oxidation in Diabetic Mice.",
+          "year": 2025,
+          "relevance": 0.4766666666666667
+        }
+      ]
+    },
+    "GO:0009888": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "37477020",
+          "title": "EGFR/IGF1R Signaling Modulates Relaxation in Hypertrophic Cardiomyopathy.",
+          "year": 2023,
+          "relevance": 0.4766666666666667
+        },
+        {
+          "pmid": "34399835",
+          "title": "Multiple functions of autophagy in vascular calcification.",
+          "year": 2021,
+          "relevance": 0.44333333333333336
+        },
+        {
+          "pmid": "36866436",
+          "title": "Pyruvate dehydrogenase kinase regulates vascular inflammation in atherosclerosis and increases cardiovascular risk.",
+          "year": 2023,
+          "relevance": 0.37583333333333335
+        }
+      ]
+    },
+    "GO:0035239": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "40052435",
+          "title": "Therapeutic Targeting of Decr1 Ameliorates Cardiomyopathy by Suppressing Mitochondrial Fatty Acid Oxidation in Diabetic Mice.",
+          "year": 2025,
+          "relevance": 0.3516666666666667
+        },
+        {
+          "pmid": "37477020",
+          "title": "EGFR/IGF1R Signaling Modulates Relaxation in Hypertrophic Cardiomyopathy.",
+          "year": 2023,
+          "relevance": 0.3516666666666667
+        },
+        {
+          "pmid": "39613849",
+          "title": "IGFBP5 affects cardiomyocyte survival and functional recovery in mice following myocardial ischemia.",
+          "year": 2024,
+          "relevance": 0.3516666666666667
+        }
+      ]
+    },
+    "GO:0009719": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "36036015",
+          "title": "Exercise-induced signaling pathways to counteracting cardiac apoptotic processes.",
+          "year": 2022,
+          "relevance": 0.38
+        },
+        {
+          "pmid": "40052435",
+          "title": "Therapeutic Targeting of Decr1 Ameliorates Cardiomyopathy by Suppressing Mitochondrial Fatty Acid Oxidation in Diabetic Mice.",
+          "year": 2025,
+          "relevance": 0.3516666666666667
+        },
+        {
+          "pmid": "37477020",
+          "title": "EGFR/IGF1R Signaling Modulates Relaxation in Hypertrophic Cardiomyopathy.",
+          "year": 2023,
+          "relevance": 0.3516666666666667
+        }
+      ]
+    },
+    "GO:1901700": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "37477020",
+          "title": "EGFR/IGF1R Signaling Modulates Relaxation in Hypertrophic Cardiomyopathy.",
+          "year": 2023,
+          "relevance": 0.4141666666666667
+        },
+        {
+          "pmid": "36036015",
+          "title": "Exercise-induced signaling pathways to counteracting cardiac apoptotic processes.",
+          "year": 2022,
+          "relevance": 0.38
+        },
+        {
+          "pmid": "40052435",
+          "title": "Therapeutic Targeting of Decr1 Ameliorates Cardiomyopathy by Suppressing Mitochondrial Fatty Acid Oxidation in Diabetic Mice.",
+          "year": 2025,
+          "relevance": 0.3516666666666667
+        }
+      ]
+    },
+    "GO:0051240": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "37477020",
+          "title": "EGFR/IGF1R Signaling Modulates Relaxation in Hypertrophic Cardiomyopathy.",
+          "year": 2023,
+          "relevance": 0.43499999999999994
+        },
+        {
+          "pmid": "36726122",
+          "title": "Role of mitochondrial metabolic disorder and immune infiltration in diabetic cardiomyopathy: new insights from bioinformatics analysis.",
+          "year": 2023,
+          "relevance": 0.4091666666666667
+        },
+        {
+          "pmid": "40052435",
+          "title": "Therapeutic Targeting of Decr1 Ameliorates Cardiomyopathy by Suppressing Mitochondrial Fatty Acid Oxidation in Diabetic Mice.",
+          "year": 2025,
+          "relevance": 0.3933333333333333
+        }
+      ]
+    },
+    "GO:0006952": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "36036015",
+          "title": "Exercise-induced signaling pathways to counteracting cardiac apoptotic processes.",
+          "year": 2022,
+          "relevance": 0.4425
+        },
+        {
+          "pmid": "32617517",
+          "title": "Mitochondrial Substrate Utilization Regulates Cardiomyocyte Cell Cycle Progression.",
+          "year": 2020,
+          "relevance": 0.37583333333333335
+        },
+        {
+          "pmid": "40222696",
+          "title": "Cardiac PDK4 promotes neutrophilic PFKL methylation and drives the innate immune response in diabetic myocardial infarction.",
+          "year": 2025,
+          "relevance": 0.37583333333333335
+        }
+      ]
+    },
+    "GO:0009892": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "36726122",
+          "title": "Role of mitochondrial metabolic disorder and immune infiltration in diabetic cardiomyopathy: new insights from bioinformatics analysis.",
+          "year": 2023,
+          "relevance": 0.48416666666666663
+        },
+        {
+          "pmid": "40052435",
+          "title": "Therapeutic Targeting of Decr1 Ameliorates Cardiomyopathy by Suppressing Mitochondrial Fatty Acid Oxidation in Diabetic Mice.",
+          "year": 2025,
+          "relevance": 0.45166666666666666
+        },
+        {
+          "pmid": "36036015",
+          "title": "Exercise-induced signaling pathways to counteracting cardiac apoptotic processes.",
+          "year": 2022,
+          "relevance": 0.4175
+        }
+      ]
+    },
+    "GO:0009887": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "34399835",
+          "title": "Multiple functions of autophagy in vascular calcification.",
+          "year": 2021,
+          "relevance": 0.4016666666666666
+        },
+        {
+          "pmid": "36726122",
+          "title": "Role of mitochondrial metabolic disorder and immune infiltration in diabetic cardiomyopathy: new insights from bioinformatics analysis.",
+          "year": 2023,
+          "relevance": 0.36750000000000005
+        },
+        {
+          "pmid": "40052435",
+          "title": "Therapeutic Targeting of Decr1 Ameliorates Cardiomyopathy by Suppressing Mitochondrial Fatty Acid Oxidation in Diabetic Mice.",
+          "year": 2025,
+          "relevance": 0.3516666666666667
+        }
+      ]
+    },
+    "GO:0044419": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "34399835",
+          "title": "Multiple functions of autophagy in vascular calcification.",
+          "year": 2021,
+          "relevance": 0.41208333333333336
+        },
+        {
+          "pmid": "36726122",
+          "title": "Role of mitochondrial metabolic disorder and immune infiltration in diabetic cardiomyopathy: new insights from bioinformatics analysis.",
+          "year": 2023,
+          "relevance": 0.4091666666666667
+        },
+        {
+          "pmid": "37477020",
+          "title": "EGFR/IGF1R Signaling Modulates Relaxation in Hypertrophic Cardiomyopathy.",
+          "year": 2023,
+          "relevance": 0.3829166666666667
+        }
+      ]
+    },
+    "GO:0051246": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "40052435",
+          "title": "Therapeutic Targeting of Decr1 Ameliorates Cardiomyopathy by Suppressing Mitochondrial Fatty Acid Oxidation in Diabetic Mice.",
+          "year": 2025,
+          "relevance": 0.45166666666666666
+        },
+        {
+          "pmid": "37477020",
+          "title": "EGFR/IGF1R Signaling Modulates Relaxation in Hypertrophic Cardiomyopathy.",
+          "year": 2023,
+          "relevance": 0.45166666666666666
+        },
+        {
+          "pmid": "39613849",
+          "title": "IGFBP5 affects cardiomyocyte survival and functional recovery in mice following myocardial ischemia.",
+          "year": 2024,
+          "relevance": 0.45166666666666666
+        }
+      ]
+    },
+    "GO:0042592": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "34399835",
+          "title": "Multiple functions of autophagy in vascular calcification.",
+          "year": 2021,
+          "relevance": 0.44333333333333336
+        },
+        {
+          "pmid": "36036015",
+          "title": "Exercise-induced signaling pathways to counteracting cardiac apoptotic processes.",
+          "year": 2022,
+          "relevance": 0.4425
+        },
+        {
+          "pmid": "36726122",
+          "title": "Role of mitochondrial metabolic disorder and immune infiltration in diabetic cardiomyopathy: new insights from bioinformatics analysis.",
+          "year": 2023,
+          "relevance": 0.4091666666666667
+        }
+      ]
+    },
+    "GO:0019219": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "40052435",
+          "title": "Therapeutic Targeting of Decr1 Ameliorates Cardiomyopathy by Suppressing Mitochondrial Fatty Acid Oxidation in Diabetic Mice.",
+          "year": 2025,
+          "relevance": 0.43499999999999994
+        },
+        {
+          "pmid": "37477020",
+          "title": "EGFR/IGF1R Signaling Modulates Relaxation in Hypertrophic Cardiomyopathy.",
+          "year": 2023,
+          "relevance": 0.43499999999999994
+        },
+        {
+          "pmid": "36726122",
+          "title": "Role of mitochondrial metabolic disorder and immune infiltration in diabetic cardiomyopathy: new insights from bioinformatics analysis.",
+          "year": 2023,
+          "relevance": 0.4091666666666667
+        }
+      ]
+    },
+    "GO:0045595": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "40052435",
+          "title": "Therapeutic Targeting of Decr1 Ameliorates Cardiomyopathy by Suppressing Mitochondrial Fatty Acid Oxidation in Diabetic Mice.",
+          "year": 2025,
+          "relevance": 0.4766666666666667
+        },
+        {
+          "pmid": "37477020",
+          "title": "EGFR/IGF1R Signaling Modulates Relaxation in Hypertrophic Cardiomyopathy.",
+          "year": 2023,
+          "relevance": 0.4766666666666667
+        },
+        {
+          "pmid": "34399835",
+          "title": "Multiple functions of autophagy in vascular calcification.",
+          "year": 2021,
+          "relevance": 0.44333333333333336
+        }
+      ]
+    },
+    "KEGG:04151": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "34399835",
+          "title": "Multiple functions of autophagy in vascular calcification.",
+          "year": 2021,
+          "relevance": 0.485
+        },
+        {
+          "pmid": "36036015",
+          "title": "Exercise-induced signaling pathways to counteracting cardiac apoptotic processes.",
+          "year": 2022,
+          "relevance": 0.48416666666666663
+        },
+        {
+          "pmid": "34852207",
+          "title": "Aerobic exercise and resistance exercise alleviate skeletal muscle atrophy through IGF-1/IGF-1R-PI3K/Akt pathway in mice with myocardial infarction.",
+          "year": 2022,
+          "relevance": 0.4666666666666667
+        }
+      ]
+    },
+    "GO:0070848": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "39613849",
+          "title": "IGFBP5 affects cardiomyocyte survival and functional recovery in mice following myocardial ischemia.",
+          "year": 2024,
+          "relevance": 0.4766666666666667
+        },
+        {
+          "pmid": "37477020",
+          "title": "EGFR/IGF1R Signaling Modulates Relaxation in Hypertrophic Cardiomyopathy.",
+          "year": 2023,
+          "relevance": 0.4766666666666667
+        },
+        {
+          "pmid": "36036015",
+          "title": "Exercise-induced signaling pathways to counteracting cardiac apoptotic processes.",
+          "year": 2022,
+          "relevance": 0.4425
+        }
+      ]
+    },
+    "GO:0051094": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "37477020",
+          "title": "EGFR/IGF1R Signaling Modulates Relaxation in Hypertrophic Cardiomyopathy.",
+          "year": 2023,
+          "relevance": 0.45166666666666666
+        },
+        {
+          "pmid": "36726122",
+          "title": "Role of mitochondrial metabolic disorder and immune infiltration in diabetic cardiomyopathy: new insights from bioinformatics analysis.",
+          "year": 2023,
+          "relevance": 0.4341666666666667
+        },
+        {
+          "pmid": "40052435",
+          "title": "Therapeutic Targeting of Decr1 Ameliorates Cardiomyopathy by Suppressing Mitochondrial Fatty Acid Oxidation in Diabetic Mice.",
+          "year": 2025,
+          "relevance": 0.4016666666666666
+        }
+      ]
+    },
+    "GO:0097190": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "34399835",
+          "title": "Multiple functions of autophagy in vascular calcification.",
+          "year": 2021,
+          "relevance": 0.5683333333333334
+        },
+        {
+          "pmid": "36036015",
+          "title": "Exercise-induced signaling pathways to counteracting cardiac apoptotic processes.",
+          "year": 2022,
+          "relevance": 0.5675
+        },
+        {
+          "pmid": "40052435",
+          "title": "Therapeutic Targeting of Decr1 Ameliorates Cardiomyopathy by Suppressing Mitochondrial Fatty Acid Oxidation in Diabetic Mice.",
+          "year": 2025,
+          "relevance": 0.43499999999999994
+        }
+      ]
+    },
+    "GO:0007507": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "40052435",
+          "title": "Therapeutic Targeting of Decr1 Ameliorates Cardiomyopathy by Suppressing Mitochondrial Fatty Acid Oxidation in Diabetic Mice.",
+          "year": 2025,
+          "relevance": 0.4766666666666667
+        },
+        {
+          "pmid": "39613849",
+          "title": "IGFBP5 affects cardiomyocyte survival and functional recovery in mice following myocardial ischemia.",
+          "year": 2024,
+          "relevance": 0.4766666666666667
+        },
+        {
+          "pmid": "37477020",
+          "title": "EGFR/IGF1R Signaling Modulates Relaxation in Hypertrophic Cardiomyopathy.",
+          "year": 2023,
+          "relevance": 0.4766666666666667
+        }
+      ]
+    },
+    "GO:0072359": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "36866436",
+          "title": "Pyruvate dehydrogenase kinase regulates vascular inflammation in atherosclerosis and increases cardiovascular risk.",
+          "year": 2023,
+          "relevance": 0.4175
+        },
+        {
+          "pmid": "34399835",
+          "title": "Multiple functions of autophagy in vascular calcification.",
+          "year": 2021,
+          "relevance": 0.4016666666666666
+        },
+        {
+          "pmid": "40052435",
+          "title": "Therapeutic Targeting of Decr1 Ameliorates Cardiomyopathy by Suppressing Mitochondrial Fatty Acid Oxidation in Diabetic Mice.",
+          "year": 2025,
+          "relevance": 0.3516666666666667
+        }
+      ]
+    },
+    "GO:2000026": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "40052435",
+          "title": "Therapeutic Targeting of Decr1 Ameliorates Cardiomyopathy by Suppressing Mitochondrial Fatty Acid Oxidation in Diabetic Mice.",
+          "year": 2025,
+          "relevance": 0.4016666666666666
+        },
+        {
+          "pmid": "37477020",
+          "title": "EGFR/IGF1R Signaling Modulates Relaxation in Hypertrophic Cardiomyopathy.",
+          "year": 2023,
+          "relevance": 0.4016666666666666
+        },
+        {
+          "pmid": "39613849",
+          "title": "IGFBP5 affects cardiomyocyte survival and functional recovery in mice following myocardial ischemia.",
+          "year": 2024,
+          "relevance": 0.4016666666666666
+        }
+      ]
+    },
+    "KEGG:05410": {
+      "citation_count": 0,
+      "top_citations": []
+    },
+    "KEGG:05414": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "33135971",
+          "title": "Assessment of <i>PDK4</i> and <i>TTN</i> gene variants in 48 Doberman Pinschers with dilated cardiomyopathy.",
+          "year": 2020,
+          "relevance": 0.5341666666666667
+        },
+        {
+          "pmid": "40052435",
+          "title": "Therapeutic Targeting of Decr1 Ameliorates Cardiomyopathy by Suppressing Mitochondrial Fatty Acid Oxidation in Diabetic Mice.",
+          "year": 2025,
+          "relevance": 0.4766666666666667
+        },
+        {
+          "pmid": "37477020",
+          "title": "EGFR/IGF1R Signaling Modulates Relaxation in Hypertrophic Cardiomyopathy.",
+          "year": 2023,
+          "relevance": 0.4766666666666667
+        }
+      ]
+    },
+    "GO:0003179": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "39467114",
+          "title": "Dexmedetomidine Ameliorates Myocardial Ischemia-Reperfusion Injury by Inhibiting MDH2 Lactylation via Regulating Metabolic Reprogramming.",
+          "year": 2024,
+          "relevance": 0.4508333333333333
+        },
+        {
+          "pmid": "40052435",
+          "title": "Therapeutic Targeting of Decr1 Ameliorates Cardiomyopathy by Suppressing Mitochondrial Fatty Acid Oxidation in Diabetic Mice.",
+          "year": 2025,
+          "relevance": 0.43499999999999994
+        },
+        {
+          "pmid": "37477020",
+          "title": "EGFR/IGF1R Signaling Modulates Relaxation in Hypertrophic Cardiomyopathy.",
+          "year": 2023,
+          "relevance": 0.43499999999999994
+        }
+      ]
+    },
+    "WP:WP2118": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "40052435",
+          "title": "Therapeutic Targeting of Decr1 Ameliorates Cardiomyopathy by Suppressing Mitochondrial Fatty Acid Oxidation in Diabetic Mice.",
+          "year": 2025,
+          "relevance": 0.4141666666666667
+        },
+        {
+          "pmid": "37477020",
+          "title": "EGFR/IGF1R Signaling Modulates Relaxation in Hypertrophic Cardiomyopathy.",
+          "year": 2023,
+          "relevance": 0.4141666666666667
+        },
+        {
+          "pmid": "33135971",
+          "title": "Assessment of <i>PDK4</i> and <i>TTN</i> gene variants in 48 Doberman Pinschers with dilated cardiomyopathy.",
+          "year": 2020,
+          "relevance": 0.4091666666666667
+        }
+      ]
+    },
+    "GO:0060411": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "40052435",
+          "title": "Therapeutic Targeting of Decr1 Ameliorates Cardiomyopathy by Suppressing Mitochondrial Fatty Acid Oxidation in Diabetic Mice.",
+          "year": 2025,
+          "relevance": 0.43499999999999994
+        },
+        {
+          "pmid": "39613849",
+          "title": "IGFBP5 affects cardiomyocyte survival and functional recovery in mice following myocardial ischemia.",
+          "year": 2024,
+          "relevance": 0.43499999999999994
+        },
+        {
+          "pmid": "37477020",
+          "title": "EGFR/IGF1R Signaling Modulates Relaxation in Hypertrophic Cardiomyopathy.",
+          "year": 2023,
+          "relevance": 0.43499999999999994
+        }
+      ]
+    },
+    "GO:0003180": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "39467114",
+          "title": "Dexmedetomidine Ameliorates Myocardial Ischemia-Reperfusion Injury by Inhibiting MDH2 Lactylation via Regulating Metabolic Reprogramming.",
+          "year": 2024,
+          "relevance": 0.36750000000000005
+        },
+        {
+          "pmid": "40052435",
+          "title": "Therapeutic Targeting of Decr1 Ameliorates Cardiomyopathy by Suppressing Mitochondrial Fatty Acid Oxidation in Diabetic Mice.",
+          "year": 2025,
+          "relevance": 0.3516666666666667
+        },
+        {
+          "pmid": "39613849",
+          "title": "IGFBP5 affects cardiomyocyte survival and functional recovery in mice following myocardial ischemia.",
+          "year": 2024,
+          "relevance": 0.3516666666666667
+        }
+      ]
+    },
+    "WP:WP2406": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "40052435",
+          "title": "Therapeutic Targeting of Decr1 Ameliorates Cardiomyopathy by Suppressing Mitochondrial Fatty Acid Oxidation in Diabetic Mice.",
+          "year": 2025,
+          "relevance": 0.43499999999999994
+        },
+        {
+          "pmid": "37477020",
+          "title": "EGFR/IGF1R Signaling Modulates Relaxation in Hypertrophic Cardiomyopathy.",
+          "year": 2023,
+          "relevance": 0.43499999999999994
+        },
+        {
+          "pmid": "39613849",
+          "title": "IGFBP5 affects cardiomyocyte survival and functional recovery in mice following myocardial ischemia.",
+          "year": 2024,
+          "relevance": 0.43499999999999994
+        }
+      ]
+    },
+    "WP:WP1528": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "40052435",
+          "title": "Therapeutic Targeting of Decr1 Ameliorates Cardiomyopathy by Suppressing Mitochondrial Fatty Acid Oxidation in Diabetic Mice.",
+          "year": 2025,
+          "relevance": 0.4230952380952381
+        },
+        {
+          "pmid": "39613849",
+          "title": "IGFBP5 affects cardiomyocyte survival and functional recovery in mice following myocardial ischemia.",
+          "year": 2024,
+          "relevance": 0.4230952380952381
+        },
+        {
+          "pmid": "37477020",
+          "title": "EGFR/IGF1R Signaling Modulates Relaxation in Hypertrophic Cardiomyopathy.",
+          "year": 2023,
+          "relevance": 0.3873809523809524
+        }
+      ]
+    },
+    "GO:0003181": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "39467114",
+          "title": "Dexmedetomidine Ameliorates Myocardial Ischemia-Reperfusion Injury by Inhibiting MDH2 Lactylation via Regulating Metabolic Reprogramming.",
+          "year": 2024,
+          "relevance": 0.36750000000000005
+        },
+        {
+          "pmid": "40052435",
+          "title": "Therapeutic Targeting of Decr1 Ameliorates Cardiomyopathy by Suppressing Mitochondrial Fatty Acid Oxidation in Diabetic Mice.",
+          "year": 2025,
+          "relevance": 0.3516666666666667
+        },
+        {
+          "pmid": "39613849",
+          "title": "IGFBP5 affects cardiomyocyte survival and functional recovery in mice following myocardial ischemia.",
+          "year": 2024,
+          "relevance": 0.3516666666666667
+        }
+      ]
+    },
+    "GO:0060412": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "40052435",
+          "title": "Therapeutic Targeting of Decr1 Ameliorates Cardiomyopathy by Suppressing Mitochondrial Fatty Acid Oxidation in Diabetic Mice.",
+          "year": 2025,
+          "relevance": 0.3516666666666667
+        },
+        {
+          "pmid": "39613849",
+          "title": "IGFBP5 affects cardiomyocyte survival and functional recovery in mice following myocardial ischemia.",
+          "year": 2024,
+          "relevance": 0.3516666666666667
+        },
+        {
+          "pmid": "37477020",
+          "title": "EGFR/IGF1R Signaling Modulates Relaxation in Hypertrophic Cardiomyopathy.",
+          "year": 2023,
+          "relevance": 0.3516666666666667
+        }
+      ]
+    },
+    "REAC:R-HSA-9733709": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "37012447",
+          "title": "Epicardioid single-cell genomics uncovers principles of human epicardium biology in heart development and disease.",
+          "year": 2023,
+          "relevance": 0.36750000000000005
+        },
+        {
+          "pmid": "40052435",
+          "title": "Therapeutic Targeting of Decr1 Ameliorates Cardiomyopathy by Suppressing Mitochondrial Fatty Acid Oxidation in Diabetic Mice.",
+          "year": 2025,
+          "relevance": 0.3516666666666667
+        },
+        {
+          "pmid": "37477020",
+          "title": "EGFR/IGF1R Signaling Modulates Relaxation in Hypertrophic Cardiomyopathy.",
+          "year": 2023,
+          "relevance": 0.3516666666666667
+        }
+      ]
+    },
+    "GO:0060978": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "39613849",
+          "title": "IGFBP5 affects cardiomyocyte survival and functional recovery in mice following myocardial ischemia.",
+          "year": 2024,
+          "relevance": 0.43499999999999994
+        },
+        {
+          "pmid": "33439236",
+          "title": "Identification of Cardiac Fibrosis in Young Adults With a Homozygous Frameshift Variant in SERPINE1.",
+          "year": 2021,
+          "relevance": 0.4008333333333334
+        },
+        {
+          "pmid": "37477020",
+          "title": "EGFR/IGF1R Signaling Modulates Relaxation in Hypertrophic Cardiomyopathy.",
+          "year": 2023,
+          "relevance": 0.3933333333333333
+        }
+      ]
+    },
+    "GO:0060979": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "39613849",
+          "title": "IGFBP5 affects cardiomyocyte survival and functional recovery in mice following myocardial ischemia.",
+          "year": 2024,
+          "relevance": 0.43499999999999994
+        },
+        {
+          "pmid": "33439236",
+          "title": "Identification of Cardiac Fibrosis in Young Adults With a Homozygous Frameshift Variant in SERPINE1.",
+          "year": 2021,
+          "relevance": 0.4008333333333334
+        },
+        {
+          "pmid": "37477020",
+          "title": "EGFR/IGF1R Signaling Modulates Relaxation in Hypertrophic Cardiomyopathy.",
+          "year": 2023,
+          "relevance": 0.3933333333333333
+        }
+      ]
+    },
+    "GO:2000136": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "37477020",
+          "title": "EGFR/IGF1R Signaling Modulates Relaxation in Hypertrophic Cardiomyopathy.",
+          "year": 2023,
+          "relevance": 0.4766666666666667
+        },
+        {
+          "pmid": "39613849",
+          "title": "IGFBP5 affects cardiomyocyte survival and functional recovery in mice following myocardial ischemia.",
+          "year": 2024,
+          "relevance": 0.4766666666666667
+        },
+        {
+          "pmid": "40052435",
+          "title": "Therapeutic Targeting of Decr1 Ameliorates Cardiomyopathy by Suppressing Mitochondrial Fatty Acid Oxidation in Diabetic Mice.",
+          "year": 2025,
+          "relevance": 0.4454166666666667
+        }
+      ]
+    },
+    "GO:0003278": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "36036015",
+          "title": "Exercise-induced signaling pathways to counteracting cardiac apoptotic processes.",
+          "year": 2022,
+          "relevance": 0.4425
+        },
+        {
+          "pmid": "37477020",
+          "title": "EGFR/IGF1R Signaling Modulates Relaxation in Hypertrophic Cardiomyopathy.",
+          "year": 2023,
+          "relevance": 0.43499999999999994
+        },
+        {
+          "pmid": "39613849",
+          "title": "IGFBP5 affects cardiomyocyte survival and functional recovery in mice following myocardial ischemia.",
+          "year": 2024,
+          "relevance": 0.43499999999999994
+        }
+      ]
+    },
+    "WP:WP1559": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "40052435",
+          "title": "Therapeutic Targeting of Decr1 Ameliorates Cardiomyopathy by Suppressing Mitochondrial Fatty Acid Oxidation in Diabetic Mice.",
+          "year": 2025,
+          "relevance": 0.4766666666666667
+        },
+        {
+          "pmid": "36726122",
+          "title": "Role of mitochondrial metabolic disorder and immune infiltration in diabetic cardiomyopathy: new insights from bioinformatics analysis.",
+          "year": 2023,
+          "relevance": 0.4404166666666667
+        },
+        {
+          "pmid": "37477020",
+          "title": "EGFR/IGF1R Signaling Modulates Relaxation in Hypertrophic Cardiomyopathy.",
+          "year": 2023,
+          "relevance": 0.4141666666666667
+        }
+      ]
+    },
+    "GO:0003222": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "37477020",
+          "title": "EGFR/IGF1R Signaling Modulates Relaxation in Hypertrophic Cardiomyopathy.",
+          "year": 2023,
+          "relevance": 0.4141666666666667
+        },
+        {
+          "pmid": "40052435",
+          "title": "Therapeutic Targeting of Decr1 Ameliorates Cardiomyopathy by Suppressing Mitochondrial Fatty Acid Oxidation in Diabetic Mice.",
+          "year": 2025,
+          "relevance": 0.3516666666666667
+        },
+        {
+          "pmid": "39613849",
+          "title": "IGFBP5 affects cardiomyocyte survival and functional recovery in mice following myocardial ischemia.",
+          "year": 2024,
+          "relevance": 0.3516666666666667
+        }
+      ]
+    },
+    "GO:0061343": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "37477020",
+          "title": "EGFR/IGF1R Signaling Modulates Relaxation in Hypertrophic Cardiomyopathy.",
+          "year": 2023,
+          "relevance": 0.4766666666666667
+        },
+        {
+          "pmid": "37432746",
+          "title": "Stress-enhanced cardiac lncRNA Morrbid protects hearts from acute myocardial infarction.",
+          "year": 2023,
+          "relevance": 0.4425
+        },
+        {
+          "pmid": "36036015",
+          "title": "Exercise-induced signaling pathways to counteracting cardiac apoptotic processes.",
+          "year": 2022,
+          "relevance": 0.4425
+        }
+      ]
+    },
+    "GO:0003223": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "37477020",
+          "title": "EGFR/IGF1R Signaling Modulates Relaxation in Hypertrophic Cardiomyopathy.",
+          "year": 2023,
+          "relevance": 0.4141666666666667
+        },
+        {
+          "pmid": "40052435",
+          "title": "Therapeutic Targeting of Decr1 Ameliorates Cardiomyopathy by Suppressing Mitochondrial Fatty Acid Oxidation in Diabetic Mice.",
+          "year": 2025,
+          "relevance": 0.3516666666666667
+        },
+        {
+          "pmid": "39613849",
+          "title": "IGFBP5 affects cardiomyocyte survival and functional recovery in mice following myocardial ischemia.",
+          "year": 2024,
+          "relevance": 0.3516666666666667
+        }
+      ]
+    },
+    "WP:WP2456": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "37477020",
+          "title": "EGFR/IGF1R Signaling Modulates Relaxation in Hypertrophic Cardiomyopathy.",
+          "year": 2023,
+          "relevance": 0.43499999999999994
+        },
+        {
+          "pmid": "40052435",
+          "title": "Therapeutic Targeting of Decr1 Ameliorates Cardiomyopathy by Suppressing Mitochondrial Fatty Acid Oxidation in Diabetic Mice.",
+          "year": 2025,
+          "relevance": 0.3933333333333333
+        },
+        {
+          "pmid": "33439236",
+          "title": "Identification of Cardiac Fibrosis in Young Adults With a Homozygous Frameshift Variant in SERPINE1.",
+          "year": 2021,
+          "relevance": 0.35916666666666663
+        }
+      ]
+    },
+    "GO:0060413": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "40052435",
+          "title": "Therapeutic Targeting of Decr1 Ameliorates Cardiomyopathy by Suppressing Mitochondrial Fatty Acid Oxidation in Diabetic Mice.",
+          "year": 2025,
+          "relevance": 0.3516666666666667
+        },
+        {
+          "pmid": "39613849",
+          "title": "IGFBP5 affects cardiomyocyte survival and functional recovery in mice following myocardial ischemia.",
+          "year": 2024,
+          "relevance": 0.3516666666666667
+        },
+        {
+          "pmid": "37477020",
+          "title": "EGFR/IGF1R Signaling Modulates Relaxation in Hypertrophic Cardiomyopathy.",
+          "year": 2023,
+          "relevance": 0.3516666666666667
+        }
+      ]
+    },
+    "GO:0003251": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "37477020",
+          "title": "EGFR/IGF1R Signaling Modulates Relaxation in Hypertrophic Cardiomyopathy.",
+          "year": 2023,
+          "relevance": 0.4766666666666667
+        },
+        {
+          "pmid": "39613849",
+          "title": "IGFBP5 affects cardiomyocyte survival and functional recovery in mice following myocardial ischemia.",
+          "year": 2024,
+          "relevance": 0.45166666666666666
+        },
+        {
+          "pmid": "40052435",
+          "title": "Therapeutic Targeting of Decr1 Ameliorates Cardiomyopathy by Suppressing Mitochondrial Fatty Acid Oxidation in Diabetic Mice.",
+          "year": 2025,
+          "relevance": 0.42666666666666664
+        }
+      ]
+    },
+    "GO:0003185": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "39467114",
+          "title": "Dexmedetomidine Ameliorates Myocardial Ischemia-Reperfusion Injury by Inhibiting MDH2 Lactylation via Regulating Metabolic Reprogramming.",
+          "year": 2024,
+          "relevance": 0.36750000000000005
+        },
+        {
+          "pmid": "40052435",
+          "title": "Therapeutic Targeting of Decr1 Ameliorates Cardiomyopathy by Suppressing Mitochondrial Fatty Acid Oxidation in Diabetic Mice.",
+          "year": 2025,
+          "relevance": 0.3516666666666667
+        },
+        {
+          "pmid": "37477020",
+          "title": "EGFR/IGF1R Signaling Modulates Relaxation in Hypertrophic Cardiomyopathy.",
+          "year": 2023,
+          "relevance": 0.3516666666666667
+        }
+      ]
+    },
+    "GO:1905285": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "39613849",
+          "title": "IGFBP5 affects cardiomyocyte survival and functional recovery in mice following myocardial ischemia.",
+          "year": 2024,
+          "relevance": 0.45166666666666666
+        },
+        {
+          "pmid": "40052435",
+          "title": "Therapeutic Targeting of Decr1 Ameliorates Cardiomyopathy by Suppressing Mitochondrial Fatty Acid Oxidation in Diabetic Mice.",
+          "year": 2025,
+          "relevance": 0.4016666666666666
+        },
+        {
+          "pmid": "37477020",
+          "title": "EGFR/IGF1R Signaling Modulates Relaxation in Hypertrophic Cardiomyopathy.",
+          "year": 2023,
+          "relevance": 0.4016666666666666
+        }
+      ]
+    },
+    "GO:0060981": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "37477020",
+          "title": "EGFR/IGF1R Signaling Modulates Relaxation in Hypertrophic Cardiomyopathy.",
+          "year": 2023,
+          "relevance": 0.43499999999999994
+        },
+        {
+          "pmid": "37432746",
+          "title": "Stress-enhanced cardiac lncRNA Morrbid protects hearts from acute myocardial infarction.",
+          "year": 2023,
+          "relevance": 0.4008333333333334
+        },
+        {
+          "pmid": "40052435",
+          "title": "Therapeutic Targeting of Decr1 Ameliorates Cardiomyopathy by Suppressing Mitochondrial Fatty Acid Oxidation in Diabetic Mice.",
+          "year": 2025,
+          "relevance": 0.3933333333333333
+        }
+      ]
+    },
+    "GO:0086092": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "37477020",
+          "title": "EGFR/IGF1R Signaling Modulates Relaxation in Hypertrophic Cardiomyopathy.",
+          "year": 2023,
+          "relevance": 0.45166666666666666
+        },
+        {
+          "pmid": "40052435",
+          "title": "Therapeutic Targeting of Decr1 Ameliorates Cardiomyopathy by Suppressing Mitochondrial Fatty Acid Oxidation in Diabetic Mice.",
+          "year": 2025,
+          "relevance": 0.42666666666666664
+        },
+        {
+          "pmid": "39613849",
+          "title": "IGFBP5 affects cardiomyocyte survival and functional recovery in mice following myocardial ischemia.",
+          "year": 2024,
+          "relevance": 0.42666666666666664
+        }
+      ]
+    },
+    "GO:0003289": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "40052435",
+          "title": "Therapeutic Targeting of Decr1 Ameliorates Cardiomyopathy by Suppressing Mitochondrial Fatty Acid Oxidation in Diabetic Mice.",
+          "year": 2025,
+          "relevance": 0.3516666666666667
+        },
+        {
+          "pmid": "39613849",
+          "title": "IGFBP5 affects cardiomyocyte survival and functional recovery in mice following myocardial ischemia.",
+          "year": 2024,
+          "relevance": 0.3516666666666667
+        },
+        {
+          "pmid": "37477020",
+          "title": "EGFR/IGF1R Signaling Modulates Relaxation in Hypertrophic Cardiomyopathy.",
+          "year": 2023,
+          "relevance": 0.3516666666666667
+        }
+      ]
+    }
+  },
+  "ranked_hypotheses": [
+    {
+      "rank": 96,
+      "pathway_id": "GO:0007507",
+      "pathway_name": "heart development",
+      "source_db": "GO:BP",
+      "nes_score": 5.729071559806401,
+      "p_adj": 0.0,
+      "evidence_count": 114,
+      "support_count": 20,
+      "seed_genes": [
+        "ATP2A2",
+        "BCL2L1",
+        "C3",
+        "CYBB",
+        "CYP1A1",
+        "HDAC5",
+        "HDAC9",
+        "IGF1R",
+        "IGFBP5",
+        "LIPE",
+        "MMP2",
+        "NPPA",
+        "PDK4",
+        "PLN",
+        "SERPINE1",
+        "TGFB1",
+        "TNF"
+      ],
+      "literature_support": true,
+      "citations": [
+        {
+          "pmid": "40052435",
+          "title": "Therapeutic Targeting of Decr1 Ameliorates Cardiomyopathy by Suppressing Mitochondrial Fatty Acid Oxidation in Diabetic Mice.",
+          "year": 2025,
+          "relevance": 0.4766666666666667
+        },
+        {
+          "pmid": "39613849",
+          "title": "IGFBP5 affects cardiomyocyte survival and functional recovery in mice following myocardial ischemia.",
+          "year": 2024,
+          "relevance": 0.4766666666666667
+        },
+        {
+          "pmid": "37477020",
+          "title": "EGFR/IGF1R Signaling Modulates Relaxation in Hypertrophic Cardiomyopathy.",
+          "year": 2023,
+          "relevance": 0.4766666666666667
+        }
+      ],
+      "citation_count": 25,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0065007",
+        "GO:0050896",
+        "GO:0050789",
+        "GO:0050794",
+        "GO:0051716",
+        "GO:0032501",
+        "REAC:R-HSA-162582",
+        "GO:0048518",
+        "GO:0007154",
+        "GO:0023052",
+        "GO:0007165",
+        "GO:0048522",
+        "GO:0032502",
+        "GO:0048856",
+        "GO:0019222",
+        "GO:0042221",
+        "GO:0048519",
+        "GO:0048583",
+        "GO:0006950",
+        "GO:0048523"
+      ]
+    },
+    {
+      "rank": 692,
+      "pathway_id": "KEGG:05410",
+      "pathway_name": "Hypertrophic cardiomyopathy",
+      "source_db": "KEGG",
+      "nes_score": 4.663289946090194,
+      "p_adj": 1.3509193763638905e-12,
+      "evidence_count": 33,
+      "support_count": 20,
+      "seed_genes": [
+        "ATP2A2",
+        "BCL2L1",
+        "C3",
+        "CYBB",
+        "CYP1A1",
+        "HDAC5",
+        "HDAC9",
+        "IGF1R",
+        "IGFBP5",
+        "LIPE",
+        "MMP2",
+        "NPPA",
+        "PDK4",
+        "PLN",
+        "SERPINE1",
+        "TGFB1",
+        "TNF"
+      ],
+      "literature_support": true,
+      "citations": [],
+      "citation_count": 0,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0065007",
+        "GO:0050896",
+        "GO:0050789",
+        "GO:0050794",
+        "GO:0051716",
+        "GO:0032501",
+        "REAC:R-HSA-162582",
+        "GO:0048518",
+        "GO:0007154",
+        "GO:0023052",
+        "GO:0007165",
+        "GO:0048522",
+        "GO:0032502",
+        "GO:0048856",
+        "GO:0019222",
+        "GO:0042221",
+        "GO:0048519",
+        "GO:0048583",
+        "GO:0006950",
+        "GO:0048523"
+      ]
+    },
+    {
+      "rank": 871,
+      "pathway_id": "KEGG:05414",
+      "pathway_name": "Dilated cardiomyopathy",
+      "source_db": "KEGG",
+      "nes_score": 4.325079933832461,
+      "p_adj": 3.755474597966213e-09,
+      "evidence_count": 29,
+      "support_count": 20,
+      "seed_genes": [
+        "ATP2A2",
+        "BCL2L1",
+        "C3",
+        "CYBB",
+        "CYP1A1",
+        "HDAC5",
+        "HDAC9",
+        "IGF1R",
+        "IGFBP5",
+        "LIPE",
+        "MMP2",
+        "NPPA",
+        "PDK4",
+        "PLN",
+        "SERPINE1",
+        "TGFB1",
+        "TNF"
+      ],
+      "literature_support": true,
+      "citations": [
+        {
+          "pmid": "33135971",
+          "title": "Assessment of <i>PDK4</i> and <i>TTN</i> gene variants in 48 Doberman Pinschers with dilated cardiomyopathy.",
+          "year": 2020,
+          "relevance": 0.5341666666666667
+        },
+        {
+          "pmid": "40052435",
+          "title": "Therapeutic Targeting of Decr1 Ameliorates Cardiomyopathy by Suppressing Mitochondrial Fatty Acid Oxidation in Diabetic Mice.",
+          "year": 2025,
+          "relevance": 0.4766666666666667
+        },
+        {
+          "pmid": "37477020",
+          "title": "EGFR/IGF1R Signaling Modulates Relaxation in Hypertrophic Cardiomyopathy.",
+          "year": 2023,
+          "relevance": 0.4766666666666667
+        }
+      ],
+      "citation_count": 25,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0065007",
+        "GO:0050896",
+        "GO:0050789",
+        "GO:0050794",
+        "GO:0051716",
+        "GO:0032501",
+        "REAC:R-HSA-162582",
+        "GO:0048518",
+        "GO:0007154",
+        "GO:0023052",
+        "GO:0007165",
+        "GO:0048522",
+        "GO:0032502",
+        "GO:0048856",
+        "GO:0019222",
+        "GO:0042221",
+        "GO:0048519",
+        "GO:0048583",
+        "GO:0006950",
+        "GO:0048523"
+      ]
+    },
+    {
+      "rank": 893,
+      "pathway_id": "GO:0003179",
+      "pathway_name": "heart valve morphogenesis",
+      "source_db": "GO:BP",
+      "nes_score": 4.262456980984509,
+      "p_adj": 3.352873534367973e-14,
+      "evidence_count": 21,
+      "support_count": 20,
+      "seed_genes": [
+        "ATP2A2",
+        "BCL2L1",
+        "C3",
+        "CYBB",
+        "CYP1A1",
+        "HDAC5",
+        "HDAC9",
+        "IGF1R",
+        "IGFBP5",
+        "LIPE",
+        "MMP2",
+        "NPPA",
+        "PDK4",
+        "PLN",
+        "SERPINE1",
+        "TGFB1",
+        "TNF"
+      ],
+      "literature_support": false,
+      "citations": [
+        {
+          "pmid": "39467114",
+          "title": "Dexmedetomidine Ameliorates Myocardial Ischemia-Reperfusion Injury by Inhibiting MDH2 Lactylation via Regulating Metabolic Reprogramming.",
+          "year": 2024,
+          "relevance": 0.4508333333333333
+        },
+        {
+          "pmid": "40052435",
+          "title": "Therapeutic Targeting of Decr1 Ameliorates Cardiomyopathy by Suppressing Mitochondrial Fatty Acid Oxidation in Diabetic Mice.",
+          "year": 2025,
+          "relevance": 0.43499999999999994
+        },
+        {
+          "pmid": "37477020",
+          "title": "EGFR/IGF1R Signaling Modulates Relaxation in Hypertrophic Cardiomyopathy.",
+          "year": 2023,
+          "relevance": 0.43499999999999994
+        }
+      ],
+      "citation_count": 25,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0065007",
+        "GO:0050896",
+        "GO:0050789",
+        "GO:0050794",
+        "GO:0051716",
+        "GO:0032501",
+        "REAC:R-HSA-162582",
+        "GO:0048518",
+        "GO:0007154",
+        "GO:0023052",
+        "GO:0007165",
+        "GO:0048522",
+        "GO:0032502",
+        "GO:0048856",
+        "GO:0019222",
+        "GO:0042221",
+        "GO:0048519",
+        "GO:0048583",
+        "GO:0006950",
+        "GO:0048523"
+      ]
+    },
+    {
+      "rank": 1009,
+      "pathway_id": "WP:WP2118",
+      "pathway_name": "Arrhythmogenic right ventricular cardiomyopathy",
+      "source_db": "WP",
+      "nes_score": 3.9725359274595773,
+      "p_adj": 6.328271240363392e-15,
+      "evidence_count": 12,
+      "support_count": 16,
+      "seed_genes": [
+        "ATP2A2",
+        "BCL2L1",
+        "C3",
+        "CYBB",
+        "CYP1A1",
+        "HDAC5",
+        "HDAC9",
+        "IGF1R",
+        "IGFBP5",
+        "LIPE",
+        "MMP2",
+        "NPPA",
+        "PDK4",
+        "PLN",
+        "SERPINE1",
+        "TGFB1",
+        "TNF"
+      ],
+      "literature_support": true,
+      "citations": [
+        {
+          "pmid": "40052435",
+          "title": "Therapeutic Targeting of Decr1 Ameliorates Cardiomyopathy by Suppressing Mitochondrial Fatty Acid Oxidation in Diabetic Mice.",
+          "year": 2025,
+          "relevance": 0.4141666666666667
+        },
+        {
+          "pmid": "37477020",
+          "title": "EGFR/IGF1R Signaling Modulates Relaxation in Hypertrophic Cardiomyopathy.",
+          "year": 2023,
+          "relevance": 0.4141666666666667
+        },
+        {
+          "pmid": "33135971",
+          "title": "Assessment of <i>PDK4</i> and <i>TTN</i> gene variants in 48 Doberman Pinschers with dilated cardiomyopathy.",
+          "year": 2020,
+          "relevance": 0.4091666666666667
+        }
+      ],
+      "citation_count": 25,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0065007",
+        "GO:0050896",
+        "GO:0050789",
+        "GO:0050794",
+        "GO:0051716",
+        "GO:0032501",
+        "REAC:R-HSA-162582",
+        "GO:0048518",
+        "GO:0007154",
+        "GO:0023052",
+        "GO:0007165",
+        "GO:0032502",
+        "GO:0048856",
+        "GO:0048519",
+        "GO:0006950",
+        "GO:0048523"
+      ]
+    },
+    {
+      "rank": 1118,
+      "pathway_id": "GO:0060411",
+      "pathway_name": "cardiac septum morphogenesis",
+      "source_db": "GO:BP",
+      "nes_score": 3.8304693383299155,
+      "p_adj": 3.248962210378181e-10,
+      "evidence_count": 18,
+      "support_count": 20,
+      "seed_genes": [
+        "ATP2A2",
+        "BCL2L1",
+        "C3",
+        "CYBB",
+        "CYP1A1",
+        "HDAC5",
+        "HDAC9",
+        "IGF1R",
+        "IGFBP5",
+        "LIPE",
+        "MMP2",
+        "NPPA",
+        "PDK4",
+        "PLN",
+        "SERPINE1",
+        "TGFB1",
+        "TNF"
+      ],
+      "literature_support": false,
+      "citations": [
+        {
+          "pmid": "40052435",
+          "title": "Therapeutic Targeting of Decr1 Ameliorates Cardiomyopathy by Suppressing Mitochondrial Fatty Acid Oxidation in Diabetic Mice.",
+          "year": 2025,
+          "relevance": 0.43499999999999994
+        },
+        {
+          "pmid": "39613849",
+          "title": "IGFBP5 affects cardiomyocyte survival and functional recovery in mice following myocardial ischemia.",
+          "year": 2024,
+          "relevance": 0.43499999999999994
+        },
+        {
+          "pmid": "37477020",
+          "title": "EGFR/IGF1R Signaling Modulates Relaxation in Hypertrophic Cardiomyopathy.",
+          "year": 2023,
+          "relevance": 0.43499999999999994
+        }
+      ],
+      "citation_count": 25,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0065007",
+        "GO:0050896",
+        "GO:0050789",
+        "GO:0050794",
+        "GO:0051716",
+        "GO:0032501",
+        "REAC:R-HSA-162582",
+        "GO:0048518",
+        "GO:0007154",
+        "GO:0023052",
+        "GO:0007165",
+        "GO:0048522",
+        "GO:0032502",
+        "GO:0048856",
+        "GO:0019222",
+        "GO:0042221",
+        "GO:0048519",
+        "GO:0048583",
+        "GO:0006950",
+        "GO:0048523"
+      ]
+    },
+    {
+      "rank": 1436,
+      "pathway_id": "GO:0003180",
+      "pathway_name": "aortic valve morphogenesis",
+      "source_db": "GO:BP",
+      "nes_score": 3.5611594062417424,
+      "p_adj": 4.9139560198696586e-09,
+      "evidence_count": 13,
+      "support_count": 20,
+      "seed_genes": [
+        "ATP2A2",
+        "BCL2L1",
+        "C3",
+        "CYBB",
+        "CYP1A1",
+        "HDAC5",
+        "HDAC9",
+        "IGF1R",
+        "IGFBP5",
+        "LIPE",
+        "MMP2",
+        "NPPA",
+        "PDK4",
+        "PLN",
+        "SERPINE1",
+        "TGFB1",
+        "TNF"
+      ],
+      "literature_support": false,
+      "citations": [
+        {
+          "pmid": "39467114",
+          "title": "Dexmedetomidine Ameliorates Myocardial Ischemia-Reperfusion Injury by Inhibiting MDH2 Lactylation via Regulating Metabolic Reprogramming.",
+          "year": 2024,
+          "relevance": 0.36750000000000005
+        },
+        {
+          "pmid": "40052435",
+          "title": "Therapeutic Targeting of Decr1 Ameliorates Cardiomyopathy by Suppressing Mitochondrial Fatty Acid Oxidation in Diabetic Mice.",
+          "year": 2025,
+          "relevance": 0.3516666666666667
+        },
+        {
+          "pmid": "39613849",
+          "title": "IGFBP5 affects cardiomyocyte survival and functional recovery in mice following myocardial ischemia.",
+          "year": 2024,
+          "relevance": 0.3516666666666667
+        }
+      ],
+      "citation_count": 25,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0065007",
+        "GO:0050896",
+        "GO:0050789",
+        "GO:0050794",
+        "GO:0051716",
+        "GO:0032501",
+        "REAC:R-HSA-162582",
+        "GO:0048518",
+        "GO:0007154",
+        "GO:0023052",
+        "GO:0007165",
+        "GO:0048522",
+        "GO:0032502",
+        "GO:0048856",
+        "GO:0019222",
+        "GO:0042221",
+        "GO:0048519",
+        "GO:0048583",
+        "GO:0006950",
+        "GO:0048523"
+      ]
+    },
+    {
+      "rank": 1535,
+      "pathway_id": "WP:WP2406",
+      "pathway_name": "Cardiac progenitor differentiation",
+      "source_db": "WP",
+      "nes_score": 3.497856588095533,
+      "p_adj": 1.0175430049441658e-05,
+      "evidence_count": 16,
+      "support_count": 20,
+      "seed_genes": [
+        "ATP2A2",
+        "BCL2L1",
+        "C3",
+        "CYBB",
+        "CYP1A1",
+        "HDAC5",
+        "HDAC9",
+        "IGF1R",
+        "IGFBP5",
+        "LIPE",
+        "MMP2",
+        "NPPA",
+        "PDK4",
+        "PLN",
+        "SERPINE1",
+        "TGFB1",
+        "TNF"
+      ],
+      "literature_support": false,
+      "citations": [
+        {
+          "pmid": "40052435",
+          "title": "Therapeutic Targeting of Decr1 Ameliorates Cardiomyopathy by Suppressing Mitochondrial Fatty Acid Oxidation in Diabetic Mice.",
+          "year": 2025,
+          "relevance": 0.43499999999999994
+        },
+        {
+          "pmid": "37477020",
+          "title": "EGFR/IGF1R Signaling Modulates Relaxation in Hypertrophic Cardiomyopathy.",
+          "year": 2023,
+          "relevance": 0.43499999999999994
+        },
+        {
+          "pmid": "39613849",
+          "title": "IGFBP5 affects cardiomyocyte survival and functional recovery in mice following myocardial ischemia.",
+          "year": 2024,
+          "relevance": 0.43499999999999994
+        }
+      ],
+      "citation_count": 25,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0065007",
+        "GO:0050896",
+        "GO:0050789",
+        "GO:0050794",
+        "GO:0051716",
+        "GO:0032501",
+        "REAC:R-HSA-162582",
+        "GO:0048518",
+        "GO:0007154",
+        "GO:0023052",
+        "GO:0007165",
+        "GO:0048522",
+        "GO:0032502",
+        "GO:0048856",
+        "GO:0019222",
+        "GO:0042221",
+        "GO:0048519",
+        "GO:0048583",
+        "GO:0006950",
+        "GO:0048523"
+      ]
+    },
+    {
+      "rank": 2336,
+      "pathway_id": "WP:WP1528",
+      "pathway_name": "Physiological and pathological hypertrophy of the heart",
+      "source_db": "WP",
+      "nes_score": 3.0303952974830333,
+      "p_adj": 2.5962908244969718e-05,
+      "evidence_count": 10,
+      "support_count": 20,
+      "seed_genes": [
+        "ATP2A2",
+        "BCL2L1",
+        "C3",
+        "CYBB",
+        "CYP1A1",
+        "HDAC5",
+        "HDAC9",
+        "IGF1R",
+        "IGFBP5",
+        "LIPE",
+        "MMP2",
+        "NPPA",
+        "PDK4",
+        "PLN",
+        "SERPINE1",
+        "TGFB1",
+        "TNF"
+      ],
+      "literature_support": false,
+      "citations": [
+        {
+          "pmid": "40052435",
+          "title": "Therapeutic Targeting of Decr1 Ameliorates Cardiomyopathy by Suppressing Mitochondrial Fatty Acid Oxidation in Diabetic Mice.",
+          "year": 2025,
+          "relevance": 0.4230952380952381
+        },
+        {
+          "pmid": "39613849",
+          "title": "IGFBP5 affects cardiomyocyte survival and functional recovery in mice following myocardial ischemia.",
+          "year": 2024,
+          "relevance": 0.4230952380952381
+        },
+        {
+          "pmid": "37477020",
+          "title": "EGFR/IGF1R Signaling Modulates Relaxation in Hypertrophic Cardiomyopathy.",
+          "year": 2023,
+          "relevance": 0.3873809523809524
+        }
+      ],
+      "citation_count": 25,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0065007",
+        "GO:0050896",
+        "GO:0050789",
+        "GO:0050794",
+        "GO:0051716",
+        "GO:0032501",
+        "REAC:R-HSA-162582",
+        "GO:0048518",
+        "GO:0007154",
+        "GO:0023052",
+        "GO:0007165",
+        "GO:0048522",
+        "GO:0032502",
+        "GO:0048856",
+        "GO:0019222",
+        "GO:0042221",
+        "GO:0048519",
+        "GO:0048583",
+        "GO:0006950",
+        "GO:0048523"
+      ]
+    },
+    {
+      "rank": 2689,
+      "pathway_id": "GO:0003181",
+      "pathway_name": "atrioventricular valve morphogenesis",
+      "source_db": "GO:BP",
+      "nes_score": 2.867563533725356,
+      "p_adj": 1.2458372042778443e-05,
+      "evidence_count": 8,
+      "support_count": 20,
+      "seed_genes": [
+        "ATP2A2",
+        "BCL2L1",
+        "C3",
+        "CYBB",
+        "CYP1A1",
+        "HDAC5",
+        "HDAC9",
+        "IGF1R",
+        "IGFBP5",
+        "LIPE",
+        "MMP2",
+        "NPPA",
+        "PDK4",
+        "PLN",
+        "SERPINE1",
+        "TGFB1",
+        "TNF"
+      ],
+      "literature_support": false,
+      "citations": [
+        {
+          "pmid": "39467114",
+          "title": "Dexmedetomidine Ameliorates Myocardial Ischemia-Reperfusion Injury by Inhibiting MDH2 Lactylation via Regulating Metabolic Reprogramming.",
+          "year": 2024,
+          "relevance": 0.36750000000000005
+        },
+        {
+          "pmid": "40052435",
+          "title": "Therapeutic Targeting of Decr1 Ameliorates Cardiomyopathy by Suppressing Mitochondrial Fatty Acid Oxidation in Diabetic Mice.",
+          "year": 2025,
+          "relevance": 0.3516666666666667
+        },
+        {
+          "pmid": "39613849",
+          "title": "IGFBP5 affects cardiomyocyte survival and functional recovery in mice following myocardial ischemia.",
+          "year": 2024,
+          "relevance": 0.3516666666666667
+        }
+      ],
+      "citation_count": 25,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0065007",
+        "GO:0050896",
+        "GO:0050789",
+        "GO:0050794",
+        "GO:0051716",
+        "GO:0032501",
+        "REAC:R-HSA-162582",
+        "GO:0048518",
+        "GO:0007154",
+        "GO:0023052",
+        "GO:0007165",
+        "GO:0048522",
+        "GO:0032502",
+        "GO:0048856",
+        "GO:0019222",
+        "GO:0042221",
+        "GO:0048519",
+        "GO:0048583",
+        "GO:0006950",
+        "GO:0048523"
+      ]
+    },
+    {
+      "rank": 2732,
+      "pathway_id": "GO:0060412",
+      "pathway_name": "ventricular septum morphogenesis",
+      "source_db": "GO:BP",
+      "nes_score": 2.847572547876017,
+      "p_adj": 4.7173770056030406e-05,
+      "evidence_count": 9,
+      "support_count": 20,
+      "seed_genes": [
+        "ATP2A2",
+        "BCL2L1",
+        "C3",
+        "CYBB",
+        "CYP1A1",
+        "HDAC5",
+        "HDAC9",
+        "IGF1R",
+        "IGFBP5",
+        "LIPE",
+        "MMP2",
+        "NPPA",
+        "PDK4",
+        "PLN",
+        "SERPINE1",
+        "TGFB1",
+        "TNF"
+      ],
+      "literature_support": false,
+      "citations": [
+        {
+          "pmid": "40052435",
+          "title": "Therapeutic Targeting of Decr1 Ameliorates Cardiomyopathy by Suppressing Mitochondrial Fatty Acid Oxidation in Diabetic Mice.",
+          "year": 2025,
+          "relevance": 0.3516666666666667
+        },
+        {
+          "pmid": "39613849",
+          "title": "IGFBP5 affects cardiomyocyte survival and functional recovery in mice following myocardial ischemia.",
+          "year": 2024,
+          "relevance": 0.3516666666666667
+        },
+        {
+          "pmid": "37477020",
+          "title": "EGFR/IGF1R Signaling Modulates Relaxation in Hypertrophic Cardiomyopathy.",
+          "year": 2023,
+          "relevance": 0.3516666666666667
+        }
+      ],
+      "citation_count": 25,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0065007",
+        "GO:0050896",
+        "GO:0050789",
+        "GO:0050794",
+        "GO:0051716",
+        "GO:0032501",
+        "REAC:R-HSA-162582",
+        "GO:0048518",
+        "GO:0007154",
+        "GO:0023052",
+        "GO:0007165",
+        "GO:0048522",
+        "GO:0032502",
+        "GO:0048856",
+        "GO:0019222",
+        "GO:0042221",
+        "GO:0048519",
+        "GO:0048583",
+        "GO:0006950",
+        "GO:0048523"
+      ]
+    },
+    {
+      "rank": 2770,
+      "pathway_id": "REAC:R-HSA-9733709",
+      "pathway_name": "Cardiogenesis",
+      "source_db": "REAC",
+      "nes_score": 2.8335888313285515,
+      "p_adj": 0.0008017289066367672,
+      "evidence_count": 8,
+      "support_count": 20,
+      "seed_genes": [
+        "ATP2A2",
+        "BCL2L1",
+        "C3",
+        "CYBB",
+        "CYP1A1",
+        "HDAC5",
+        "HDAC9",
+        "IGF1R",
+        "IGFBP5",
+        "LIPE",
+        "MMP2",
+        "NPPA",
+        "PDK4",
+        "PLN",
+        "SERPINE1",
+        "TGFB1",
+        "TNF"
+      ],
+      "literature_support": false,
+      "citations": [
+        {
+          "pmid": "37012447",
+          "title": "Epicardioid single-cell genomics uncovers principles of human epicardium biology in heart development and disease.",
+          "year": 2023,
+          "relevance": 0.36750000000000005
+        },
+        {
+          "pmid": "40052435",
+          "title": "Therapeutic Targeting of Decr1 Ameliorates Cardiomyopathy by Suppressing Mitochondrial Fatty Acid Oxidation in Diabetic Mice.",
+          "year": 2025,
+          "relevance": 0.3516666666666667
+        },
+        {
+          "pmid": "37477020",
+          "title": "EGFR/IGF1R Signaling Modulates Relaxation in Hypertrophic Cardiomyopathy.",
+          "year": 2023,
+          "relevance": 0.3516666666666667
+        }
+      ],
+      "citation_count": 25,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0065007",
+        "GO:0050896",
+        "GO:0050789",
+        "GO:0050794",
+        "GO:0051716",
+        "GO:0032501",
+        "REAC:R-HSA-162582",
+        "GO:0048518",
+        "GO:0007154",
+        "GO:0023052",
+        "GO:0007165",
+        "GO:0048522",
+        "GO:0032502",
+        "GO:0048856",
+        "GO:0019222",
+        "GO:0042221",
+        "GO:0048519",
+        "GO:0048583",
+        "GO:0006950",
+        "GO:0048523"
+      ]
+    },
+    {
+      "rank": 2865,
+      "pathway_id": "GO:0060978",
+      "pathway_name": "angiogenesis involved in coronary vascular morphogenesis",
+      "source_db": "GO:BP",
+      "nes_score": 2.784590311079493,
+      "p_adj": 3.4588854580519524e-07,
+      "evidence_count": 5,
+      "support_count": 20,
+      "seed_genes": [
+        "ATP2A2",
+        "BCL2L1",
+        "C3",
+        "CYBB",
+        "CYP1A1",
+        "HDAC5",
+        "HDAC9",
+        "IGF1R",
+        "IGFBP5",
+        "LIPE",
+        "MMP2",
+        "NPPA",
+        "PDK4",
+        "PLN",
+        "SERPINE1",
+        "TGFB1",
+        "TNF"
+      ],
+      "literature_support": false,
+      "citations": [
+        {
+          "pmid": "39613849",
+          "title": "IGFBP5 affects cardiomyocyte survival and functional recovery in mice following myocardial ischemia.",
+          "year": 2024,
+          "relevance": 0.43499999999999994
+        },
+        {
+          "pmid": "33439236",
+          "title": "Identification of Cardiac Fibrosis in Young Adults With a Homozygous Frameshift Variant in SERPINE1.",
+          "year": 2021,
+          "relevance": 0.4008333333333334
+        },
+        {
+          "pmid": "37477020",
+          "title": "EGFR/IGF1R Signaling Modulates Relaxation in Hypertrophic Cardiomyopathy.",
+          "year": 2023,
+          "relevance": 0.3933333333333333
+        }
+      ],
+      "citation_count": 25,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0065007",
+        "GO:0050896",
+        "GO:0050789",
+        "GO:0050794",
+        "GO:0051716",
+        "GO:0032501",
+        "REAC:R-HSA-162582",
+        "GO:0048518",
+        "GO:0007154",
+        "GO:0023052",
+        "GO:0007165",
+        "GO:0048522",
+        "GO:0032502",
+        "GO:0048856",
+        "GO:0019222",
+        "GO:0042221",
+        "GO:0048519",
+        "GO:0048583",
+        "GO:0006950",
+        "GO:0048523"
+      ]
+    },
+    {
+      "rank": 3121,
+      "pathway_id": "GO:0060979",
+      "pathway_name": "vasculogenesis involved in coronary vascular morphogenesis",
+      "source_db": "GO:BP",
+      "nes_score": 2.666146386661979,
+      "p_adj": 3.219646771412954e-14,
+      "evidence_count": 2,
+      "support_count": 13,
+      "seed_genes": [
+        "ATP2A2",
+        "BCL2L1",
+        "C3",
+        "CYBB",
+        "CYP1A1",
+        "HDAC5",
+        "HDAC9",
+        "IGF1R",
+        "IGFBP5",
+        "LIPE",
+        "MMP2",
+        "NPPA",
+        "PDK4",
+        "PLN",
+        "SERPINE1",
+        "TGFB1",
+        "TNF"
+      ],
+      "literature_support": false,
+      "citations": [
+        {
+          "pmid": "39613849",
+          "title": "IGFBP5 affects cardiomyocyte survival and functional recovery in mice following myocardial ischemia.",
+          "year": 2024,
+          "relevance": 0.43499999999999994
+        },
+        {
+          "pmid": "33439236",
+          "title": "Identification of Cardiac Fibrosis in Young Adults With a Homozygous Frameshift Variant in SERPINE1.",
+          "year": 2021,
+          "relevance": 0.4008333333333334
+        },
+        {
+          "pmid": "37477020",
+          "title": "EGFR/IGF1R Signaling Modulates Relaxation in Hypertrophic Cardiomyopathy.",
+          "year": 2023,
+          "relevance": 0.3933333333333333
+        }
+      ],
+      "citation_count": 25,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0065007",
+        "GO:0050789",
+        "GO:0050794",
+        "GO:0032501",
+        "GO:0048518",
+        "GO:0007154",
+        "GO:0023052",
+        "GO:0048522",
+        "GO:0032502",
+        "GO:0048856",
+        "GO:0019222",
+        "GO:0048519",
+        "GO:0048523"
+      ]
+    },
+    {
+      "rank": 3215,
+      "pathway_id": "GO:2000136",
+      "pathway_name": "regulation of cell proliferation involved in heart morphogenesis",
+      "source_db": "GO:BP",
+      "nes_score": 2.631110970081904,
+      "p_adj": 1.2772300994612351e-09,
+      "evidence_count": 3,
+      "support_count": 12,
+      "seed_genes": [
+        "ATP2A2",
+        "BCL2L1",
+        "C3",
+        "CYBB",
+        "CYP1A1",
+        "HDAC5",
+        "HDAC9",
+        "IGF1R",
+        "IGFBP5",
+        "MMP2",
+        "NPPA",
+        "PDK4",
+        "PLN",
+        "SERPINE1",
+        "TGFB1",
+        "TNF"
+      ],
+      "literature_support": false,
+      "citations": [
+        {
+          "pmid": "37477020",
+          "title": "EGFR/IGF1R Signaling Modulates Relaxation in Hypertrophic Cardiomyopathy.",
+          "year": 2023,
+          "relevance": 0.4766666666666667
+        },
+        {
+          "pmid": "39613849",
+          "title": "IGFBP5 affects cardiomyocyte survival and functional recovery in mice following myocardial ischemia.",
+          "year": 2024,
+          "relevance": 0.4766666666666667
+        },
+        {
+          "pmid": "40052435",
+          "title": "Therapeutic Targeting of Decr1 Ameliorates Cardiomyopathy by Suppressing Mitochondrial Fatty Acid Oxidation in Diabetic Mice.",
+          "year": 2025,
+          "relevance": 0.4454166666666667
+        }
+      ],
+      "citation_count": 25,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0050789",
+        "GO:0050794",
+        "GO:0032501",
+        "GO:0048518",
+        "GO:0007154",
+        "GO:0023052",
+        "GO:0048522",
+        "GO:0032502",
+        "GO:0048856",
+        "GO:0019222",
+        "GO:0048519",
+        "GO:0048523"
+      ]
+    },
+    {
+      "rank": 3444,
+      "pathway_id": "GO:0003278",
+      "pathway_name": "apoptotic process involved in heart morphogenesis",
+      "source_db": "GO:BP",
+      "nes_score": 2.551019987652358,
+      "p_adj": 2.80109269112927e-13,
+      "evidence_count": 2,
+      "support_count": 17,
+      "seed_genes": [
+        "ATP2A2",
+        "BCL2L1",
+        "C3",
+        "CYBB",
+        "CYP1A1",
+        "HDAC5",
+        "HDAC9",
+        "IGF1R",
+        "IGFBP5",
+        "LIPE",
+        "MMP2",
+        "NPPA",
+        "PDK4",
+        "PLN",
+        "SERPINE1",
+        "TGFB1",
+        "TNF"
+      ],
+      "literature_support": false,
+      "citations": [
+        {
+          "pmid": "36036015",
+          "title": "Exercise-induced signaling pathways to counteracting cardiac apoptotic processes.",
+          "year": 2022,
+          "relevance": 0.4425
+        },
+        {
+          "pmid": "37477020",
+          "title": "EGFR/IGF1R Signaling Modulates Relaxation in Hypertrophic Cardiomyopathy.",
+          "year": 2023,
+          "relevance": 0.43499999999999994
+        },
+        {
+          "pmid": "39613849",
+          "title": "IGFBP5 affects cardiomyocyte survival and functional recovery in mice following myocardial ischemia.",
+          "year": 2024,
+          "relevance": 0.43499999999999994
+        }
+      ],
+      "citation_count": 25,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0065007",
+        "GO:0050896",
+        "GO:0050789",
+        "GO:0050794",
+        "GO:0051716",
+        "GO:0032501",
+        "GO:0048518",
+        "GO:0007154",
+        "GO:0023052",
+        "GO:0007165",
+        "GO:0048522",
+        "GO:0032502",
+        "GO:0048856",
+        "GO:0019222",
+        "GO:0048519",
+        "GO:0048583",
+        "GO:0048523"
+      ]
+    },
+    {
+      "rank": 3738,
+      "pathway_id": "WP:WP1559",
+      "pathway_name": "Transcription factors regulate miRNAs related to cardiac hypertrophy",
+      "source_db": "WP",
+      "nes_score": 2.4409423596511375,
+      "p_adj": 0.0007418264573462174,
+      "evidence_count": 5,
+      "support_count": 20,
+      "seed_genes": [
+        "ATP2A2",
+        "BCL2L1",
+        "C3",
+        "CYBB",
+        "CYP1A1",
+        "HDAC5",
+        "HDAC9",
+        "IGF1R",
+        "IGFBP5",
+        "LIPE",
+        "MMP2",
+        "NPPA",
+        "PDK4",
+        "PLN",
+        "SERPINE1",
+        "TGFB1",
+        "TNF"
+      ],
+      "literature_support": false,
+      "citations": [
+        {
+          "pmid": "40052435",
+          "title": "Therapeutic Targeting of Decr1 Ameliorates Cardiomyopathy by Suppressing Mitochondrial Fatty Acid Oxidation in Diabetic Mice.",
+          "year": 2025,
+          "relevance": 0.4766666666666667
+        },
+        {
+          "pmid": "36726122",
+          "title": "Role of mitochondrial metabolic disorder and immune infiltration in diabetic cardiomyopathy: new insights from bioinformatics analysis.",
+          "year": 2023,
+          "relevance": 0.4404166666666667
+        },
+        {
+          "pmid": "37477020",
+          "title": "EGFR/IGF1R Signaling Modulates Relaxation in Hypertrophic Cardiomyopathy.",
+          "year": 2023,
+          "relevance": 0.4141666666666667
+        }
+      ],
+      "citation_count": 25,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0065007",
+        "GO:0050896",
+        "GO:0050789",
+        "GO:0050794",
+        "GO:0051716",
+        "GO:0032501",
+        "REAC:R-HSA-162582",
+        "GO:0048518",
+        "GO:0007154",
+        "GO:0023052",
+        "GO:0007165",
+        "GO:0048522",
+        "GO:0032502",
+        "GO:0048856",
+        "GO:0019222",
+        "GO:0042221",
+        "GO:0048519",
+        "GO:0048583",
+        "GO:0006950",
+        "GO:0048523"
+      ]
+    },
+    {
+      "rank": 3974,
+      "pathway_id": "GO:0003222",
+      "pathway_name": "ventricular trabecula myocardium morphogenesis",
+      "source_db": "GO:BP",
+      "nes_score": 2.3652525475550363,
+      "p_adj": 0.000337627255425077,
+      "evidence_count": 5,
+      "support_count": 20,
+      "seed_genes": [
+        "ATP2A2",
+        "BCL2L1",
+        "C3",
+        "CYBB",
+        "CYP1A1",
+        "HDAC5",
+        "HDAC9",
+        "IGF1R",
+        "IGFBP5",
+        "LIPE",
+        "MMP2",
+        "NPPA",
+        "PDK4",
+        "PLN",
+        "SERPINE1",
+        "TGFB1",
+        "TNF"
+      ],
+      "literature_support": false,
+      "citations": [
+        {
+          "pmid": "37477020",
+          "title": "EGFR/IGF1R Signaling Modulates Relaxation in Hypertrophic Cardiomyopathy.",
+          "year": 2023,
+          "relevance": 0.4141666666666667
+        },
+        {
+          "pmid": "40052435",
+          "title": "Therapeutic Targeting of Decr1 Ameliorates Cardiomyopathy by Suppressing Mitochondrial Fatty Acid Oxidation in Diabetic Mice.",
+          "year": 2025,
+          "relevance": 0.3516666666666667
+        },
+        {
+          "pmid": "39613849",
+          "title": "IGFBP5 affects cardiomyocyte survival and functional recovery in mice following myocardial ischemia.",
+          "year": 2024,
+          "relevance": 0.3516666666666667
+        }
+      ],
+      "citation_count": 25,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0065007",
+        "GO:0050896",
+        "GO:0050789",
+        "GO:0050794",
+        "GO:0051716",
+        "GO:0032501",
+        "REAC:R-HSA-162582",
+        "GO:0048518",
+        "GO:0007154",
+        "GO:0023052",
+        "GO:0007165",
+        "GO:0048522",
+        "GO:0032502",
+        "GO:0048856",
+        "GO:0019222",
+        "GO:0042221",
+        "GO:0048519",
+        "GO:0048583",
+        "GO:0006950",
+        "GO:0048523"
+      ]
+    },
+    {
+      "rank": 4146,
+      "pathway_id": "GO:0061343",
+      "pathway_name": "cell adhesion involved in heart morphogenesis",
+      "source_db": "GO:BP",
+      "nes_score": 2.3168762324799577,
+      "p_adj": 2.045043911991229e-09,
+      "evidence_count": 2,
+      "support_count": 14,
+      "seed_genes": [
+        "ATP2A2",
+        "BCL2L1",
+        "C3",
+        "CYBB",
+        "CYP1A1",
+        "HDAC5",
+        "HDAC9",
+        "IGF1R",
+        "IGFBP5",
+        "MMP2",
+        "NPPA",
+        "PDK4",
+        "PLN",
+        "SERPINE1",
+        "TGFB1",
+        "TNF"
+      ],
+      "literature_support": false,
+      "citations": [
+        {
+          "pmid": "37477020",
+          "title": "EGFR/IGF1R Signaling Modulates Relaxation in Hypertrophic Cardiomyopathy.",
+          "year": 2023,
+          "relevance": 0.4766666666666667
+        },
+        {
+          "pmid": "37432746",
+          "title": "Stress-enhanced cardiac lncRNA Morrbid protects hearts from acute myocardial infarction.",
+          "year": 2023,
+          "relevance": 0.4425
+        },
+        {
+          "pmid": "36036015",
+          "title": "Exercise-induced signaling pathways to counteracting cardiac apoptotic processes.",
+          "year": 2022,
+          "relevance": 0.4425
+        }
+      ],
+      "citation_count": 25,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0050794",
+        "GO:0051716",
+        "GO:0032501",
+        "REAC:R-HSA-162582",
+        "GO:0048518",
+        "GO:0007154",
+        "GO:0023052",
+        "GO:0007165",
+        "GO:0048522",
+        "GO:0032502",
+        "GO:0048856",
+        "GO:0019222",
+        "GO:0042221",
+        "GO:0048583"
+      ]
+    },
+    {
+      "rank": 4500,
+      "pathway_id": "GO:0003223",
+      "pathway_name": "ventricular compact myocardium morphogenesis",
+      "source_db": "GO:BP",
+      "nes_score": 2.214098661765776,
+      "p_adj": 0.0003694745383258091,
+      "evidence_count": 4,
+      "support_count": 20,
+      "seed_genes": [
+        "ATP2A2",
+        "BCL2L1",
+        "C3",
+        "CYBB",
+        "CYP1A1",
+        "HDAC5",
+        "HDAC9",
+        "IGF1R",
+        "IGFBP5",
+        "LIPE",
+        "MMP2",
+        "NPPA",
+        "PDK4",
+        "PLN",
+        "SERPINE1",
+        "TGFB1",
+        "TNF"
+      ],
+      "literature_support": false,
+      "citations": [
+        {
+          "pmid": "37477020",
+          "title": "EGFR/IGF1R Signaling Modulates Relaxation in Hypertrophic Cardiomyopathy.",
+          "year": 2023,
+          "relevance": 0.4141666666666667
+        },
+        {
+          "pmid": "40052435",
+          "title": "Therapeutic Targeting of Decr1 Ameliorates Cardiomyopathy by Suppressing Mitochondrial Fatty Acid Oxidation in Diabetic Mice.",
+          "year": 2025,
+          "relevance": 0.3516666666666667
+        },
+        {
+          "pmid": "39613849",
+          "title": "IGFBP5 affects cardiomyocyte survival and functional recovery in mice following myocardial ischemia.",
+          "year": 2024,
+          "relevance": 0.3516666666666667
+        }
+      ],
+      "citation_count": 25,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0065007",
+        "GO:0050896",
+        "GO:0050789",
+        "GO:0050794",
+        "GO:0051716",
+        "GO:0032501",
+        "REAC:R-HSA-162582",
+        "GO:0048518",
+        "GO:0007154",
+        "GO:0023052",
+        "GO:0007165",
+        "GO:0048522",
+        "GO:0032502",
+        "GO:0048856",
+        "GO:0019222",
+        "GO:0042221",
+        "GO:0048519",
+        "GO:0048583",
+        "GO:0006950",
+        "GO:0048523"
+      ]
+    },
+    {
+      "rank": 5163,
+      "pathway_id": "WP:WP2456",
+      "pathway_name": "HIF1A and PPARG in hypertrophic cardiomyopathy",
+      "source_db": "WP",
+      "nes_score": 2.012890779399365,
+      "p_adj": 0.007334097162232434,
+      "evidence_count": 4,
+      "support_count": 19,
+      "seed_genes": [
+        "ATP2A2",
+        "BCL2L1",
+        "C3",
+        "CYBB",
+        "CYP1A1",
+        "HDAC5",
+        "HDAC9",
+        "IGF1R",
+        "IGFBP5",
+        "LIPE",
+        "MMP2",
+        "NPPA",
+        "PDK4",
+        "PLN",
+        "SERPINE1",
+        "TGFB1",
+        "TNF"
+      ],
+      "literature_support": false,
+      "citations": [
+        {
+          "pmid": "37477020",
+          "title": "EGFR/IGF1R Signaling Modulates Relaxation in Hypertrophic Cardiomyopathy.",
+          "year": 2023,
+          "relevance": 0.43499999999999994
+        },
+        {
+          "pmid": "40052435",
+          "title": "Therapeutic Targeting of Decr1 Ameliorates Cardiomyopathy by Suppressing Mitochondrial Fatty Acid Oxidation in Diabetic Mice.",
+          "year": 2025,
+          "relevance": 0.3933333333333333
+        },
+        {
+          "pmid": "33439236",
+          "title": "Identification of Cardiac Fibrosis in Young Adults With a Homozygous Frameshift Variant in SERPINE1.",
+          "year": 2021,
+          "relevance": 0.35916666666666663
+        }
+      ],
+      "citation_count": 25,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0065007",
+        "GO:0050896",
+        "GO:0050789",
+        "GO:0050794",
+        "GO:0051716",
+        "GO:0032501",
+        "GO:0048518",
+        "GO:0007154",
+        "GO:0023052",
+        "GO:0007165",
+        "GO:0048522",
+        "GO:0032502",
+        "GO:0048856",
+        "GO:0019222",
+        "GO:0042221",
+        "GO:0048519",
+        "GO:0048583",
+        "GO:0006950",
+        "GO:0048523"
+      ]
+    },
+    {
+      "rank": 5392,
+      "pathway_id": "GO:0060413",
+      "pathway_name": "atrial septum morphogenesis",
+      "source_db": "GO:BP",
+      "nes_score": 1.9410996216591643,
+      "p_adj": 0.004499427625327512,
+      "evidence_count": 4,
+      "support_count": 17,
+      "seed_genes": [
+        "ATP2A2",
+        "BCL2L1",
+        "C3",
+        "CYBB",
+        "CYP1A1",
+        "HDAC5",
+        "HDAC9",
+        "IGF1R",
+        "IGFBP5",
+        "LIPE",
+        "MMP2",
+        "NPPA",
+        "PDK4",
+        "PLN",
+        "SERPINE1",
+        "TGFB1",
+        "TNF"
+      ],
+      "literature_support": false,
+      "citations": [
+        {
+          "pmid": "40052435",
+          "title": "Therapeutic Targeting of Decr1 Ameliorates Cardiomyopathy by Suppressing Mitochondrial Fatty Acid Oxidation in Diabetic Mice.",
+          "year": 2025,
+          "relevance": 0.3516666666666667
+        },
+        {
+          "pmid": "39613849",
+          "title": "IGFBP5 affects cardiomyocyte survival and functional recovery in mice following myocardial ischemia.",
+          "year": 2024,
+          "relevance": 0.3516666666666667
+        },
+        {
+          "pmid": "37477020",
+          "title": "EGFR/IGF1R Signaling Modulates Relaxation in Hypertrophic Cardiomyopathy.",
+          "year": 2023,
+          "relevance": 0.3516666666666667
+        }
+      ],
+      "citation_count": 25,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0065007",
+        "GO:0050896",
+        "GO:0050789",
+        "GO:0050794",
+        "GO:0051716",
+        "GO:0032501",
+        "GO:0048518",
+        "GO:0007154",
+        "GO:0023052",
+        "GO:0007165",
+        "GO:0048522",
+        "GO:0032502",
+        "GO:0048856",
+        "GO:0019222",
+        "GO:0048519",
+        "GO:0048583",
+        "GO:0048523"
+      ]
+    },
+    {
+      "rank": 5409,
+      "pathway_id": "GO:0003251",
+      "pathway_name": "positive regulation of cell proliferation involved in heart valve morphogenesis",
+      "source_db": "GO:BP",
+      "nes_score": 1.9365148762536488,
+      "p_adj": 9.38766431257676e-09,
+      "evidence_count": 1,
+      "support_count": 15,
+      "seed_genes": [
+        "ACSBG1",
+        "ATP2A2",
+        "BCL2L1",
+        "C3",
+        "CYBB",
+        "CYP1A1",
+        "HDAC5",
+        "HDAC9",
+        "IGF1R",
+        "IGFBP5",
+        "MMP2",
+        "NPPA",
+        "PDK4",
+        "PLN",
+        "SERPINE1",
+        "TGFB1",
+        "TNF"
+      ],
+      "literature_support": false,
+      "citations": [
+        {
+          "pmid": "37477020",
+          "title": "EGFR/IGF1R Signaling Modulates Relaxation in Hypertrophic Cardiomyopathy.",
+          "year": 2023,
+          "relevance": 0.4766666666666667
+        },
+        {
+          "pmid": "39613849",
+          "title": "IGFBP5 affects cardiomyocyte survival and functional recovery in mice following myocardial ischemia.",
+          "year": 2024,
+          "relevance": 0.45166666666666666
+        },
+        {
+          "pmid": "40052435",
+          "title": "Therapeutic Targeting of Decr1 Ameliorates Cardiomyopathy by Suppressing Mitochondrial Fatty Acid Oxidation in Diabetic Mice.",
+          "year": 2025,
+          "relevance": 0.42666666666666664
+        }
+      ],
+      "citation_count": 25,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0032501",
+        "REAC:R-HSA-162582",
+        "GO:0048518",
+        "GO:0007154",
+        "GO:0023052",
+        "GO:0007165",
+        "GO:0048522",
+        "GO:0032502",
+        "GO:0048856",
+        "GO:0019222",
+        "GO:0042221",
+        "GO:0048519",
+        "GO:0048583",
+        "GO:0006950",
+        "GO:0048523"
+      ]
+    },
+    {
+      "rank": 5694,
+      "pathway_id": "GO:0003185",
+      "pathway_name": "sinoatrial valve morphogenesis",
+      "source_db": "GO:BP",
+      "nes_score": 1.844213074019537,
+      "p_adj": 9.38766431257676e-09,
+      "evidence_count": 1,
+      "support_count": 15,
+      "seed_genes": [
+        "ACSBG1",
+        "ATP2A2",
+        "BCL2L1",
+        "C3",
+        "CYBB",
+        "CYP1A1",
+        "HDAC5",
+        "HDAC9",
+        "IGF1R",
+        "IGFBP5",
+        "MMP2",
+        "NPPA",
+        "PDK4",
+        "PLN",
+        "SERPINE1",
+        "TGFB1",
+        "TNF"
+      ],
+      "literature_support": false,
+      "citations": [
+        {
+          "pmid": "39467114",
+          "title": "Dexmedetomidine Ameliorates Myocardial Ischemia-Reperfusion Injury by Inhibiting MDH2 Lactylation via Regulating Metabolic Reprogramming.",
+          "year": 2024,
+          "relevance": 0.36750000000000005
+        },
+        {
+          "pmid": "40052435",
+          "title": "Therapeutic Targeting of Decr1 Ameliorates Cardiomyopathy by Suppressing Mitochondrial Fatty Acid Oxidation in Diabetic Mice.",
+          "year": 2025,
+          "relevance": 0.3516666666666667
+        },
+        {
+          "pmid": "37477020",
+          "title": "EGFR/IGF1R Signaling Modulates Relaxation in Hypertrophic Cardiomyopathy.",
+          "year": 2023,
+          "relevance": 0.3516666666666667
+        }
+      ],
+      "citation_count": 25,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0032501",
+        "REAC:R-HSA-162582",
+        "GO:0048518",
+        "GO:0007154",
+        "GO:0023052",
+        "GO:0007165",
+        "GO:0048522",
+        "GO:0032502",
+        "GO:0048856",
+        "GO:0019222",
+        "GO:0042221",
+        "GO:0048519",
+        "GO:0048583",
+        "GO:0006950",
+        "GO:0048523"
+      ]
+    },
+    {
+      "rank": 5784,
+      "pathway_id": "GO:1905285",
+      "pathway_name": "fibrous ring of heart morphogenesis",
+      "source_db": "GO:BP",
+      "nes_score": 1.7977110586897345,
+      "p_adj": 2.761768824743882e-08,
+      "evidence_count": 1,
+      "support_count": 14,
+      "seed_genes": [
+        "ACSBG1",
+        "ATP2A2",
+        "BCL2L1",
+        "C3",
+        "CYBB",
+        "CYP1A1",
+        "HDAC5",
+        "HDAC9",
+        "IGF1R",
+        "IGFBP5",
+        "MMP2",
+        "NPPA",
+        "PDK4",
+        "PLN",
+        "SERPINE1",
+        "TGFB1",
+        "TNF"
+      ],
+      "literature_support": false,
+      "citations": [
+        {
+          "pmid": "39613849",
+          "title": "IGFBP5 affects cardiomyocyte survival and functional recovery in mice following myocardial ischemia.",
+          "year": 2024,
+          "relevance": 0.45166666666666666
+        },
+        {
+          "pmid": "40052435",
+          "title": "Therapeutic Targeting of Decr1 Ameliorates Cardiomyopathy by Suppressing Mitochondrial Fatty Acid Oxidation in Diabetic Mice.",
+          "year": 2025,
+          "relevance": 0.4016666666666666
+        },
+        {
+          "pmid": "37477020",
+          "title": "EGFR/IGF1R Signaling Modulates Relaxation in Hypertrophic Cardiomyopathy.",
+          "year": 2023,
+          "relevance": 0.4016666666666666
+        }
+      ],
+      "citation_count": 25,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0032501",
+        "REAC:R-HSA-162582",
+        "GO:0048518",
+        "GO:0007154",
+        "GO:0023052",
+        "GO:0007165",
+        "GO:0048522",
+        "GO:0032502",
+        "GO:0048856",
+        "GO:0019222",
+        "GO:0048519",
+        "GO:0048583",
+        "GO:0006950",
+        "GO:0048523"
+      ]
+    },
+    {
+      "rank": 5990,
+      "pathway_id": "GO:0060981",
+      "pathway_name": "cell migration involved in coronary angiogenesis",
+      "source_db": "GO:BP",
+      "nes_score": 1.7124614161284712,
+      "p_adj": 2.6923258078515033e-07,
+      "evidence_count": 1,
+      "support_count": 12,
+      "seed_genes": [
+        "ACSBG1",
+        "ATP2A2",
+        "BCL2L1",
+        "C3",
+        "CYBB",
+        "CYP1A1",
+        "HDAC5",
+        "HDAC9",
+        "IGF1R",
+        "IGFBP5",
+        "MMP2",
+        "NPPA",
+        "PDK4",
+        "PLN",
+        "SERPINE1",
+        "TGFB1",
+        "TNF"
+      ],
+      "literature_support": false,
+      "citations": [
+        {
+          "pmid": "37477020",
+          "title": "EGFR/IGF1R Signaling Modulates Relaxation in Hypertrophic Cardiomyopathy.",
+          "year": 2023,
+          "relevance": 0.43499999999999994
+        },
+        {
+          "pmid": "37432746",
+          "title": "Stress-enhanced cardiac lncRNA Morrbid protects hearts from acute myocardial infarction.",
+          "year": 2023,
+          "relevance": 0.4008333333333334
+        },
+        {
+          "pmid": "40052435",
+          "title": "Therapeutic Targeting of Decr1 Ameliorates Cardiomyopathy by Suppressing Mitochondrial Fatty Acid Oxidation in Diabetic Mice.",
+          "year": 2025,
+          "relevance": 0.3933333333333333
+        }
+      ],
+      "citation_count": 25,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0032501",
+        "REAC:R-HSA-162582",
+        "GO:0048518",
+        "GO:0007154",
+        "GO:0023052",
+        "GO:0007165",
+        "GO:0048522",
+        "GO:0032502",
+        "GO:0048856",
+        "GO:0019222",
+        "GO:0042221",
+        "GO:0048583"
+      ]
+    },
+    {
+      "rank": 6478,
+      "pathway_id": "GO:0086092",
+      "pathway_name": "regulation of the force of heart contraction by cardiac conduction",
+      "source_db": "GO:BP",
+      "nes_score": 1.5488300057009476,
+      "p_adj": 0.003427596537785238,
+      "evidence_count": 2,
+      "support_count": 13,
+      "seed_genes": [
+        "ATP2A2",
+        "BCL2L1",
+        "C3",
+        "CYBB",
+        "CYP1A1",
+        "HDAC5",
+        "HDAC9",
+        "IGF1R",
+        "IGFBP5",
+        "LIPE",
+        "MMP2",
+        "NPPA",
+        "PDK4",
+        "PLN",
+        "SERPINE1",
+        "TGFB1",
+        "TNF"
+      ],
+      "literature_support": false,
+      "citations": [
+        {
+          "pmid": "37477020",
+          "title": "EGFR/IGF1R Signaling Modulates Relaxation in Hypertrophic Cardiomyopathy.",
+          "year": 2023,
+          "relevance": 0.45166666666666666
+        },
+        {
+          "pmid": "40052435",
+          "title": "Therapeutic Targeting of Decr1 Ameliorates Cardiomyopathy by Suppressing Mitochondrial Fatty Acid Oxidation in Diabetic Mice.",
+          "year": 2025,
+          "relevance": 0.42666666666666664
+        },
+        {
+          "pmid": "39613849",
+          "title": "IGFBP5 affects cardiomyocyte survival and functional recovery in mice following myocardial ischemia.",
+          "year": 2024,
+          "relevance": 0.42666666666666664
+        }
+      ],
+      "citation_count": 25,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0065007",
+        "GO:0050896",
+        "GO:0050789",
+        "GO:0050794",
+        "GO:0051716",
+        "GO:0032501",
+        "GO:0007154",
+        "GO:0023052",
+        "GO:0007165",
+        "GO:0032502",
+        "GO:0048856",
+        "GO:0048519",
+        "GO:0048523"
+      ]
+    },
+    {
+      "rank": 6988,
+      "pathway_id": "GO:0003289",
+      "pathway_name": "atrial septum primum morphogenesis",
+      "source_db": "GO:BP",
+      "nes_score": 1.2963230519028726,
+      "p_adj": 0.0253982049587278,
+      "evidence_count": 2,
+      "support_count": 19,
+      "seed_genes": [
+        "ATP2A2",
+        "BCL2L1",
+        "C3",
+        "CYBB",
+        "CYP1A1",
+        "HDAC5",
+        "HDAC9",
+        "IGF1R",
+        "IGFBP5",
+        "LIPE",
+        "MMP2",
+        "NPPA",
+        "PDK4",
+        "PLN",
+        "SERPINE1",
+        "TGFB1",
+        "TNF"
+      ],
+      "literature_support": false,
+      "citations": [
+        {
+          "pmid": "40052435",
+          "title": "Therapeutic Targeting of Decr1 Ameliorates Cardiomyopathy by Suppressing Mitochondrial Fatty Acid Oxidation in Diabetic Mice.",
+          "year": 2025,
+          "relevance": 0.3516666666666667
+        },
+        {
+          "pmid": "39613849",
+          "title": "IGFBP5 affects cardiomyocyte survival and functional recovery in mice following myocardial ischemia.",
+          "year": 2024,
+          "relevance": 0.3516666666666667
+        },
+        {
+          "pmid": "37477020",
+          "title": "EGFR/IGF1R Signaling Modulates Relaxation in Hypertrophic Cardiomyopathy.",
+          "year": 2023,
+          "relevance": 0.3516666666666667
+        }
+      ],
+      "citation_count": 25,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0065007",
+        "GO:0050896",
+        "GO:0050789",
+        "GO:0050794",
+        "GO:0051716",
+        "GO:0032501",
+        "GO:0048518",
+        "GO:0007154",
+        "GO:0023052",
+        "GO:0007165",
+        "GO:0048522",
+        "GO:0032502",
+        "GO:0048856",
+        "GO:0019222",
+        "GO:0042221",
+        "GO:0048519",
+        "GO:0048583",
+        "GO:0006950",
+        "GO:0048523"
+      ]
+    }
+  ],
+  "testable_hypotheses": [
+    {
+      "hypothesis": "Pathway 'heart development' is involved in cardiovascular disease and phenotype processes",
+      "pathway_id": "GO:0007507",
+      "nes_score": 5.729071559806401,
+      "experimental_approaches": [
+        "Functional enrichment analysis in cardiac tissue",
+        "Gene expression profiling",
+        "Pathway perturbation studies"
+      ]
+    },
+    {
+      "hypothesis": "Pathway 'Hypertrophic cardiomyopathy' is involved in cardiovascular disease and phenotype processes",
+      "pathway_id": "KEGG:05410",
+      "nes_score": 4.663289946090194,
+      "experimental_approaches": [
+        "Functional enrichment analysis in cardiac tissue",
+        "Gene expression profiling",
+        "Pathway perturbation studies"
+      ]
+    },
+    {
+      "hypothesis": "Pathway 'Dilated cardiomyopathy' is involved in cardiovascular disease and phenotype processes",
+      "pathway_id": "KEGG:05414",
+      "nes_score": 4.325079933832461,
+      "experimental_approaches": [
+        "Functional enrichment analysis in cardiac tissue",
+        "Gene expression profiling",
+        "Pathway perturbation studies"
+      ]
+    },
+    {
+      "hypothesis": "Pathway 'heart valve morphogenesis' is involved in cardiovascular disease and phenotype processes",
+      "pathway_id": "GO:0003179",
+      "nes_score": 4.262456980984509,
+      "experimental_approaches": [
+        "Functional enrichment analysis in cardiac tissue",
+        "Gene expression profiling",
+        "Pathway perturbation studies"
+      ]
+    },
+    {
+      "hypothesis": "Pathway 'Arrhythmogenic right ventricular cardiomyopathy' is involved in cardiovascular disease and phenotype processes",
+      "pathway_id": "WP:WP2118",
+      "nes_score": 3.9725359274595773,
+      "experimental_approaches": [
+        "Functional enrichment analysis in cardiac tissue",
+        "Gene expression profiling",
+        "Pathway perturbation studies"
+      ]
+    }
+  ],
+  "conclusion": "Analysis identified 28 novel pathway hypotheses. The top-ranked hypothesis is 'heart development' (NES: 5.73), which shows strong evidence for involvement in cardiovascular disease and phenotype processes based on functional network analysis and literature mining.",
+  "top_genes": [
+    {
+      "gene": "TGFB2",
+      "pathway_count": 12,
+      "importance_score": 9.68,
+      "druggability_tier": "unknown",
+      "is_druggable": false,
+      "is_fda_approved": false,
+      "is_clinical_trial": false,
+      "centrality": 0.0,
+      "disgenet_cardiac_score": 0.78,
+      "final_score": 15.342799999999999
+    },
+    {
+      "gene": "NKX2-5",
+      "pathway_count": 10,
+      "importance_score": 8.299999999999999,
+      "druggability_tier": "unknown",
+      "is_druggable": false,
+      "is_fda_approved": false,
+      "is_clinical_trial": false,
+      "centrality": 0.0,
+      "disgenet_cardiac_score": 0.95,
+      "final_score": 14.213749999999997
+    },
+    {
+      "gene": "GATA4",
+      "pathway_count": 10,
+      "importance_score": 8.26,
+      "druggability_tier": "unknown",
+      "is_druggable": false,
+      "is_fda_approved": false,
+      "is_clinical_trial": false,
+      "centrality": 0.0,
+      "disgenet_cardiac_score": 0.95,
+      "final_score": 14.145249999999999
+    },
+    {
+      "gene": "TBX5",
+      "pathway_count": 9,
+      "importance_score": 7.52,
+      "druggability_tier": "unknown",
+      "is_druggable": false,
+      "is_fda_approved": false,
+      "is_clinical_trial": false,
+      "centrality": 0.0,
+      "disgenet_cardiac_score": 0.95,
+      "final_score": 12.877999999999998
+    },
+    {
+      "gene": "SMAD4",
+      "pathway_count": 8,
+      "importance_score": 6.68,
+      "druggability_tier": "unknown",
+      "is_druggable": true,
+      "is_fda_approved": false,
+      "is_clinical_trial": false,
+      "centrality": 0.0,
+      "disgenet_cardiac_score": 0.72,
+      "final_score": 11.9572
+    },
+    {
+      "gene": "TGFBR2",
+      "pathway_count": 7,
+      "importance_score": 6.12,
+      "druggability_tier": "unknown",
+      "is_druggable": false,
+      "is_fda_approved": false,
+      "is_clinical_trial": false,
+      "centrality": 0.0,
+      "disgenet_cardiac_score": 0.85,
+      "final_score": 10.0215
+    },
+    {
+      "gene": "TGFB1",
+      "pathway_count": 7,
+      "importance_score": 6.44,
+      "druggability_tier": "medium",
+      "is_druggable": true,
+      "is_fda_approved": false,
+      "is_clinical_trial": true,
+      "centrality": 0.0,
+      "disgenet_cardiac_score": 0.0,
+      "final_score": 9.66
+    },
+    {
+      "gene": "TGFBR1",
+      "pathway_count": 6,
+      "importance_score": 4.859999999999999,
+      "druggability_tier": "unknown",
+      "is_druggable": false,
+      "is_fda_approved": false,
+      "is_clinical_trial": false,
+      "centrality": 0.0,
+      "disgenet_cardiac_score": 0.85,
+      "final_score": 7.958249999999999
+    },
+    {
+      "gene": "RYR2",
+      "pathway_count": 4,
+      "importance_score": 3.94,
+      "druggability_tier": "unknown",
+      "is_druggable": true,
+      "is_fda_approved": false,
+      "is_clinical_trial": false,
+      "centrality": 0.0,
+      "disgenet_cardiac_score": 0.92,
+      "final_score": 7.643599999999999
+    },
+    {
+      "gene": "TNNT2",
+      "pathway_count": 4,
+      "importance_score": 3.88,
+      "druggability_tier": "unknown",
+      "is_druggable": true,
+      "is_fda_approved": false,
+      "is_clinical_trial": false,
+      "centrality": 0.0,
+      "disgenet_cardiac_score": 0.93,
+      "final_score": 7.5563
+    },
+    {
+      "gene": "TNNI3",
+      "pathway_count": 4,
+      "importance_score": 3.88,
+      "druggability_tier": "unknown",
+      "is_druggable": true,
+      "is_fda_approved": false,
+      "is_clinical_trial": false,
+      "centrality": 0.0,
+      "disgenet_cardiac_score": 0.92,
+      "final_score": 7.5272
+    },
+    {
+      "gene": "MEF2C",
+      "pathway_count": 5,
+      "importance_score": 4.220000000000001,
+      "druggability_tier": "unknown",
+      "is_druggable": false,
+      "is_fda_approved": false,
+      "is_clinical_trial": false,
+      "centrality": 0.0,
+      "disgenet_cardiac_score": 0.9,
+      "final_score": 7.068500000000001
+    },
+    {
+      "gene": "MYL2",
+      "pathway_count": 4,
+      "importance_score": 3.88,
+      "druggability_tier": "unknown",
+      "is_druggable": false,
+      "is_fda_approved": false,
+      "is_clinical_trial": false,
+      "centrality": 0.0,
+      "disgenet_cardiac_score": 0.88,
+      "final_score": 6.4408
+    },
+    {
+      "gene": "BMPR1A",
+      "pathway_count": 8,
+      "importance_score": 6.419999999999999,
+      "druggability_tier": "unknown",
+      "is_druggable": false,
+      "is_fda_approved": false,
+      "is_clinical_trial": false,
+      "centrality": 0.0,
+      "disgenet_cardiac_score": 0.0,
+      "final_score": 6.419999999999999
+    },
+    {
+      "gene": "CTNNB1",
+      "pathway_count": 4,
+      "importance_score": 3.5,
+      "druggability_tier": "unknown",
+      "is_druggable": true,
+      "is_fda_approved": false,
+      "is_clinical_trial": false,
+      "centrality": 0.0,
+      "disgenet_cardiac_score": 0.7,
+      "final_score": 6.2124999999999995
+    },
+    {
+      "gene": "MYH7",
+      "pathway_count": 3,
+      "importance_score": 3.0,
+      "druggability_tier": "unknown",
+      "is_druggable": true,
+      "is_fda_approved": false,
+      "is_clinical_trial": false,
+      "centrality": 0.0,
+      "disgenet_cardiac_score": 0.95,
+      "final_score": 5.887499999999999
+    },
+    {
+      "gene": "ITGB3",
+      "pathway_count": 3,
+      "importance_score": 2.92,
+      "druggability_tier": "high",
+      "is_druggable": false,
+      "is_fda_approved": true,
+      "is_clinical_trial": false,
+      "centrality": 0.0,
+      "disgenet_cardiac_score": 0.0,
+      "final_score": 5.84
+    },
+    {
+      "gene": "NOS3",
+      "pathway_count": 5,
+      "importance_score": 4.62,
+      "druggability_tier": "unknown",
+      "is_druggable": true,
+      "is_fda_approved": false,
+      "is_clinical_trial": false,
+      "centrality": 0.0,
+      "disgenet_cardiac_score": 0.0,
+      "final_score": 5.775
+    },
+    {
+      "gene": "ACE",
+      "pathway_count": 3,
+      "importance_score": 2.8,
+      "druggability_tier": "high",
+      "is_druggable": true,
+      "is_fda_approved": true,
+      "is_clinical_trial": false,
+      "centrality": 0.0,
+      "disgenet_cardiac_score": 0.0,
+      "final_score": 5.6
+    },
+    {
+      "gene": "IGF1",
+      "pathway_count": 4,
+      "importance_score": 3.88,
+      "druggability_tier": "unknown",
+      "is_druggable": true,
+      "is_fda_approved": false,
+      "is_clinical_trial": false,
+      "centrality": 0.0,
+      "disgenet_cardiac_score": 0.0,
+      "final_score": 4.85
+    }
+  ]
+}

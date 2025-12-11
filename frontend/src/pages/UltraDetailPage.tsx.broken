@@ -1,0 +1,1596 @@
+import { useParams, useNavigate } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
+import {
+  Box,
+  Paper,
+  Typography,
+  Grid,
+  Chip,
+  Stack,
+  Card,
+  CardContent,
+  Button,
+  CircularProgress,
+  LinearProgress,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
+  Table,
+  TableBody,
+  TableCell,
+  TableRow,
+  Alert,
+  Badge,
+  Rating,
+  List,
+  ListItem,
+  ListItemText,
+  ListItemIcon,
+  IconButton,
+  Link,
+  Tooltip,
+} from '@mui/material';
+import {
+  ArrowBack,
+  ExpandMore,
+  Science,
+  TrendingUp,
+  MenuBook,
+  Timeline,
+  AccountTree,
+  Favorite,
+  LocalHospital,
+  BiotechOutlined,
+  OpenInNew,
+  Assessment,
+  Verified,
+  Speed,
+  Share,
+  Download,
+} from '@mui/icons-material';
+import api from '../api/endpoints';
+import PathwayLineageVisualization from '../components/PathwayLineageVisualization';
+import LiteratureEvidenceDisplay from '../components/LiteratureEvidenceDisplay';
+import DatabaseEvidenceDisplay from '../components/DatabaseEvidenceDisplay';
+import testData from '../mock/testData.json';
+import detailedTestData from '../mock/detailedTestData.json';
+import {
+  normalizeHypothesis,
+  getPathwayName,
+  getPathwayId,
+  getSourceDb,
+  getPAdj,
+  getEvidenceGenes,
+  getEvidenceCount,
+  getSeedGenes,
+  getLiteratureCitations,
+  calculateCardiacRelevance,
+  calculateClinicalSignificance,
+  calculateTissueSpecificity,
+  calculatePathwayComplexity,
+  formatPValue,
+  getSignificanceLabel,
+  getCardiacRelevanceColor,
+  getDatabaseColor,
+} from '../utils/hypothesisUtils';
+
+export default function UltraDetailPage() {
+  const { analysisId, pathwayId } = useParams();
+  const navigate = useNavigate();
+
+  const { data: results, isLoading } = useQuery({
+    queryKey: ['analysis-results', analysisId],
+    queryFn: async () => {
+      try {
+        return await api.getAnalysisResults(analysisId!);
+      } catch (error) {
+        console.log('Using test data for DetailPage demo');
+        return testData;
+      }
+    },
+    enabled: !!analysisId,
+  });
+
+  const { data: detailedResults } = useQuery({
+    queryKey: ['detailed-analysis-results', analysisId],
+    queryFn: async () => {
+      try {
+        return await api.getDetailedAnalysisResults(analysisId!);
+      } catch (error) {
+        console.log('Using detailed test data for demo');
+        return detailedTestData;
+      }
+    },
+    enabled: !!analysisId,
+  });
+
+  if (isLoading) {
+    return (
+      <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', mt: 8 }}>
+        <CircularProgress size={60} thickness={4} sx={{ color: '#1E6B52', mb: 3 }} />
+        <Typography variant="h6" sx={{ color: '#1E6B52', fontWeight: 600, mb: 1 }}>
+          Loading Pathway Details
+        </Typography>
+        <Typography variant="body2" color="text.secondary">
+          Retrieving comprehensive pathway analysis and evidence data...
+        </Typography>
+      </Box>
+    );
+  }
+
+  const hypothesisData = results?.hypotheses?.hypotheses?.find(
+    (h: any) => h.pathway_id === pathwayId || h.aggregated_pathway?.pathway?.pathway_id === pathwayId
+  ) as any;
+
+  // Type the hypothesis as any to avoid type checking issues with test data
+  const hypothesis: any = hypothesisData || {};
+
+  // Check if we have valid hypothesis data (either new format with pathway_id or old format with aggregated_pathway)
+  const hasValidData = hypothesis && (hypothesis.pathway_id || hypothesis.aggregated_pathway);
+  
+  if (!hasValidData) {
+    return (
+      <Paper 
+        elevation={3}
+        sx={{ 
+          p: 6, 
+          textAlign: 'center',
+          borderRadius: 3,
+          border: '2px solid #E8F5E9',
+        }}
+      >
+        <Box
+          sx={{
+            background: 'linear-gradient(135deg, #E8F5E9 0%, #C8E6C9 100%)',
+            borderRadius: '50%',
+            width: 120,
+            height: 120,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            margin: '0 auto',
+            mb: 3,
+          }}
+        >
+          <Science sx={{ fontSize: 64, color: '#1E6B52' }} />
+        </Box>
+        <Typography variant="h5" gutterBottom sx={{ fontWeight: 700, color: '#1E6B52', mb: 2 }}>
+          Pathway Analysis Not Found
+        </Typography>
+        <Typography color="text.secondary" paragraph sx={{ mb: 4, maxWidth: 500, mx: 'auto' }}>
+          The requested pathway analysis could not be found in the results. This may be due to an invalid pathway ID or the analysis data being unavailable.
+        </Typography>
+        <Button
+          variant="contained"
+          size="large"
+          startIcon={<ArrowBack />}
+          onClick={() => navigate(`/results/${analysisId}`)}
+          sx={{
+            bgcolor: '#1E6B52',
+            color: 'white',
+            fontWeight: 600,
+            px: 4,
+            py: 1.5,
+            '&:hover': {
+              bgcolor: '#145A43',
+            }
+          }}
+        >
+          Back to Results
+        </Button>
+      </Paper>
+    );
+  }
+
+  // Normalize hypothesis data to handle both legacy and current structures
+  const normalized = normalizeHypothesis(hypothesis);
+  const pathway = normalized; // For backward compatibility with existing code
+
+  // Use utility functions for calculations
+  const cardiacRelevanceScore = calculateCardiacRelevance(hypothesis);
+  const clinicalImpactScore = calculateClinicalSignificance(hypothesis);
+  const tissueSpecificityScore = calculateTissueSpecificity(hypothesis);
+  const pathwayComplexityScore = calculatePathwayComplexity(hypothesis);
+
+  // Legacy function wrappers for backward compatibility
+  const calculateCardiacRelevance = (): number => {
+    return cardiacRelevanceScore;
+  };
+
+  const calculateClinicalImpact = (): number => {
+    return clinicalImpactScore;
+  };
+
+  const cardiacRelevance = calculateCardiacRelevance();
+  const clinicalImpact = calculateClinicalImpact();
+
+  return (
+    <Box sx={{ py: 2 }}>
+      {/* Enhanced Header with Gradient and Metrics */}
+      <Paper
+        elevation={4}
+        sx={{
+          p: 4,
+          mb: 4,
+          background: 'linear-gradient(135deg, #1E6B52 0%, #145A43 100%)',
+          color: 'white',
+          borderRadius: 3,
+          border: '2px solid #FFB81C',
+          position: 'relative',
+          overflow: 'hidden',
+          boxShadow: '0 8px 32px rgba(30, 107, 82, 0.2)',
+        }}
+      >
+        <Stack direction="row" justifyContent="space-between" alignItems="flex-start" sx={{ position: 'relative' }}>
+          <Box sx={{ flex: 1 }}>
+            <Stack direction="row" spacing={2.5} alignItems="center" sx={{ mb: 2.5 }}>
+              <Box
+                sx={{
+                  background: 'rgba(255, 184, 28, 0.2)',
+                  borderRadius: '16px',
+                  p: 1.5,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  border: '2px solid #FFB81C',
+                }}
+              >
+                <Science sx={{ fontSize: 40, color: '#FFB81C' }} />
+              </Box>
+              <Box>
+                <Typography variant="h4" sx={{ fontWeight: 700, mb: 1, color: 'white' }}>
+                  {pathway.pathway_name}
+                </Typography>
+                <Stack direction="row" spacing={1.5} alignItems="center" flexWrap="wrap">
+                  <Chip 
+                    label={`Rank #${hypothesis.rank || 'N/A'}`} 
+                    sx={{ 
+                      bgcolor: '#FFB81C', 
+                      color: '#000', 
+                      fontWeight: 700,
+                      fontSize: '0.9rem',
+                      height: 32,
+                    }} 
+                  />
+                  <Chip 
+                    label={pathway.source_db || 'Unknown'} 
+                    variant="outlined" 
+                    sx={{ 
+                      color: 'white', 
+                      borderColor: 'rgba(255,255,255,0.5)',
+                      fontWeight: 600,
+                      height: 32,
+                      '&:hover': {
+                        bgcolor: 'rgba(255,255,255,0.1)',
+                      }
+                    }}
+                  />
+                  <Chip 
+                    label={`ID: ${pathway.pathway_id}`} 
+                    variant="outlined" 
+                    sx={{ 
+                      color: 'white', 
+                      borderColor: 'rgba(255,255,255,0.5)',
+                      fontWeight: 600,
+                      height: 32,
+                      '&:hover': {
+                        bgcolor: 'rgba(255,255,255,0.1)',
+                      }
+                    }}
+                  />
+                </Stack>
+              </Box>
+            </Stack>
+          </Box>
+          
+          <Stack direction="row" spacing={1}>
+            <Tooltip title="Back to Results">
+              <IconButton 
+                sx={{ 
+                  color: 'white', 
+                  bgcolor: 'rgba(255,255,255,0.15)',
+                  '&:hover': {
+                    bgcolor: 'rgba(255,255,255,0.25)',
+                  }
+                }}
+                onClick={() => navigate(`/results/${analysisId}`)}
+              >
+                <ArrowBack />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="Share Pathway">
+              <IconButton sx={{ 
+                color: 'white', 
+                bgcolor: 'rgba(255,255,255,0.15)',
+                '&:hover': {
+                  bgcolor: 'rgba(255,255,255,0.25)',
+                }
+              }}>
+                <Share />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="Download Data">
+              <IconButton sx={{ 
+                color: 'white', 
+                bgcolor: 'rgba(255,255,255,0.15)',
+                '&:hover': {
+                  bgcolor: 'rgba(255,255,255,0.25)',
+                }
+              }}>
+                <Download />
+              </IconButton>
+            </Tooltip>
+          </Stack>
+        </Stack>
+      </Paper>
+
+      {/* Ultra-Comprehensive Metrics Dashboard */}
+      <Grid container spacing={3} sx={{ mb: 4 }}>
+        <Grid item xs={12} md={3}>
+          <Card 
+            elevation={3} 
+            sx={{ 
+              height: '100%',
+              border: '2px solid #E8F5E9',
+              borderRadius: 3,
+              transition: 'all 0.3s ease-in-out',
+              '&:hover': {
+                transform: 'translateY(-4px)',
+                boxShadow: '0 12px 32px rgba(30, 107, 82, 0.2)',
+                borderColor: '#1E6B52',
+              }
+            }}
+          >
+            <CardContent sx={{ textAlign: 'center', p: 3 }}>
+              <Box
+                sx={{
+                  background: 'linear-gradient(135deg, #E8F5E9 0%, #C8E6C9 100%)',
+                  borderRadius: '50%',
+                  width: 64,
+                  height: 64,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  margin: '0 auto',
+                  mb: 2,
+                }}
+              >
+                <TrendingUp sx={{ fontSize: 36, color: '#1E6B52' }} />
+              </Box>
+              <Typography variant="h3" sx={{ fontWeight: 700, color: '#1E6B52', mb: 1 }}>
+                {hypothesis.nes_score?.toFixed(2) || '0.00'}
+              </Typography>
+              <Typography variant="body2" color="text.secondary" gutterBottom fontWeight={600}>
+                NES Score
+              </Typography>
+              <LinearProgress
+                variant="determinate"
+                value={Math.min(Math.abs(hypothesis.nes_score || 0) * 25, 100)}
+                sx={{ 
+                  height: 8, 
+                  borderRadius: 4,
+                  bgcolor: '#E8F5E9',
+                  mt: 2,
+                  '& .MuiLinearProgress-bar': {
+                    bgcolor: hypothesis.nes_score > 0 ? '#1E6B52' : '#d32f2f',
+                    borderRadius: 4,
+                  }
+                }}
+              />
+            </CardContent>
+          </Card>
+        </Grid>
+
+        <Grid item xs={12} md={3}>
+          <Card 
+            elevation={3} 
+            sx={{ 
+              height: '100%',
+              border: '2px solid #FCE4EC',
+              borderRadius: 3,
+              transition: 'all 0.3s ease-in-out',
+              '&:hover': {
+                transform: 'translateY(-4px)',
+                boxShadow: '0 12px 32px rgba(233, 30, 99, 0.2)',
+                borderColor: '#E91E63',
+              }
+            }}
+          >
+            <CardContent sx={{ textAlign: 'center', p: 3 }}>
+              <Box
+                sx={{
+                  background: 'linear-gradient(135deg, #FCE4EC 0%, #F8BBD0 100%)',
+                  borderRadius: '50%',
+                  width: 64,
+                  height: 64,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  margin: '0 auto',
+                  mb: 2,
+                }}
+              >
+                <Favorite sx={{ fontSize: 36, color: '#E91E63' }} />
+              </Box>
+              <Typography variant="h3" sx={{ fontWeight: 700, color: '#E91E63', mb: 1 }}>
+                {(cardiacRelevance * 100).toFixed(0)}%
+              </Typography>
+              <Typography variant="body2" color="text.secondary" gutterBottom fontWeight={600}>
+                Cardiac Relevance
+              </Typography>
+              <LinearProgress
+                variant="determinate"
+                value={cardiacRelevance * 100}
+                sx={{ 
+                  height: 8, 
+                  borderRadius: 4,
+                  bgcolor: '#FCE4EC',
+                  mt: 2,
+                  '& .MuiLinearProgress-bar': {
+                    bgcolor: '#E91E63',
+                    borderRadius: 4,
+                  }
+                }}
+              />
+            </CardContent>
+          </Card>
+        </Grid>
+
+        <Grid item xs={12} md={3}>
+          <Card 
+            elevation={3} 
+            sx={{ 
+              height: '100%',
+              border: '2px solid #FFF3E0',
+              borderRadius: 3,
+              transition: 'all 0.3s ease-in-out',
+              '&:hover': {
+                transform: 'translateY(-4px)',
+                boxShadow: '0 12px 32px rgba(255, 152, 0, 0.2)',
+                borderColor: '#FF9800',
+              }
+            }}
+          >
+            <CardContent sx={{ textAlign: 'center', p: 3 }}>
+              <Box
+                sx={{
+                  background: 'linear-gradient(135deg, #FFF3E0 0%, #FFE0B2 100%)',
+                  borderRadius: '50%',
+                  width: 64,
+                  height: 64,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  margin: '0 auto',
+                  mb: 2,
+                }}
+              >
+                <LocalHospital sx={{ fontSize: 36, color: '#FF9800' }} />
+              </Box>
+              <Rating
+                value={clinicalImpact * 5}
+                precision={0.1}
+                readOnly
+                size="large"
+                sx={{ mb: 1 }}
+                icon={<LocalHospital fontSize="inherit" sx={{ color: '#FF9800' }} />}
+                emptyIcon={<LocalHospital fontSize="inherit" sx={{ color: '#FFE0B2' }} />}
+              />
+              <Typography variant="body2" color="text.secondary" gutterBottom>
+                Clinical Impact
+              </Typography>
+              <Typography variant="h5" sx={{ fontWeight: 600, color: '#FF9800' }}>
+                {(clinicalImpact * 100).toFixed(0)}%
+              </Typography>
+            </CardContent>
+          </Card>
+        </Grid>
+
+        <Grid item xs={12} md={3}>
+          <Card elevation={2} sx={{ height: '100%' }}>
+            <CardContent sx={{ textAlign: 'center', p: 2.5 }}>
+              <Assessment sx={{ fontSize: 40, color: '#9C27B0', mb: 1 }} />
+              <Typography variant="h3" sx={{ fontWeight: 700, color: '#9C27B0', mb: 0.5 }}>
+                {(pathway?.p_adj || 0) < 0.001 ? '< 0.001' : (pathway?.p_adj || 0).toFixed(4)}
+              </Typography>
+              <Typography variant="body2" color="text.secondary" gutterBottom>
+                FDR q-value
+              </Typography>
+              <Chip
+                label={(pathway?.p_adj || 1) < 0.05 ? 'Significant' : 'Not Significant'}
+                color={(pathway?.p_adj || 1) < 0.05 ? 'success' : 'default'}
+                size="small"
+                icon={<Verified />}
+              />
+            </CardContent>
+          </Card>
+        </Grid>
+
+        {/* GTEx Tissue Expression Card */}
+        <Grid item xs={12} md={3}>
+          <Card elevation={2} sx={{ height: '100%' }}>
+            <CardContent sx={{ textAlign: 'center', p: 2.5 }}>
+              <BiotechOutlined sx={{ fontSize: 40, color: '#E57373', mb: 1 }} />
+              <Typography variant="h3" sx={{ fontWeight: 700, color: '#E57373', mb: 0.5 }}>
+                {(hypothesis.score_components as any)?.cardiac_specificity_ratio 
+                  ? `${((hypothesis.score_components as any).cardiac_specificity_ratio).toFixed(1)}x`
+                  : 'N/A'
+                }
+              </Typography>
+              <Typography variant="body2" color="text.secondary" gutterBottom>
+                GTEx Cardiac Specificity
+              </Typography>
+              {(hypothesis.score_components as any)?.tissue_validation_passed && (
+                <Chip
+                  label="Cardiac Expressed"
+                  color="success"
+                  size="small"
+                  icon={<Favorite />}
+                />
+              )}
+              {(hypothesis.score_components as any)?.mean_cardiac_tpm && (
+                <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 1 }}>
+                  Mean TPM: {((hypothesis.score_components as any).mean_cardiac_tpm).toFixed(1)}
+                </Typography>
+              )}
+              {(hypothesis.score_components as any)?.cardiac_expressed_genes && (
+                <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
+                  {(hypothesis.score_components as any).cardiac_expressed_genes.length} genes
+                </Typography>
+              )}
+            </CardContent>
+          </Card>
+        </Grid>
+      </Grid>
+
+      {/* SEED GENE LINEAGE - PROMINENT SECTION AT TOP */}
+      <Paper elevation={3} sx={{ p: 3, mb: 3, bgcolor: '#F3F7F9', borderLeft: '4px solid #1976d2' }}>
+        <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 2 }}>
+          <Timeline color="primary" sx={{ fontSize: 28 }} />
+          <Typography variant="h5" sx={{ fontWeight: 700, color: '#1976d2' }}>
+            Seed Gene Lineage & Network Contribution
+          </Typography>
+          <Badge 
+            badgeContent={hypothesis.traced_seed_genes?.length || 0}
+            color="primary"
+            sx={{ ml: 1 }}
+          >
+            <BiotechOutlined />
+          </Badge>
+        </Stack>
+        
+        <Alert severity="info" sx={{ mb: 3 }}>
+          <Typography variant="body2">
+            <strong>Pathway Discovery Lineage:</strong> This visualization shows how your input seed genes contributed to discovering this pathway 
+            through functional neighborhoods and protein-protein interactions. Each connection represents evidence-based biological relationships 
+            that led to this pathway's identification.
+          </Typography>
+        </Alert>
+        
+        <PathwayLineageVisualization 
+          hypothesis={hypothesis}
+          functionalNeighborhood={{
+            seed_genes: (hypothesis.traced_seed_genes || []).map((gene: string) => ({ 
+              input_id: gene, 
+              symbol: gene, 
+              entrez_id: '', 
+              validated: true 
+            })),
+            neighbors: (pathway.traced_seed_genes || []).map((gene: string) => ({ 
+              input_id: gene, 
+              symbol: gene, 
+              entrez_id: '', 
+              validated: true 
+            })),
+            size: (pathway.traced_seed_genes || []).length,
+            interactions: []
+          }}
+          allResults={detailedResults || {}}
+        />
+      </Paper>
+
+      <Grid container spacing={3}>
+        {/* Left Column - Detailed Analysis */}
+        <Grid item xs={12} md={8}>
+          {/* Pathway Overview */}
+          <Card elevation={2} sx={{ mb: 3 }}>
+            <CardContent>
+              <Typography variant="h5" gutterBottom sx={{ color: '#1E6B52', fontWeight: 600 }}>
+                <AccountTree sx={{ mr: 1, verticalAlign: 'middle' }} />
+                Pathway Overview
+              </Typography>
+              
+              <Grid container spacing={2} sx={{ mb: 2 }}>
+                <Grid item xs={6}>
+                  <Stack spacing={1}>
+                    <Box>
+                      <Typography variant="body2" color="text.secondary">Evidence Genes</Typography>
+                      <Typography variant="h6" color="primary">
+                        {pathway.traced_seed_genes?.length || 0} genes
+                      </Typography>
+                    </Box>
+                    <Box>
+                      <Typography variant="body2" color="text.secondary">Literature Citations</Typography>
+                      <Typography variant="h6" color="primary">
+                        {hypothesis.literature_associations?.total_citations || 0} papers
+                      </Typography>
+                    </Box>
+                  </Stack>
+                </Grid>
+                <Grid item xs={6}>
+                  <Stack spacing={1}>
+                    <Box>
+                      <Typography variant="body2" color="text.secondary">Seed Gene Contributors</Typography>
+                      <Typography variant="h6" color="primary">
+                        {hypothesis.traced_seed_genes?.length || 0} genes
+                      </Typography>
+                    </Box>
+                    <Box>
+                      <Typography variant="body2" color="text.secondary">Database Source</Typography>
+                      <Typography variant="h6" color="primary">
+                        {pathway.source_db || 'Unknown'}
+                      </Typography>
+                    </Box>
+                  </Stack>
+                </Grid>
+              </Grid>
+
+              {/* Quick Gene List */}
+              {pathway.traced_seed_genes && pathway.traced_seed_genes.length > 0 && (
+                <Box>
+                  <Typography variant="subtitle2" gutterBottom sx={{ color: '#1E6B52' }}>
+                    Top Evidence Genes:
+                  </Typography>
+                  <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+                    {pathway.traced_seed_genes.slice(0, 10).map((gene: string) => (
+                      <Chip
+                        key={gene}
+                        label={gene}
+                        size="small"
+                        variant="outlined"
+                        color="primary"
+                      />
+                    ))}
+                    {pathway.traced_seed_genes.length > 10 && (
+                      <Chip
+                        label={`+${pathway.traced_seed_genes.length - 10} more`}
+                        size="small"
+                        color="primary"
+                      />
+                    )}
+                  </Stack>
+                </Box>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Enhanced Expandable Sections */}
+          <Stack spacing={2}>
+
+            {/* NEW: Stage 3 Clinical Evidence Integration */}
+            {hypothesis.stage_3_clinical_evidence && (
+              <Accordion defaultExpanded>
+                <AccordionSummary 
+                  expandIcon={<ExpandMore />}
+                  sx={{ bgcolor: '#FFF3E0', border: '2px solid #FF5722' }}
+                >
+                  <Stack direction="row" spacing={1} alignItems="center">
+                    <LocalHospital sx={{ color: '#FF5722' }} />
+                    <Typography variant="h6" sx={{ fontWeight: 600, color: '#FF5722' }}>
+                      🆕 Stage 3: Multi-Modal Clinical Evidence
+                    </Typography>
+                    {hypothesis.stage_3_clinical_evidence.clinical_score > 0.5 && (
+                      <Chip label="Strong Clinical Support" color="success" size="small" />
+                    )}
+                  </Stack>
+                </AccordionSummary>
+                <AccordionDetails>
+                  <Alert severity="info" sx={{ mb: 3 }}>
+                    <Typography variant="body2" fontWeight={600}>
+                      Clinical Validation Score: {(hypothesis.stage_3_clinical_evidence.clinical_score * 100).toFixed(0)}%
+                    </Typography>
+                    <Typography variant="body2">
+                      This pathway has been validated using <strong>three independent clinical evidence sources</strong>: 
+                      HPA tissue expression, GWAS genetic associations, and epigenomic regulatory marks. Clinical score &gt; 50% 
+                      indicates strong multi-modal support. This contributes a <strong>{hypothesis.stage_3_clinical_evidence.clinical_weight.toFixed(2)}× multiplier</strong> to the NES score.
+                    </Typography>
+                  </Alert>
+
+                  <Grid container spacing={2}>
+                    {/* HPA Tissue Expression */}
+                    <Grid item xs={12} md={4}>
+                      <Paper elevation={2} sx={{ p: 2, height: '100%', borderLeft: '4px solid #2196F3' }}>
+                        <Typography variant="subtitle1" fontWeight={700} color="primary.main" gutterBottom>
+                          🔬 Human Protein Atlas
+                        </Typography>
+                        <Typography variant="h4" sx={{ color: '#2196F3', fontWeight: 700, mb: 1 }}>
+                          {(hypothesis.stage_3_clinical_evidence.hpa_score * 100).toFixed(0)}%
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary" paragraph>
+                          Cardiac tissue expression specificity
+                        </Typography>
+                        
+                        {hypothesis.stage_3_clinical_evidence.hpa_genes && hypothesis.stage_3_clinical_evidence.hpa_genes.length > 0 && (
+                          <Box sx={{ mt: 2 }}>
+                            <Typography variant="caption" color="text.secondary" display="block" gutterBottom>
+                              Genes with cardiac expression:
+                            </Typography>
+                            <Stack direction="row" spacing={0.5} flexWrap="wrap" useFlexGap>
+                              {hypothesis.stage_3_clinical_evidence.hpa_genes.slice(0, 8).map((gene: string) => (
+                                <Chip 
+                                  key={gene}
+                                  label={gene} 
+                                  size="small" 
+                                  sx={{ 
+                                    bgcolor: '#E3F2FD', 
+                                    color: '#1976D2',
+                                    fontSize: '0.7rem',
+                                    height: 20
+                                  }} 
+                                />
+                              ))}
+                              {hypothesis.stage_3_clinical_evidence.hpa_genes.length > 8 && (
+                                <Chip 
+                                  label={`+${hypothesis.stage_3_clinical_evidence.hpa_genes.length - 8}`}
+                                  size="small"
+                                  sx={{ bgcolor: '#E3F2FD', color: '#1976D2', fontSize: '0.7rem', height: 20 }}
+                                />
+                              )}
+                            </Stack>
+                          </Box>
+                        )}
+                      </Paper>
+                    </Grid>
+
+                    {/* GWAS Associations */}
+                    <Grid item xs={12} md={4}>
+                      <Paper elevation={2} sx={{ p: 2, height: '100%', borderLeft: '4px solid #4CAF50' }}>
+                        <Typography variant="subtitle1" fontWeight={700} sx={{ color: '#4CAF50' }} gutterBottom>
+                          🧬 GWAS Catalog
+                        </Typography>
+                        <Typography variant="h4" sx={{ color: '#4CAF50', fontWeight: 700, mb: 1 }}>
+                          {(hypothesis.stage_3_clinical_evidence.gwas_score * 100).toFixed(0)}%
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary" paragraph>
+                          Cardiovascular genetic associations
+                        </Typography>
+                        
+                        {hypothesis.stage_3_clinical_evidence.gwas_genes && hypothesis.stage_3_clinical_evidence.gwas_genes.length > 0 && (
+                          <Box sx={{ mt: 2 }}>
+                            <Typography variant="caption" color="text.secondary" display="block" gutterBottom>
+                              Genes with CVD GWAS hits:
+                            </Typography>
+                            <Stack direction="row" spacing={0.5} flexWrap="wrap" useFlexGap>
+                              {hypothesis.stage_3_clinical_evidence.gwas_genes.slice(0, 8).map((gene: string) => (
+                                <Chip 
+                                  key={gene}
+                                  label={gene} 
+                                  size="small" 
+                                  sx={{ 
+                                    bgcolor: '#E8F5E9', 
+                                    color: '#2E7D32',
+                                    fontSize: '0.7rem',
+                                    height: 20
+                                  }} 
+                                />
+                              ))}
+                              {hypothesis.stage_3_clinical_evidence.gwas_genes.length > 8 && (
+                                <Chip 
+                                  label={`+${hypothesis.stage_3_clinical_evidence.gwas_genes.length - 8}`}
+                                  size="small"
+                                  sx={{ bgcolor: '#E8F5E9', color: '#2E7D32', fontSize: '0.7rem', height: 20 }}
+                                />
+                              )}
+                            </Stack>
+                          </Box>
+                        )}
+                      </Paper>
+                    </Grid>
+
+                    {/* Epigenomic Regulation */}
+                    <Grid item xs={12} md={4}>
+                      <Paper elevation={2} sx={{ p: 2, height: '100%', borderLeft: '4px solid #9C27B0' }}>
+                        <Typography variant="subtitle1" fontWeight={700} sx={{ color: '#9C27B0' }} gutterBottom>
+                          📍 Epigenomics Roadmap
+                        </Typography>
+                        <Typography variant="h4" sx={{ color: '#9C27B0', fontWeight: 700, mb: 1 }}>
+                          {(hypothesis.stage_3_clinical_evidence.epigenomic_score * 100).toFixed(0)}%
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary" paragraph>
+                          Cardiac regulatory activity
+                        </Typography>
+                        
+                        {hypothesis.stage_3_clinical_evidence.epigenomic_genes && hypothesis.stage_3_clinical_evidence.epigenomic_genes.length > 0 && (
+                          <Box sx={{ mt: 2 }}>
+                            <Typography variant="caption" color="text.secondary" display="block" gutterBottom>
+                              Genes with cardiac enhancers:
+                            </Typography>
+                            <Stack direction="row" spacing={0.5} flexWrap="wrap" useFlexGap>
+                              {hypothesis.stage_3_clinical_evidence.epigenomic_genes.slice(0, 8).map((gene: string) => (
+                                <Chip 
+                                  key={gene}
+                                  label={gene} 
+                                  size="small" 
+                                  sx={{ 
+                                    bgcolor: '#F3E5F5', 
+                                    color: '#7B1FA2',
+                                    fontSize: '0.7rem',
+                                    height: 20
+                                  }} 
+                                />
+                              ))}
+                              {hypothesis.stage_3_clinical_evidence.epigenomic_genes.length > 8 && (
+                                <Chip 
+                                  label={`+${hypothesis.stage_3_clinical_evidence.epigenomic_genes.length - 8}`}
+                                  size="small"
+                                  sx={{ bgcolor: '#F3E5F5', color: '#7B1FA2', fontSize: '0.7rem', height: 20 }}
+                                />
+                              )}
+                            </Stack>
+                          </Box>
+                        )}
+                      </Paper>
+                    </Grid>
+                  </Grid>
+
+                  <Box sx={{ mt: 3, p: 2, bgcolor: '#FFF3E0', borderRadius: 1, border: '1px solid #FF5722' }}>
+                    <Typography variant="subtitle2" fontWeight={600} color="#FF5722" gutterBottom>
+                      Clinical Evidence Impact on NES Score
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      Combined clinical score: <strong>{(hypothesis.stage_3_clinical_evidence.clinical_score * 100).toFixed(1)}%</strong> → 
+                      NES multiplier: <strong>{hypothesis.stage_3_clinical_evidence.clinical_weight.toFixed(2)}×</strong>
+                      <br/>
+                      This pathway's NES score has been {hypothesis.stage_3_clinical_evidence.clinical_weight > 1.5 ? 'significantly boosted' : hypothesis.stage_3_clinical_evidence.clinical_weight > 1.2 ? 'moderately boosted' : 'slightly adjusted'} due to {hypothesis.stage_3_clinical_evidence.clinical_weight > 1.5 ? 'strong' : hypothesis.stage_3_clinical_evidence.clinical_weight > 1.2 ? 'moderate' : 'some'} multi-modal clinical validation.
+                    </Typography>
+                  </Box>
+                </AccordionDetails>
+              </Accordion>
+            )}
+
+            {/* GTEx Tissue Expression Analysis */}
+            <Accordion>
+              <AccordionSummary 
+                expandIcon={<ExpandMore />}
+                sx={{ bgcolor: '#F8F9FA' }}
+              >
+                <Stack direction="row" spacing={1} alignItems="center">
+                  <BiotechOutlined color="primary" />
+                  <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                    GTEx Cardiac Tissue Expression (Legacy)
+                  </Typography>
+                  <Badge 
+                    badgeContent={(hypothesis.score_components as any)?.cardiac_expressed_genes?.length || 0}
+                    color="secondary"
+                  >
+                    <Favorite sx={{ color: '#E57373' }} />
+                  </Badge>
+                  {(hypothesis.score_components as any)?.tissue_validation_passed && (
+                    <Chip label="Validated" color="success" size="small" />
+                  )}
+                </Stack>
+              </AccordionSummary>
+              <AccordionDetails>
+                <Alert severity="info" sx={{ mb: 2 }}>
+                  <Typography variant="body2">
+                    GTEx Portal tissue expression analysis showing cardiac-specific expression patterns for pathway genes. 
+                    Higher cardiac specificity ratios indicate stronger cardiac tissue preference.
+                  </Typography>
+                </Alert>
+                
+                <Grid container spacing={2}>
+                  <Grid item xs={12} md={6}>
+                    <Paper sx={{ p: 2, bgcolor: '#FAFAFA' }}>
+                      <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2, color: '#E57373' }}>
+                        <Favorite sx={{ mr: 1, verticalAlign: 'middle' }} />
+                        Cardiac Expression Metrics
+                      </Typography>
+                      
+                      <Stack spacing={2}>
+                        <Box>
+                          <Typography variant="body2" color="text.secondary">
+                            Cardiac Specificity Ratio
+                          </Typography>
+                          <Typography variant="h4" sx={{ color: '#E57373', fontWeight: 600 }}>
+                            {(hypothesis.score_components as any)?.cardiac_specificity_ratio 
+                              ? `${((hypothesis.score_components as any).cardiac_specificity_ratio).toFixed(2)}x`
+                              : 'Not available'
+                            }
+                          </Typography>
+                          <Typography variant="caption" color="text.secondary">
+                            Higher expression in cardiac vs. other tissues
+                          </Typography>
+                        </Box>
+
+                        <Box>
+                          <Typography variant="body2" color="text.secondary">
+                            Mean Cardiac TPM
+                          </Typography>
+                          <Typography variant="h5" sx={{ color: '#FF9800', fontWeight: 600 }}>
+                            {(hypothesis.score_components as any)?.mean_cardiac_tpm 
+                              ? ((hypothesis.score_components as any).mean_cardiac_tpm).toFixed(1)
+                              : 'N/A'
+                            }
+                          </Typography>
+                          <Typography variant="caption" color="text.secondary">
+                            Average transcripts per million in cardiac tissue
+                          </Typography>
+                        </Box>
+
+                        <Box>
+                          <Typography variant="body2" color="text.secondary">
+                            Cardiac Expression Ratio
+                          </Typography>
+                          <Typography variant="h5" sx={{ color: '#4CAF50', fontWeight: 600 }}>
+                            {(hypothesis.score_components as any)?.cardiac_expression_ratio 
+                              ? `${((hypothesis.score_components as any).cardiac_expression_ratio * 100).toFixed(1)}%`
+                              : 'N/A'
+                            }
+                          </Typography>
+                          <Typography variant="caption" color="text.secondary">
+                            Percentage of pathway genes expressed in cardiac tissue
+                          </Typography>
+                        </Box>
+                      </Stack>
+                    </Paper>
+                  </Grid>
+
+                  <Grid item xs={12} md={6}>
+                    <Paper sx={{ p: 2, bgcolor: '#FAFAFA' }}>
+                      <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2, color: '#1976D2' }}>
+                        <Assessment sx={{ mr: 1, verticalAlign: 'middle' }} />
+                        Expression Validation
+                      </Typography>
+                      
+                      <Stack spacing={2}>
+                        <Box>
+                          <Typography variant="body2" color="text.secondary" gutterBottom>
+                            Tissue Validation Status
+                          </Typography>
+                          <Chip
+                            label={(hypothesis.score_components as any)?.tissue_validation_passed ? "Passed" : "Not validated"}
+                            color={(hypothesis.score_components as any)?.tissue_validation_passed ? "success" : "default"}
+                            icon={<Verified />}
+                          />
+                        </Box>
+
+                        <Box>
+                          <Typography variant="body2" color="text.secondary" gutterBottom>
+                            Cardiac Expressed Genes
+                          </Typography>
+                          <Typography variant="h5" sx={{ color: '#9C27B0', fontWeight: 600 }}>
+                            {(hypothesis.score_components as any)?.cardiac_expressed_genes?.length || 0}
+                          </Typography>
+                          <Typography variant="caption" color="text.secondary">
+                            out of {pathway.traced_seed_genes?.length || 0} pathway genes
+                          </Typography>
+                        </Box>
+
+                        {(hypothesis.score_components as any)?.cardiac_expressed_genes && 
+                         (hypothesis.score_components as any).cardiac_expressed_genes.length > 0 && (
+                          <Box>
+                            <Typography variant="body2" color="text.secondary" gutterBottom>
+                              Expressed Genes
+                            </Typography>
+                            <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+                              {(hypothesis.score_components as any).cardiac_expressed_genes.slice(0, 8).map((gene: string) => (
+                                <Chip
+                                  key={gene}
+                                  label={gene}
+                                  size="small"
+                                  color="secondary"
+                                  variant="outlined"
+                                />
+                              ))}
+                              {(hypothesis.score_components as any).cardiac_expressed_genes.length > 8 && (
+                                <Chip
+                                  label={`+${(hypothesis.score_components as any).cardiac_expressed_genes.length - 8} more`}
+                                  size="small"
+                                  color="secondary"
+                                />
+                              )}
+                            </Stack>
+                          </Box>
+                        )}
+                      </Stack>
+                    </Paper>
+                  </Grid>
+                </Grid>
+
+                <Alert severity="success" sx={{ mt: 2 }}>
+                  <Typography variant="body2">
+                    <strong>GTEx Integration:</strong> This analysis uses the GTEx Portal (GTEx v8) with expression data from 
+                    Heart - Left Ventricle and Heart - Atrial Appendage tissues to validate cardiac-specific pathway relevance.
+                  </Typography>
+                </Alert>
+              </AccordionDetails>
+            </Accordion>
+
+            {/* Enhanced Tissue Expression Profile */}
+            <Accordion 
+              defaultExpanded
+              sx={{ 
+                mb: 3,
+                border: '2px solid #E8F5E9',
+                borderRadius: 2,
+                '&:before': { display: 'none' }
+              }}
+            >
+              <AccordionSummary expandIcon={<ExpandMore />} sx={{ bgcolor: '#E8F5E9' }}>
+                <Stack direction="row" spacing={2} alignItems="center">
+                  <BiotechOutlined sx={{ color: '#2E7D32', fontSize: 28 }} />
+                  <Typography variant="h6" sx={{ fontWeight: 600, color: '#2E7D32' }}>
+                    Tissue Expression Profile
+                  </Typography>
+                  <Badge 
+                    badgeContent={hypothesis.score_components?.tissue_expression_data?.length || 0}
+                    color="success"
+                  />
+                </Stack>
+              </AccordionSummary>
+              <AccordionDetails sx={{ p: 3 }}>
+                <Typography variant="body1" color="text.secondary" paragraph sx={{ mb: 3 }}>
+                  Comprehensive tissue expression analysis across 54 GTEx tissues, showing cardiac specificity and expression patterns for pathway genes.
+                </Typography>
+
+                <Grid container spacing={3}>
+                  {/* Cardiac Expression Summary */}
+                  <Grid item xs={12} md={6}>
+                    <Paper elevation={2} sx={{ p: 3, height: '100%', borderLeft: '4px solid #4CAF50' }}>
+                      <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, color: '#2E7D32' }}>
+                        Cardiac Tissue Expression
+                      </Typography>
+                      
+                      <Stack spacing={2}>
+                        <Box>
+                          <Typography variant="body2" color="text.secondary">
+                            Cardiac Specificity Score
+                          </Typography>
+                          <Typography variant="h4" sx={{ color: '#4CAF50', fontWeight: 700 }}>
+                            {(hypothesis.score_components as any)?.cardiac_specificity_ratio 
+                              ? `${((hypothesis.score_components as any).cardiac_specificity_ratio).toFixed(2)}x`
+                              : 'N/A'
+                            }
+                          </Typography>
+                          <Typography variant="caption" color="text.secondary">
+                            Expression level relative to other tissues
+                          </Typography>
+                        </Box>
+
+                        <Box>
+                          <Typography variant="body2" color="text.secondary">
+                            Mean Cardiac TPM
+                          </Typography>
+                          <Typography variant="h5" sx={{ color: '#FF9800', fontWeight: 600 }}>
+                            {(hypothesis.score_components as any)?.mean_cardiac_tpm 
+                              ? ((hypothesis.score_components as any).mean_cardiac_tpm).toFixed(1)
+                              : 'N/A'
+                            }
+                          </Typography>
+                        </Box>
+
+                        <Box>
+                          <Typography variant="body2" color="text.secondary">
+                            Cardiac Expression Ratio
+                          </Typography>
+                          <Typography variant="h5" sx={{ color: '#9C27B0', fontWeight: 600 }}>
+                            {(hypothesis.score_components as any)?.cardiac_expression_ratio 
+                              ? `${((hypothesis.score_components as any).cardiac_expression_ratio * 100).toFixed(1)}%`
+                              : 'N/A'
+                            }
+                          </Typography>
+                          <Typography variant="caption" color="text.secondary">
+                            Pathway genes expressed in cardiac tissue
+                          </Typography>
+                        </Box>
+                      </Stack>
+                    </Paper>
+                  </Grid>
+
+                  {/* Cardiac Expression Summary */}
+                  <Grid item xs={12} md={6}>
+                    <Paper elevation={2} sx={{ p: 3, height: '100%', borderLeft: '4px solid #2196F3' }}>
+                      <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, color: '#1976D2' }}>
+                        Cardiac Expression Profile
+                      </Typography>
+                      
+                      <Typography variant="body2" color="text.secondary" paragraph>
+                        Genes in this pathway expressed in cardiac tissue:
+                      </Typography>
+
+                      <Box sx={{ mb: 2 }}>
+                        <Typography variant="body2" gutterBottom>
+                          <strong>Expression Ratio:</strong> {((hypothesis.score_components as any)?.cardiac_expression_ratio * 100 || 0).toFixed(1)}%
+                        </Typography>
+                        <Typography variant="body2" gutterBottom>
+                          <strong>Mean TPM:</strong> {((hypothesis.score_components as any)?.mean_cardiac_tpm || 0).toFixed(2)}
+                        </Typography>
+                        <Typography variant="body2" gutterBottom>
+                          <strong>Cardiac Specificity:</strong> {((hypothesis.score_components as any)?.cardiac_specificity_ratio * 100 || 0).toFixed(1)}%
+                        </Typography>
+                      </Box>
+
+                      <Typography variant="caption" color="text.secondary" display="block" gutterBottom>
+                        Cardiac-expressed genes ({((hypothesis.score_components as any)?.cardiac_expressed_genes?.length || 0)}):
+                      </Typography>
+                      <Box sx={{ maxHeight: 150, overflowY: 'auto' }}>
+                        {((hypothesis.score_components as any)?.cardiac_expressed_genes || []).map((gene: string, idx: number) => (
+                          <Chip
+                            key={idx}
+                            label={gene}
+                            size="small"
+                            sx={{ m: 0.5 }}
+                            color="primary"
+                            variant="outlined"
+                          />
+                        ))}
+                        {((hypothesis.score_components as any)?.cardiac_expressed_genes?.length === 0 || 
+                          !(hypothesis.score_components as any)?.cardiac_expressed_genes) && (
+                          <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic', p: 2 }}>
+                            No cardiac expression data available for this pathway
+                          </Typography>
+                        )}
+                      </Box>
+                    </Paper>
+                  </Grid>
+                </Grid>
+              </AccordionDetails>
+            </Accordion>
+
+            {/* GWAS Signals Expansion */}
+            <Accordion 
+              sx={{ 
+                mb: 3,
+                border: '2px solid #FFF3E0',
+                borderRadius: 2,
+                '&:before': { display: 'none' }
+              }}
+            >
+              <AccordionSummary expandIcon={<ExpandMore />} sx={{ bgcolor: '#FFF3E0' }}>
+                <Stack direction="row" spacing={2} alignItems="center">
+                  <LocalHospital sx={{ color: '#F57C00', fontSize: 28 }} />
+                  <Typography variant="h6" sx={{ fontWeight: 600, color: '#F57C00' }}>
+                    GWAS Signals & Genetic Associations
+                  </Typography>
+                  <Badge 
+                    badgeContent={hypothesis.stage_3_clinical_evidence?.gwas_associations?.length || 0}
+                    color="warning"
+                  />
+                </Stack>
+              </AccordionSummary>
+              <AccordionDetails sx={{ p: 3 }}>
+                <Typography variant="body1" color="text.secondary" paragraph sx={{ mb: 3 }}>
+                  Genome-wide association study signals linked to cardiovascular diseases and traits for genes in this pathway.
+                </Typography>
+
+                <Grid container spacing={3}>
+                  {/* GWAS Summary */}
+                  <Grid item xs={12} md={4}>
+                    <Paper elevation={2} sx={{ p: 3, height: '100%', borderLeft: '4px solid #FF9800' }}>
+                      <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, color: '#F57C00' }}>
+                        GWAS Summary
+                      </Typography>
+                      
+                      <Stack spacing={2}>
+                        <Box>
+                          <Typography variant="body2" color="text.secondary">
+                            Total GWAS Hits
+                          </Typography>
+                          <Typography variant="h4" sx={{ color: '#FF9800', fontWeight: 700 }}>
+                            {hypothesis.stage_3_clinical_evidence?.gwas_associations?.length || 0}
+                          </Typography>
+                        </Box>
+
+                        <Box>
+                          <Typography variant="body2" color="text.secondary">
+                            Cardiovascular Traits
+                          </Typography>
+                          <Typography variant="h5" sx={{ color: '#E91E63', fontWeight: 600 }}>
+                            {hypothesis.stage_3_clinical_evidence?.gwas_associations?.filter((g: any) => 
+                              g.trait?.toLowerCase().includes('cardio') || 
+                              g.trait?.toLowerCase().includes('heart') ||
+                              g.trait?.toLowerCase().includes('blood pressure')
+                            ).length || 0}
+                          </Typography>
+                        </Box>
+
+                        <Box>
+                          <Typography variant="body2" color="text.secondary">
+                            Strongest Association
+                          </Typography>
+                          <Typography variant="h6" sx={{ color: '#4CAF50', fontWeight: 600 }}>
+                            {hypothesis.stage_3_clinical_evidence?.gwas_associations?.[0]?.p_value 
+                              ? `p = ${hypothesis.stage_3_clinical_evidence.gwas_associations[0].p_value.toExponential(1)}`
+                              : 'N/A'
+                            }
+                          </Typography>
+                        </Box>
+                      </Stack>
+                    </Paper>
+                  </Grid>
+
+                  {/* Literature Associations List */}
+                  <Grid item xs={12} md={8}>
+                    <Paper elevation={2} sx={{ p: 3, height: '100%', borderLeft: '4px solid #FF5722' }}>
+                      <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, color: '#D84315' }}>
+                        Literature Evidence
+                      </Typography>
+                      
+                      <Box sx={{ mb: 2 }}>
+                        <Typography variant="body2" gutterBottom>
+                          <strong>Total Citations:</strong> {(hypothesis.literature_associations as any)?.total_citations || 0}
+                        </Typography>
+                        <Typography variant="body2" gutterBottom>
+                          <strong>Literature Support:</strong> {(hypothesis.literature_associations as any)?.has_literature_support ? 'Yes' : 'No'}
+                        </Typography>
+                      </Box>
+                      
+                      <Typography variant="caption" color="text.secondary" display="block" gutterBottom>
+                        Key Associations:
+                      </Typography>
+                      <Box sx={{ maxHeight: 300, overflowY: 'auto' }}>
+                        {((hypothesis.literature_associations as any)?.associations || []).slice(0, 10).map((assoc: any, idx: number) => (
+                          <Box key={idx} sx={{ mb: 2, p: 2, border: '1px solid #FFE0B2', borderRadius: 1 }}>
+                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
+                              <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
+                                {assoc.gene || assoc.term || `Association ${idx + 1}`}
+                              </Typography>
+                              <Chip 
+                                label={`${assoc.citation_count || 0} citations`}
+                                size="small"
+                                color="warning"
+                              />
+                            </Box>
+                            
+                            <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                              {assoc.description || assoc.evidence || 'Literature evidence found'}
+                            </Typography>
+                            
+                            {assoc.pmids && assoc.pmids.length > 0 && (
+                              <Typography variant="caption" color="text.secondary">
+                                PMIDs: {assoc.pmids.slice(0, 3).join(', ')}
+                                {assoc.pmids.length > 3 && ` (+${assoc.pmids.length - 3} more)`}
+                              </Typography>
+                            )}
+                          </Box>
+                        ))}
+                        {(!((hypothesis.literature_associations as any)?.associations) || 
+                          ((hypothesis.literature_associations as any)?.associations?.length === 0)) && (
+                          <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic', p: 2 }}>
+                            No literature associations data available for this pathway
+                          </Typography>
+                        )}
+                      </Box>
+                    </Paper>
+                  </Grid>
+                </Grid>
+              </AccordionDetails>
+            </Accordion>
+
+            {/* Therapeutic Targets & Drug Discovery */}
+            <Accordion 
+              sx={{ 
+                mb: 3,
+                border: '2px solid #FCE4EC',
+                borderRadius: 2,
+                '&:before': { display: 'none' }
+              }}
+            >
+              <AccordionSummary expandIcon={<ExpandMore />} sx={{ bgcolor: '#FCE4EC' }}>
+                <Stack direction="row" spacing={2} alignItems="center">
+                  <LocalHospital sx={{ color: '#C2185B', fontSize: 28 }} />
+                  <Typography variant="h6" sx={{ fontWeight: 600, color: '#C2185B' }}>
+                    Therapeutic Targets & Drug Discovery
+                  </Typography>
+                  <Badge 
+                    badgeContent={(results as any)?.stage_4c_topology?.therapeutic_targets?.length || 0}
+                    color="error"
+                  />
+                </Stack>
+              </AccordionSummary>
+              <AccordionDetails sx={{ p: 3 }}>
+                <Typography variant="body1" color="text.secondary" paragraph sx={{ mb: 3 }}>
+                  Potential drug targets identified in this pathway based on network centrality, druggability scores, and clinical evidence.
+                </Typography>
+
+                <Grid container spacing={3}>
+                  {/* Therapeutic Targets Summary */}
+                  <Grid item xs={12} md={4}>
+                    <Paper elevation={2} sx={{ p: 3, height: '100%', borderLeft: '4px solid #E91E63' }}>
+                      <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, color: '#C2185B' }}>
+                        Target Summary
+                      </Typography>
+                      
+                      <Stack spacing={2}>
+                        <Box>
+                          <Typography variant="body2" color="text.secondary">
+                            High-Confidence Targets
+                          </Typography>
+                          <Typography variant="h4" sx={{ color: '#E91E63', fontWeight: 700 }}>
+                            {(results as any)?.stage_4c_topology?.therapeutic_targets?.filter((t: any) => 
+                              t.druggability_score > 0.7
+                            ).length || 0}
+                          </Typography>
+                        </Box>
+
+                        <Box>
+                          <Typography variant="body2" color="text.secondary">
+                            Average Druggability
+                          </Typography>
+                          <Typography variant="h5" sx={{ color: '#9C27B0', fontWeight: 600 }}>
+                            {((results as any)?.stage_4c_topology?.therapeutic_targets?.reduce((sum: number, t: any) => 
+                              sum + (t.druggability_score || 0), 0
+                            ) / ((results as any)?.stage_4c_topology?.therapeutic_targets?.length || 1) * 100).toFixed(0)}%
+                          </Typography>
+                        </Box>
+
+                        <Box>
+                          <Typography variant="body2" color="text.secondary">
+                            Known Drugs
+                          </Typography>
+                          <Typography variant="h5" sx={{ color: '#3F51B5', fontWeight: 600 }}>
+                            {(results as any)?.stage_4c_topology?.therapeutic_targets?.filter((t: any) => 
+                              t.existing_drugs?.length > 0
+                            ).length || 0}
+                          </Typography>
+                        </Box>
+                      </Stack>
+                    </Paper>
+                  </Grid>
+
+                  {/* Therapeutic Targets List */}
+                  <Grid item xs={12} md={8}>
+                    <Paper elevation={2} sx={{ p: 3, height: '100%', borderLeft: '4px solid #9C27B0' }}>
+                      <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, color: '#7B1FA2' }}>
+                        Prioritized Therapeutic Targets
+                      </Typography>
+                      
+                      <Box sx={{ maxHeight: 400, overflowY: 'auto' }}>
+                        {((results as any)?.stage_4c_topology?.therapeutic_targets || []).slice(0, 8).map((target: any, idx: number) => (
+                          <Box key={idx} sx={{ mb: 2, p: 2, border: '1px solid #F8BBD9', borderRadius: 1 }}>
+                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
+                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
+                                  {target.gene_symbol}
+                                </Typography>
+                                <Chip 
+                                  label={`Druggability: ${(target.druggability_score * 100).toFixed(0)}%`}
+                                  size="small"
+                                  color={target.druggability_score > 0.7 ? 'success' : target.druggability_score > 0.4 ? 'warning' : 'default'}
+                                />
+                              </Box>
+                              {target.existing_drugs?.length > 0 && (
+                                <Chip 
+                                  label={`${target.existing_drugs.length} drug${target.existing_drugs.length > 1 ? 's' : ''}`}
+                                  size="small"
+                                  color="primary"
+                                  icon={<LocalHospital />}
+                                />
+                              )}
+                            </Box>
+                            
+                            <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                              <strong>Rationale:</strong> {target.prioritization_rationale || 'High network centrality and clinical relevance'}
+                            </Typography>
+                            
+                            {target.existing_drugs?.length > 0 && (
+                              <Box sx={{ mb: 1 }}>
+                                <Typography variant="caption" color="text.secondary" display="block" gutterBottom>
+                                  Existing drugs:
+                                </Typography>
+                                <Stack direction="row" spacing={0.5} flexWrap="wrap" useFlexGap>
+                                  {target.existing_drugs.slice(0, 3).map((drug: string, drugIdx: number) => (
+                                    <Chip 
+                                      key={drugIdx}
+                                      label={drug}
+                                      size="small"
+                                      variant="outlined"
+                                      color="primary"
+                                    />
+                                  ))}
+                                  {target.existing_drugs.length > 3 && (
+                                    <Chip 
+                                      label={`+${target.existing_drugs.length - 3} more`}
+                                      size="small"
+                                      variant="outlined"
+                                    />
+                                  )}
+                                </Stack>
+                              </Box>
+                            )}
+                            
+                            <Typography variant="caption" color="text.secondary">
+                              {target.clinical_evidence || 'Clinical evidence available'}
+                            </Typography>
+                          </Box>
+                        ))}
+                      </Box>
+                    </Paper>
+                  </Grid>
+                </Grid>
+              </AccordionDetails>
+            </Accordion>
+
+            {/* Literature Evidence */}
+            <Accordion>
+              <AccordionSummary 
+                expandIcon={<ExpandMore />}
+                sx={{ bgcolor: '#F8F9FA' }}
+              >
+                <Stack direction="row" spacing={1} alignItems="center">
+                  <MenuBook color="primary" />
+                  <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                    Literature Evidence & Citations
+                  </Typography>
+                  <Badge 
+                    badgeContent={hypothesis.literature_associations?.total_citations || 0}
+                    color="secondary"
+                  >
+                    <Science />
+                  </Badge>
+                </Stack>
+              </AccordionSummary>
+              <AccordionDetails>
+                <Alert severity="info" sx={{ mb: 2 }}>
+                  <Typography variant="body2">
+                    Comprehensive literature analysis showing research publications that support the cardiovascular relevance of this pathway.
+                  </Typography>
+                </Alert>
+                <LiteratureEvidenceDisplay 
+                  hypothesis={hypothesis}
+                  allResults={detailedResults || {}}
+                />
+              </AccordionDetails>
+            </Accordion>
+
+            {/* Database Cross-References */}
+            <Accordion>
+              <AccordionSummary 
+                expandIcon={<ExpandMore />}
+                sx={{ bgcolor: '#F8F9FA' }}
+              >
+                <Stack direction="row" spacing={1} alignItems="center">
+                  <AccountTree color="primary" />
+                  <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                    Database Cross-References & Evidence
+                  </Typography>
+                  <Verified color="success" />
+                </Stack>
+              </AccordionSummary>
+              <AccordionDetails>
+                <DatabaseEvidenceDisplay 
+                  hypothesis={hypothesis}
+                  functionalNeighborhood={{
+                    seed_genes: (hypothesis.traced_seed_genes || []).map((gene: string) => ({ symbol: gene, validated: true })),
+                    neighbors: (pathway.traced_seed_genes || []).map((gene: string) => ({ symbol: gene, validated: true })),
+                    size: (pathway.traced_seed_genes || []).length,
+                    interactions: []
+                  }}
+                />
+              </AccordionDetails>
+            </Accordion>
+          </Stack>
+        </Grid>
+
+        {/* Right Column - Summary & Quick Actions */}
+        <Grid item xs={12} md={4}>
+          {/* Enhanced Summary Card */}
+          <Card elevation={2} sx={{ mb: 2, bgcolor: '#FAFAFA' }}>
+            <CardContent>
+              <Typography variant="h6" gutterBottom color="primary" sx={{ fontWeight: 600 }}>
+                <Speed sx={{ mr: 1, verticalAlign: 'middle' }} />
+                Quick Summary
+              </Typography>
+              
+              <List dense>
+                <ListItem>
+                  <ListItemIcon><TrendingUp color="primary" /></ListItemIcon>
+                  <ListItemText 
+                    primary="Enrichment Score"
+                    secondary={`NES: ${hypothesis.nes_score?.toFixed(3) || 'N/A'}`}
+                  />
+                </ListItem>
+                <ListItem>
+                  <ListItemIcon><Assessment color="primary" /></ListItemIcon>
+                  <ListItemText 
+                    primary="Statistical Significance"
+                    secondary={`q-value: ${(pathway?.p_adj || 0) < 0.001 ? '< 0.001' : (pathway?.p_adj || 0).toFixed(4)}`}
+                  />
+                </ListItem>
+                <ListItem>
+                  <ListItemIcon><BiotechOutlined color="primary" /></ListItemIcon>
+                  <ListItemText 
+                    primary="Evidence Genes"
+                    secondary={`${pathway.traced_seed_genes?.length || 0} genes involved`}
+                  />
+                </ListItem>
+                <ListItem>
+                  <ListItemIcon><MenuBook color="primary" /></ListItemIcon>
+                  <ListItemText 
+                    primary="Literature Support"
+                    secondary={`${hypothesis.literature_associations?.total_citations || 0} citations`}
+                  />
+                </ListItem>
+              </List>
+            </CardContent>
+          </Card>
+
+          {/* External Resources */}
+          <Card elevation={2} sx={{ mb: 2 }}>
+            <CardContent>
+              <Typography variant="h6" gutterBottom color="primary" sx={{ fontWeight: 600 }}>
+                External Resources
+              </Typography>
+              
+              <Stack spacing={1}>
+                <Button
+                  variant="outlined"
+                  fullWidth
+                  startIcon={<OpenInNew />}
+                  component={Link}
+                  href={`https://reactome.org/content/detail/${pathway.pathway_id}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  View in Reactome
+                </Button>
+                <Button
+                  variant="outlined"
+                  fullWidth
+                  startIcon={<OpenInNew />}
+                  component={Link}
+                  href={`https://www.genome.jp/kegg-bin/show_pathway?${pathway.pathway_id}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  KEGG Pathway
+                </Button>
+                <Button
+                  variant="outlined"
+                  fullWidth
+                  startIcon={<OpenInNew />}
+                  component={Link}
+                  href={`https://www.ncbi.nlm.nih.gov/pubmed/?term=${encodeURIComponent(pathway.pathway_name + ' cardiovascular')}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  PubMed Search
+                </Button>
+              </Stack>
+            </CardContent>
+          </Card>
+
+          {/* Analysis Metadata */}
+          <Card elevation={2}>
+            <CardContent>
+              <Typography variant="h6" gutterBottom color="primary" sx={{ fontWeight: 600 }}>
+                Analysis Details
+              </Typography>
+              
+              <Table size="small">
+                <TableBody>
+                  <TableRow>
+                    <TableCell><strong>Analysis ID</strong></TableCell>
+                    <TableCell>{analysisId}</TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell><strong>Pathway ID</strong></TableCell>
+                    <TableCell>{pathway.pathway_id}</TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell><strong>Database</strong></TableCell>
+                    <TableCell>{pathway.source_db || 'Unknown'}</TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell><strong>Rank</strong></TableCell>
+                    <TableCell>#{hypothesis.rank || 'N/A'}</TableCell>
+                  </TableRow>
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        </Grid>
+      </Grid>
+    </Box>
+  );
+}

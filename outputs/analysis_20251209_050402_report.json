@@ -1,0 +1,1818 @@
+{
+  "analysis_id": "analysis_20251209_050402",
+  "timestamp": "2025-12-09T05:10:06.070328",
+  "input_summary": {
+    "total_seed_genes": 3,
+    "valid_genes": 3,
+    "invalid_genes": 0,
+    "gene_list": [
+      "PIK3R1",
+      "ITGB1",
+      "SRC"
+    ],
+    "warnings": []
+  },
+  "stage_1": {
+    "fn_size": 241,
+    "seed_count": 3,
+    "neighbor_count": 238,
+    "contributions": {
+      "PIK3R1": 98,
+      "ITGB1": 77,
+      "SRC": 63
+    }
+  },
+  "stage_2a": {
+    "primary_pathways_count": 3782,
+    "known_pathways_filtered": 248,
+    "top_pathways": [
+      {
+        "name": "response to stimulus",
+        "nes": 14820.0,
+        "p_adj": 4.490801982574089e-66
+      },
+      {
+        "name": "regulation of cellular process",
+        "nes": 14724.854987720792,
+        "p_adj": 6.321235991299241e-49
+      },
+      {
+        "name": "cellular response to stimulus",
+        "nes": 14495.0,
+        "p_adj": 9.849370739790494e-78
+      },
+      {
+        "name": "regulation of biological process",
+        "nes": 14282.546282660698,
+        "p_adj": 2.7971777792706056e-47
+      },
+      {
+        "name": "signaling",
+        "nes": 14105.0,
+        "p_adj": 5.326011593918502e-81
+      }
+    ]
+  },
+  "stage_2b": {
+    "total_secondary_pathways": 4426,
+    "union_genes_processed": 0,
+    "genes_successfully_processed": 0,
+    "literature_stats": {
+      "primaries_processed": 20,
+      "total_secondaries": 77308,
+      "unique_secondaries": 4426
+    }
+  },
+  "stage_2c": {
+    "final_pathways_count": 4426,
+    "aggregation_strategy": "rigorous_statistical",
+    "min_support_threshold": 1
+  },
+  "stage_3": {
+    "total_hypotheses": 8,
+    "top_nes_score": 5.475233256928155
+  },
+  "stage_4_topology": {},
+  "stage_4_literature": {
+    "GO:0007166": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "32600062",
+          "title": "gp130 Controls Cardiomyocyte Proliferation and Heart Regeneration.",
+          "year": 2020,
+          "relevance": 0.6166666666666666
+        },
+        {
+          "pmid": "35872324",
+          "title": "Integrins in cardiac fibrosis.",
+          "year": 2022,
+          "relevance": 0.6166666666666666
+        },
+        {
+          "pmid": "36700976",
+          "title": "Role of c-Src and reactive oxygen species in cardiovascular diseases.",
+          "year": 2023,
+          "relevance": 0.6166666666666666
+        }
+      ]
+    },
+    "GO:0009653": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "40307543",
+          "title": "Selective inhibition of stromal mechanosensing suppresses cardiac fibrosis.",
+          "year": 2025,
+          "relevance": 0.41666666666666663
+        },
+        {
+          "pmid": "32600062",
+          "title": "gp130 Controls Cardiomyocyte Proliferation and Heart Regeneration.",
+          "year": 2020,
+          "relevance": 0.41666666666666663
+        },
+        {
+          "pmid": "35437018",
+          "title": "The E3 Ligase TRIM16 Is a Key Suppressor of Pathological Cardiac Hypertrophy.",
+          "year": 2022,
+          "relevance": 0.41666666666666663
+        }
+      ]
+    },
+    "GO:0048856": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "37806546",
+          "title": "Leucine zipper protein 1 attenuates pressure overload-induced cardiac hypertrophy through inhibiting Stat3 signaling.",
+          "year": 2024,
+          "relevance": 0.5
+        },
+        {
+          "pmid": "37492967",
+          "title": "Interaction of Filamin C With Actin Is Essential for Cardiac Development and Function.",
+          "year": 2023,
+          "relevance": 0.4833333333333333
+        },
+        {
+          "pmid": "34351805",
+          "title": "Cardioprotective and Vasoprotective Effects of Corticotropin-Releasing Hormone and Urocortins: Receptors and Signaling.",
+          "year": 2021,
+          "relevance": 0.4666666666666667
+        }
+      ]
+    },
+    "KEGG:04151": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "36403355",
+          "title": "Dissecting the molecular mechanism of cepharanthine against COVID-19, based on a network pharmacology strategy combined with RNA-sequencing analysis, molecular docking, and molecular dynamics simulation.",
+          "year": 2022,
+          "relevance": 0.6
+        },
+        {
+          "pmid": "32600062",
+          "title": "gp130 Controls Cardiomyocyte Proliferation and Heart Regeneration.",
+          "year": 2020,
+          "relevance": 0.5833333333333334
+        },
+        {
+          "pmid": "36700976",
+          "title": "Role of c-Src and reactive oxygen species in cardiovascular diseases.",
+          "year": 2023,
+          "relevance": 0.5833333333333334
+        }
+      ]
+    },
+    "GO:0035556": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "35872324",
+          "title": "Integrins in cardiac fibrosis.",
+          "year": 2022,
+          "relevance": 0.5833333333333334
+        },
+        {
+          "pmid": "36700976",
+          "title": "Role of c-Src and reactive oxygen species in cardiovascular diseases.",
+          "year": 2023,
+          "relevance": 0.5833333333333334
+        },
+        {
+          "pmid": "33526983",
+          "title": "Src-family Protein Tyrosine Kinases: A promising target for treating Cardiovascular Diseases.",
+          "year": 2021,
+          "relevance": 0.55
+        }
+      ]
+    },
+    "GO:0007167": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "32600062",
+          "title": "gp130 Controls Cardiomyocyte Proliferation and Heart Regeneration.",
+          "year": 2020,
+          "relevance": 0.6166666666666666
+        },
+        {
+          "pmid": "36700976",
+          "title": "Role of c-Src and reactive oxygen species in cardiovascular diseases.",
+          "year": 2023,
+          "relevance": 0.6166666666666666
+        },
+        {
+          "pmid": "34351805",
+          "title": "Cardioprotective and Vasoprotective Effects of Corticotropin-Releasing Hormone and Urocortins: Receptors and Signaling.",
+          "year": 2021,
+          "relevance": 0.5833333333333334
+        }
+      ]
+    },
+    "GO:0016310": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "32600062",
+          "title": "gp130 Controls Cardiomyocyte Proliferation and Heart Regeneration.",
+          "year": 2020,
+          "relevance": 0.6666666666666666
+        },
+        {
+          "pmid": "35437018",
+          "title": "The E3 Ligase TRIM16 Is a Key Suppressor of Pathological Cardiac Hypertrophy.",
+          "year": 2022,
+          "relevance": 0.6666666666666666
+        },
+        {
+          "pmid": "36632222",
+          "title": "ALKBH5 activates FAK signaling through m6A demethylation in <i>ITGB1</i> mRNA and enhances tumor-associated lymphangiogenesis and lymph node metastasis in ovarian cancer.",
+          "year": 2023,
+          "relevance": 0.6333333333333333
+        }
+      ]
+    },
+    "GO:0019222": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "39355520",
+          "title": "Identification and validation of autophagy\u2011related genes in hypertrophic cardiomyopathy.",
+          "year": 2024,
+          "relevance": 0.5083333333333333
+        },
+        {
+          "pmid": "40307543",
+          "title": "Selective inhibition of stromal mechanosensing suppresses cardiac fibrosis.",
+          "year": 2025,
+          "relevance": 0.47916666666666663
+        },
+        {
+          "pmid": "35872324",
+          "title": "Integrins in cardiac fibrosis.",
+          "year": 2022,
+          "relevance": 0.47916666666666663
+        }
+      ]
+    },
+    "GO:0048519": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "39355520",
+          "title": "Identification and validation of autophagy\u2011related genes in hypertrophic cardiomyopathy.",
+          "year": 2024,
+          "relevance": 0.4833333333333334
+        },
+        {
+          "pmid": "35437018",
+          "title": "The E3 Ligase TRIM16 Is a Key Suppressor of Pathological Cardiac Hypertrophy.",
+          "year": 2022,
+          "relevance": 0.4666666666666667
+        },
+        {
+          "pmid": "35872324",
+          "title": "Integrins in cardiac fibrosis.",
+          "year": 2022,
+          "relevance": 0.4666666666666667
+        }
+      ]
+    },
+    "GO:0048646": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "36700976",
+          "title": "Role of c-Src and reactive oxygen species in cardiovascular diseases.",
+          "year": 2023,
+          "relevance": 0.45833333333333337
+        },
+        {
+          "pmid": "34351805",
+          "title": "Cardioprotective and Vasoprotective Effects of Corticotropin-Releasing Hormone and Urocortins: Receptors and Signaling.",
+          "year": 2021,
+          "relevance": 0.42500000000000004
+        },
+        {
+          "pmid": "39062199",
+          "title": "Unveiling the Potential of Migrasomes: A Machine-Learning-Driven Signature for Diagnosing Acute Myocardial Infarction.",
+          "year": 2024,
+          "relevance": 0.42500000000000004
+        }
+      ]
+    },
+    "GO:0042221": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "35437018",
+          "title": "The E3 Ligase TRIM16 Is a Key Suppressor of Pathological Cardiac Hypertrophy.",
+          "year": 2022,
+          "relevance": 0.5
+        },
+        {
+          "pmid": "35872324",
+          "title": "Integrins in cardiac fibrosis.",
+          "year": 2022,
+          "relevance": 0.5
+        },
+        {
+          "pmid": "36700976",
+          "title": "Role of c-Src and reactive oxygen species in cardiovascular diseases.",
+          "year": 2023,
+          "relevance": 0.5
+        }
+      ]
+    },
+    "GO:0048468": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "34351805",
+          "title": "Cardioprotective and Vasoprotective Effects of Corticotropin-Releasing Hormone and Urocortins: Receptors and Signaling.",
+          "year": 2021,
+          "relevance": 0.6333333333333333
+        },
+        {
+          "pmid": "33526983",
+          "title": "Src-family Protein Tyrosine Kinases: A promising target for treating Cardiovascular Diseases.",
+          "year": 2021,
+          "relevance": 0.6333333333333333
+        },
+        {
+          "pmid": "37492967",
+          "title": "Interaction of Filamin C With Actin Is Essential for Cardiac Development and Function.",
+          "year": 2023,
+          "relevance": 0.5666666666666667
+        }
+      ]
+    },
+    "GO:0008283": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "32600062",
+          "title": "gp130 Controls Cardiomyocyte Proliferation and Heart Regeneration.",
+          "year": 2020,
+          "relevance": 0.5833333333333334
+        },
+        {
+          "pmid": "36700976",
+          "title": "Role of c-Src and reactive oxygen species in cardiovascular diseases.",
+          "year": 2023,
+          "relevance": 0.5833333333333334
+        },
+        {
+          "pmid": "40307543",
+          "title": "Selective inhibition of stromal mechanosensing suppresses cardiac fibrosis.",
+          "year": 2025,
+          "relevance": 0.5
+        }
+      ]
+    },
+    "KEGG:04510": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "40307543",
+          "title": "Selective inhibition of stromal mechanosensing suppresses cardiac fibrosis.",
+          "year": 2025,
+          "relevance": 0.6666666666666666
+        },
+        {
+          "pmid": "36632222",
+          "title": "ALKBH5 activates FAK signaling through m6A demethylation in <i>ITGB1</i> mRNA and enhances tumor-associated lymphangiogenesis and lymph node metastasis in ovarian cancer.",
+          "year": 2023,
+          "relevance": 0.6333333333333333
+        },
+        {
+          "pmid": "38326908",
+          "title": "RNA-binding protein RPS7 promotes hepatocellular carcinoma progression via LOXL2-dependent activation of ITGB1/FAK/SRC signaling.",
+          "year": 2024,
+          "relevance": 0.6
+        }
+      ]
+    },
+    "GO:0035239": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "40307543",
+          "title": "Selective inhibition of stromal mechanosensing suppresses cardiac fibrosis.",
+          "year": 2025,
+          "relevance": 0.41666666666666663
+        },
+        {
+          "pmid": "32600062",
+          "title": "gp130 Controls Cardiomyocyte Proliferation and Heart Regeneration.",
+          "year": 2020,
+          "relevance": 0.41666666666666663
+        },
+        {
+          "pmid": "35437018",
+          "title": "The E3 Ligase TRIM16 Is a Key Suppressor of Pathological Cardiac Hypertrophy.",
+          "year": 2022,
+          "relevance": 0.41666666666666663
+        }
+      ]
+    },
+    "KEGG:05414": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "35411175",
+          "title": "Identification and Validation of Dilated Cardiomyopathy-Related Genes via Bioinformatics Analysis.",
+          "year": 2022,
+          "relevance": 0.6333333333333333
+        },
+        {
+          "pmid": "37492967",
+          "title": "Interaction of Filamin C With Actin Is Essential for Cardiac Development and Function.",
+          "year": 2023,
+          "relevance": 0.5666666666666667
+        },
+        {
+          "pmid": "39212055",
+          "title": "c-Src Is Responsible for Mitochondria-Mediated Arrhythmic Risk in Ischemic Cardiomyopathy.",
+          "year": 2024,
+          "relevance": 0.5083333333333333
+        }
+      ]
+    },
+    "GO:0048584": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "35872324",
+          "title": "Integrins in cardiac fibrosis.",
+          "year": 2022,
+          "relevance": 0.5
+        },
+        {
+          "pmid": "35437018",
+          "title": "The E3 Ligase TRIM16 Is a Key Suppressor of Pathological Cardiac Hypertrophy.",
+          "year": 2022,
+          "relevance": 0.45833333333333337
+        },
+        {
+          "pmid": "36700976",
+          "title": "Role of c-Src and reactive oxygen species in cardiovascular diseases.",
+          "year": 2023,
+          "relevance": 0.45833333333333337
+        }
+      ]
+    },
+    "GO:0016477": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "36700976",
+          "title": "Role of c-Src and reactive oxygen species in cardiovascular diseases.",
+          "year": 2023,
+          "relevance": 0.6666666666666666
+        },
+        {
+          "pmid": "39427726",
+          "title": "Histone deacetylase upregulation of neuropilin-1 in osteosarcoma is essential for pulmonary metastasis.",
+          "year": 2024,
+          "relevance": 0.6
+        },
+        {
+          "pmid": "40307543",
+          "title": "Selective inhibition of stromal mechanosensing suppresses cardiac fibrosis.",
+          "year": 2025,
+          "relevance": 0.5416666666666666
+        }
+      ]
+    },
+    "GO:0051239": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "39355520",
+          "title": "Identification and validation of autophagy\u2011related genes in hypertrophic cardiomyopathy.",
+          "year": 2024,
+          "relevance": 0.4833333333333334
+        },
+        {
+          "pmid": "35872324",
+          "title": "Integrins in cardiac fibrosis.",
+          "year": 2022,
+          "relevance": 0.4666666666666667
+        },
+        {
+          "pmid": "36818331",
+          "title": "Cardiovascular toxicity of tyrosine kinase inhibitors during cancer treatment: Potential involvement of TRPM7.",
+          "year": 2023,
+          "relevance": 0.43333333333333335
+        }
+      ]
+    },
+    "GO:0051179": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "35872324",
+          "title": "Integrins in cardiac fibrosis.",
+          "year": 2022,
+          "relevance": 0.6666666666666666
+        },
+        {
+          "pmid": "37492967",
+          "title": "Interaction of Filamin C With Actin Is Essential for Cardiac Development and Function.",
+          "year": 2023,
+          "relevance": 0.5666666666666667
+        },
+        {
+          "pmid": "40307543",
+          "title": "Selective inhibition of stromal mechanosensing suppresses cardiac fibrosis.",
+          "year": 2025,
+          "relevance": 0.41666666666666663
+        }
+      ]
+    },
+    "GO:0050793": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "39355520",
+          "title": "Identification and validation of autophagy\u2011related genes in hypertrophic cardiomyopathy.",
+          "year": 2024,
+          "relevance": 0.5083333333333333
+        },
+        {
+          "pmid": "35872324",
+          "title": "Integrins in cardiac fibrosis.",
+          "year": 2022,
+          "relevance": 0.47916666666666663
+        },
+        {
+          "pmid": "36818331",
+          "title": "Cardiovascular toxicity of tyrosine kinase inhibitors during cancer treatment: Potential involvement of TRPM7.",
+          "year": 2023,
+          "relevance": 0.4458333333333333
+        }
+      ]
+    },
+    "GO:0002376": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "35437018",
+          "title": "The E3 Ligase TRIM16 Is a Key Suppressor of Pathological Cardiac Hypertrophy.",
+          "year": 2022,
+          "relevance": 0.5833333333333334
+        },
+        {
+          "pmid": "40307543",
+          "title": "Selective inhibition of stromal mechanosensing suppresses cardiac fibrosis.",
+          "year": 2025,
+          "relevance": 0.5
+        },
+        {
+          "pmid": "37806546",
+          "title": "Leucine zipper protein 1 attenuates pressure overload-induced cardiac hypertrophy through inhibiting Stat3 signaling.",
+          "year": 2024,
+          "relevance": 0.5
+        }
+      ]
+    },
+    "GO:0007155": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "40307543",
+          "title": "Selective inhibition of stromal mechanosensing suppresses cardiac fibrosis.",
+          "year": 2025,
+          "relevance": 0.6666666666666666
+        },
+        {
+          "pmid": "37414198",
+          "title": "Integration of network pharmacology and proteomics to elucidate the mechanism and targets of traditional Chinese medicine Biyuan Tongqiao granule against allergic rhinitis in an ovalbumin-induced mice model.",
+          "year": 2024,
+          "relevance": 0.6
+        },
+        {
+          "pmid": "32600062",
+          "title": "gp130 Controls Cardiomyocyte Proliferation and Heart Regeneration.",
+          "year": 2020,
+          "relevance": 0.5416666666666666
+        }
+      ]
+    },
+    "GO:0006950": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "35437018",
+          "title": "The E3 Ligase TRIM16 Is a Key Suppressor of Pathological Cardiac Hypertrophy.",
+          "year": 2022,
+          "relevance": 0.5833333333333334
+        },
+        {
+          "pmid": "35872324",
+          "title": "Integrins in cardiac fibrosis.",
+          "year": 2022,
+          "relevance": 0.5833333333333334
+        },
+        {
+          "pmid": "36700976",
+          "title": "Role of c-Src and reactive oxygen species in cardiovascular diseases.",
+          "year": 2023,
+          "relevance": 0.5833333333333334
+        }
+      ]
+    },
+    "GO:0048513": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "36700976",
+          "title": "Role of c-Src and reactive oxygen species in cardiovascular diseases.",
+          "year": 2023,
+          "relevance": 0.5
+        },
+        {
+          "pmid": "37806546",
+          "title": "Leucine zipper protein 1 attenuates pressure overload-induced cardiac hypertrophy through inhibiting Stat3 signaling.",
+          "year": 2024,
+          "relevance": 0.5
+        },
+        {
+          "pmid": "34351805",
+          "title": "Cardioprotective and Vasoprotective Effects of Corticotropin-Releasing Hormone and Urocortins: Receptors and Signaling.",
+          "year": 2021,
+          "relevance": 0.4666666666666667
+        }
+      ]
+    },
+    "GO:0065008": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "35437018",
+          "title": "The E3 Ligase TRIM16 Is a Key Suppressor of Pathological Cardiac Hypertrophy.",
+          "year": 2022,
+          "relevance": 0.47916666666666663
+        },
+        {
+          "pmid": "35872324",
+          "title": "Integrins in cardiac fibrosis.",
+          "year": 2022,
+          "relevance": 0.47916666666666663
+        },
+        {
+          "pmid": "39062199",
+          "title": "Unveiling the Potential of Migrasomes: A Machine-Learning-Driven Signature for Diagnosing Acute Myocardial Infarction.",
+          "year": 2024,
+          "relevance": 0.4458333333333333
+        }
+      ]
+    },
+    "KEGG:04015": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "39160598",
+          "title": "Buyang Huanwu decoction ameliorates myocardial injury and attenuates platelet activation by regulating the PI3 kinase/Rap1/integrin \u03b1(IIb)\u03b2(3) pathway.",
+          "year": 2024,
+          "relevance": 0.6
+        },
+        {
+          "pmid": "32600062",
+          "title": "gp130 Controls Cardiomyocyte Proliferation and Heart Regeneration.",
+          "year": 2020,
+          "relevance": 0.5833333333333334
+        },
+        {
+          "pmid": "36700976",
+          "title": "Role of c-Src and reactive oxygen species in cardiovascular diseases.",
+          "year": 2023,
+          "relevance": 0.5833333333333334
+        }
+      ]
+    },
+    "GO:0009888": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "40307543",
+          "title": "Selective inhibition of stromal mechanosensing suppresses cardiac fibrosis.",
+          "year": 2025,
+          "relevance": 0.5416666666666666
+        },
+        {
+          "pmid": "35872324",
+          "title": "Integrins in cardiac fibrosis.",
+          "year": 2022,
+          "relevance": 0.5416666666666666
+        },
+        {
+          "pmid": "37806546",
+          "title": "Leucine zipper protein 1 attenuates pressure overload-induced cardiac hypertrophy through inhibiting Stat3 signaling.",
+          "year": 2024,
+          "relevance": 0.5416666666666666
+        }
+      ]
+    },
+    "GO:0009605": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "35437018",
+          "title": "The E3 Ligase TRIM16 Is a Key Suppressor of Pathological Cardiac Hypertrophy.",
+          "year": 2022,
+          "relevance": 0.47916666666666663
+        },
+        {
+          "pmid": "35872324",
+          "title": "Integrins in cardiac fibrosis.",
+          "year": 2022,
+          "relevance": 0.47916666666666663
+        },
+        {
+          "pmid": "36700976",
+          "title": "Role of c-Src and reactive oxygen species in cardiovascular diseases.",
+          "year": 2023,
+          "relevance": 0.47916666666666663
+        }
+      ]
+    },
+    "GO:0051128": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "39355520",
+          "title": "Identification and validation of autophagy\u2011related genes in hypertrophic cardiomyopathy.",
+          "year": 2024,
+          "relevance": 0.5333333333333333
+        },
+        {
+          "pmid": "35872324",
+          "title": "Integrins in cardiac fibrosis.",
+          "year": 2022,
+          "relevance": 0.5166666666666667
+        },
+        {
+          "pmid": "36700976",
+          "title": "Role of c-Src and reactive oxygen species in cardiovascular diseases.",
+          "year": 2023,
+          "relevance": 0.5166666666666667
+        }
+      ]
+    },
+    "GO:0009719": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "35437018",
+          "title": "The E3 Ligase TRIM16 Is a Key Suppressor of Pathological Cardiac Hypertrophy.",
+          "year": 2022,
+          "relevance": 0.47916666666666663
+        },
+        {
+          "pmid": "35872324",
+          "title": "Integrins in cardiac fibrosis.",
+          "year": 2022,
+          "relevance": 0.47916666666666663
+        },
+        {
+          "pmid": "36700976",
+          "title": "Role of c-Src and reactive oxygen species in cardiovascular diseases.",
+          "year": 2023,
+          "relevance": 0.47916666666666663
+        }
+      ]
+    },
+    "GO:1902533": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "35872324",
+          "title": "Integrins in cardiac fibrosis.",
+          "year": 2022,
+          "relevance": 0.5416666666666666
+        },
+        {
+          "pmid": "36700976",
+          "title": "Role of c-Src and reactive oxygen species in cardiovascular diseases.",
+          "year": 2023,
+          "relevance": 0.5
+        },
+        {
+          "pmid": "36818331",
+          "title": "Cardiovascular toxicity of tyrosine kinase inhibitors during cancer treatment: Potential involvement of TRPM7.",
+          "year": 2023,
+          "relevance": 0.4666666666666667
+        }
+      ]
+    },
+    "GO:0042325": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "32600062",
+          "title": "gp130 Controls Cardiomyocyte Proliferation and Heart Regeneration.",
+          "year": 2020,
+          "relevance": 0.5
+        },
+        {
+          "pmid": "35437018",
+          "title": "The E3 Ligase TRIM16 Is a Key Suppressor of Pathological Cardiac Hypertrophy.",
+          "year": 2022,
+          "relevance": 0.5
+        },
+        {
+          "pmid": "35872324",
+          "title": "Integrins in cardiac fibrosis.",
+          "year": 2022,
+          "relevance": 0.5
+        }
+      ]
+    },
+    "GO:0070848": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "35872324",
+          "title": "Integrins in cardiac fibrosis.",
+          "year": 2022,
+          "relevance": 0.6041666666666666
+        },
+        {
+          "pmid": "36700976",
+          "title": "Role of c-Src and reactive oxygen species in cardiovascular diseases.",
+          "year": 2023,
+          "relevance": 0.6041666666666666
+        },
+        {
+          "pmid": "35437018",
+          "title": "The E3 Ligase TRIM16 Is a Key Suppressor of Pathological Cardiac Hypertrophy.",
+          "year": 2022,
+          "relevance": 0.5416666666666666
+        }
+      ]
+    },
+    "KEGG:04014": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "32600062",
+          "title": "gp130 Controls Cardiomyocyte Proliferation and Heart Regeneration.",
+          "year": 2020,
+          "relevance": 0.5833333333333334
+        },
+        {
+          "pmid": "36700976",
+          "title": "Role of c-Src and reactive oxygen species in cardiovascular diseases.",
+          "year": 2023,
+          "relevance": 0.5833333333333334
+        },
+        {
+          "pmid": "34351805",
+          "title": "Cardioprotective and Vasoprotective Effects of Corticotropin-Releasing Hormone and Urocortins: Receptors and Signaling.",
+          "year": 2021,
+          "relevance": 0.55
+        }
+      ]
+    },
+    "GO:0008219": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "34351805",
+          "title": "Cardioprotective and Vasoprotective Effects of Corticotropin-Releasing Hormone and Urocortins: Receptors and Signaling.",
+          "year": 2021,
+          "relevance": 0.6333333333333333
+        },
+        {
+          "pmid": "37152411",
+          "title": "Dasatinib targets c-Src kinase in cardiotoxicity.",
+          "year": 2023,
+          "relevance": 0.6
+        },
+        {
+          "pmid": "40307543",
+          "title": "Selective inhibition of stromal mechanosensing suppresses cardiac fibrosis.",
+          "year": 2025,
+          "relevance": 0.5416666666666666
+        }
+      ]
+    },
+    "GO:0007399": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "37806546",
+          "title": "Leucine zipper protein 1 attenuates pressure overload-induced cardiac hypertrophy through inhibiting Stat3 signaling.",
+          "year": 2024,
+          "relevance": 0.5833333333333334
+        },
+        {
+          "pmid": "40307543",
+          "title": "Selective inhibition of stromal mechanosensing suppresses cardiac fibrosis.",
+          "year": 2025,
+          "relevance": 0.5
+        },
+        {
+          "pmid": "35437018",
+          "title": "The E3 Ligase TRIM16 Is a Key Suppressor of Pathological Cardiac Hypertrophy.",
+          "year": 2022,
+          "relevance": 0.5
+        }
+      ]
+    },
+    "GO:0022603": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "35872324",
+          "title": "Integrins in cardiac fibrosis.",
+          "year": 2022,
+          "relevance": 0.4666666666666667
+        },
+        {
+          "pmid": "39355520",
+          "title": "Identification and validation of autophagy\u2011related genes in hypertrophic cardiomyopathy.",
+          "year": 2024,
+          "relevance": 0.43333333333333335
+        },
+        {
+          "pmid": "40307543",
+          "title": "Selective inhibition of stromal mechanosensing suppresses cardiac fibrosis.",
+          "year": 2025,
+          "relevance": 0.41666666666666663
+        }
+      ]
+    },
+    "KEGG:04062": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "32600062",
+          "title": "gp130 Controls Cardiomyocyte Proliferation and Heart Regeneration.",
+          "year": 2020,
+          "relevance": 0.5833333333333334
+        },
+        {
+          "pmid": "36700976",
+          "title": "Role of c-Src and reactive oxygen species in cardiovascular diseases.",
+          "year": 2023,
+          "relevance": 0.5833333333333334
+        },
+        {
+          "pmid": "34351805",
+          "title": "Cardioprotective and Vasoprotective Effects of Corticotropin-Releasing Hormone and Urocortins: Receptors and Signaling.",
+          "year": 2021,
+          "relevance": 0.55
+        }
+      ]
+    },
+    "WP:WP1528": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "35437018",
+          "title": "The E3 Ligase TRIM16 Is a Key Suppressor of Pathological Cardiac Hypertrophy.",
+          "year": 2022,
+          "relevance": 0.5238095238095238
+        },
+        {
+          "pmid": "40307543",
+          "title": "Selective inhibition of stromal mechanosensing suppresses cardiac fibrosis.",
+          "year": 2025,
+          "relevance": 0.45238095238095233
+        },
+        {
+          "pmid": "32600062",
+          "title": "gp130 Controls Cardiomyocyte Proliferation and Heart Regeneration.",
+          "year": 2020,
+          "relevance": 0.45238095238095233
+        }
+      ]
+    },
+    "GO:0060981": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "36700976",
+          "title": "Role of c-Src and reactive oxygen species in cardiovascular diseases.",
+          "year": 2023,
+          "relevance": 0.5833333333333334
+        },
+        {
+          "pmid": "34351805",
+          "title": "Cardioprotective and Vasoprotective Effects of Corticotropin-Releasing Hormone and Urocortins: Receptors and Signaling.",
+          "year": 2021,
+          "relevance": 0.5083333333333333
+        },
+        {
+          "pmid": "33526983",
+          "title": "Src-family Protein Tyrosine Kinases: A promising target for treating Cardiovascular Diseases.",
+          "year": 2021,
+          "relevance": 0.4666666666666667
+        }
+      ]
+    },
+    "GO:0003294": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "34351805",
+          "title": "Cardioprotective and Vasoprotective Effects of Corticotropin-Releasing Hormone and Urocortins: Receptors and Signaling.",
+          "year": 2021,
+          "relevance": 0.5083333333333333
+        },
+        {
+          "pmid": "35437018",
+          "title": "The E3 Ligase TRIM16 Is a Key Suppressor of Pathological Cardiac Hypertrophy.",
+          "year": 2022,
+          "relevance": 0.47916666666666663
+        },
+        {
+          "pmid": "35872324",
+          "title": "Integrins in cardiac fibrosis.",
+          "year": 2022,
+          "relevance": 0.47916666666666663
+        }
+      ]
+    },
+    "GO:0060411": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "40307543",
+          "title": "Selective inhibition of stromal mechanosensing suppresses cardiac fibrosis.",
+          "year": 2025,
+          "relevance": 0.5
+        },
+        {
+          "pmid": "32600062",
+          "title": "gp130 Controls Cardiomyocyte Proliferation and Heart Regeneration.",
+          "year": 2020,
+          "relevance": 0.5
+        },
+        {
+          "pmid": "35437018",
+          "title": "The E3 Ligase TRIM16 Is a Key Suppressor of Pathological Cardiac Hypertrophy.",
+          "year": 2022,
+          "relevance": 0.5
+        }
+      ]
+    },
+    "WP:WP1559": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "35437018",
+          "title": "The E3 Ligase TRIM16 Is a Key Suppressor of Pathological Cardiac Hypertrophy.",
+          "year": 2022,
+          "relevance": 0.5104166666666666
+        },
+        {
+          "pmid": "36700976",
+          "title": "Role of c-Src and reactive oxygen species in cardiovascular diseases.",
+          "year": 2023,
+          "relevance": 0.5104166666666666
+        },
+        {
+          "pmid": "40307543",
+          "title": "Selective inhibition of stromal mechanosensing suppresses cardiac fibrosis.",
+          "year": 2025,
+          "relevance": 0.47916666666666663
+        }
+      ]
+    }
+  },
+  "ranked_hypotheses": [
+    {
+      "rank": 27,
+      "pathway_id": "GO:0019222",
+      "pathway_name": "regulation of metabolic process",
+      "source_db": "GO:BP",
+      "nes_score": 5.475233256928155,
+      "p_adj": 0.0,
+      "evidence_count": 154,
+      "support_count": 20,
+      "seed_genes": [
+        "ITGB1",
+        "PIK3R1",
+        "SRC"
+      ],
+      "literature_support": false,
+      "citations": [
+        {
+          "pmid": "39355520",
+          "title": "Identification and validation of autophagy\u2011related genes in hypertrophic cardiomyopathy.",
+          "year": 2024,
+          "relevance": 0.5083333333333333
+        },
+        {
+          "pmid": "40307543",
+          "title": "Selective inhibition of stromal mechanosensing suppresses cardiac fibrosis.",
+          "year": 2025,
+          "relevance": 0.47916666666666663
+        },
+        {
+          "pmid": "35872324",
+          "title": "Integrins in cardiac fibrosis.",
+          "year": 2022,
+          "relevance": 0.47916666666666663
+        }
+      ],
+      "citation_count": 25,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0050896",
+        "GO:0050794",
+        "GO:0051716",
+        "GO:0050789",
+        "GO:0023052",
+        "GO:0007154",
+        "GO:0007165",
+        "GO:0065007",
+        "GO:0032501",
+        "GO:0032502",
+        "GO:0048856",
+        "GO:0048522",
+        "GO:0048518",
+        "GO:0048583",
+        "GO:0007166",
+        "GO:0007275",
+        "GO:0030154",
+        "GO:0048869",
+        "GO:0035556",
+        "GO:0010646"
+      ]
+    },
+    {
+      "rank": 41,
+      "pathway_id": "KEGG:05414",
+      "pathway_name": "Dilated cardiomyopathy",
+      "source_db": "KEGG",
+      "nes_score": 5.411555304519166,
+      "p_adj": 0.0,
+      "evidence_count": 25,
+      "support_count": 20,
+      "seed_genes": [
+        "ITGB1",
+        "PIK3R1",
+        "SRC"
+      ],
+      "literature_support": true,
+      "citations": [
+        {
+          "pmid": "35411175",
+          "title": "Identification and Validation of Dilated Cardiomyopathy-Related Genes via Bioinformatics Analysis.",
+          "year": 2022,
+          "relevance": 0.6333333333333333
+        },
+        {
+          "pmid": "37492967",
+          "title": "Interaction of Filamin C With Actin Is Essential for Cardiac Development and Function.",
+          "year": 2023,
+          "relevance": 0.5666666666666667
+        },
+        {
+          "pmid": "39212055",
+          "title": "c-Src Is Responsible for Mitochondria-Mediated Arrhythmic Risk in Ischemic Cardiomyopathy.",
+          "year": 2024,
+          "relevance": 0.5083333333333333
+        }
+      ],
+      "citation_count": 25,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0050896",
+        "GO:0050794",
+        "GO:0051716",
+        "GO:0050789",
+        "GO:0023052",
+        "GO:0007154",
+        "GO:0007165",
+        "GO:0065007",
+        "GO:0032501",
+        "GO:0032502",
+        "GO:0048856",
+        "GO:0048522",
+        "GO:0048518",
+        "GO:0048583",
+        "GO:0007166",
+        "GO:0007275",
+        "GO:0030154",
+        "GO:0048869",
+        "GO:0035556",
+        "GO:0010646"
+      ]
+    },
+    {
+      "rank": 83,
+      "pathway_id": "GO:0008219",
+      "pathway_name": "cell death",
+      "source_db": "GO:BP",
+      "nes_score": 5.257199591490221,
+      "p_adj": 0.0,
+      "evidence_count": 105,
+      "support_count": 20,
+      "seed_genes": [
+        "ITGB1",
+        "PIK3R1",
+        "SRC"
+      ],
+      "literature_support": false,
+      "citations": [
+        {
+          "pmid": "34351805",
+          "title": "Cardioprotective and Vasoprotective Effects of Corticotropin-Releasing Hormone and Urocortins: Receptors and Signaling.",
+          "year": 2021,
+          "relevance": 0.6333333333333333
+        },
+        {
+          "pmid": "37152411",
+          "title": "Dasatinib targets c-Src kinase in cardiotoxicity.",
+          "year": 2023,
+          "relevance": 0.6
+        },
+        {
+          "pmid": "40307543",
+          "title": "Selective inhibition of stromal mechanosensing suppresses cardiac fibrosis.",
+          "year": 2025,
+          "relevance": 0.5416666666666666
+        }
+      ],
+      "citation_count": 25,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0050896",
+        "GO:0050794",
+        "GO:0051716",
+        "GO:0050789",
+        "GO:0023052",
+        "GO:0007154",
+        "GO:0007165",
+        "GO:0065007",
+        "GO:0032501",
+        "GO:0032502",
+        "GO:0048856",
+        "GO:0048522",
+        "GO:0048518",
+        "GO:0048583",
+        "GO:0007166",
+        "GO:0007275",
+        "GO:0030154",
+        "GO:0048869",
+        "GO:0035556",
+        "GO:0010646"
+      ]
+    },
+    {
+      "rank": 1471,
+      "pathway_id": "WP:WP1528",
+      "pathway_name": "Physiological and pathological hypertrophy of the heart",
+      "source_db": "WP",
+      "nes_score": 2.6347155739612753,
+      "p_adj": 7.362570499058751e-05,
+      "evidence_count": 6,
+      "support_count": 20,
+      "seed_genes": [
+        "ITGB1",
+        "PIK3R1",
+        "SRC"
+      ],
+      "literature_support": false,
+      "citations": [
+        {
+          "pmid": "35437018",
+          "title": "The E3 Ligase TRIM16 Is a Key Suppressor of Pathological Cardiac Hypertrophy.",
+          "year": 2022,
+          "relevance": 0.5238095238095238
+        },
+        {
+          "pmid": "40307543",
+          "title": "Selective inhibition of stromal mechanosensing suppresses cardiac fibrosis.",
+          "year": 2025,
+          "relevance": 0.45238095238095233
+        },
+        {
+          "pmid": "32600062",
+          "title": "gp130 Controls Cardiomyocyte Proliferation and Heart Regeneration.",
+          "year": 2020,
+          "relevance": 0.45238095238095233
+        }
+      ],
+      "citation_count": 25,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0050896",
+        "GO:0050794",
+        "GO:0051716",
+        "GO:0050789",
+        "GO:0023052",
+        "GO:0007154",
+        "GO:0007165",
+        "GO:0065007",
+        "GO:0032501",
+        "GO:0032502",
+        "GO:0048856",
+        "GO:0048522",
+        "GO:0048518",
+        "GO:0048583",
+        "GO:0007166",
+        "GO:0007275",
+        "GO:0030154",
+        "GO:0048869",
+        "GO:0035556",
+        "GO:0010646"
+      ]
+    },
+    {
+      "rank": 2232,
+      "pathway_id": "GO:0060981",
+      "pathway_name": "cell migration involved in coronary angiogenesis",
+      "source_db": "GO:BP",
+      "nes_score": 2.2312071888245817,
+      "p_adj": 6.661338147750939e-16,
+      "evidence_count": 1,
+      "support_count": 20,
+      "seed_genes": [
+        "ITGB1",
+        "PIK3R1",
+        "SRC"
+      ],
+      "literature_support": false,
+      "citations": [
+        {
+          "pmid": "36700976",
+          "title": "Role of c-Src and reactive oxygen species in cardiovascular diseases.",
+          "year": 2023,
+          "relevance": 0.5833333333333334
+        },
+        {
+          "pmid": "34351805",
+          "title": "Cardioprotective and Vasoprotective Effects of Corticotropin-Releasing Hormone and Urocortins: Receptors and Signaling.",
+          "year": 2021,
+          "relevance": 0.5083333333333333
+        },
+        {
+          "pmid": "33526983",
+          "title": "Src-family Protein Tyrosine Kinases: A promising target for treating Cardiovascular Diseases.",
+          "year": 2021,
+          "relevance": 0.4666666666666667
+        }
+      ],
+      "citation_count": 25,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0050896",
+        "GO:0050794",
+        "GO:0051716",
+        "GO:0050789",
+        "GO:0023052",
+        "GO:0007154",
+        "GO:0007165",
+        "GO:0065007",
+        "GO:0032501",
+        "GO:0032502",
+        "GO:0048856",
+        "GO:0048522",
+        "GO:0048518",
+        "GO:0048583",
+        "GO:0007166",
+        "GO:0007275",
+        "GO:0030154",
+        "GO:0048869",
+        "GO:0035556",
+        "GO:0010646"
+      ]
+    },
+    {
+      "rank": 2252,
+      "pathway_id": "GO:0003294",
+      "pathway_name": "atrial ventricular junction remodeling",
+      "source_db": "GO:BP",
+      "nes_score": 2.2229506305884494,
+      "p_adj": 3.6637359812630166e-15,
+      "evidence_count": 1,
+      "support_count": 19,
+      "seed_genes": [
+        "ITGB1",
+        "PIK3R1",
+        "SRC"
+      ],
+      "literature_support": false,
+      "citations": [
+        {
+          "pmid": "34351805",
+          "title": "Cardioprotective and Vasoprotective Effects of Corticotropin-Releasing Hormone and Urocortins: Receptors and Signaling.",
+          "year": 2021,
+          "relevance": 0.5083333333333333
+        },
+        {
+          "pmid": "35437018",
+          "title": "The E3 Ligase TRIM16 Is a Key Suppressor of Pathological Cardiac Hypertrophy.",
+          "year": 2022,
+          "relevance": 0.47916666666666663
+        },
+        {
+          "pmid": "35872324",
+          "title": "Integrins in cardiac fibrosis.",
+          "year": 2022,
+          "relevance": 0.47916666666666663
+        }
+      ],
+      "citation_count": 25,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0050896",
+        "GO:0050794",
+        "GO:0051716",
+        "GO:0050789",
+        "GO:0023052",
+        "GO:0007154",
+        "GO:0007165",
+        "GO:0065007",
+        "GO:0032501",
+        "GO:0032502",
+        "GO:0048856",
+        "GO:0048522",
+        "GO:0048518",
+        "GO:0048583",
+        "GO:0007275",
+        "GO:0030154",
+        "GO:0048869",
+        "GO:0035556",
+        "GO:0010646"
+      ]
+    },
+    {
+      "rank": 2264,
+      "pathway_id": "GO:0060411",
+      "pathway_name": "cardiac septum morphogenesis",
+      "source_db": "GO:BP",
+      "nes_score": 2.2182338461301456,
+      "p_adj": 1.6730349707505532e-05,
+      "evidence_count": 3,
+      "support_count": 8,
+      "seed_genes": [
+        "ITGB1",
+        "PIK3R1",
+        "SRC"
+      ],
+      "literature_support": false,
+      "citations": [
+        {
+          "pmid": "40307543",
+          "title": "Selective inhibition of stromal mechanosensing suppresses cardiac fibrosis.",
+          "year": 2025,
+          "relevance": 0.5
+        },
+        {
+          "pmid": "32600062",
+          "title": "gp130 Controls Cardiomyocyte Proliferation and Heart Regeneration.",
+          "year": 2020,
+          "relevance": 0.5
+        },
+        {
+          "pmid": "35437018",
+          "title": "The E3 Ligase TRIM16 Is a Key Suppressor of Pathological Cardiac Hypertrophy.",
+          "year": 2022,
+          "relevance": 0.5
+        }
+      ],
+      "citation_count": 25,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0032501",
+        "GO:0032502",
+        "GO:0048856",
+        "GO:0048522",
+        "GO:0048518",
+        "GO:0007275",
+        "GO:0030154",
+        "GO:0048869"
+      ]
+    },
+    {
+      "rank": 2806,
+      "pathway_id": "WP:WP1559",
+      "pathway_name": "Transcription factors regulate miRNAs related to cardiac hypertrophy",
+      "source_db": "WP",
+      "nes_score": 1.9710875548832596,
+      "p_adj": 0.00288381279737282,
+      "evidence_count": 3,
+      "support_count": 20,
+      "seed_genes": [
+        "ITGB1",
+        "PIK3R1",
+        "SRC"
+      ],
+      "literature_support": false,
+      "citations": [
+        {
+          "pmid": "35437018",
+          "title": "The E3 Ligase TRIM16 Is a Key Suppressor of Pathological Cardiac Hypertrophy.",
+          "year": 2022,
+          "relevance": 0.5104166666666666
+        },
+        {
+          "pmid": "36700976",
+          "title": "Role of c-Src and reactive oxygen species in cardiovascular diseases.",
+          "year": 2023,
+          "relevance": 0.5104166666666666
+        },
+        {
+          "pmid": "40307543",
+          "title": "Selective inhibition of stromal mechanosensing suppresses cardiac fibrosis.",
+          "year": 2025,
+          "relevance": 0.47916666666666663
+        }
+      ],
+      "citation_count": 25,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0050896",
+        "GO:0050794",
+        "GO:0051716",
+        "GO:0050789",
+        "GO:0023052",
+        "GO:0007154",
+        "GO:0007165",
+        "GO:0065007",
+        "GO:0032501",
+        "GO:0032502",
+        "GO:0048856",
+        "GO:0048522",
+        "GO:0048518",
+        "GO:0048583",
+        "GO:0007166",
+        "GO:0007275",
+        "GO:0030154",
+        "GO:0048869",
+        "GO:0035556",
+        "GO:0010646"
+      ]
+    }
+  ],
+  "testable_hypotheses": [
+    {
+      "hypothesis": "Pathway 'regulation of metabolic process' is involved in cardiovascular disease and phenotype processes",
+      "pathway_id": "GO:0019222",
+      "nes_score": 5.475233256928155,
+      "experimental_approaches": [
+        "Functional enrichment analysis in cardiac tissue",
+        "Gene expression profiling",
+        "Pathway perturbation studies"
+      ]
+    },
+    {
+      "hypothesis": "Pathway 'Dilated cardiomyopathy' is involved in cardiovascular disease and phenotype processes",
+      "pathway_id": "KEGG:05414",
+      "nes_score": 5.411555304519166,
+      "experimental_approaches": [
+        "Functional enrichment analysis in cardiac tissue",
+        "Gene expression profiling",
+        "Pathway perturbation studies"
+      ]
+    },
+    {
+      "hypothesis": "Pathway 'cell death' is involved in cardiovascular disease and phenotype processes",
+      "pathway_id": "GO:0008219",
+      "nes_score": 5.257199591490221,
+      "experimental_approaches": [
+        "Functional enrichment analysis in cardiac tissue",
+        "Gene expression profiling",
+        "Pathway perturbation studies"
+      ]
+    },
+    {
+      "hypothesis": "Pathway 'Physiological and pathological hypertrophy of the heart' is involved in cardiovascular disease and phenotype processes",
+      "pathway_id": "WP:WP1528",
+      "nes_score": 2.6347155739612753,
+      "experimental_approaches": [
+        "Functional enrichment analysis in cardiac tissue",
+        "Gene expression profiling",
+        "Pathway perturbation studies"
+      ]
+    },
+    {
+      "hypothesis": "Pathway 'cell migration involved in coronary angiogenesis' is involved in cardiovascular disease and phenotype processes",
+      "pathway_id": "GO:0060981",
+      "nes_score": 2.2312071888245817,
+      "experimental_approaches": [
+        "Functional enrichment analysis in cardiac tissue",
+        "Gene expression profiling",
+        "Pathway perturbation studies"
+      ]
+    }
+  ],
+  "conclusion": "Analysis identified 8 novel pathway hypotheses. The top-ranked hypothesis is 'regulation of metabolic process' (NES: 5.48), which shows strong evidence for involvement in cardiovascular disease and phenotype processes based on functional network analysis and literature mining.",
+  "stage_7_topology": {
+    "network_summary": {
+      "total_nodes": 1,
+      "total_edges": 0,
+      "density": 0,
+      "average_clustering": 0.0,
+      "average_degree": 0.0,
+      "diameter": 0,
+      "connected_components": 1,
+      "largest_component_size": 1,
+      "modularity": 0.0
+    },
+    "hub_genes": [
+      {
+        "gene_symbol": "ITGAX",
+        "degree_centrality": 1,
+        "betweenness_centrality": 0.0,
+        "closeness_centrality": 0.0,
+        "eigenvector_centrality": 1.0,
+        "pagerank": 1.0,
+        "hub_score": 0.6,
+        "pathways": [
+          "regulation of metabolic process"
+        ],
+        "pathway_count": 1,
+        "is_druggable": false,
+        "druggability_tier": null,
+        "rank": 1
+      }
+    ],
+    "therapeutic_targets": [],
+    "functional_modules": [],
+    "pathway_crosstalk": [
+      {
+        "pathway_1": "regulation of metabolic process",
+        "pathway_2": "cell death",
+        "shared_genes": [
+          "YWHAZ",
+          "MAPK8",
+          "PTPRC",
+          "ITGA6",
+          "JUN",
+          "IL6ST",
+          "AXL",
+          "COMP",
+          "CTNNB1",
+          "ITGB2"
+        ],
+        "interaction_strength": 52.102409638554214,
+        "crosstalk_type": "overlap"
+      },
+      {
+        "pathway_1": "regulation of metabolic process",
+        "pathway_2": "Dilated cardiomyopathy",
+        "shared_genes": [
+          "ITGA6",
+          "ACTG1",
+          "ACTB",
+          "PRKACA",
+          "ITGB8",
+          "ITGA8",
+          "ITGA5",
+          "ITGAV",
+          "CAV3",
+          "PRKACB"
+        ],
+        "interaction_strength": 1.187878787878788,
+        "crosstalk_type": "bridge"
+      },
+      {
+        "pathway_1": "Dilated cardiomyopathy",
+        "pathway_2": "cell death",
+        "shared_genes": [
+          "ITGA6",
+          "ACTB",
+          "ITGA1",
+          "ITGA5",
+          "ITGA4",
+          "ITGAV",
+          "ITGB1",
+          "ITGB3"
+        ],
+        "interaction_strength": 0.5245901639344263,
+        "crosstalk_type": "bridge"
+      },
+      {
+        "pathway_1": "regulation of metabolic process",
+        "pathway_2": "Physiological and pathological hypertrophy of the heart",
+        "shared_genes": [
+          "JUN",
+          "IL6ST",
+          "MAPK8",
+          "FOS",
+          "RHOA",
+          "STAT3"
+        ],
+        "interaction_strength": 0.23376623376623376,
+        "crosstalk_type": "bridge"
+      },
+      {
+        "pathway_1": "cell death",
+        "pathway_2": "Physiological and pathological hypertrophy of the heart",
+        "shared_genes": [
+          "IL6ST",
+          "RHOA",
+          "JUN",
+          "MAPK8"
+        ],
+        "interaction_strength": 0.14953271028037382,
+        "crosstalk_type": "bridge"
+      },
+      {
+        "pathway_1": "regulation of metabolic process",
+        "pathway_2": "Transcription factors regulate miRNAs related to cardiac hypertrophy",
+        "shared_genes": [
+          "AKT1",
+          "AKT2",
+          "STAT3"
+        ],
+        "interaction_strength": 0.05844155844155844,
+        "crosstalk_type": "bridge"
+      },
+      {
+        "pathway_1": "cell death",
+        "pathway_2": "Transcription factors regulate miRNAs related to cardiac hypertrophy",
+        "shared_genes": [
+          "AKT1",
+          "AKT2"
+        ],
+        "interaction_strength": 0.03773584905660377,
+        "crosstalk_type": "bridge"
+      },
+      {
+        "pathway_1": "regulation of metabolic process",
+        "pathway_2": "cardiac septum morphogenesis",
+        "shared_genes": [
+          "FGFR2",
+          "ENG"
+        ],
+        "interaction_strength": 0.025806451612903226,
+        "crosstalk_type": "bridge"
+      }
+    ]
+  },
+  "top_genes": [
+    {
+      "gene": "ITGB3",
+      "pathway_count": 3,
+      "importance_score": 3.0,
+      "druggability_tier": "high",
+      "is_druggable": false,
+      "is_fda_approved": true,
+      "is_clinical_trial": false,
+      "centrality": 0.0,
+      "disgenet_cardiac_score": 0.0,
+      "final_score": 6.0
+    },
+    {
+      "gene": "JUN",
+      "pathway_count": 3,
+      "importance_score": 2.96,
+      "druggability_tier": "unknown",
+      "is_druggable": true,
+      "is_fda_approved": false,
+      "is_clinical_trial": false,
+      "centrality": 0.0,
+      "disgenet_cardiac_score": 0.0,
+      "final_score": 3.7
+    },
+    {
+      "gene": "MAPK8",
+      "pathway_count": 3,
+      "importance_score": 2.96,
+      "druggability_tier": "unknown",
+      "is_druggable": true,
+      "is_fda_approved": false,
+      "is_clinical_trial": false,
+      "centrality": 0.0,
+      "disgenet_cardiac_score": 0.0,
+      "final_score": 3.7
+    },
+    {
+      "gene": "AKT2",
+      "pathway_count": 3,
+      "importance_score": 2.88,
+      "druggability_tier": "unknown",
+      "is_druggable": true,
+      "is_fda_approved": false,
+      "is_clinical_trial": false,
+      "centrality": 0.0,
+      "disgenet_cardiac_score": 0.0,
+      "final_score": 3.5999999999999996
+    },
+    {
+      "gene": "AKT1",
+      "pathway_count": 3,
+      "importance_score": 2.88,
+      "druggability_tier": "unknown",
+      "is_druggable": true,
+      "is_fda_approved": false,
+      "is_clinical_trial": false,
+      "centrality": 0.0,
+      "disgenet_cardiac_score": 0.0,
+      "final_score": 3.5999999999999996
+    }
+  ]
+}

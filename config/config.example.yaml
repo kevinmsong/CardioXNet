@@ -1,0 +1,75 @@
+# CardioXNet Configuration Example
+# Copy this file to config.yaml and customize as needed
+
+# Application Settings
+app_name: "CardioXNet"
+environment: "development"  # Options: development, staging, production
+debug: true
+
+# Server Settings
+host: "0.0.0.0"
+port: 8000
+
+# CORS Settings - Add your frontend URLs
+cors_origins:
+  - "http://localhost:3000"
+  - "http://localhost:8000"
+
+# Logging Settings
+log_level: "INFO"  # Options: DEBUG, INFO, WARNING, ERROR, CRITICAL
+
+# Directory Paths
+data_dir: "data"
+output_dir: "outputs"
+config_dir: "config"
+
+# NETS Pipeline Configuration
+nets:
+  # API Versions - Update if newer versions are available
+  string_version: "11.5"
+  gprofiler_version: "e104_eg51_p15"
+  reactome_version: "79"
+  
+  # Analysis Parameters - Adjust based on your research needs
+  string_score_threshold: 0.7   # Minimum STRING interaction score (0-1)
+  fdr_threshold: 0.05           # FDR significance threshold
+  top_hypotheses_count: 5       # Number of top hypotheses to validate
+  
+  # Database Weights - Higher weights prioritize certain databases
+  db_weight_reactome: 1.5
+  db_weight_kegg: 1.5
+  db_weight_wikipathways: 1.2
+  db_weight_gobp: 1.0
+  
+  # API Endpoints - Typically don't need to change these
+  string_api_url: "https://string-db.org/api"
+  gprofiler_api_url: "https://biit.cs.ut.ee/gprofiler/api"
+  reactome_api_url: "https://reactome.org/ContentService"
+  
+  # Retry Configuration
+  max_retries: 3
+  retry_backoff_factor: 2.0
+  request_timeout: 30
+  
+  # Aggregation Configuration
+  aggregation_strategy: "intersection"  # Options: intersection, frequency, weighted
+  min_support_threshold: 2              # Minimum support count for intersection
+  
+  # Literature Mining
+  pubmed_max_results: 50
+  literature_relevance_threshold: 0.3
+  
+  # Enhanced Semantic Filtering (STRICT for focused cardiac repair discovery)
+  semantic_relevance_threshold: 0.40  # Much higher threshold for cardiac relevance
+  semantic_repair_boost: 2.0          # Extra boost for repair-specific pathways
+  semantic_max_results: 100           # Limit final results to top 100 most relevant
+  semantic_progressive_thresholds:     # Progressive filtering tiers
+    high_cardiac: 0.70                # High cardiac relevance (repair-focused)
+    medium_cardiac: 0.40              # Medium cardiac relevance
+    low_cardiac: 0.20                 # Low cardiac relevance (general cardiac)
+  
+  # Output Formats
+  output_formats:
+    - "markdown"
+    - "json"
+    - "html"

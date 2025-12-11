@@ -1,0 +1,23 @@
+# CardioXNet Requirements - All components are required
+fastapi==0.104.0
+uvicorn[standard]==0.24.0
+pydantic==2.5.0
+pydantic-settings==2.1.0
+requests==2.31.0
+pandas==2.1.0
+tenacity==8.2.0
+networkx==3.2.0
+biopython==1.81
+aiohttp==3.9.0
+pyyaml==6.0.1
+jinja2==3.1.2
+pytest==7.4.0
+pytest-asyncio==0.21.0
+httpx==0.25.0
+diskcache==5.6.3
+scikit-learn==1.3.2
+scipy==1.11.4
+matplotlib==3.8.2
+seaborn==0.13.0
+gprofiler==1.2.2
+reportlab==4.4.4

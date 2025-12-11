@@ -1,0 +1,31 @@
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: cardioxnet-backend
+    ports:
+      - "8000:8000"
+    environment:
+      - NETS_ENVIRONMENT=production
+      - NETS_DEBUG=false
+      - NETS_LOG_LEVEL=INFO
+    volumes:
+      - ./data:/app/data
+      - ./outputs:/app/outputs
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: cardioxnet-frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+volumes:
+  data:
+  outputs:

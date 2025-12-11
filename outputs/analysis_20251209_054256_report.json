@@ -1,0 +1,3277 @@
+{
+  "analysis_id": "analysis_20251209_054256",
+  "timestamp": "2025-12-09T05:47:43.964779",
+  "input_summary": {
+    "total_seed_genes": 2,
+    "valid_genes": 2,
+    "invalid_genes": 0,
+    "gene_list": [
+      "BRCA1",
+      "PTEN"
+    ],
+    "warnings": []
+  },
+  "stage_1": {
+    "fn_size": 199,
+    "seed_count": 2,
+    "neighbor_count": 197,
+    "contributions": {
+      "BRCA1": 97,
+      "PTEN": 100
+    }
+  },
+  "stage_2a": {
+    "primary_pathways_count": 3059,
+    "known_pathways_filtered": 85,
+    "top_pathways": [
+      {
+        "name": "cellular response to stimulus",
+        "nes": 10511.865038881988,
+        "p_adj": 2.722700205087395e-48
+      },
+      {
+        "name": "response to stimulus",
+        "nes": 8674.082034890522,
+        "p_adj": 4.498227350780406e-39
+      },
+      {
+        "name": "intracellular signal transduction",
+        "nes": 7687.23561366456,
+        "p_adj": 5.282610987755613e-50
+      },
+      {
+        "name": "primary metabolic process",
+        "nes": 6965.23059200375,
+        "p_adj": 1.5640441174112814e-29
+      },
+      {
+        "name": "cellular response to stress",
+        "nes": 6760.0,
+        "p_adj": 1.3085578427288648e-54
+      }
+    ]
+  },
+  "stage_2b": {
+    "total_secondary_pathways": 3960,
+    "union_genes_processed": 0,
+    "genes_successfully_processed": 0,
+    "literature_stats": {
+      "primaries_processed": 20,
+      "total_secondaries": 60536,
+      "unique_secondaries": 3960
+    }
+  },
+  "stage_2c": {
+    "final_pathways_count": 3960,
+    "aggregation_strategy": "rigorous_statistical",
+    "min_support_threshold": 1
+  },
+  "stage_3": {
+    "total_hypotheses": 18,
+    "top_nes_score": 5.521370001128022
+  },
+  "stage_4_topology": {},
+  "stage_4_literature": {
+    "GO:0008152": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "35758064",
+          "title": "A circular RNA derived from the insulin receptor locus protects against doxorubicin-induced cardiotoxicity.",
+          "year": 2022,
+          "relevance": 0.6583333333333333
+        },
+        {
+          "pmid": "35395187",
+          "title": "A small-molecule cocktail promotes mammalian cardiomyocyte proliferation and heart regeneration.",
+          "year": 2022,
+          "relevance": 0.6
+        },
+        {
+          "pmid": "38873758",
+          "title": "Ubiquitin Ligase RBX2/SAG Regulates Mitochondrial Ubiquitination and Mitophagy.",
+          "year": 2024,
+          "relevance": 0.6
+        }
+      ]
+    },
+    "GO:0035556": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "35395187",
+          "title": "A small-molecule cocktail promotes mammalian cardiomyocyte proliferation and heart regeneration.",
+          "year": 2022,
+          "relevance": 0.5583333333333333
+        },
+        {
+          "pmid": "36036015",
+          "title": "Exercise-induced signaling pathways to counteracting cardiac apoptotic processes.",
+          "year": 2022,
+          "relevance": 0.5583333333333333
+        },
+        {
+          "pmid": "33213359",
+          "title": "PTEN inhibitor improves vascular remodeling and cardiac function after myocardial infarction through PI3k/Akt/VEGF signaling pathway.",
+          "year": 2020,
+          "relevance": 0.5583333333333333
+        }
+      ]
+    },
+    "GO:0032502": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "34337686",
+          "title": "Role of PTEN-less in cardiac injury, hypertrophy and regeneration.",
+          "year": 2021,
+          "relevance": 0.6
+        },
+        {
+          "pmid": "36036015",
+          "title": "Exercise-induced signaling pathways to counteracting cardiac apoptotic processes.",
+          "year": 2022,
+          "relevance": 0.6
+        },
+        {
+          "pmid": "35758064",
+          "title": "A circular RNA derived from the insulin receptor locus protects against doxorubicin-induced cardiotoxicity.",
+          "year": 2022,
+          "relevance": 0.5333333333333333
+        }
+      ]
+    },
+    "GO:0048583": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "34337686",
+          "title": "Role of PTEN-less in cardiac injury, hypertrophy and regeneration.",
+          "year": 2021,
+          "relevance": 0.5750000000000001
+        },
+        {
+          "pmid": "40080209",
+          "title": "Exosome-mediated effects of BRCA1 on cardiovascular artery disease.",
+          "year": 2025,
+          "relevance": 0.5750000000000001
+        },
+        {
+          "pmid": "36036015",
+          "title": "Exercise-induced signaling pathways to counteracting cardiac apoptotic processes.",
+          "year": 2022,
+          "relevance": 0.525
+        }
+      ]
+    },
+    "GO:0009893": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "34337686",
+          "title": "Role of PTEN-less in cardiac injury, hypertrophy and regeneration.",
+          "year": 2021,
+          "relevance": 0.5750000000000001
+        },
+        {
+          "pmid": "35758064",
+          "title": "A circular RNA derived from the insulin receptor locus protects against doxorubicin-induced cardiotoxicity.",
+          "year": 2022,
+          "relevance": 0.5583333333333332
+        },
+        {
+          "pmid": "35395187",
+          "title": "A small-molecule cocktail promotes mammalian cardiomyocyte proliferation and heart regeneration.",
+          "year": 2022,
+          "relevance": 0.525
+        }
+      ]
+    },
+    "GO:0033554": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "34337686",
+          "title": "Role of PTEN-less in cardiac injury, hypertrophy and regeneration.",
+          "year": 2021,
+          "relevance": 0.6625
+        },
+        {
+          "pmid": "36036015",
+          "title": "Exercise-induced signaling pathways to counteracting cardiac apoptotic processes.",
+          "year": 2022,
+          "relevance": 0.6
+        },
+        {
+          "pmid": "39091464",
+          "title": "Corosolic acid attenuates cardiac ischemia/reperfusion injury through the PHB2/PINK1/parkin/mitophagy pathway.",
+          "year": 2024,
+          "relevance": 0.6
+        }
+      ]
+    },
+    "GO:0019538": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "35758064",
+          "title": "A circular RNA derived from the insulin receptor locus protects against doxorubicin-induced cardiotoxicity.",
+          "year": 2022,
+          "relevance": 0.6583333333333333
+        },
+        {
+          "pmid": "38873758",
+          "title": "Ubiquitin Ligase RBX2/SAG Regulates Mitochondrial Ubiquitination and Mitophagy.",
+          "year": 2024,
+          "relevance": 0.6416666666666667
+        },
+        {
+          "pmid": "36036015",
+          "title": "Exercise-induced signaling pathways to counteracting cardiac apoptotic processes.",
+          "year": 2022,
+          "relevance": 0.6416666666666667
+        }
+      ]
+    },
+    "GO:0006796": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "35395187",
+          "title": "A small-molecule cocktail promotes mammalian cardiomyocyte proliferation and heart regeneration.",
+          "year": 2022,
+          "relevance": 0.5375
+        },
+        {
+          "pmid": "38873758",
+          "title": "Ubiquitin Ligase RBX2/SAG Regulates Mitochondrial Ubiquitination and Mitophagy.",
+          "year": 2024,
+          "relevance": 0.5375
+        },
+        {
+          "pmid": "36036015",
+          "title": "Exercise-induced signaling pathways to counteracting cardiac apoptotic processes.",
+          "year": 2022,
+          "relevance": 0.5375
+        }
+      ]
+    },
+    "GO:0016310": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "36036015",
+          "title": "Exercise-induced signaling pathways to counteracting cardiac apoptotic processes.",
+          "year": 2022,
+          "relevance": 0.725
+        },
+        {
+          "pmid": "19147653",
+          "title": "Cardiac regulation by phosphoinositide 3-kinases and PTEN.",
+          "year": 2009,
+          "relevance": 0.5916666666666667
+        },
+        {
+          "pmid": "33288731",
+          "title": "Phosphorylation and Driver Mutations in PI3K\u03b1 and PTEN Autoinhibition.",
+          "year": 2021,
+          "relevance": 0.525
+        }
+      ]
+    },
+    "GO:0006259": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "35758064",
+          "title": "A circular RNA derived from the insulin receptor locus protects against doxorubicin-induced cardiotoxicity.",
+          "year": 2022,
+          "relevance": 0.575
+        },
+        {
+          "pmid": "35395187",
+          "title": "A small-molecule cocktail promotes mammalian cardiomyocyte proliferation and heart regeneration.",
+          "year": 2022,
+          "relevance": 0.5583333333333333
+        },
+        {
+          "pmid": "38873758",
+          "title": "Ubiquitin Ligase RBX2/SAG Regulates Mitochondrial Ubiquitination and Mitophagy.",
+          "year": 2024,
+          "relevance": 0.5583333333333333
+        }
+      ]
+    },
+    "GO:0009892": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "34337686",
+          "title": "Role of PTEN-less in cardiac injury, hypertrophy and regeneration.",
+          "year": 2021,
+          "relevance": 0.5750000000000001
+        },
+        {
+          "pmid": "36036015",
+          "title": "Exercise-induced signaling pathways to counteracting cardiac apoptotic processes.",
+          "year": 2022,
+          "relevance": 0.5750000000000001
+        },
+        {
+          "pmid": "35758064",
+          "title": "A circular RNA derived from the insulin receptor locus protects against doxorubicin-induced cardiotoxicity.",
+          "year": 2022,
+          "relevance": 0.5583333333333332
+        }
+      ]
+    },
+    "GO:0006996": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "35395187",
+          "title": "A small-molecule cocktail promotes mammalian cardiomyocyte proliferation and heart regeneration.",
+          "year": 2022,
+          "relevance": 0.475
+        },
+        {
+          "pmid": "38873758",
+          "title": "Ubiquitin Ligase RBX2/SAG Regulates Mitochondrial Ubiquitination and Mitophagy.",
+          "year": 2024,
+          "relevance": 0.475
+        },
+        {
+          "pmid": "34337686",
+          "title": "Role of PTEN-less in cardiac injury, hypertrophy and regeneration.",
+          "year": 2021,
+          "relevance": 0.475
+        }
+      ]
+    },
+    "GO:0042221": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "35395187",
+          "title": "A small-molecule cocktail promotes mammalian cardiomyocyte proliferation and heart regeneration.",
+          "year": 2022,
+          "relevance": 0.5583333333333333
+        },
+        {
+          "pmid": "38873758",
+          "title": "Ubiquitin Ligase RBX2/SAG Regulates Mitochondrial Ubiquitination and Mitophagy.",
+          "year": 2024,
+          "relevance": 0.5583333333333333
+        },
+        {
+          "pmid": "36036015",
+          "title": "Exercise-induced signaling pathways to counteracting cardiac apoptotic processes.",
+          "year": 2022,
+          "relevance": 0.5583333333333333
+        }
+      ]
+    },
+    "GO:0048468": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "38873758",
+          "title": "Ubiquitin Ligase RBX2/SAG Regulates Mitochondrial Ubiquitination and Mitophagy.",
+          "year": 2024,
+          "relevance": 0.725
+        },
+        {
+          "pmid": "34337686",
+          "title": "Role of PTEN-less in cardiac injury, hypertrophy and regeneration.",
+          "year": 2021,
+          "relevance": 0.725
+        },
+        {
+          "pmid": "35395187",
+          "title": "A small-molecule cocktail promotes mammalian cardiomyocyte proliferation and heart regeneration.",
+          "year": 2022,
+          "relevance": 0.6
+        }
+      ]
+    },
+    "GO:1902531": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "34337686",
+          "title": "Role of PTEN-less in cardiac injury, hypertrophy and regeneration.",
+          "year": 2021,
+          "relevance": 0.5750000000000001
+        },
+        {
+          "pmid": "33577036",
+          "title": "Effects of PPAR\u03b3 agonist pioglitazone on cardiac fibrosis in diabetic mice by regulating PTEN/AKT/FAK pathway.",
+          "year": 2021,
+          "relevance": 0.5416666666666667
+        },
+        {
+          "pmid": "35395187",
+          "title": "A small-molecule cocktail promotes mammalian cardiomyocyte proliferation and heart regeneration.",
+          "year": 2022,
+          "relevance": 0.525
+        }
+      ]
+    },
+    "GO:0051641": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "38873758",
+          "title": "Ubiquitin Ligase RBX2/SAG Regulates Mitochondrial Ubiquitination and Mitophagy.",
+          "year": 2024,
+          "relevance": 0.6
+        },
+        {
+          "pmid": "34337686",
+          "title": "Role of PTEN-less in cardiac injury, hypertrophy and regeneration.",
+          "year": 2021,
+          "relevance": 0.6
+        },
+        {
+          "pmid": "34359000",
+          "title": "Non-canonical function of nuclear PTEN and its implication on tumorigenesis.",
+          "year": 2021,
+          "relevance": 0.525
+        }
+      ]
+    },
+    "GO:0008283": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "35395187",
+          "title": "A small-molecule cocktail promotes mammalian cardiomyocyte proliferation and heart regeneration.",
+          "year": 2022,
+          "relevance": 0.6416666666666667
+        },
+        {
+          "pmid": "34337686",
+          "title": "Role of PTEN-less in cardiac injury, hypertrophy and regeneration.",
+          "year": 2021,
+          "relevance": 0.6416666666666667
+        },
+        {
+          "pmid": "38873758",
+          "title": "Ubiquitin Ligase RBX2/SAG Regulates Mitochondrial Ubiquitination and Mitophagy.",
+          "year": 2024,
+          "relevance": 0.5583333333333333
+        }
+      ]
+    },
+    "GO:0045935": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "34337686",
+          "title": "Role of PTEN-less in cardiac injury, hypertrophy and regeneration.",
+          "year": 2021,
+          "relevance": 0.5464285714285714
+        },
+        {
+          "pmid": "35758064",
+          "title": "A circular RNA derived from the insulin receptor locus protects against doxorubicin-induced cardiotoxicity.",
+          "year": 2022,
+          "relevance": 0.5154761904761904
+        },
+        {
+          "pmid": "35395187",
+          "title": "A small-molecule cocktail promotes mammalian cardiomyocyte proliferation and heart regeneration.",
+          "year": 2022,
+          "relevance": 0.5107142857142857
+        }
+      ]
+    },
+    "GO:0007049": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "35395187",
+          "title": "A small-molecule cocktail promotes mammalian cardiomyocyte proliferation and heart regeneration.",
+          "year": 2022,
+          "relevance": 0.725
+        },
+        {
+          "pmid": "36036015",
+          "title": "Exercise-induced signaling pathways to counteracting cardiac apoptotic processes.",
+          "year": 2022,
+          "relevance": 0.6
+        },
+        {
+          "pmid": "34337686",
+          "title": "Role of PTEN-less in cardiac injury, hypertrophy and regeneration.",
+          "year": 2021,
+          "relevance": 0.6
+        }
+      ]
+    },
+    "GO:0008219": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "38873758",
+          "title": "Ubiquitin Ligase RBX2/SAG Regulates Mitochondrial Ubiquitination and Mitophagy.",
+          "year": 2024,
+          "relevance": 0.725
+        },
+        {
+          "pmid": "34337686",
+          "title": "Role of PTEN-less in cardiac injury, hypertrophy and regeneration.",
+          "year": 2021,
+          "relevance": 0.725
+        },
+        {
+          "pmid": "36036015",
+          "title": "Exercise-induced signaling pathways to counteracting cardiac apoptotic processes.",
+          "year": 2022,
+          "relevance": 0.725
+        }
+      ]
+    },
+    "GO:0051128": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "38873758",
+          "title": "Ubiquitin Ligase RBX2/SAG Regulates Mitochondrial Ubiquitination and Mitophagy.",
+          "year": 2024,
+          "relevance": 0.5750000000000001
+        },
+        {
+          "pmid": "34337686",
+          "title": "Role of PTEN-less in cardiac injury, hypertrophy and regeneration.",
+          "year": 2021,
+          "relevance": 0.5750000000000001
+        },
+        {
+          "pmid": "32856216",
+          "title": "Roles of MicroRNA-122 in Cardiovascular Fibrosis and Related Diseases.",
+          "year": 2020,
+          "relevance": 0.525
+        }
+      ]
+    },
+    "GO:0009891": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "34337686",
+          "title": "Role of PTEN-less in cardiac injury, hypertrophy and regeneration.",
+          "year": 2021,
+          "relevance": 0.5750000000000001
+        },
+        {
+          "pmid": "36036015",
+          "title": "Exercise-induced signaling pathways to counteracting cardiac apoptotic processes.",
+          "year": 2022,
+          "relevance": 0.525
+        },
+        {
+          "pmid": "40080209",
+          "title": "Exosome-mediated effects of BRCA1 on cardiovascular artery disease.",
+          "year": 2025,
+          "relevance": 0.525
+        }
+      ]
+    },
+    "GO:0048584": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "34337686",
+          "title": "Role of PTEN-less in cardiac injury, hypertrophy and regeneration.",
+          "year": 2021,
+          "relevance": 0.5583333333333333
+        },
+        {
+          "pmid": "40080209",
+          "title": "Exosome-mediated effects of BRCA1 on cardiovascular artery disease.",
+          "year": 2025,
+          "relevance": 0.5583333333333333
+        },
+        {
+          "pmid": "36036015",
+          "title": "Exercise-induced signaling pathways to counteracting cardiac apoptotic processes.",
+          "year": 2022,
+          "relevance": 0.5166666666666666
+        }
+      ]
+    },
+    "GO:0051246": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "34337686",
+          "title": "Role of PTEN-less in cardiac injury, hypertrophy and regeneration.",
+          "year": 2021,
+          "relevance": 0.6249999999999999
+        },
+        {
+          "pmid": "35758064",
+          "title": "A circular RNA derived from the insulin receptor locus protects against doxorubicin-induced cardiotoxicity.",
+          "year": 2022,
+          "relevance": 0.6083333333333333
+        },
+        {
+          "pmid": "38873758",
+          "title": "Ubiquitin Ligase RBX2/SAG Regulates Mitochondrial Ubiquitination and Mitophagy.",
+          "year": 2024,
+          "relevance": 0.5750000000000001
+        }
+      ]
+    },
+    "GO:0009628": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "36036015",
+          "title": "Exercise-induced signaling pathways to counteracting cardiac apoptotic processes.",
+          "year": 2022,
+          "relevance": 0.5375
+        },
+        {
+          "pmid": "34337686",
+          "title": "Role of PTEN-less in cardiac injury, hypertrophy and regeneration.",
+          "year": 2021,
+          "relevance": 0.5375
+        },
+        {
+          "pmid": "39091464",
+          "title": "Corosolic acid attenuates cardiac ischemia/reperfusion injury through the PHB2/PINK1/parkin/mitophagy pathway.",
+          "year": 2024,
+          "relevance": 0.5375
+        }
+      ]
+    },
+    "GO:0007167": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "36036015",
+          "title": "Exercise-induced signaling pathways to counteracting cardiac apoptotic processes.",
+          "year": 2022,
+          "relevance": 0.6749999999999999
+        },
+        {
+          "pmid": "33577036",
+          "title": "Effects of PPAR\u03b3 agonist pioglitazone on cardiac fibrosis in diabetic mice by regulating PTEN/AKT/FAK pathway.",
+          "year": 2021,
+          "relevance": 0.6416666666666667
+        },
+        {
+          "pmid": "34337686",
+          "title": "Role of PTEN-less in cardiac injury, hypertrophy and regeneration.",
+          "year": 2021,
+          "relevance": 0.6249999999999999
+        }
+      ]
+    },
+    "GO:0141124": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "35395187",
+          "title": "A small-molecule cocktail promotes mammalian cardiomyocyte proliferation and heart regeneration.",
+          "year": 2022,
+          "relevance": 0.5583333333333333
+        },
+        {
+          "pmid": "36036015",
+          "title": "Exercise-induced signaling pathways to counteracting cardiac apoptotic processes.",
+          "year": 2022,
+          "relevance": 0.5583333333333333
+        },
+        {
+          "pmid": "34337686",
+          "title": "Role of PTEN-less in cardiac injury, hypertrophy and regeneration.",
+          "year": 2021,
+          "relevance": 0.5583333333333333
+        }
+      ]
+    },
+    "GO:0080134": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "34337686",
+          "title": "Role of PTEN-less in cardiac injury, hypertrophy and regeneration.",
+          "year": 2021,
+          "relevance": 0.6249999999999999
+        },
+        {
+          "pmid": "36036015",
+          "title": "Exercise-induced signaling pathways to counteracting cardiac apoptotic processes.",
+          "year": 2022,
+          "relevance": 0.5750000000000001
+        },
+        {
+          "pmid": "38861679",
+          "title": "Loss of Cavin-2 destabilizes phosphatase and tensin homologue and enhances Akt signalling pathway in cardiomyocytes.",
+          "year": 2024,
+          "relevance": 0.5750000000000001
+        }
+      ]
+    },
+    "GO:0009968": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "34337686",
+          "title": "Role of PTEN-less in cardiac injury, hypertrophy and regeneration.",
+          "year": 2021,
+          "relevance": 0.5750000000000001
+        },
+        {
+          "pmid": "36036015",
+          "title": "Exercise-induced signaling pathways to counteracting cardiac apoptotic processes.",
+          "year": 2022,
+          "relevance": 0.5750000000000001
+        },
+        {
+          "pmid": "32856216",
+          "title": "Roles of MicroRNA-122 in Cardiovascular Fibrosis and Related Diseases.",
+          "year": 2020,
+          "relevance": 0.5750000000000001
+        }
+      ]
+    },
+    "GO:0009719": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "35395187",
+          "title": "A small-molecule cocktail promotes mammalian cardiomyocyte proliferation and heart regeneration.",
+          "year": 2022,
+          "relevance": 0.5375
+        },
+        {
+          "pmid": "36036015",
+          "title": "Exercise-induced signaling pathways to counteracting cardiac apoptotic processes.",
+          "year": 2022,
+          "relevance": 0.5375
+        },
+        {
+          "pmid": "34337686",
+          "title": "Role of PTEN-less in cardiac injury, hypertrophy and regeneration.",
+          "year": 2021,
+          "relevance": 0.5375
+        }
+      ]
+    },
+    "GO:1901700": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "36036015",
+          "title": "Exercise-induced signaling pathways to counteracting cardiac apoptotic processes.",
+          "year": 2022,
+          "relevance": 0.5375
+        },
+        {
+          "pmid": "34337686",
+          "title": "Role of PTEN-less in cardiac injury, hypertrophy and regeneration.",
+          "year": 2021,
+          "relevance": 0.5375
+        },
+        {
+          "pmid": "39091464",
+          "title": "Corosolic acid attenuates cardiac ischemia/reperfusion injury through the PHB2/PINK1/parkin/mitophagy pathway.",
+          "year": 2024,
+          "relevance": 0.5375
+        }
+      ]
+    },
+    "GO:0051052": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "34337686",
+          "title": "Role of PTEN-less in cardiac injury, hypertrophy and regeneration.",
+          "year": 2021,
+          "relevance": 0.5750000000000001
+        },
+        {
+          "pmid": "35758064",
+          "title": "A circular RNA derived from the insulin receptor locus protects against doxorubicin-induced cardiotoxicity.",
+          "year": 2022,
+          "relevance": 0.5583333333333332
+        },
+        {
+          "pmid": "35395187",
+          "title": "A small-molecule cocktail promotes mammalian cardiomyocyte proliferation and heart regeneration.",
+          "year": 2022,
+          "relevance": 0.525
+        }
+      ]
+    },
+    "KEGG:04070": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "35395187",
+          "title": "A small-molecule cocktail promotes mammalian cardiomyocyte proliferation and heart regeneration.",
+          "year": 2022,
+          "relevance": 0.5583333333333333
+        },
+        {
+          "pmid": "36036015",
+          "title": "Exercise-induced signaling pathways to counteracting cardiac apoptotic processes.",
+          "year": 2022,
+          "relevance": 0.5583333333333333
+        },
+        {
+          "pmid": "33213359",
+          "title": "PTEN inhibitor improves vascular remodeling and cardiac function after myocardial infarction through PI3k/Akt/VEGF signaling pathway.",
+          "year": 2020,
+          "relevance": 0.5583333333333333
+        }
+      ]
+    },
+    "KEGG:04068": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "36036015",
+          "title": "Exercise-induced signaling pathways to counteracting cardiac apoptotic processes.",
+          "year": 2022,
+          "relevance": 0.725
+        },
+        {
+          "pmid": "33213359",
+          "title": "PTEN inhibitor improves vascular remodeling and cardiac function after myocardial infarction through PI3k/Akt/VEGF signaling pathway.",
+          "year": 2020,
+          "relevance": 0.6416666666666667
+        },
+        {
+          "pmid": "34337686",
+          "title": "Role of PTEN-less in cardiac injury, hypertrophy and regeneration.",
+          "year": 2021,
+          "relevance": 0.6416666666666667
+        }
+      ]
+    },
+    "GO:1903047": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "35395187",
+          "title": "A small-molecule cocktail promotes mammalian cardiomyocyte proliferation and heart regeneration.",
+          "year": 2022,
+          "relevance": 0.6
+        },
+        {
+          "pmid": "36036015",
+          "title": "Exercise-induced signaling pathways to counteracting cardiac apoptotic processes.",
+          "year": 2022,
+          "relevance": 0.6
+        },
+        {
+          "pmid": "34337686",
+          "title": "Role of PTEN-less in cardiac injury, hypertrophy and regeneration.",
+          "year": 2021,
+          "relevance": 0.6
+        }
+      ]
+    },
+    "KEGG:05131": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "35395187",
+          "title": "A small-molecule cocktail promotes mammalian cardiomyocyte proliferation and heart regeneration.",
+          "year": 2022,
+          "relevance": 0.475
+        },
+        {
+          "pmid": "38873758",
+          "title": "Ubiquitin Ligase RBX2/SAG Regulates Mitochondrial Ubiquitination and Mitophagy.",
+          "year": 2024,
+          "relevance": 0.475
+        },
+        {
+          "pmid": "33180227",
+          "title": "miR-30e-5p Alleviates Inflammation and Cardiac Dysfunction After Myocardial Infarction Through Targeting PTEN.",
+          "year": 2021,
+          "relevance": 0.475
+        }
+      ]
+    },
+    "GO:0006302": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "32733558",
+          "title": "Secondary Prevention in Hereditary Breast and/or Ovarian Cancer Syndromes Other Than BRCA.",
+          "year": 2020,
+          "relevance": 0.7166666666666667
+        },
+        {
+          "pmid": "32456160",
+          "title": "Vitamin D in Triple-Negative and BRCA1-Deficient Breast Cancer-Implications for Pathogenesis and Therapy.",
+          "year": 2020,
+          "relevance": 0.5916666666666667
+        },
+        {
+          "pmid": "35395187",
+          "title": "A small-molecule cocktail promotes mammalian cardiomyocyte proliferation and heart regeneration.",
+          "year": 2022,
+          "relevance": 0.5583333333333333
+        }
+      ]
+    },
+    "GO:0009314": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "36036015",
+          "title": "Exercise-induced signaling pathways to counteracting cardiac apoptotic processes.",
+          "year": 2022,
+          "relevance": 0.5583333333333333
+        },
+        {
+          "pmid": "34337686",
+          "title": "Role of PTEN-less in cardiac injury, hypertrophy and regeneration.",
+          "year": 2021,
+          "relevance": 0.5583333333333333
+        },
+        {
+          "pmid": "39091464",
+          "title": "Corosolic acid attenuates cardiac ischemia/reperfusion injury through the PHB2/PINK1/parkin/mitophagy pathway.",
+          "year": 2024,
+          "relevance": 0.5583333333333333
+        }
+      ]
+    },
+    "GO:0033365": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "38873758",
+          "title": "Ubiquitin Ligase RBX2/SAG Regulates Mitochondrial Ubiquitination and Mitophagy.",
+          "year": 2024,
+          "relevance": 0.5375
+        },
+        {
+          "pmid": "36036015",
+          "title": "Exercise-induced signaling pathways to counteracting cardiac apoptotic processes.",
+          "year": 2022,
+          "relevance": 0.5375
+        },
+        {
+          "pmid": "33180227",
+          "title": "miR-30e-5p Alleviates Inflammation and Cardiac Dysfunction After Myocardial Infarction Through Targeting PTEN.",
+          "year": 2021,
+          "relevance": 0.5375
+        }
+      ]
+    },
+    "WP:WP4946": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "35311628",
+          "title": "Tripartite motif 27 promotes cardiac hypertrophy via PTEN/Akt/mTOR signal pathways.",
+          "year": 2022,
+          "relevance": 0.5416666666666667
+        },
+        {
+          "pmid": "35395187",
+          "title": "A small-molecule cocktail promotes mammalian cardiomyocyte proliferation and heart regeneration.",
+          "year": 2022,
+          "relevance": 0.525
+        },
+        {
+          "pmid": "36036015",
+          "title": "Exercise-induced signaling pathways to counteracting cardiac apoptotic processes.",
+          "year": 2022,
+          "relevance": 0.525
+        }
+      ]
+    },
+    "WP:WP4016": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "38873758",
+          "title": "Ubiquitin Ligase RBX2/SAG Regulates Mitochondrial Ubiquitination and Mitophagy.",
+          "year": 2024,
+          "relevance": 0.5375
+        },
+        {
+          "pmid": "36036015",
+          "title": "Exercise-induced signaling pathways to counteracting cardiac apoptotic processes.",
+          "year": 2022,
+          "relevance": 0.5375
+        },
+        {
+          "pmid": "34337686",
+          "title": "Role of PTEN-less in cardiac injury, hypertrophy and regeneration.",
+          "year": 2021,
+          "relevance": 0.5375
+        }
+      ]
+    },
+    "GO:0009894": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "34337686",
+          "title": "Role of PTEN-less in cardiac injury, hypertrophy and regeneration.",
+          "year": 2021,
+          "relevance": 0.6
+        },
+        {
+          "pmid": "36036015",
+          "title": "Exercise-induced signaling pathways to counteracting cardiac apoptotic processes.",
+          "year": 2022,
+          "relevance": 0.5375
+        },
+        {
+          "pmid": "40080209",
+          "title": "Exosome-mediated effects of BRCA1 on cardiovascular artery disease.",
+          "year": 2025,
+          "relevance": 0.5375
+        }
+      ]
+    },
+    "WP:WP1559": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "33486894",
+          "title": "LKB1IP promotes pathological cardiac hypertrophy by targeting PTEN/Akt signalling pathway.",
+          "year": 2021,
+          "relevance": 0.56875
+        },
+        {
+          "pmid": "36036015",
+          "title": "Exercise-induced signaling pathways to counteracting cardiac apoptotic processes.",
+          "year": 2022,
+          "relevance": 0.56875
+        },
+        {
+          "pmid": "34337686",
+          "title": "Role of PTEN-less in cardiac injury, hypertrophy and regeneration.",
+          "year": 2021,
+          "relevance": 0.56875
+        }
+      ]
+    },
+    "GO:0060411": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "35395187",
+          "title": "A small-molecule cocktail promotes mammalian cardiomyocyte proliferation and heart regeneration.",
+          "year": 2022,
+          "relevance": 0.5583333333333333
+        },
+        {
+          "pmid": "38873758",
+          "title": "Ubiquitin Ligase RBX2/SAG Regulates Mitochondrial Ubiquitination and Mitophagy.",
+          "year": 2024,
+          "relevance": 0.5583333333333333
+        },
+        {
+          "pmid": "33180227",
+          "title": "miR-30e-5p Alleviates Inflammation and Cardiac Dysfunction After Myocardial Infarction Through Targeting PTEN.",
+          "year": 2021,
+          "relevance": 0.5583333333333333
+        }
+      ]
+    },
+    "GO:2000136": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "34337686",
+          "title": "Role of PTEN-less in cardiac injury, hypertrophy and regeneration.",
+          "year": 2021,
+          "relevance": 0.6
+        },
+        {
+          "pmid": "35395187",
+          "title": "A small-molecule cocktail promotes mammalian cardiomyocyte proliferation and heart regeneration.",
+          "year": 2022,
+          "relevance": 0.56875
+        },
+        {
+          "pmid": "40080209",
+          "title": "Exosome-mediated effects of BRCA1 on cardiovascular artery disease.",
+          "year": 2025,
+          "relevance": 0.56875
+        }
+      ]
+    },
+    "GO:0003181": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "35395187",
+          "title": "A small-molecule cocktail promotes mammalian cardiomyocyte proliferation and heart regeneration.",
+          "year": 2022,
+          "relevance": 0.475
+        },
+        {
+          "pmid": "38873758",
+          "title": "Ubiquitin Ligase RBX2/SAG Regulates Mitochondrial Ubiquitination and Mitophagy.",
+          "year": 2024,
+          "relevance": 0.475
+        },
+        {
+          "pmid": "33180227",
+          "title": "miR-30e-5p Alleviates Inflammation and Cardiac Dysfunction After Myocardial Infarction Through Targeting PTEN.",
+          "year": 2021,
+          "relevance": 0.475
+        }
+      ]
+    },
+    "GO:0003179": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "35395187",
+          "title": "A small-molecule cocktail promotes mammalian cardiomyocyte proliferation and heart regeneration.",
+          "year": 2022,
+          "relevance": 0.5583333333333333
+        },
+        {
+          "pmid": "38873758",
+          "title": "Ubiquitin Ligase RBX2/SAG Regulates Mitochondrial Ubiquitination and Mitophagy.",
+          "year": 2024,
+          "relevance": 0.5583333333333333
+        },
+        {
+          "pmid": "34337686",
+          "title": "Role of PTEN-less in cardiac injury, hypertrophy and regeneration.",
+          "year": 2021,
+          "relevance": 0.5583333333333333
+        }
+      ]
+    },
+    "GO:0003251": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "34337686",
+          "title": "Role of PTEN-less in cardiac injury, hypertrophy and regeneration.",
+          "year": 2021,
+          "relevance": 0.5750000000000001
+        },
+        {
+          "pmid": "35395187",
+          "title": "A small-molecule cocktail promotes mammalian cardiomyocyte proliferation and heart regeneration.",
+          "year": 2022,
+          "relevance": 0.55
+        },
+        {
+          "pmid": "38873758",
+          "title": "Ubiquitin Ligase RBX2/SAG Regulates Mitochondrial Ubiquitination and Mitophagy.",
+          "year": 2024,
+          "relevance": 0.525
+        }
+      ]
+    },
+    "GO:0060981": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "33180227",
+          "title": "miR-30e-5p Alleviates Inflammation and Cardiac Dysfunction After Myocardial Infarction Through Targeting PTEN.",
+          "year": 2021,
+          "relevance": 0.5583333333333333
+        },
+        {
+          "pmid": "33993982",
+          "title": "MiRNA-26a inhibits myocardial infarction-induced apoptosis by targeting PTEN via JAK/STAT pathways.",
+          "year": 2021,
+          "relevance": 0.5583333333333333
+        },
+        {
+          "pmid": "35395187",
+          "title": "A small-molecule cocktail promotes mammalian cardiomyocyte proliferation and heart regeneration.",
+          "year": 2022,
+          "relevance": 0.5166666666666666
+        }
+      ]
+    },
+    "GO:0003180": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "33486894",
+          "title": "LKB1IP promotes pathological cardiac hypertrophy by targeting PTEN/Akt signalling pathway.",
+          "year": 2021,
+          "relevance": 0.5583333333333333
+        },
+        {
+          "pmid": "35395187",
+          "title": "A small-molecule cocktail promotes mammalian cardiomyocyte proliferation and heart regeneration.",
+          "year": 2022,
+          "relevance": 0.475
+        },
+        {
+          "pmid": "38873758",
+          "title": "Ubiquitin Ligase RBX2/SAG Regulates Mitochondrial Ubiquitination and Mitophagy.",
+          "year": 2024,
+          "relevance": 0.475
+        }
+      ]
+    }
+  },
+  "ranked_hypotheses": [
+    {
+      "rank": 1,
+      "pathway_id": "GO:0008152",
+      "pathway_name": "metabolic process",
+      "source_db": "GO:BP",
+      "nes_score": 5.521370001128022,
+      "p_adj": 0.0,
+      "evidence_count": 167,
+      "support_count": 20,
+      "seed_genes": [
+        "BRCA1",
+        "PTEN"
+      ],
+      "literature_support": false,
+      "citations": [
+        {
+          "pmid": "35758064",
+          "title": "A circular RNA derived from the insulin receptor locus protects against doxorubicin-induced cardiotoxicity.",
+          "year": 2022,
+          "relevance": 0.6583333333333333
+        },
+        {
+          "pmid": "35395187",
+          "title": "A small-molecule cocktail promotes mammalian cardiomyocyte proliferation and heart regeneration.",
+          "year": 2022,
+          "relevance": 0.6
+        },
+        {
+          "pmid": "38873758",
+          "title": "Ubiquitin Ligase RBX2/SAG Regulates Mitochondrial Ubiquitination and Mitophagy.",
+          "year": 2024,
+          "relevance": 0.6
+        }
+      ],
+      "citation_count": 25,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0051716",
+        "GO:0050896",
+        "GO:0035556",
+        "GO:0044238",
+        "GO:0033554",
+        "GO:0007165",
+        "GO:0023052",
+        "GO:0050794",
+        "GO:0007154",
+        "GO:0006950",
+        "GO:0048523",
+        "GO:0006793",
+        "GO:0006796",
+        "GO:0008152",
+        "GO:0050789",
+        "GO:0006974",
+        "GO:0048519",
+        "GO:0006259",
+        "GO:0080090",
+        "GO:0048583"
+      ]
+    },
+    {
+      "rank": 24,
+      "pathway_id": "GO:0009893",
+      "pathway_name": "positive regulation of metabolic process",
+      "source_db": "GO:BP",
+      "nes_score": 5.2625956590905645,
+      "p_adj": 0.0,
+      "evidence_count": 106,
+      "support_count": 20,
+      "seed_genes": [
+        "BRCA1",
+        "PTEN"
+      ],
+      "literature_support": false,
+      "citations": [
+        {
+          "pmid": "34337686",
+          "title": "Role of PTEN-less in cardiac injury, hypertrophy and regeneration.",
+          "year": 2021,
+          "relevance": 0.5750000000000001
+        },
+        {
+          "pmid": "35758064",
+          "title": "A circular RNA derived from the insulin receptor locus protects against doxorubicin-induced cardiotoxicity.",
+          "year": 2022,
+          "relevance": 0.5583333333333332
+        },
+        {
+          "pmid": "35395187",
+          "title": "A small-molecule cocktail promotes mammalian cardiomyocyte proliferation and heart regeneration.",
+          "year": 2022,
+          "relevance": 0.525
+        }
+      ],
+      "citation_count": 25,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0051716",
+        "GO:0050896",
+        "GO:0035556",
+        "GO:0044238",
+        "GO:0033554",
+        "GO:0007165",
+        "GO:0023052",
+        "GO:0050794",
+        "GO:0007154",
+        "GO:0006950",
+        "GO:0048523",
+        "GO:0006793",
+        "GO:0006796",
+        "GO:0008152",
+        "GO:0050789",
+        "GO:0006974",
+        "GO:0048519",
+        "GO:0006259",
+        "GO:0080090",
+        "GO:0048583"
+      ]
+    },
+    {
+      "rank": 31,
+      "pathway_id": "GO:0019538",
+      "pathway_name": "protein metabolic process",
+      "source_db": "GO:BP",
+      "nes_score": 5.206185357483018,
+      "p_adj": 0.0,
+      "evidence_count": 96,
+      "support_count": 20,
+      "seed_genes": [
+        "BRCA1",
+        "PTEN"
+      ],
+      "literature_support": false,
+      "citations": [
+        {
+          "pmid": "35758064",
+          "title": "A circular RNA derived from the insulin receptor locus protects against doxorubicin-induced cardiotoxicity.",
+          "year": 2022,
+          "relevance": 0.6583333333333333
+        },
+        {
+          "pmid": "38873758",
+          "title": "Ubiquitin Ligase RBX2/SAG Regulates Mitochondrial Ubiquitination and Mitophagy.",
+          "year": 2024,
+          "relevance": 0.6416666666666667
+        },
+        {
+          "pmid": "36036015",
+          "title": "Exercise-induced signaling pathways to counteracting cardiac apoptotic processes.",
+          "year": 2022,
+          "relevance": 0.6416666666666667
+        }
+      ],
+      "citation_count": 25,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0051716",
+        "GO:0050896",
+        "GO:0035556",
+        "GO:0044238",
+        "GO:0033554",
+        "GO:0007165",
+        "GO:0023052",
+        "GO:0050794",
+        "GO:0007154",
+        "GO:0006950",
+        "GO:0048523",
+        "GO:0006793",
+        "GO:0006796",
+        "GO:0008152",
+        "GO:0050789",
+        "GO:0006974",
+        "GO:0048519",
+        "GO:0006259",
+        "GO:0080090",
+        "GO:0048583"
+      ]
+    },
+    {
+      "rank": 34,
+      "pathway_id": "GO:0006796",
+      "pathway_name": "phosphate-containing compound metabolic process",
+      "source_db": "GO:BP",
+      "nes_score": 5.181957272074108,
+      "p_adj": 0.0,
+      "evidence_count": 92,
+      "support_count": 20,
+      "seed_genes": [
+        "BRCA1",
+        "PTEN"
+      ],
+      "literature_support": false,
+      "citations": [
+        {
+          "pmid": "35395187",
+          "title": "A small-molecule cocktail promotes mammalian cardiomyocyte proliferation and heart regeneration.",
+          "year": 2022,
+          "relevance": 0.5375
+        },
+        {
+          "pmid": "38873758",
+          "title": "Ubiquitin Ligase RBX2/SAG Regulates Mitochondrial Ubiquitination and Mitophagy.",
+          "year": 2024,
+          "relevance": 0.5375
+        },
+        {
+          "pmid": "36036015",
+          "title": "Exercise-induced signaling pathways to counteracting cardiac apoptotic processes.",
+          "year": 2022,
+          "relevance": 0.5375
+        }
+      ],
+      "citation_count": 25,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0051716",
+        "GO:0050896",
+        "GO:0035556",
+        "GO:0044238",
+        "GO:0033554",
+        "GO:0007165",
+        "GO:0023052",
+        "GO:0050794",
+        "GO:0007154",
+        "GO:0006950",
+        "GO:0048523",
+        "GO:0006793",
+        "GO:0006796",
+        "GO:0008152",
+        "GO:0050789",
+        "GO:0006974",
+        "GO:0048519",
+        "GO:0006259",
+        "GO:0080090",
+        "GO:0048583"
+      ]
+    },
+    {
+      "rank": 41,
+      "pathway_id": "GO:0006259",
+      "pathway_name": "DNA metabolic process",
+      "source_db": "GO:BP",
+      "nes_score": 5.109466945931151,
+      "p_adj": 0.0,
+      "evidence_count": 81,
+      "support_count": 20,
+      "seed_genes": [
+        "BRCA1",
+        "PTEN"
+      ],
+      "literature_support": false,
+      "citations": [
+        {
+          "pmid": "35758064",
+          "title": "A circular RNA derived from the insulin receptor locus protects against doxorubicin-induced cardiotoxicity.",
+          "year": 2022,
+          "relevance": 0.575
+        },
+        {
+          "pmid": "35395187",
+          "title": "A small-molecule cocktail promotes mammalian cardiomyocyte proliferation and heart regeneration.",
+          "year": 2022,
+          "relevance": 0.5583333333333333
+        },
+        {
+          "pmid": "38873758",
+          "title": "Ubiquitin Ligase RBX2/SAG Regulates Mitochondrial Ubiquitination and Mitophagy.",
+          "year": 2024,
+          "relevance": 0.5583333333333333
+        }
+      ],
+      "citation_count": 25,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0051716",
+        "GO:0050896",
+        "GO:0035556",
+        "GO:0044238",
+        "GO:0033554",
+        "GO:0007165",
+        "GO:0023052",
+        "GO:0050794",
+        "GO:0007154",
+        "GO:0006950",
+        "GO:0048523",
+        "GO:0006793",
+        "GO:0006796",
+        "GO:0008152",
+        "GO:0050789",
+        "GO:0006974",
+        "GO:0048519",
+        "GO:0006259",
+        "GO:0080090",
+        "GO:0048583"
+      ]
+    },
+    {
+      "rank": 42,
+      "pathway_id": "GO:0009892",
+      "pathway_name": "negative regulation of metabolic process",
+      "source_db": "GO:BP",
+      "nes_score": 5.102395256443012,
+      "p_adj": 0.0,
+      "evidence_count": 80,
+      "support_count": 20,
+      "seed_genes": [
+        "BRCA1",
+        "PTEN"
+      ],
+      "literature_support": false,
+      "citations": [
+        {
+          "pmid": "34337686",
+          "title": "Role of PTEN-less in cardiac injury, hypertrophy and regeneration.",
+          "year": 2021,
+          "relevance": 0.5750000000000001
+        },
+        {
+          "pmid": "36036015",
+          "title": "Exercise-induced signaling pathways to counteracting cardiac apoptotic processes.",
+          "year": 2022,
+          "relevance": 0.5750000000000001
+        },
+        {
+          "pmid": "35758064",
+          "title": "A circular RNA derived from the insulin receptor locus protects against doxorubicin-induced cardiotoxicity.",
+          "year": 2022,
+          "relevance": 0.5583333333333332
+        }
+      ],
+      "citation_count": 25,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0051716",
+        "GO:0050896",
+        "GO:0035556",
+        "GO:0044238",
+        "GO:0033554",
+        "GO:0007165",
+        "GO:0023052",
+        "GO:0050794",
+        "GO:0007154",
+        "GO:0006950",
+        "GO:0048523",
+        "GO:0006793",
+        "GO:0006796",
+        "GO:0008152",
+        "GO:0050789",
+        "GO:0006974",
+        "GO:0048519",
+        "GO:0006259",
+        "GO:0080090",
+        "GO:0048583"
+      ]
+    },
+    {
+      "rank": 52,
+      "pathway_id": "GO:0045935",
+      "pathway_name": "positive regulation of nucleobase-containing compound metabolic process",
+      "source_db": "GO:BP",
+      "nes_score": 5.034456076497366,
+      "p_adj": 0.0,
+      "evidence_count": 71,
+      "support_count": 20,
+      "seed_genes": [
+        "BRCA1",
+        "PTEN"
+      ],
+      "literature_support": false,
+      "citations": [
+        {
+          "pmid": "34337686",
+          "title": "Role of PTEN-less in cardiac injury, hypertrophy and regeneration.",
+          "year": 2021,
+          "relevance": 0.5464285714285714
+        },
+        {
+          "pmid": "35758064",
+          "title": "A circular RNA derived from the insulin receptor locus protects against doxorubicin-induced cardiotoxicity.",
+          "year": 2022,
+          "relevance": 0.5154761904761904
+        },
+        {
+          "pmid": "35395187",
+          "title": "A small-molecule cocktail promotes mammalian cardiomyocyte proliferation and heart regeneration.",
+          "year": 2022,
+          "relevance": 0.5107142857142857
+        }
+      ],
+      "citation_count": 25,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0051716",
+        "GO:0050896",
+        "GO:0035556",
+        "GO:0044238",
+        "GO:0033554",
+        "GO:0007165",
+        "GO:0023052",
+        "GO:0050794",
+        "GO:0007154",
+        "GO:0006950",
+        "GO:0048523",
+        "GO:0006793",
+        "GO:0006796",
+        "GO:0008152",
+        "GO:0050789",
+        "GO:0006974",
+        "GO:0048519",
+        "GO:0006259",
+        "GO:0080090",
+        "GO:0048583"
+      ]
+    },
+    {
+      "rank": 54,
+      "pathway_id": "GO:0008219",
+      "pathway_name": "cell death",
+      "source_db": "GO:BP",
+      "nes_score": 5.018190604346457,
+      "p_adj": 0.0,
+      "evidence_count": 69,
+      "support_count": 20,
+      "seed_genes": [
+        "BRCA1",
+        "PTEN"
+      ],
+      "literature_support": true,
+      "citations": [
+        {
+          "pmid": "38873758",
+          "title": "Ubiquitin Ligase RBX2/SAG Regulates Mitochondrial Ubiquitination and Mitophagy.",
+          "year": 2024,
+          "relevance": 0.725
+        },
+        {
+          "pmid": "34337686",
+          "title": "Role of PTEN-less in cardiac injury, hypertrophy and regeneration.",
+          "year": 2021,
+          "relevance": 0.725
+        },
+        {
+          "pmid": "36036015",
+          "title": "Exercise-induced signaling pathways to counteracting cardiac apoptotic processes.",
+          "year": 2022,
+          "relevance": 0.725
+        }
+      ],
+      "citation_count": 25,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0051716",
+        "GO:0050896",
+        "GO:0035556",
+        "GO:0044238",
+        "GO:0033554",
+        "GO:0007165",
+        "GO:0023052",
+        "GO:0050794",
+        "GO:0007154",
+        "GO:0006950",
+        "GO:0048523",
+        "GO:0006793",
+        "GO:0006796",
+        "GO:0008152",
+        "GO:0050789",
+        "GO:0006974",
+        "GO:0048519",
+        "GO:0006259",
+        "GO:0080090",
+        "GO:0048583"
+      ]
+    },
+    {
+      "rank": 61,
+      "pathway_id": "GO:0051246",
+      "pathway_name": "regulation of protein metabolic process",
+      "source_db": "GO:BP",
+      "nes_score": 5.001446740131722,
+      "p_adj": 0.0,
+      "evidence_count": 67,
+      "support_count": 20,
+      "seed_genes": [
+        "BRCA1",
+        "PTEN"
+      ],
+      "literature_support": false,
+      "citations": [
+        {
+          "pmid": "34337686",
+          "title": "Role of PTEN-less in cardiac injury, hypertrophy and regeneration.",
+          "year": 2021,
+          "relevance": 0.6249999999999999
+        },
+        {
+          "pmid": "35758064",
+          "title": "A circular RNA derived from the insulin receptor locus protects against doxorubicin-induced cardiotoxicity.",
+          "year": 2022,
+          "relevance": 0.6083333333333333
+        },
+        {
+          "pmid": "38873758",
+          "title": "Ubiquitin Ligase RBX2/SAG Regulates Mitochondrial Ubiquitination and Mitophagy.",
+          "year": 2024,
+          "relevance": 0.5750000000000001
+        }
+      ],
+      "citation_count": 25,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0051716",
+        "GO:0050896",
+        "GO:0035556",
+        "GO:0044238",
+        "GO:0033554",
+        "GO:0007165",
+        "GO:0023052",
+        "GO:0050794",
+        "GO:0007154",
+        "GO:0006950",
+        "GO:0048523",
+        "GO:0006793",
+        "GO:0006796",
+        "GO:0008152",
+        "GO:0050789",
+        "GO:0006974",
+        "GO:0048519",
+        "GO:0006259",
+        "GO:0080090",
+        "GO:0048583"
+      ]
+    },
+    {
+      "rank": 77,
+      "pathway_id": "GO:0051052",
+      "pathway_name": "regulation of DNA metabolic process",
+      "source_db": "GO:BP",
+      "nes_score": 4.868016947592826,
+      "p_adj": 0.0,
+      "evidence_count": 53,
+      "support_count": 20,
+      "seed_genes": [
+        "BRCA1",
+        "PTEN"
+      ],
+      "literature_support": false,
+      "citations": [
+        {
+          "pmid": "34337686",
+          "title": "Role of PTEN-less in cardiac injury, hypertrophy and regeneration.",
+          "year": 2021,
+          "relevance": 0.5750000000000001
+        },
+        {
+          "pmid": "35758064",
+          "title": "A circular RNA derived from the insulin receptor locus protects against doxorubicin-induced cardiotoxicity.",
+          "year": 2022,
+          "relevance": 0.5583333333333332
+        },
+        {
+          "pmid": "35395187",
+          "title": "A small-molecule cocktail promotes mammalian cardiomyocyte proliferation and heart regeneration.",
+          "year": 2022,
+          "relevance": 0.525
+        }
+      ],
+      "citation_count": 25,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0051716",
+        "GO:0050896",
+        "GO:0035556",
+        "GO:0044238",
+        "GO:0033554",
+        "GO:0007165",
+        "GO:0023052",
+        "GO:0050794",
+        "GO:0007154",
+        "GO:0006950",
+        "GO:0048523",
+        "GO:0006793",
+        "GO:0006796",
+        "GO:0008152",
+        "GO:0050789",
+        "GO:0006974",
+        "GO:0048519",
+        "GO:0006259",
+        "GO:0080090",
+        "GO:0048583"
+      ]
+    },
+    {
+      "rank": 1013,
+      "pathway_id": "WP:WP1559",
+      "pathway_name": "Transcription factors regulate miRNAs related to cardiac hypertrophy",
+      "source_db": "WP",
+      "nes_score": 2.7632009049351605,
+      "p_adj": 1.986188991054405e-13,
+      "evidence_count": 2,
+      "support_count": 15,
+      "seed_genes": [
+        "BRCA1",
+        "PTEN"
+      ],
+      "literature_support": false,
+      "citations": [
+        {
+          "pmid": "33486894",
+          "title": "LKB1IP promotes pathological cardiac hypertrophy by targeting PTEN/Akt signalling pathway.",
+          "year": 2021,
+          "relevance": 0.56875
+        },
+        {
+          "pmid": "36036015",
+          "title": "Exercise-induced signaling pathways to counteracting cardiac apoptotic processes.",
+          "year": 2022,
+          "relevance": 0.56875
+        },
+        {
+          "pmid": "34337686",
+          "title": "Role of PTEN-less in cardiac injury, hypertrophy and regeneration.",
+          "year": 2021,
+          "relevance": 0.56875
+        }
+      ],
+      "citation_count": 25,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0051716",
+        "GO:0050896",
+        "GO:0035556",
+        "GO:0044238",
+        "GO:0007165",
+        "GO:0023052",
+        "GO:0050794",
+        "GO:0007154",
+        "GO:0048523",
+        "GO:0006793",
+        "GO:0006796",
+        "GO:0008152",
+        "GO:0050789",
+        "GO:0048519",
+        "GO:0080090"
+      ]
+    },
+    {
+      "rank": 1221,
+      "pathway_id": "GO:0060411",
+      "pathway_name": "cardiac septum morphogenesis",
+      "source_db": "GO:BP",
+      "nes_score": 2.615256811450205,
+      "p_adj": 1.3649257279979565e-09,
+      "evidence_count": 3,
+      "support_count": 13,
+      "seed_genes": [
+        "BRCA1",
+        "PTEN"
+      ],
+      "literature_support": false,
+      "citations": [
+        {
+          "pmid": "35395187",
+          "title": "A small-molecule cocktail promotes mammalian cardiomyocyte proliferation and heart regeneration.",
+          "year": 2022,
+          "relevance": 0.5583333333333333
+        },
+        {
+          "pmid": "38873758",
+          "title": "Ubiquitin Ligase RBX2/SAG Regulates Mitochondrial Ubiquitination and Mitophagy.",
+          "year": 2024,
+          "relevance": 0.5583333333333333
+        },
+        {
+          "pmid": "33180227",
+          "title": "miR-30e-5p Alleviates Inflammation and Cardiac Dysfunction After Myocardial Infarction Through Targeting PTEN.",
+          "year": 2021,
+          "relevance": 0.5583333333333333
+        }
+      ],
+      "citation_count": 25,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0051716",
+        "GO:0050896",
+        "GO:0035556",
+        "GO:0007165",
+        "GO:0023052",
+        "GO:0050794",
+        "GO:0007154",
+        "GO:0006950",
+        "GO:0048523",
+        "GO:0050789",
+        "GO:0048519",
+        "GO:0080090",
+        "GO:0048583"
+      ]
+    },
+    {
+      "rank": 1399,
+      "pathway_id": "GO:2000136",
+      "pathway_name": "regulation of cell proliferation involved in heart morphogenesis",
+      "source_db": "GO:BP",
+      "nes_score": 2.515995154215111,
+      "p_adj": 6.7268413062038235e-12,
+      "evidence_count": 2,
+      "support_count": 14,
+      "seed_genes": [
+        "BRCA1",
+        "PTEN"
+      ],
+      "literature_support": false,
+      "citations": [
+        {
+          "pmid": "34337686",
+          "title": "Role of PTEN-less in cardiac injury, hypertrophy and regeneration.",
+          "year": 2021,
+          "relevance": 0.6
+        },
+        {
+          "pmid": "35395187",
+          "title": "A small-molecule cocktail promotes mammalian cardiomyocyte proliferation and heart regeneration.",
+          "year": 2022,
+          "relevance": 0.56875
+        },
+        {
+          "pmid": "40080209",
+          "title": "Exosome-mediated effects of BRCA1 on cardiovascular artery disease.",
+          "year": 2025,
+          "relevance": 0.56875
+        }
+      ],
+      "citation_count": 25,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0051716",
+        "GO:0050896",
+        "GO:0035556",
+        "GO:0044238",
+        "GO:0007165",
+        "GO:0023052",
+        "GO:0050794",
+        "GO:0007154",
+        "GO:0048523",
+        "GO:0008152",
+        "GO:0050789",
+        "GO:0048519",
+        "GO:0080090",
+        "GO:0048583"
+      ]
+    },
+    {
+      "rank": 1685,
+      "pathway_id": "GO:0003181",
+      "pathway_name": "atrioventricular valve morphogenesis",
+      "source_db": "GO:BP",
+      "nes_score": 2.348569724579463,
+      "p_adj": 1.6319544604570524e-09,
+      "evidence_count": 2,
+      "support_count": 14,
+      "seed_genes": [
+        "BRCA1",
+        "PTEN"
+      ],
+      "literature_support": false,
+      "citations": [
+        {
+          "pmid": "35395187",
+          "title": "A small-molecule cocktail promotes mammalian cardiomyocyte proliferation and heart regeneration.",
+          "year": 2022,
+          "relevance": 0.475
+        },
+        {
+          "pmid": "38873758",
+          "title": "Ubiquitin Ligase RBX2/SAG Regulates Mitochondrial Ubiquitination and Mitophagy.",
+          "year": 2024,
+          "relevance": 0.475
+        },
+        {
+          "pmid": "33180227",
+          "title": "miR-30e-5p Alleviates Inflammation and Cardiac Dysfunction After Myocardial Infarction Through Targeting PTEN.",
+          "year": 2021,
+          "relevance": 0.475
+        }
+      ],
+      "citation_count": 25,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0051716",
+        "GO:0050896",
+        "GO:0035556",
+        "GO:0044238",
+        "GO:0007165",
+        "GO:0023052",
+        "GO:0050794",
+        "GO:0007154",
+        "GO:0006950",
+        "GO:0048523",
+        "GO:0050789",
+        "GO:0048519",
+        "GO:0080090",
+        "GO:0048583"
+      ]
+    },
+    {
+      "rank": 1709,
+      "pathway_id": "GO:0003179",
+      "pathway_name": "heart valve morphogenesis",
+      "source_db": "GO:BP",
+      "nes_score": 2.3367599079171355,
+      "p_adj": 0.000680455319812312,
+      "evidence_count": 5,
+      "support_count": 18,
+      "seed_genes": [
+        "BRCA1",
+        "PTEN"
+      ],
+      "literature_support": false,
+      "citations": [
+        {
+          "pmid": "35395187",
+          "title": "A small-molecule cocktail promotes mammalian cardiomyocyte proliferation and heart regeneration.",
+          "year": 2022,
+          "relevance": 0.5583333333333333
+        },
+        {
+          "pmid": "38873758",
+          "title": "Ubiquitin Ligase RBX2/SAG Regulates Mitochondrial Ubiquitination and Mitophagy.",
+          "year": 2024,
+          "relevance": 0.5583333333333333
+        },
+        {
+          "pmid": "34337686",
+          "title": "Role of PTEN-less in cardiac injury, hypertrophy and regeneration.",
+          "year": 2021,
+          "relevance": 0.5583333333333333
+        }
+      ],
+      "citation_count": 25,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0051716",
+        "GO:0050896",
+        "GO:0035556",
+        "GO:0044238",
+        "GO:0033554",
+        "GO:0007165",
+        "GO:0023052",
+        "GO:0050794",
+        "GO:0007154",
+        "GO:0006950",
+        "GO:0048523",
+        "GO:0006793",
+        "GO:0006796",
+        "GO:0008152",
+        "GO:0050789",
+        "GO:0048519",
+        "GO:0080090",
+        "GO:0048583"
+      ]
+    },
+    {
+      "rank": 1999,
+      "pathway_id": "GO:0003251",
+      "pathway_name": "positive regulation of cell proliferation involved in heart valve morphogenesis",
+      "source_db": "GO:BP",
+      "nes_score": 2.2035560483544496,
+      "p_adj": 8.434364318077314e-13,
+      "evidence_count": 1,
+      "support_count": 15,
+      "seed_genes": [
+        "BRCA1",
+        "PTEN"
+      ],
+      "literature_support": false,
+      "citations": [
+        {
+          "pmid": "34337686",
+          "title": "Role of PTEN-less in cardiac injury, hypertrophy and regeneration.",
+          "year": 2021,
+          "relevance": 0.5750000000000001
+        },
+        {
+          "pmid": "35395187",
+          "title": "A small-molecule cocktail promotes mammalian cardiomyocyte proliferation and heart regeneration.",
+          "year": 2022,
+          "relevance": 0.55
+        },
+        {
+          "pmid": "38873758",
+          "title": "Ubiquitin Ligase RBX2/SAG Regulates Mitochondrial Ubiquitination and Mitophagy.",
+          "year": 2024,
+          "relevance": 0.525
+        }
+      ],
+      "citation_count": 25,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0051716",
+        "GO:0050896",
+        "GO:0035556",
+        "GO:0044238",
+        "GO:0007165",
+        "GO:0023052",
+        "GO:0050794",
+        "GO:0007154",
+        "GO:0006950",
+        "GO:0048523",
+        "GO:0008152",
+        "GO:0050789",
+        "GO:0048519",
+        "GO:0080090",
+        "GO:0048583"
+      ]
+    },
+    {
+      "rank": 2214,
+      "pathway_id": "GO:0060981",
+      "pathway_name": "cell migration involved in coronary angiogenesis",
+      "source_db": "GO:BP",
+      "nes_score": 2.0954752661900105,
+      "p_adj": 5.904166044956582e-13,
+      "evidence_count": 1,
+      "support_count": 15,
+      "seed_genes": [
+        "BRCA1",
+        "PTEN"
+      ],
+      "literature_support": false,
+      "citations": [
+        {
+          "pmid": "33180227",
+          "title": "miR-30e-5p Alleviates Inflammation and Cardiac Dysfunction After Myocardial Infarction Through Targeting PTEN.",
+          "year": 2021,
+          "relevance": 0.5583333333333333
+        },
+        {
+          "pmid": "33993982",
+          "title": "MiRNA-26a inhibits myocardial infarction-induced apoptosis by targeting PTEN via JAK/STAT pathways.",
+          "year": 2021,
+          "relevance": 0.5583333333333333
+        },
+        {
+          "pmid": "35395187",
+          "title": "A small-molecule cocktail promotes mammalian cardiomyocyte proliferation and heart regeneration.",
+          "year": 2022,
+          "relevance": 0.5166666666666666
+        }
+      ],
+      "citation_count": 25,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0051716",
+        "GO:0050896",
+        "GO:0035556",
+        "GO:0044238",
+        "GO:0007165",
+        "GO:0023052",
+        "GO:0050794",
+        "GO:0007154",
+        "GO:0006793",
+        "GO:0006796",
+        "GO:0008152",
+        "GO:0050789",
+        "GO:0006259",
+        "GO:0080090",
+        "GO:0048583"
+      ]
+    },
+    {
+      "rank": 2598,
+      "pathway_id": "GO:0003180",
+      "pathway_name": "aortic valve morphogenesis",
+      "source_db": "GO:BP",
+      "nes_score": 1.9197310306847677,
+      "p_adj": 4.5522131752351314e-05,
+      "evidence_count": 2,
+      "support_count": 7,
+      "seed_genes": [
+        "BRCA1",
+        "PTEN"
+      ],
+      "literature_support": false,
+      "citations": [
+        {
+          "pmid": "33486894",
+          "title": "LKB1IP promotes pathological cardiac hypertrophy by targeting PTEN/Akt signalling pathway.",
+          "year": 2021,
+          "relevance": 0.5583333333333333
+        },
+        {
+          "pmid": "35395187",
+          "title": "A small-molecule cocktail promotes mammalian cardiomyocyte proliferation and heart regeneration.",
+          "year": 2022,
+          "relevance": 0.475
+        },
+        {
+          "pmid": "38873758",
+          "title": "Ubiquitin Ligase RBX2/SAG Regulates Mitochondrial Ubiquitination and Mitophagy.",
+          "year": 2024,
+          "relevance": 0.475
+        }
+      ],
+      "citation_count": 25,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0035556",
+        "GO:0048523",
+        "GO:0006793",
+        "GO:0006796",
+        "GO:0048519",
+        "GO:0080090",
+        "GO:0048583"
+      ]
+    }
+  ],
+  "testable_hypotheses": [
+    {
+      "hypothesis": "Pathway 'metabolic process' is involved in cardiovascular disease and phenotype processes",
+      "pathway_id": "GO:0008152",
+      "nes_score": 5.521370001128022,
+      "experimental_approaches": [
+        "Functional enrichment analysis in cardiac tissue",
+        "Gene expression profiling",
+        "Pathway perturbation studies"
+      ]
+    },
+    {
+      "hypothesis": "Pathway 'positive regulation of metabolic process' is involved in cardiovascular disease and phenotype processes",
+      "pathway_id": "GO:0009893",
+      "nes_score": 5.2625956590905645,
+      "experimental_approaches": [
+        "Functional enrichment analysis in cardiac tissue",
+        "Gene expression profiling",
+        "Pathway perturbation studies"
+      ]
+    },
+    {
+      "hypothesis": "Pathway 'protein metabolic process' is involved in cardiovascular disease and phenotype processes",
+      "pathway_id": "GO:0019538",
+      "nes_score": 5.206185357483018,
+      "experimental_approaches": [
+        "Functional enrichment analysis in cardiac tissue",
+        "Gene expression profiling",
+        "Pathway perturbation studies"
+      ]
+    },
+    {
+      "hypothesis": "Pathway 'phosphate-containing compound metabolic process' is involved in cardiovascular disease and phenotype processes",
+      "pathway_id": "GO:0006796",
+      "nes_score": 5.181957272074108,
+      "experimental_approaches": [
+        "Functional enrichment analysis in cardiac tissue",
+        "Gene expression profiling",
+        "Pathway perturbation studies"
+      ]
+    },
+    {
+      "hypothesis": "Pathway 'DNA metabolic process' is involved in cardiovascular disease and phenotype processes",
+      "pathway_id": "GO:0006259",
+      "nes_score": 5.109466945931151,
+      "experimental_approaches": [
+        "Functional enrichment analysis in cardiac tissue",
+        "Gene expression profiling",
+        "Pathway perturbation studies"
+      ]
+    }
+  ],
+  "conclusion": "Analysis identified 18 novel pathway hypotheses. The top-ranked hypothesis is 'metabolic process' (NES: 5.52), which shows strong evidence for involvement in cardiovascular disease and phenotype processes based on functional network analysis and literature mining.",
+  "stage_7_topology": {
+    "network_summary": {
+      "total_nodes": 1,
+      "total_edges": 0,
+      "density": 0,
+      "average_clustering": 0.0,
+      "average_degree": 0.0,
+      "diameter": 0,
+      "connected_components": 1,
+      "largest_component_size": 1,
+      "modularity": 0.0
+    },
+    "hub_genes": [
+      {
+        "gene_symbol": "TP53",
+        "degree_centrality": 1,
+        "betweenness_centrality": 0.0,
+        "closeness_centrality": 0.0,
+        "eigenvector_centrality": 1.0,
+        "pagerank": 1.0,
+        "hub_score": 0.6,
+        "pathways": [
+          "metabolic process",
+          "positive regulation of metabolic process",
+          "protein metabolic process",
+          "phosphate-containing compound metabolic process",
+          "DNA metabolic process"
+        ],
+        "pathway_count": 11,
+        "is_druggable": true,
+        "druggability_tier": "druggable",
+        "rank": 1
+      }
+    ],
+    "therapeutic_targets": [
+      {
+        "gene_symbol": "TP53",
+        "therapeutic_score": 0.85,
+        "centrality_score": 1.0,
+        "druggability_score": 0.5,
+        "evidence_score": 1.0,
+        "pathway_count": 11,
+        "pathways": [
+          "metabolic process",
+          "positive regulation of metabolic process",
+          "protein metabolic process",
+          "phosphate-containing compound metabolic process",
+          "DNA metabolic process"
+        ],
+        "drugs": [],
+        "prioritization_rationale": "Hub score 0.600, druggable target",
+        "rank": 1
+      }
+    ],
+    "functional_modules": [],
+    "pathway_crosstalk": [
+      {
+        "pathway_1": "metabolic process",
+        "pathway_2": "positive regulation of metabolic process",
+        "shared_genes": [
+          "TP53",
+          "BARD1",
+          "RBBP7",
+          "TNKS2",
+          "SMARCA4",
+          "INPP5F",
+          "BRCA1",
+          "NOP53",
+          "EZH2",
+          "TP53BP1"
+        ],
+        "interaction_strength": 67.28143712574851,
+        "crosstalk_type": "overlap"
+      },
+      {
+        "pathway_1": "metabolic process",
+        "pathway_2": "protein metabolic process",
+        "shared_genes": [
+          "TP53",
+          "BARD1",
+          "TNKS2",
+          "PARD3",
+          "INPP5F",
+          "BRCA1",
+          "NOP53",
+          "EZH2",
+          "DHX9",
+          "ATR"
+        ],
+        "interaction_strength": 55.185628742514965,
+        "crosstalk_type": "overlap"
+      },
+      {
+        "pathway_1": "metabolic process",
+        "pathway_2": "phosphate-containing compound metabolic process",
+        "shared_genes": [
+          "TP53",
+          "BARD1",
+          "PARD3",
+          "PLCB3",
+          "INPP5F",
+          "NOP53",
+          "EZH2",
+          "PIP4K2B",
+          "ATR",
+          "CDK4"
+        ],
+        "interaction_strength": 50.68263473053892,
+        "crosstalk_type": "overlap"
+      },
+      {
+        "pathway_1": "positive regulation of metabolic process",
+        "pathway_2": "positive regulation of nucleobase-containing compound metabolic process",
+        "shared_genes": [
+          "TP53",
+          "PGR",
+          "CHEK2",
+          "IFI16",
+          "RNF168",
+          "CDK2",
+          "EP300",
+          "BRCA2",
+          "CDC25A",
+          "TNKS2"
+        ],
+        "interaction_strength": 47.556603773584904,
+        "crosstalk_type": "overlap"
+      },
+      {
+        "pathway_1": "positive regulation of metabolic process",
+        "pathway_2": "protein metabolic process",
+        "shared_genes": [
+          "TP53",
+          "BARD1",
+          "TNKS2",
+          "INPP5F",
+          "BRCA1",
+          "NOP53",
+          "EZH2",
+          "DHX9",
+          "ATR",
+          "CTNNB1"
+        ],
+        "interaction_strength": 47.432,
+        "crosstalk_type": "overlap"
+      },
+      {
+        "pathway_1": "protein metabolic process",
+        "pathway_2": "regulation of protein metabolic process",
+        "shared_genes": [
+          "CSNK2A2",
+          "TP53",
+          "CHEK2",
+          "RAD51",
+          "BARD1",
+          "CDK2",
+          "EP300",
+          "CDC25A",
+          "FANCI",
+          "HDAC2"
+        ],
+        "interaction_strength": 46.760416666666664,
+        "crosstalk_type": "overlap"
+      },
+      {
+        "pathway_1": "metabolic process",
+        "pathway_2": "DNA metabolic process",
+        "shared_genes": [
+          "TP53",
+          "FANCC",
+          "BARD1",
+          "RPA1",
+          "TNKS2",
+          "RBBP7",
+          "SMARCA4",
+          "BRIP1",
+          "BRCA1",
+          "NOP53"
+        ],
+        "interaction_strength": 39.287425149700596,
+        "crosstalk_type": "overlap"
+      },
+      {
+        "pathway_1": "metabolic process",
+        "pathway_2": "negative regulation of metabolic process",
+        "shared_genes": [
+          "TP53",
+          "BARD1",
+          "RBBP7",
+          "TNKS2",
+          "PARD3",
+          "SMARCA4",
+          "BRIP1",
+          "INPP5F",
+          "BRCA1",
+          "NOP53"
+        ],
+        "interaction_strength": 38.32335329341318,
+        "crosstalk_type": "overlap"
+      },
+      {
+        "pathway_1": "positive regulation of metabolic process",
+        "pathway_2": "negative regulation of metabolic process",
+        "shared_genes": [
+          "TP53",
+          "PGR",
+          "IFI16",
+          "RNF168",
+          "BARD1",
+          "CDK2",
+          "EP300",
+          "RBBP7",
+          "TNKS2",
+          "HDAC2"
+        ],
+        "interaction_strength": 36.300000000000004,
+        "crosstalk_type": "overlap"
+      },
+      {
+        "pathway_1": "DNA metabolic process",
+        "pathway_2": "regulation of DNA metabolic process",
+        "shared_genes": [
+          "TP53",
+          "RNF168",
+          "BARD1",
+          "CDK2",
+          "RAD51",
+          "CDC25A",
+          "TNKS2",
+          "CDKN2A",
+          "MLH1",
+          "BRCC3"
+        ],
+        "interaction_strength": 34.67901234567901,
+        "crosstalk_type": "overlap"
+      },
+      {
+        "pathway_1": "protein metabolic process",
+        "pathway_2": "negative regulation of metabolic process",
+        "shared_genes": [
+          "CSNK2A2",
+          "TP53",
+          "RNF168",
+          "BARD1",
+          "CDK2",
+          "EP300",
+          "TNKS2",
+          "HDAC2",
+          "CDKN2A",
+          "PARD3"
+        ],
+        "interaction_strength": 32.356521739130436,
+        "crosstalk_type": "overlap"
+      },
+      {
+        "pathway_1": "positive regulation of metabolic process",
+        "pathway_2": "regulation of protein metabolic process",
+        "shared_genes": [
+          "TP53",
+          "CHEK2",
+          "BARD1",
+          "CDK2",
+          "EP300",
+          "CDC25A",
+          "FANCI",
+          "HDAC2",
+          "CDKN2A",
+          "BLM"
+        ],
+        "interaction_strength": 31.85840707964602,
+        "crosstalk_type": "overlap"
+      },
+      {
+        "pathway_1": "protein metabolic process",
+        "pathway_2": "phosphate-containing compound metabolic process",
+        "shared_genes": [
+          "CSNK2A2",
+          "TP53",
+          "CHEK2",
+          "RAD51",
+          "BARD1",
+          "CDK2",
+          "EP300",
+          "CDC25A",
+          "CDKN2A",
+          "PARD3"
+        ],
+        "interaction_strength": 31.752,
+        "crosstalk_type": "overlap"
+      },
+      {
+        "pathway_1": "metabolic process",
+        "pathway_2": "positive regulation of nucleobase-containing compound metabolic process",
+        "shared_genes": [
+          "TP53",
+          "PGR",
+          "CHEK2",
+          "IFI16",
+          "RNF168",
+          "CDK2",
+          "EP300",
+          "BRCA2",
+          "CDC25A",
+          "TNKS2"
+        ],
+        "interaction_strength": 30.18562874251497,
+        "crosstalk_type": "overlap"
+      },
+      {
+        "pathway_1": "metabolic process",
+        "pathway_2": "cell death",
+        "shared_genes": [
+          "CSNK2A2",
+          "TP53",
+          "CHEK2",
+          "IFI16",
+          "BARD1",
+          "EP300",
+          "BRCA2",
+          "HDAC2",
+          "CDKN2A",
+          "MLH1"
+        ],
+        "interaction_strength": 28.508982035928142,
+        "crosstalk_type": "overlap"
+      },
+      {
+        "pathway_1": "positive regulation of metabolic process",
+        "pathway_2": "cell death",
+        "shared_genes": [
+          "TP53",
+          "CHEK2",
+          "IFI16",
+          "BARD1",
+          "EP300",
+          "BRCA2",
+          "HDAC2",
+          "CDKN2A",
+          "MLH1",
+          "FOXO1"
+        ],
+        "interaction_strength": 27.533898305084744,
+        "crosstalk_type": "overlap"
+      },
+      {
+        "pathway_1": "metabolic process",
+        "pathway_2": "regulation of protein metabolic process",
+        "shared_genes": [
+          "CSNK2A2",
+          "TP53",
+          "CHEK2",
+          "RAD51",
+          "BARD1",
+          "CDK2",
+          "EP300",
+          "CDC25A",
+          "FANCI",
+          "HDAC2"
+        ],
+        "interaction_strength": 26.880239520958085,
+        "crosstalk_type": "overlap"
+      },
+      {
+        "pathway_1": "protein metabolic process",
+        "pathway_2": "cell death",
+        "shared_genes": [
+          "CSNK2A2",
+          "TP53",
+          "CHEK2",
+          "BARD1",
+          "EP300",
+          "HDAC2",
+          "CDKN2A",
+          "FOXO1",
+          "UBE2D3",
+          "AKT2"
+        ],
+        "interaction_strength": 25.080357142857142,
+        "crosstalk_type": "overlap"
+      },
+      {
+        "pathway_1": "positive regulation of metabolic process",
+        "pathway_2": "DNA metabolic process",
+        "shared_genes": [
+          "TP53",
+          "CHEK2",
+          "RNF168",
+          "BARD1",
+          "CDK2",
+          "BRCA2",
+          "CDC25A",
+          "FANCI",
+          "RBBP7",
+          "TNKS2"
+        ],
+        "interaction_strength": 24.99230769230769,
+        "crosstalk_type": "overlap"
+      },
+      {
+        "pathway_1": "DNA metabolic process",
+        "pathway_2": "positive regulation of nucleobase-containing compound metabolic process",
+        "shared_genes": [
+          "TP53",
+          "CHEK2",
+          "RNF168",
+          "CDK2",
+          "BRCA2",
+          "CDC25A",
+          "TNKS2",
+          "RBBP7",
+          "CDKN2A",
+          "MLH1"
+        ],
+        "interaction_strength": 24.509803921568626,
+        "crosstalk_type": "overlap"
+      },
+      {
+        "pathway_1": "negative regulation of metabolic process",
+        "pathway_2": "positive regulation of nucleobase-containing compound metabolic process",
+        "shared_genes": [
+          "TP53",
+          "PGR",
+          "IFI16",
+          "RNF168",
+          "CDK2",
+          "EP300",
+          "TNKS2",
+          "RBBP7",
+          "HDAC2",
+          "CDKN2A"
+        ],
+        "interaction_strength": 23.53921568627451,
+        "crosstalk_type": "overlap"
+      },
+      {
+        "pathway_1": "positive regulation of nucleobase-containing compound metabolic process",
+        "pathway_2": "regulation of DNA metabolic process",
+        "shared_genes": [
+          "TP53",
+          "RNF168",
+          "CDK2",
+          "CDC25A",
+          "TNKS2",
+          "CDKN2A",
+          "MLH1",
+          "BRCC3",
+          "SMARCA4",
+          "RFC2"
+        ],
+        "interaction_strength": 22.82716049382716,
+        "crosstalk_type": "overlap"
+      },
+      {
+        "pathway_1": "positive regulation of metabolic process",
+        "pathway_2": "phosphate-containing compound metabolic process",
+        "shared_genes": [
+          "TP53",
+          "CHEK2",
+          "BARD1",
+          "CDK2",
+          "EP300",
+          "CDC25A",
+          "CDKN2A",
+          "PIK3R2",
+          "BLM",
+          "AKT2"
+        ],
+        "interaction_strength": 22.08450704225352,
+        "crosstalk_type": "overlap"
+      },
+      {
+        "pathway_1": "negative regulation of metabolic process",
+        "pathway_2": "cell death",
+        "shared_genes": [
+          "CSNK2A2",
+          "TP53",
+          "IFI16",
+          "BARD1",
+          "EP300",
+          "HDAC2",
+          "CDKN2A",
+          "MLH1",
+          "FOXO1",
+          "UBE2D3"
+        ],
+        "interaction_strength": 21.65686274509804,
+        "crosstalk_type": "overlap"
+      },
+      {
+        "pathway_1": "negative regulation of metabolic process",
+        "pathway_2": "regulation of protein metabolic process",
+        "shared_genes": [
+          "CSNK2A2",
+          "TP53",
+          "BARD1",
+          "CDK2",
+          "EP300",
+          "HDAC2",
+          "CDKN2A",
+          "PARD3",
+          "BLM",
+          "FOXO1"
+        ],
+        "interaction_strength": 20.95049504950495,
+        "crosstalk_type": "overlap"
+      },
+      {
+        "pathway_1": "phosphate-containing compound metabolic process",
+        "pathway_2": "regulation of protein metabolic process",
+        "shared_genes": [
+          "CSNK2A2",
+          "TP53",
+          "CHEK2",
+          "RAD51",
+          "BARD1",
+          "CDK2",
+          "EP300",
+          "CDC25A",
+          "CDKN2A",
+          "PARD3"
+        ],
+        "interaction_strength": 20.756756756756758,
+        "crosstalk_type": "overlap"
+      },
+      {
+        "pathway_1": "cell death",
+        "pathway_2": "regulation of protein metabolic process",
+        "shared_genes": [
+          "CSNK2A2",
+          "TP53",
+          "CHEK2",
+          "BARD1",
+          "EP300",
+          "HDAC2",
+          "CDKN2A",
+          "FOXO1",
+          "AKT2",
+          "PRKDC"
+        ],
+        "interaction_strength": 19.881720430107524,
+        "crosstalk_type": "overlap"
+      },
+      {
+        "pathway_1": "positive regulation of metabolic process",
+        "pathway_2": "regulation of DNA metabolic process",
+        "shared_genes": [
+          "TP53",
+          "RNF168",
+          "BARD1",
+          "CDK2",
+          "CDC25A",
+          "TNKS2",
+          "CDKN2A",
+          "MLH1",
+          "BRCC3",
+          "SMARCA4"
+        ],
+        "interaction_strength": 19.723214285714285,
+        "crosstalk_type": "overlap"
+      },
+      {
+        "pathway_1": "protein metabolic process",
+        "pathway_2": "positive regulation of nucleobase-containing compound metabolic process",
+        "shared_genes": [
+          "TP53",
+          "CHEK2",
+          "RNF168",
+          "CDK2",
+          "EP300",
+          "CDC25A",
+          "TNKS2",
+          "HDAC2",
+          "CDKN2A",
+          "BRCC3"
+        ],
+        "interaction_strength": 18.40833333333333,
+        "crosstalk_type": "overlap"
+      },
+      {
+        "pathway_1": "DNA metabolic process",
+        "pathway_2": "negative regulation of metabolic process",
+        "shared_genes": [
+          "CSNK2A2",
+          "TP53",
+          "RNF168",
+          "BARD1",
+          "CDK2",
+          "RBBP7",
+          "TNKS2",
+          "CDKN2A",
+          "MLH1",
+          "SMARCA4"
+        ],
+        "interaction_strength": 18.400000000000002,
+        "crosstalk_type": "overlap"
+      },
+      {
+        "pathway_1": "metabolic process",
+        "pathway_2": "regulation of DNA metabolic process",
+        "shared_genes": [
+          "TP53",
+          "RNF168",
+          "BARD1",
+          "CDK2",
+          "RAD51",
+          "CDC25A",
+          "TNKS2",
+          "CDKN2A",
+          "MLH1",
+          "BRCC3"
+        ],
+        "interaction_strength": 16.820359281437128,
+        "crosstalk_type": "overlap"
+      },
+      {
+        "pathway_1": "phosphate-containing compound metabolic process",
+        "pathway_2": "cell death",
+        "shared_genes": [
+          "CSNK2A2",
+          "TP53",
+          "CHEK2",
+          "BARD1",
+          "EP300",
+          "CDKN2A",
+          "AKT2",
+          "ATM",
+          "PRKDC",
+          "NOP53"
+        ],
+        "interaction_strength": 16.547008547008545,
+        "crosstalk_type": "overlap"
+      },
+      {
+        "pathway_1": "protein metabolic process",
+        "pathway_2": "DNA metabolic process",
+        "shared_genes": [
+          "CSNK2A2",
+          "TP53",
+          "CHEK2",
+          "RAD51",
+          "BARD1",
+          "RNF168",
+          "CDK2",
+          "CDC25A",
+          "FANCI",
+          "TNKS2"
+        ],
+        "interaction_strength": 15.34090909090909,
+        "crosstalk_type": "overlap"
+      },
+      {
+        "pathway_1": "negative regulation of metabolic process",
+        "pathway_2": "regulation of DNA metabolic process",
+        "shared_genes": [
+          "TP53",
+          "RNF168",
+          "BARD1",
+          "CDK2",
+          "TNKS2",
+          "CDKN2A",
+          "MLH1",
+          "SMARCA4",
+          "BLM",
+          "TERF2"
+        ],
+        "interaction_strength": 15.200000000000001,
+        "crosstalk_type": "overlap"
+      },
+      {
+        "pathway_1": "phosphate-containing compound metabolic process",
+        "pathway_2": "negative regulation of metabolic process",
+        "shared_genes": [
+          "CSNK2A2",
+          "TP53",
+          "BARD1",
+          "CDK2",
+          "EP300",
+          "CDKN2A",
+          "PARD3",
+          "BLM",
+          "ATM",
+          "PRKDC"
+        ],
+        "interaction_strength": 15.125,
+        "crosstalk_type": "overlap"
+      },
+      {
+        "pathway_1": "protein metabolic process",
+        "pathway_2": "regulation of DNA metabolic process",
+        "shared_genes": [
+          "TP53",
+          "RNF168",
+          "BARD1",
+          "CDK2",
+          "RAD51",
+          "CDC25A",
+          "TNKS2",
+          "CDKN2A",
+          "BRCC3",
+          "BLM"
+        ],
+        "interaction_strength": 12.223214285714285,
+        "crosstalk_type": "overlap"
+      },
+      {
+        "pathway_1": "positive regulation of nucleobase-containing compound metabolic process",
+        "pathway_2": "cell death",
+        "shared_genes": [
+          "TP53",
+          "CHEK2",
+          "IFI16",
+          "EP300",
+          "BRCA2",
+          "HDAC2",
+          "CDKN2A",
+          "MLH1",
+          "FOXO1",
+          "ATM"
+        ],
+        "interaction_strength": 10.177570093457943,
+        "crosstalk_type": "overlap"
+      },
+      {
+        "pathway_1": "positive regulation of nucleobase-containing compound metabolic process",
+        "pathway_2": "regulation of protein metabolic process",
+        "shared_genes": [
+          "TP53",
+          "CHEK2",
+          "CDK2",
+          "EP300",
+          "CDC25A",
+          "HDAC2",
+          "CDKN2A",
+          "BLM",
+          "FOXO1",
+          "PRKDC"
+        ],
+        "interaction_strength": 8.981308411214952,
+        "crosstalk_type": "bridge"
+      },
+      {
+        "pathway_1": "DNA metabolic process",
+        "pathway_2": "cell death",
+        "shared_genes": [
+          "CSNK2A2",
+          "TP53",
+          "CHEK2",
+          "BARD1",
+          "BRCA2",
+          "CDKN2A",
+          "MLH1",
+          "UBE2D3",
+          "ATM",
+          "PRKDC"
+        ],
+        "interaction_strength": 8.07563025210084,
+        "crosstalk_type": "bridge"
+      },
+      {
+        "pathway_1": "DNA metabolic process",
+        "pathway_2": "regulation of protein metabolic process",
+        "shared_genes": [
+          "CSNK2A2",
+          "TP53",
+          "CHEK2",
+          "RAD51",
+          "BARD1",
+          "CDK2",
+          "CDC25A",
+          "FANCI",
+          "CDKN2A",
+          "BLM"
+        ],
+        "interaction_strength": 7.627118644067796,
+        "crosstalk_type": "bridge"
+      },
+      {
+        "pathway_1": "phosphate-containing compound metabolic process",
+        "pathway_2": "positive regulation of nucleobase-containing compound metabolic process",
+        "shared_genes": [
+          "TP53",
+          "CHEK2",
+          "CDK2",
+          "EP300",
+          "CDC25A",
+          "CDKN2A",
+          "PIK3R2",
+          "BLM",
+          "ATM",
+          "PRKDC"
+        ],
+        "interaction_strength": 6.276119402985074,
+        "crosstalk_type": "bridge"
+      },
+      {
+        "pathway_1": "regulation of protein metabolic process",
+        "pathway_2": "regulation of DNA metabolic process",
+        "shared_genes": [
+          "TP53",
+          "RAD51",
+          "BARD1",
+          "CDK2",
+          "CDC25A",
+          "CDKN2A",
+          "BLM",
+          "USP7",
+          "PRKDC",
+          "RAD50"
+        ],
+        "interaction_strength": 5.453608247422681,
+        "crosstalk_type": "bridge"
+      },
+      {
+        "pathway_1": "phosphate-containing compound metabolic process",
+        "pathway_2": "DNA metabolic process",
+        "shared_genes": [
+          "CSNK2A2",
+          "TP53",
+          "CHEK2",
+          "RAD51",
+          "BARD1",
+          "CDK2",
+          "CDC25A",
+          "CDKN2A",
+          "BLM",
+          "ATM"
+        ],
+        "interaction_strength": 5.406896551724138,
+        "crosstalk_type": "bridge"
+      },
+      {
+        "pathway_1": "cell death",
+        "pathway_2": "regulation of DNA metabolic process",
+        "shared_genes": [
+          "TP53",
+          "BARD1",
+          "CDKN2A",
+          "MLH1",
+          "ATM",
+          "PRKDC",
+          "BRCA1",
+          "AKT1",
+          "CHEK1",
+          "MYC"
+        ],
+        "interaction_strength": 4.84,
+        "crosstalk_type": "bridge"
+      },
+      {
+        "pathway_1": "phosphate-containing compound metabolic process",
+        "pathway_2": "regulation of DNA metabolic process",
+        "shared_genes": [
+          "TP53",
+          "RAD51",
+          "BARD1",
+          "CDK2",
+          "CDC25A",
+          "CDKN2A",
+          "BLM",
+          "ATM",
+          "PRKDC",
+          "RAD50"
+        ],
+        "interaction_strength": 4.336065573770491,
+        "crosstalk_type": "bridge"
+      },
+      {
+        "pathway_1": "cardiac septum morphogenesis",
+        "pathway_2": "atrioventricular valve morphogenesis",
+        "shared_genes": [
+          "SMAD4",
+          "MDM2"
+        ],
+        "interaction_strength": 1.3333333333333333,
+        "crosstalk_type": "overlap"
+      },
+      {
+        "pathway_1": "atrioventricular valve morphogenesis",
+        "pathway_2": "heart valve morphogenesis",
+        "shared_genes": [
+          "SMAD4",
+          "MDM2"
+        ],
+        "interaction_strength": 0.8,
+        "crosstalk_type": "overlap"
+      },
+      {
+        "pathway_1": "heart valve morphogenesis",
+        "pathway_2": "aortic valve morphogenesis",
+        "shared_genes": [
+          "ROCK1",
+          "ROCK2"
+        ],
+        "interaction_strength": 0.8,
+        "crosstalk_type": "overlap"
+      },
+      {
+        "pathway_1": "cardiac septum morphogenesis",
+        "pathway_2": "heart valve morphogenesis",
+        "shared_genes": [
+          "SMAD4",
+          "MDM2"
+        ],
+        "interaction_strength": 0.6666666666666666,
+        "crosstalk_type": "overlap"
+      },
+      {
+        "pathway_1": "regulation of protein metabolic process",
+        "pathway_2": "heart valve morphogenesis",
+        "shared_genes": [
+          "MTOR",
+          "MDM2",
+          "ROCK1",
+          "SMAD4",
+          "ROCK2"
+        ],
+        "interaction_strength": 0.3731343283582089,
+        "crosstalk_type": "bridge"
+      }
+    ]
+  },
+  "top_genes": [
+    {
+      "gene": "SMAD4",
+      "pathway_count": 12,
+      "importance_score": 10.360000000000001,
+      "druggability_tier": "unknown",
+      "is_druggable": true,
+      "is_fda_approved": false,
+      "is_clinical_trial": false,
+      "centrality": 0.0,
+      "disgenet_cardiac_score": 0.72,
+      "final_score": 18.544400000000003
+    },
+    {
+      "gene": "CTNNB1",
+      "pathway_count": 10,
+      "importance_score": 9.120000000000001,
+      "druggability_tier": "unknown",
+      "is_druggable": true,
+      "is_fda_approved": false,
+      "is_clinical_trial": false,
+      "centrality": 0.0,
+      "disgenet_cardiac_score": 0.7,
+      "final_score": 16.188000000000002
+    },
+    {
+      "gene": "AKT1",
+      "pathway_count": 11,
+      "importance_score": 10.120000000000001,
+      "druggability_tier": "unknown",
+      "is_druggable": true,
+      "is_fda_approved": false,
+      "is_clinical_trial": false,
+      "centrality": 0.0,
+      "disgenet_cardiac_score": 0.0,
+      "final_score": 12.650000000000002
+    },
+    {
+      "gene": "TP53",
+      "pathway_count": 11,
+      "importance_score": 10.100000000000001,
+      "druggability_tier": "unknown",
+      "is_druggable": true,
+      "is_fda_approved": false,
+      "is_clinical_trial": false,
+      "centrality": 0.0,
+      "disgenet_cardiac_score": 0.0,
+      "final_score": 12.625000000000002
+    },
+    {
+      "gene": "EGFR",
+      "pathway_count": 10,
+      "importance_score": 9.3,
+      "druggability_tier": "unknown",
+      "is_druggable": true,
+      "is_fda_approved": false,
+      "is_clinical_trial": false,
+      "centrality": 0.0,
+      "disgenet_cardiac_score": 0.0,
+      "final_score": 11.625
+    }
+  ]
+}

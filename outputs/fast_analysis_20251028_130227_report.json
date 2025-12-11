@@ -1,0 +1,58 @@
+{
+  "analysis_id": "fast_analysis_20251028_130227",
+  "timestamp": "2025-10-28T13:02:42.582913",
+  "input_summary": {
+    "total_seed_genes": 5,
+    "valid_genes": 5,
+    "invalid_genes": 0,
+    "gene_list": [
+      "GATA4",
+      "NKX2-5",
+      "TBX5",
+      "HAND2",
+      "MEF2C"
+    ],
+    "warnings": []
+  },
+  "stage_1": {
+    "fn_size": 119,
+    "seed_count": 5,
+    "neighbor_count": 114,
+    "contributions": {
+      "GATA4": 34,
+      "NKX2-5": 13,
+      "TBX5": 23,
+      "HAND2": 20,
+      "MEF2C": 24
+    }
+  },
+  "stage_2a": {
+    "primary_pathways_count": 0,
+    "known_pathways_filtered": 0,
+    "top_pathways": []
+  },
+  "stage_2b": {
+    "total_secondary_pathways": 0,
+    "union_genes_processed": 0,
+    "genes_successfully_processed": 0,
+    "literature_stats": {
+      "primaries_processed": 0,
+      "total_secondaries": 0,
+      "unique_secondaries": 0
+    }
+  },
+  "stage_2c": {
+    "final_pathways_count": 0,
+    "aggregation_strategy": "fallback_empty",
+    "min_support_threshold": 1
+  },
+  "stage_3": {
+    "total_hypotheses": 0,
+    "top_nes_score": 0
+  },
+  "stage_4_topology": {},
+  "stage_4_literature": {},
+  "ranked_hypotheses": [],
+  "testable_hypotheses": [],
+  "conclusion": "No significant pathway hypotheses were identified."
+}

@@ -1,0 +1,699 @@
+import { useState, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  TablePagination,
+  TableSortLabel,
+  Button,
+  IconButton,
+  Box,
+  Tooltip,
+  Chip,
+  Typography,
+  LinearProgress,
+  Stack,
+  Paper,
+  Rating,
+  Badge,
+  CircularProgress,
+} from '@mui/material';
+import { 
+  Download, 
+  Visibility, 
+  Science,
+  MenuBook,
+  TrendingUp,
+  Favorite,
+  LocalHospital,
+  BiotechOutlined,
+  Assessment,
+} from '@mui/icons-material';
+import type { PathwayHypothesis } from '../api/types';
+
+interface UltraComprehensiveTableProps {
+  hypotheses: PathwayHypothesis[];
+  analysisId?: string;
+}
+
+type Order = 'asc' | 'desc';
+type OrderBy = 'nes_score' | 'p_adj' | 'evidence_count' | 'support_count' | 'cardiac_relevance' | 'literature_support' | 'clinical_significance' | 'pathway_complexity' | 'tissue_specificity';
+
+// Column tooltips with comprehensive explanations
+const columnTooltips: Record<string, string> = {
+  pathway_name: 'Biological pathway or gene set name from curated databases (Reactome, KEGG, GO)',
+  nes_score: 'Normalized Enrichment Score: Combined metric of statistical significance, evidence strength, and biological relevance. Calculated with log10 transformation for improved interpretability. Higher values indicate stronger pathway associations. Typical range: 0-2.',
+  p_adj: 'FDR-adjusted p-value from pathway enrichment (g:Profiler). Values < 0.05 are considered significant (FDR threshold: 0.05).',
+  cardiac_relevance: 'Cardiac-specific relevance score (0-100%) based on: cardiovascular keywords, literature support, evidence genes, and NES score.',
+  clinical_significance: 'Clinical impact score (0-100%) combining: statistical significance (p-value), effect size (NES), and literature validation.',
+  evidence_count: 'Number of genes from the functional neighborhood (seed + neighbors) that overlap with this pathway.',
+  literature_support: 'Number of PubMed citations linking seed genes to pathway-related concepts, validating the biological connection.',
+  tissue_specificity: 'GTEx cardiac tissue specificity score (0-100%): Ratio of cardiac vs. non-cardiac tissue expression for pathway genes. Higher = more cardiac-specific.',
+  pathway_complexity: 'Pathway size and complexity score (0-100%) based on number of evidence genes and seed gene contributors.',
+  database_source: 'Original database source: Reactome (curated signaling), KEGG (metabolic/disease), GO (functional processes), or WikiPathways.',
+};
+
+// Ultra-comprehensive column definitions for cardiovascular analysis
+const headCells = [
+  { id: 'pathway_name' as const, label: 'Pathway Name', align: 'left' as const, width: 220, tooltip: columnTooltips.pathway_name },
+  { id: 'nes_score' as OrderBy, label: 'NES Score', align: 'center' as const, width: 100, tooltip: columnTooltips.nes_score },
+  { id: 'p_adj' as OrderBy, label: 'FDR p-value', align: 'center' as const, width: 100, tooltip: columnTooltips.p_adj },
+  { id: 'cardiac_relevance' as OrderBy, label: 'Cardiac Relevance', align: 'center' as const, width: 130, tooltip: columnTooltips.cardiac_relevance },
+  { id: 'clinical_significance' as OrderBy, label: 'Clinical Impact', align: 'center' as const, width: 110, tooltip: columnTooltips.clinical_significance },
+  { id: 'evidence_count' as OrderBy, label: 'Evidence Genes', align: 'center' as const, width: 100, tooltip: columnTooltips.evidence_count },
+  { id: 'literature_support' as OrderBy, label: 'Literature', align: 'center' as const, width: 90, tooltip: columnTooltips.literature_support },
+  { id: 'tissue_specificity' as OrderBy, label: 'GTEx Cardiac Specificity', align: 'center' as const, width: 140, tooltip: columnTooltips.tissue_specificity },
+  { id: 'pathway_complexity' as OrderBy, label: 'Complexity', align: 'center' as const, width: 90, tooltip: columnTooltips.pathway_complexity },
+  { id: 'database_source' as const, label: 'Database', align: 'center' as const, width: 100, tooltip: columnTooltips.database_source },
+  { id: 'actions' as const, label: 'Details', align: 'center' as const, width: 100, tooltip: 'View comprehensive pathway details, gene lists, and evidence' },
+];
+
+// NES scores include log10 transformation in the backend calculation for improved interpretability
+// No need for frontend transformation
+
+export default function UltraComprehensiveTable({ hypotheses, analysisId }: UltraComprehensiveTableProps) {
+  const navigate = useNavigate();
+  
+  // Pagination state - default to 20 rows per page
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(20);
+  
+  // Sorting state - Default to NES score descending
+  const [order, setOrder] = useState<Order>('desc');
+  const [orderBy, setOrderBy] = useState<OrderBy>('nes_score');
+
+  const handleChangePage = (_event: unknown, newPage: number) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
+
+  const handleRequestSort = (property: OrderBy) => {
+    const isAsc = orderBy === property && order === 'asc';
+    setOrder(isAsc ? 'desc' : 'asc');
+    setOrderBy(property);
+    setPage(0); // Reset to first page when sorting
+  };
+
+  // Enhanced sorting with comprehensive metrics
+  const sortedHypotheses = useMemo(() => {
+    const comparator = (a: PathwayHypothesis, b: PathwayHypothesis) => {
+      let aValue: any;
+      let bValue: any;
+
+      switch (orderBy) {
+        case 'nes_score':
+          // NES scores calculated in backend with log10 transformation
+          aValue = a.nes_score || 0;
+          bValue = b.nes_score || 0;
+          break;
+        case 'p_adj':
+          aValue = a.aggregated_pathway?.pathway?.p_adj || 1;
+          bValue = b.aggregated_pathway?.pathway?.p_adj || 1;
+          break;
+        case 'evidence_count':
+          aValue = a.aggregated_pathway?.pathway?.evidence_genes?.length || 0;
+          bValue = b.aggregated_pathway?.pathway?.evidence_genes?.length || 0;
+          break;
+        case 'cardiac_relevance':
+          // Enhanced cardiovascular relevance calculation
+          aValue = calculateCardiacRelevance(a);
+          bValue = calculateCardiacRelevance(b);
+          break;
+        case 'clinical_significance':
+          aValue = calculateClinicalSignificance(a);
+          bValue = calculateClinicalSignificance(b);
+          break;
+        case 'literature_support':
+          aValue = a.literature_associations?.total_citations || 0;
+          bValue = b.literature_associations?.total_citations || 0;
+          break;
+        case 'tissue_specificity':
+          aValue = calculateTissueSpecificity(a);
+          bValue = calculateTissueSpecificity(b);
+          break;
+        case 'pathway_complexity':
+          aValue = calculatePathwayComplexity(a);
+          bValue = calculatePathwayComplexity(b);
+          break;
+        default:
+          aValue = 0;
+          bValue = 0;
+      }
+
+      if (order === 'desc') {
+        return bValue < aValue ? -1 : bValue > aValue ? 1 : 0;
+      } else {
+        return aValue < bValue ? -1 : aValue > bValue ? 1 : 0;
+      }
+    };
+
+    return [...hypotheses].sort(comparator);
+  }, [hypotheses, order, orderBy]);
+
+  // Enhanced cardiovascular relevance calculation
+  const calculateCardiacRelevance = (hypothesis: PathwayHypothesis): number => {
+    const pathway = hypothesis.aggregated_pathway?.pathway;
+    let score = 0;
+    
+    // Base NES score contribution
+    score += Math.abs(hypothesis.nes_score || 0) * 0.3;
+    
+    // Cardiovascular keyword matching
+    const cardiacKeywords = [
+      'cardiac', 'heart', 'cardiovascular', 'coronary', 'myocardial', 
+      'vascular', 'arterial', 'circulation', 'hypertension', 'atherosclerosis'
+    ];
+    const pathwayName = pathway?.pathway_name?.toLowerCase() || '';
+    const keywordMatches = cardiacKeywords.filter(keyword => pathwayName.includes(keyword)).length;
+    score += keywordMatches * 0.2;
+    
+    // Literature support boost
+    const litSupport = hypothesis.literature_associations?.total_citations || 0;
+    score += Math.min(litSupport / 10, 0.3);
+    
+    // Evidence gene count
+    const evidenceCount = pathway?.evidence_genes?.length || 0;
+    score += Math.min(evidenceCount / 20, 0.2);
+    
+    return Math.min(score, 1.0);
+  };
+
+  // Clinical significance calculation
+  const calculateClinicalSignificance = (hypothesis: PathwayHypothesis): number => {
+    const pValue = hypothesis.aggregated_pathway?.pathway?.p_adj || 1;
+    const nesScore = Math.abs(hypothesis.nes_score || 0);
+    const litSupport = hypothesis.literature_associations?.total_citations || 0;
+    
+    // Combine statistical significance with literature support
+    let clinicalScore = 0;
+    
+    // P-value contribution (lower is better)
+    if (pValue < 0.001) clinicalScore += 0.4;
+    else if (pValue < 0.01) clinicalScore += 0.3;
+    else if (pValue < 0.05) clinicalScore += 0.2;
+    
+    // NES score contribution
+    clinicalScore += Math.min(nesScore / 3, 0.3);
+    
+    // Literature support
+    clinicalScore += Math.min(litSupport / 15, 0.3);
+    
+    return Math.min(clinicalScore, 1.0);
+  };
+
+  // Tissue specificity calculation using GTEx data
+  const calculateTissueSpecificity = (hypothesis: PathwayHypothesis): number => {
+    // Use actual GTEx cardiac specificity ratio from score_components
+    const cardiacSpecificityRatio = hypothesis.score_components?.cardiac_specificity_ratio;
+    
+    if (cardiacSpecificityRatio && cardiacSpecificityRatio > 0) {
+      // Normalize the ratio to 0-1 scale for display
+      // Ratios > 10 are considered highly specific (1.0)
+      // Ratios 1-10 are scaled proportionally
+      // Ratios < 1 are considered non-specific (scaled from 0-0.5)
+      if (cardiacSpecificityRatio >= 10) {
+        return 1.0;
+      } else if (cardiacSpecificityRatio >= 1) {
+        return 0.5 + (cardiacSpecificityRatio - 1) / 18; // Scale 1-10 to 0.5-1.0
+      } else {
+        return cardiacSpecificityRatio / 2; // Scale 0-1 to 0-0.5
+      }
+    }
+    
+    // Fallback to pathway name analysis if GTEx data unavailable
+    const pathwayName = hypothesis.pathway_name?.toLowerCase() || '';
+    const tissueKeywords = ['cardiac', 'myocardial', 'coronary', 'heart'];
+    const matches = tissueKeywords.filter(keyword => pathwayName.includes(keyword)).length;
+    
+    return Math.min(matches * 0.2 + 0.1, 0.6); // Lower baseline without GTEx data
+  };
+
+  // Pathway complexity calculation
+  const calculatePathwayComplexity = (hypothesis: PathwayHypothesis): number => {
+    const evidenceCount = hypothesis.aggregated_pathway?.pathway?.evidence_genes?.length || 0;
+    const seedCount = hypothesis.aggregated_pathway?.contributing_seed_genes?.length || 0;
+    
+    // Normalize complexity score
+    return Math.min((evidenceCount + seedCount) / 30, 1.0);
+  };
+
+  // Paginated results
+  const paginatedHypotheses = sortedHypotheses.slice(
+    page * rowsPerPage,
+    page * rowsPerPage + rowsPerPage
+  );
+
+  const handleViewDetails = (hypothesis: PathwayHypothesis) => {
+    if (analysisId && hypothesis.aggregated_pathway?.pathway?.pathway_id) {
+      navigate(`/detail/${analysisId}/${hypothesis.aggregated_pathway.pathway.pathway_id}`);
+    }
+  };
+
+  const handleExportCSV = () => {
+    // Export ALL hypotheses, not just the current page
+    const csvData = hypotheses.map((hypothesis) => ({
+      pathway_name: hypothesis.aggregated_pathway?.pathway?.pathway_name || hypothesis.pathway_name || 'Unknown',
+      nes_score: hypothesis.nes_score?.toFixed(3) || '0.000',
+      p_adj: hypothesis.aggregated_pathway?.pathway?.p_adj?.toExponential(2) || hypothesis.p_adj?.toExponential(2) || '1.00e+00',
+      cardiac_relevance: (calculateCardiacRelevance(hypothesis) * 100).toFixed(1) + '%',
+      clinical_significance: (calculateClinicalSignificance(hypothesis) * 100).toFixed(1) + '%',
+      evidence_genes: hypothesis.aggregated_pathway?.pathway?.evidence_genes?.length || hypothesis.evidence_count || 0,
+      literature_citations: hypothesis.literature_associations?.total_citations || 0,
+      tissue_specificity: (calculateTissueSpecificity(hypothesis) * 100).toFixed(1) + '%',
+      pathway_complexity: (calculatePathwayComplexity(hypothesis) * 100).toFixed(1) + '%',
+      database: hypothesis.aggregated_pathway?.pathway?.source_db || hypothesis.source_db || 'Unknown',
+      // GTEx tissue expression data
+      gtex_cardiac_specificity_ratio: (hypothesis.score_components as any)?.cardiac_specificity_ratio?.toFixed(2) || 'N/A',
+      gtex_mean_cardiac_tpm: (hypothesis.score_components as any)?.mean_cardiac_tpm?.toFixed(1) || 'N/A',
+      gtex_cardiac_expression_ratio: (hypothesis.score_components as any)?.cardiac_expression_ratio ? 
+        `${((hypothesis.score_components as any).cardiac_expression_ratio * 100).toFixed(1)}%` : 'N/A',
+      gtex_cardiac_expressed_genes: (hypothesis.score_components as any)?.cardiac_expressed_genes?.length || 0,
+      gtex_tissue_validation_passed: (hypothesis.score_components as any)?.tissue_validation_passed ? 'Yes' : 'No',
+    }));
+
+    const csvContent = [
+      Object.keys(csvData[0]).join(','),
+      ...csvData.map(row => Object.values(row).join(','))
+    ].join('\\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `cardioxnet_comprehensive_results_${analysisId || 'export'}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
+  };
+
+  const getCardiacRelevanceColor = (score: number) => {
+    if (score >= 0.7) return 'success';
+    if (score >= 0.4) return 'warning';
+    return 'primary';
+  };
+
+
+
+  const formatPValue = (pValue: number | undefined): string => {
+    if (!pValue) return 'N/A';
+    if (pValue < 0.001) return '< 0.001';
+    if (pValue < 0.01) return pValue.toFixed(4);
+    return pValue.toFixed(3);
+  };
+
+  if (!hypotheses.length) {
+    return (
+      <Paper 
+        elevation={2} 
+        sx={{ 
+          p: 6, 
+          textAlign: 'center',
+          borderRadius: 3,
+          border: '2px solid #E8F5E9',
+        }}
+      >
+        <Box
+          sx={{
+            background: 'linear-gradient(135deg, #E8F5E9 0%, #C8E6C9 100%)',
+            borderRadius: '50%',
+            width: 100,
+            height: 100,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            margin: '0 auto',
+            mb: 3,
+          }}
+        >
+          <Science sx={{ fontSize: 56, color: '#1E6B52' }} />
+        </Box>
+        <Typography variant="h6" sx={{ color: '#1E6B52', fontWeight: 700, mb: 2 }}>
+          No Pathway Analysis Results Available
+        </Typography>
+        <Typography variant="body2" color="text.secondary">
+          No pathway hypotheses were generated for this analysis. This may occur if the input genes did not produce significant pathway enrichment.
+        </Typography>
+      </Paper>
+    );
+  }
+
+  return (
+    <Box>
+      {/* Enhanced Header with Export */}
+      <Box sx={{ mb: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <Stack direction="row" spacing={2} alignItems="center">
+          <Assessment color="primary" />
+          <Typography variant="h5" sx={{ fontWeight: 600, color: '#1E6B52' }}>
+            Comprehensive Pathway Analysis Results
+          </Typography>
+          <Chip 
+            label={`${hypotheses.length} pathways`} 
+            color="primary" 
+            size="small"
+            icon={<TrendingUp />}
+          />
+        </Stack>
+        <Button
+          variant="outlined"
+          startIcon={<Download />}
+          onClick={handleExportCSV}
+          color="primary"
+        >
+          Export CSV
+        </Button>
+      </Box>
+
+      {/* Ultra-Comprehensive Table */}
+      <TableContainer 
+        component={Paper} 
+        elevation={3}
+        sx={{
+          borderRadius: 2,
+          border: '2px solid #E8F5E9',
+          maxHeight: 'calc(100vh - 400px)',
+        }}
+      >
+        <Table size="small" stickyHeader>
+          <TableHead>
+            <TableRow>
+              {headCells.map((headCell) => (
+                <TableCell
+                  key={headCell.id}
+                  align={headCell.align}
+                  style={{ width: headCell.width }}
+                  sx={{ 
+                    bgcolor: 'linear-gradient(135deg, #1E6B52 0%, #145A43 100%)',
+                    background: 'linear-gradient(135deg, #1E6B52 0%, #145A43 100%)',
+                    color: 'white',
+                    fontWeight: 700,
+                    fontSize: '0.85rem',
+                    borderBottom: '3px solid #FFB81C',
+                    py: 2,
+                    position: 'sticky',
+                    top: 0,
+                    zIndex: 100,
+                  }}
+                >
+                  <Tooltip 
+                    title={headCell.tooltip || ''} 
+                    arrow 
+                    placement="top"
+                    sx={{
+                      '& .MuiTooltip-tooltip': {
+                        fontSize: '0.875rem',
+                        maxWidth: 350,
+                        bgcolor: 'rgba(0, 0, 0, 0.9)',
+                      }
+                    }}
+                  >
+                    <Box>
+                      {headCell.id !== 'pathway_name' && headCell.id !== 'database_source' && headCell.id !== 'actions' ? (
+                        <TableSortLabel
+                          active={orderBy === headCell.id}
+                          direction={orderBy === headCell.id ? order : 'asc'}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            e.preventDefault();
+                            handleRequestSort(headCell.id as OrderBy);
+                          }}
+                          sx={{
+                            color: 'white !important',
+                            '& .MuiTableSortLabel-icon': {
+                              color: '#FFB81C !important',
+                            },
+                            '&.Mui-active': {
+                              color: 'white !important',
+                            },
+                            '&:hover': {
+                              color: '#FFB81C !important',
+                            }
+                          }}
+                        >
+                          {headCell.label}
+                        </TableSortLabel>
+                      ) : (
+                        headCell.label
+                      )}
+                    </Box>
+                  </Tooltip>
+                </TableCell>
+              ))}
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {paginatedHypotheses.map((hypothesis, index) => {
+              const pathway = hypothesis.aggregated_pathway?.pathway;
+              const cardiacRelevance = calculateCardiacRelevance(hypothesis);
+              const clinicalSignificance = calculateClinicalSignificance(hypothesis);
+              const tissueSpecificity = calculateTissueSpecificity(hypothesis);
+              const pathwayComplexity = calculatePathwayComplexity(hypothesis);
+
+              return (
+                <TableRow 
+                  key={`${pathway?.pathway_id || index}`}
+                  hover
+                  onClick={() => handleViewDetails(hypothesis)}
+                  sx={{ 
+                    '&:hover': { 
+                      bgcolor: 'rgba(30, 107, 82, 0.05)',
+                      transform: 'scale(1.001)',
+                      transition: 'all 0.2s ease-in-out',
+                    },
+                    cursor: 'pointer',
+                    height: 56,
+                    borderBottom: '1px solid #E8F5E9',
+                  }}
+                >
+                  {/* Pathway Name */}
+                  <TableCell>
+                    <Box>
+                      <Typography variant="body2" sx={{ fontWeight: 600, fontSize: '0.85rem' }}>
+                        {pathway?.pathway_name || 'Unknown Pathway'}
+                      </Typography>
+                      {pathway?.pathway_id && (
+                        <Typography variant="caption" color="text.secondary">
+                          ID: {pathway.pathway_id}
+                        </Typography>
+                      )}
+                    </Box>
+                  </TableCell>
+
+                  {/* NES Score */}
+                  <TableCell align="center">
+                    <Stack spacing={0.5} alignItems="center">
+                      <Typography 
+                        variant="body2" 
+                        sx={{ 
+                          fontWeight: 600,
+                          color: (hypothesis.nes_score || 0) > 0 ? '#1E6B52' : '#d32f2f',
+                          fontSize: '0.9rem'
+                        }}
+                      >
+                        {hypothesis.nes_score?.toFixed(3) || '0.000'}
+                      </Typography>
+                      <LinearProgress
+                        variant="determinate"
+                        value={Math.min(Math.abs(hypothesis.nes_score || 0) * 50, 100)}
+                        sx={{ 
+                          width: 40, 
+                          height: 4,
+                          bgcolor: '#f0f0f0',
+                          '& .MuiLinearProgress-bar': {
+                            bgcolor: (hypothesis.nes_score || 0) > 0 ? '#1E6B52' : '#d32f2f'
+                          }
+                        }}
+                      />
+                    </Stack>
+                  </TableCell>
+
+                  {/* FDR P_adj */}
+                  <TableCell align="center">
+                    <Typography 
+                      variant="body2" 
+                      sx={{ 
+                        fontSize: '0.8rem',
+                        fontWeight: 600,
+                        color: (pathway?.p_adj || 1) < 0.05 ? '#1E6B52' : 'text.secondary',
+                        bgcolor: (pathway?.p_adj || 1) < 0.05 ? 'rgba(30, 107, 82, 0.08)' : 'transparent',
+                        px: 1,
+                        py: 0.5,
+                        borderRadius: 1,
+                        border: (pathway?.p_adj || 1) < 0.05 ? '1px solid #1E6B52' : 'none'
+                      }}
+                    >
+                      {formatPValue(pathway?.p_adj)}
+                    </Typography>
+                  </TableCell>
+
+                  {/* Cardiac Relevance */}
+                  <TableCell align="center">
+                    <Stack spacing={0.5} alignItems="center">
+                      <Chip
+                        label={`${(cardiacRelevance * 100).toFixed(0)}%`}
+                        color={getCardiacRelevanceColor(cardiacRelevance)}
+                        size="small"
+                        icon={<Favorite />}
+                        sx={{ fontSize: '0.75rem', height: 24 }}
+                      />
+                      <LinearProgress
+                        variant="determinate"
+                        value={cardiacRelevance * 100}
+                        color={getCardiacRelevanceColor(cardiacRelevance)}
+                        sx={{ width: 50, height: 3 }}
+                      />
+                    </Stack>
+                  </TableCell>
+
+                  {/* Clinical Impact */}
+                  <TableCell align="center">
+                    <Stack spacing={0.5} alignItems="center">
+                      <Rating
+                        value={clinicalSignificance * 5}
+                        precision={0.5}
+                        size="small"
+                        readOnly
+                        icon={<LocalHospital fontSize="inherit" />}
+                        emptyIcon={<LocalHospital fontSize="inherit" />}
+                        sx={{ fontSize: '1rem' }}
+                      />
+                      <Typography variant="caption" color="text.secondary">
+                        {(clinicalSignificance * 100).toFixed(0)}%
+                      </Typography>
+                    </Stack>
+                  </TableCell>
+
+                  {/* Evidence Genes */}
+                  <TableCell align="center">
+                    <Badge 
+                      badgeContent={pathway?.evidence_genes?.length || 0}
+                      color="primary"
+                      max={999}
+                    >
+                      <BiotechOutlined color="action" />
+                    </Badge>
+                  </TableCell>
+
+                  {/* Literature Support */}
+                  <TableCell align="center">
+                    <Stack spacing={0.5} alignItems="center">
+                      <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                        {hypothesis.literature_associations?.total_citations || 0}
+                      </Typography>
+                      <MenuBook 
+                        fontSize="small" 
+                        color={hypothesis.literature_associations?.total_citations ? 'primary' : 'disabled'}
+                      />
+                    </Stack>
+                  </TableCell>
+
+                  {/* Tissue Specificity */}
+                  <TableCell align="center">
+                    <Tooltip title={
+                      hypothesis.score_components?.cardiac_specificity_ratio 
+                        ? `GTEx Cardiac Specificity: ${hypothesis.score_components.cardiac_specificity_ratio.toFixed(2)}x higher in cardiac tissue` +
+                          (hypothesis.score_components.mean_cardiac_tpm 
+                            ? ` (Mean Cardiac TPM: ${hypothesis.score_components.mean_cardiac_tpm.toFixed(1)})` 
+                            : '') +
+                          (hypothesis.score_components.cardiac_expressed_genes 
+                            ? ` • ${hypothesis.score_components.cardiac_expressed_genes.length} genes with cardiac expression` 
+                            : '')
+                        : "Cardiac specificity based on pathway name analysis"
+                    }>
+                      <Stack spacing={0.5} alignItems="center">
+                        <LinearProgress
+                          variant="determinate"
+                          value={tissueSpecificity * 100}
+                          sx={{ 
+                            width: 60, 
+                            height: 8,
+                            borderRadius: 4,
+                            bgcolor: '#f0f0f0',
+                            '& .MuiLinearProgress-bar': { 
+                              bgcolor: hypothesis.score_components?.cardiac_specificity_ratio ? '#E57373' : '#FFB81C' 
+                            }
+                          }}
+                        />
+                        <Stack direction="row" spacing={0.5} alignItems="center">
+                          <Typography variant="caption" color="text.secondary">
+                            {(tissueSpecificity * 100).toFixed(0)}%
+                          </Typography>
+                          {hypothesis.score_components?.cardiac_specificity_ratio && (
+                            <Favorite fontSize="small" sx={{ color: '#E57373', fontSize: 12 }} />
+                          )}
+                        </Stack>
+                      </Stack>
+                    </Tooltip>
+                  </TableCell>
+
+                  {/* Pathway Complexity */}
+                  <TableCell align="center">
+                    <CircularProgress
+                      variant="determinate"
+                      value={pathwayComplexity * 100}
+                      size={24}
+                      thickness={4}
+                      sx={{ 
+                        color: pathwayComplexity > 0.7 ? '#d32f2f' : pathwayComplexity > 0.4 ? '#FFB81C' : '#1E6B52'
+                      }}
+                    />
+                    <Typography variant="caption" color="text.secondary" display="block">
+                      {(pathwayComplexity * 100).toFixed(0)}%
+                    </Typography>
+                  </TableCell>
+
+                  {/* Database Source */}
+                  <TableCell align="center">
+                    <Chip
+                      label={pathway?.source_db || 'Unknown'}
+                      variant="outlined"
+                      size="small"
+                      sx={{ fontSize: '0.7rem' }}
+                    />
+                  </TableCell>
+
+                  {/* Actions */}
+                  <TableCell align="center" onClick={(e) => e.stopPropagation()}>
+                    <Tooltip title="View detailed analysis">
+                      <IconButton
+                        size="small"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleViewDetails(hypothesis);
+                        }}
+                        disabled={!analysisId || !pathway?.pathway_id}
+                        color="primary"
+                      >
+                        <Visibility />
+                      </IconButton>
+                    </Tooltip>
+                  </TableCell>
+                </TableRow>
+              );
+            })}
+          </TableBody>
+        </Table>
+      </TableContainer>
+
+      {/* Enhanced Pagination */}
+      <TablePagination
+        rowsPerPageOptions={[10, 20, 50, 100]}
+        component="div"
+        count={hypotheses.length}
+        rowsPerPage={rowsPerPage}
+        page={page}
+        onPageChange={handleChangePage}
+        onRowsPerPageChange={handleChangeRowsPerPage}
+        sx={{ borderTop: '1px solid #e0e0e0' }}
+      />
+    </Box>
+  );
+}

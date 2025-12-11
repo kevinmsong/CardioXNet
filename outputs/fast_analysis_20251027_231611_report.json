@@ -1,0 +1,5840 @@
+{
+  "analysis_id": "fast_analysis_20251027_231611",
+  "timestamp": "2025-10-27T23:17:36.734118",
+  "input_summary": {
+    "total_seed_genes": 2,
+    "valid_genes": 2,
+    "invalid_genes": 0,
+    "gene_list": [
+      "SCN5A",
+      "KCNH2"
+    ],
+    "warnings": [],
+    "seed_genes": [
+      "SCN5A",
+      "KCNH2"
+    ]
+  },
+  "stage_1": {
+    "fn_size": 99,
+    "seed_count": 2,
+    "neighbor_count": 97,
+    "contributions": {
+      "SCN5A": 63,
+      "KCNH2": 34
+    }
+  },
+  "stage_2a": {
+    "primary_pathways_count": 1025,
+    "known_pathways_filtered": 13,
+    "top_pathways": [
+      {
+        "name": "regulation of biological quality",
+        "nes": 5330.0,
+        "p_adj": 1.8898976003213876e-54
+      },
+      {
+        "name": "system process",
+        "nes": 4875.0,
+        "p_adj": 3.2582968646098472e-52
+      },
+      {
+        "name": "monoatomic ion transport",
+        "nes": 4550.0,
+        "p_adj": 2.0797741761723096e-62
+      },
+      {
+        "name": "blood circulation",
+        "nes": 4485.0,
+        "p_adj": 2.3662085492137613e-88
+      },
+      {
+        "name": "circulatory system process",
+        "nes": 4485.0,
+        "p_adj": 9.014575590362287e-84
+      }
+    ]
+  },
+  "stage_2b": {
+    "total_secondary_pathways": 1199,
+    "union_genes_processed": 0,
+    "genes_successfully_processed": 0,
+    "literature_stats": {
+      "primaries_processed": 20,
+      "total_secondaries": 16032,
+      "unique_secondaries": 1199
+    }
+  },
+  "stage_2c": {
+    "final_pathways_count": 1199,
+    "aggregation_strategy": "rigorous_statistical",
+    "min_support_threshold": 1
+  },
+  "stage_3": {
+    "total_hypotheses": 106,
+    "top_nes_score": 4.078945939468641
+  },
+  "stage_4_topology": {
+    "GO:0065008": {
+      "key_nodes_count": 10,
+      "top_key_nodes": [
+        {
+          "gene": "SCN5A",
+          "centrality": 0.4054180963766816,
+          "role": "hub"
+        },
+        {
+          "gene": "KCNH2",
+          "centrality": 0.1611384313484995,
+          "role": "connector"
+        },
+        {
+          "gene": "CALM3",
+          "centrality": 0.03169737598671892,
+          "role": "connector"
+        },
+        {
+          "gene": "CACNA1C",
+          "centrality": 0.030315013549312694,
+          "role": "connector"
+        },
+        {
+          "gene": "SCN4B",
+          "centrality": 0.02227777177947051,
+          "role": "mediator"
+        }
+      ]
+    },
+    "GO:0065007": {
+      "key_nodes_count": 10,
+      "top_key_nodes": [
+        {
+          "gene": "SCN5A",
+          "centrality": 0.4054180963766816,
+          "role": "hub"
+        },
+        {
+          "gene": "KCNH2",
+          "centrality": 0.1611384313484995,
+          "role": "connector"
+        },
+        {
+          "gene": "CALM3",
+          "centrality": 0.03169737598671892,
+          "role": "connector"
+        },
+        {
+          "gene": "CACNA1C",
+          "centrality": 0.030315013549312694,
+          "role": "connector"
+        },
+        {
+          "gene": "SCN4B",
+          "centrality": 0.02227777177947051,
+          "role": "mediator"
+        }
+      ]
+    },
+    "GO:0032501": {
+      "key_nodes_count": 10,
+      "top_key_nodes": [
+        {
+          "gene": "SCN5A",
+          "centrality": 0.4054180963766816,
+          "role": "hub"
+        },
+        {
+          "gene": "KCNH2",
+          "centrality": 0.1611384313484995,
+          "role": "connector"
+        },
+        {
+          "gene": "CALM3",
+          "centrality": 0.03169737598671892,
+          "role": "connector"
+        },
+        {
+          "gene": "CACNA1C",
+          "centrality": 0.030315013549312694,
+          "role": "connector"
+        },
+        {
+          "gene": "SCN4B",
+          "centrality": 0.02227777177947051,
+          "role": "mediator"
+        }
+      ]
+    },
+    "GO:0003008": {
+      "key_nodes_count": 10,
+      "top_key_nodes": [
+        {
+          "gene": "SCN5A",
+          "centrality": 0.4054180963766816,
+          "role": "hub"
+        },
+        {
+          "gene": "KCNH2",
+          "centrality": 0.1611384313484995,
+          "role": "connector"
+        },
+        {
+          "gene": "CALM3",
+          "centrality": 0.03169737598671892,
+          "role": "connector"
+        },
+        {
+          "gene": "CACNA1C",
+          "centrality": 0.030315013549312694,
+          "role": "connector"
+        },
+        {
+          "gene": "SCN4B",
+          "centrality": 0.02227777177947051,
+          "role": "mediator"
+        }
+      ]
+    },
+    "GO:0051179": {
+      "key_nodes_count": 10,
+      "top_key_nodes": [
+        {
+          "gene": "SCN5A",
+          "centrality": 0.4054180963766816,
+          "role": "hub"
+        },
+        {
+          "gene": "KCNH2",
+          "centrality": 0.1611384313484995,
+          "role": "connector"
+        },
+        {
+          "gene": "CALM3",
+          "centrality": 0.03169737598671892,
+          "role": "connector"
+        },
+        {
+          "gene": "CACNA1C",
+          "centrality": 0.030315013549312694,
+          "role": "connector"
+        },
+        {
+          "gene": "SCN4B",
+          "centrality": 0.02227777177947051,
+          "role": "mediator"
+        }
+      ]
+    },
+    "GO:0006810": {
+      "key_nodes_count": 10,
+      "top_key_nodes": [
+        {
+          "gene": "SCN5A",
+          "centrality": 0.4054180963766816,
+          "role": "hub"
+        },
+        {
+          "gene": "KCNH2",
+          "centrality": 0.1611384313484995,
+          "role": "connector"
+        },
+        {
+          "gene": "CALM3",
+          "centrality": 0.03169737598671892,
+          "role": "connector"
+        },
+        {
+          "gene": "CACNA1C",
+          "centrality": 0.030315013549312694,
+          "role": "connector"
+        },
+        {
+          "gene": "SCN4B",
+          "centrality": 0.02227777177947051,
+          "role": "mediator"
+        }
+      ]
+    },
+    "GO:0051234": {
+      "key_nodes_count": 10,
+      "top_key_nodes": [
+        {
+          "gene": "SCN5A",
+          "centrality": 0.4054180963766816,
+          "role": "hub"
+        },
+        {
+          "gene": "KCNH2",
+          "centrality": 0.1611384313484995,
+          "role": "connector"
+        },
+        {
+          "gene": "CALM3",
+          "centrality": 0.03169737598671892,
+          "role": "connector"
+        },
+        {
+          "gene": "CACNA1C",
+          "centrality": 0.030315013549312694,
+          "role": "connector"
+        },
+        {
+          "gene": "SCN4B",
+          "centrality": 0.02227777177947051,
+          "role": "mediator"
+        }
+      ]
+    },
+    "GO:0006811": {
+      "key_nodes_count": 10,
+      "top_key_nodes": [
+        {
+          "gene": "SCN5A",
+          "centrality": 0.4054180963766816,
+          "role": "hub"
+        },
+        {
+          "gene": "KCNH2",
+          "centrality": 0.1611384313484995,
+          "role": "connector"
+        },
+        {
+          "gene": "CALM3",
+          "centrality": 0.03169737598671892,
+          "role": "connector"
+        },
+        {
+          "gene": "CACNA1C",
+          "centrality": 0.030315013549312694,
+          "role": "connector"
+        },
+        {
+          "gene": "SCN4B",
+          "centrality": 0.02227777177947051,
+          "role": "mediator"
+        }
+      ]
+    },
+    "GO:0008015": {
+      "key_nodes_count": 10,
+      "top_key_nodes": [
+        {
+          "gene": "SCN5A",
+          "centrality": 0.4054180963766816,
+          "role": "hub"
+        },
+        {
+          "gene": "KCNH2",
+          "centrality": 0.1611384313484995,
+          "role": "connector"
+        },
+        {
+          "gene": "CALM3",
+          "centrality": 0.03169737598671892,
+          "role": "connector"
+        },
+        {
+          "gene": "CACNA1C",
+          "centrality": 0.030315013549312694,
+          "role": "connector"
+        },
+        {
+          "gene": "SCN4B",
+          "centrality": 0.02227777177947051,
+          "role": "mediator"
+        }
+      ]
+    },
+    "GO:0003013": {
+      "key_nodes_count": 10,
+      "top_key_nodes": [
+        {
+          "gene": "SCN5A",
+          "centrality": 0.4054180963766816,
+          "role": "hub"
+        },
+        {
+          "gene": "KCNH2",
+          "centrality": 0.1611384313484995,
+          "role": "connector"
+        },
+        {
+          "gene": "CALM3",
+          "centrality": 0.03169737598671892,
+          "role": "connector"
+        },
+        {
+          "gene": "CACNA1C",
+          "centrality": 0.030315013549312694,
+          "role": "connector"
+        },
+        {
+          "gene": "SCN4B",
+          "centrality": 0.02227777177947051,
+          "role": "mediator"
+        }
+      ]
+    },
+    "GO:0030001": {
+      "key_nodes_count": 10,
+      "top_key_nodes": [
+        {
+          "gene": "SCN5A",
+          "centrality": 0.4054180963766816,
+          "role": "hub"
+        },
+        {
+          "gene": "KCNH2",
+          "centrality": 0.1611384313484995,
+          "role": "connector"
+        },
+        {
+          "gene": "CALM3",
+          "centrality": 0.03169737598671892,
+          "role": "connector"
+        },
+        {
+          "gene": "CACNA1C",
+          "centrality": 0.030315013549312694,
+          "role": "connector"
+        },
+        {
+          "gene": "SCN4B",
+          "centrality": 0.02227777177947051,
+          "role": "mediator"
+        }
+      ]
+    },
+    "GO:0006812": {
+      "key_nodes_count": 10,
+      "top_key_nodes": [
+        {
+          "gene": "SCN5A",
+          "centrality": 0.4054180963766816,
+          "role": "hub"
+        },
+        {
+          "gene": "KCNH2",
+          "centrality": 0.1611384313484995,
+          "role": "connector"
+        },
+        {
+          "gene": "CALM3",
+          "centrality": 0.03169737598671892,
+          "role": "connector"
+        },
+        {
+          "gene": "CACNA1C",
+          "centrality": 0.030315013549312694,
+          "role": "connector"
+        },
+        {
+          "gene": "SCN4B",
+          "centrality": 0.02227777177947051,
+          "role": "mediator"
+        }
+      ]
+    },
+    "GO:0055085": {
+      "key_nodes_count": 10,
+      "top_key_nodes": [
+        {
+          "gene": "SCN5A",
+          "centrality": 0.4054180963766816,
+          "role": "hub"
+        },
+        {
+          "gene": "KCNH2",
+          "centrality": 0.1611384313484995,
+          "role": "connector"
+        },
+        {
+          "gene": "CALM3",
+          "centrality": 0.03169737598671892,
+          "role": "connector"
+        },
+        {
+          "gene": "CACNA1C",
+          "centrality": 0.030315013549312694,
+          "role": "connector"
+        },
+        {
+          "gene": "SCN4B",
+          "centrality": 0.02227777177947051,
+          "role": "mediator"
+        }
+      ]
+    },
+    "GO:0060047": {
+      "key_nodes_count": 10,
+      "top_key_nodes": [
+        {
+          "gene": "SCN5A",
+          "centrality": 0.4054180963766816,
+          "role": "hub"
+        },
+        {
+          "gene": "KCNH2",
+          "centrality": 0.1611384313484995,
+          "role": "connector"
+        },
+        {
+          "gene": "CALM3",
+          "centrality": 0.03169737598671892,
+          "role": "connector"
+        },
+        {
+          "gene": "CACNA1C",
+          "centrality": 0.030315013549312694,
+          "role": "connector"
+        },
+        {
+          "gene": "SCN4B",
+          "centrality": 0.02227777177947051,
+          "role": "mediator"
+        }
+      ]
+    },
+    "GO:0003015": {
+      "key_nodes_count": 10,
+      "top_key_nodes": [
+        {
+          "gene": "SCN5A",
+          "centrality": 0.4054180963766816,
+          "role": "hub"
+        },
+        {
+          "gene": "KCNH2",
+          "centrality": 0.1611384313484995,
+          "role": "connector"
+        },
+        {
+          "gene": "CALM3",
+          "centrality": 0.03169737598671892,
+          "role": "connector"
+        },
+        {
+          "gene": "CACNA1C",
+          "centrality": 0.030315013549312694,
+          "role": "connector"
+        },
+        {
+          "gene": "SCN4B",
+          "centrality": 0.02227777177947051,
+          "role": "mediator"
+        }
+      ]
+    },
+    "GO:0034220": {
+      "key_nodes_count": 10,
+      "top_key_nodes": [
+        {
+          "gene": "SCN5A",
+          "centrality": 0.4054180963766816,
+          "role": "hub"
+        },
+        {
+          "gene": "KCNH2",
+          "centrality": 0.1611384313484995,
+          "role": "connector"
+        },
+        {
+          "gene": "CALM3",
+          "centrality": 0.03169737598671892,
+          "role": "connector"
+        },
+        {
+          "gene": "CACNA1C",
+          "centrality": 0.030315013549312694,
+          "role": "connector"
+        },
+        {
+          "gene": "SCN4B",
+          "centrality": 0.02227777177947051,
+          "role": "mediator"
+        }
+      ]
+    },
+    "GO:0003012": {
+      "key_nodes_count": 10,
+      "top_key_nodes": [
+        {
+          "gene": "SCN5A",
+          "centrality": 0.4054180963766816,
+          "role": "hub"
+        },
+        {
+          "gene": "KCNH2",
+          "centrality": 0.1611384313484995,
+          "role": "connector"
+        },
+        {
+          "gene": "CALM3",
+          "centrality": 0.03169737598671892,
+          "role": "connector"
+        },
+        {
+          "gene": "CACNA1C",
+          "centrality": 0.030315013549312694,
+          "role": "connector"
+        },
+        {
+          "gene": "SCN4B",
+          "centrality": 0.02227777177947051,
+          "role": "mediator"
+        }
+      ]
+    },
+    "GO:0098662": {
+      "key_nodes_count": 10,
+      "top_key_nodes": [
+        {
+          "gene": "SCN5A",
+          "centrality": 0.4054180963766816,
+          "role": "hub"
+        },
+        {
+          "gene": "KCNH2",
+          "centrality": 0.1611384313484995,
+          "role": "connector"
+        },
+        {
+          "gene": "CALM3",
+          "centrality": 0.03169737598671892,
+          "role": "connector"
+        },
+        {
+          "gene": "CACNA1C",
+          "centrality": 0.030315013549312694,
+          "role": "connector"
+        },
+        {
+          "gene": "SCN4B",
+          "centrality": 0.02227777177947051,
+          "role": "mediator"
+        }
+      ]
+    },
+    "GO:0098655": {
+      "key_nodes_count": 10,
+      "top_key_nodes": [
+        {
+          "gene": "SCN5A",
+          "centrality": 0.4054180963766816,
+          "role": "hub"
+        },
+        {
+          "gene": "KCNH2",
+          "centrality": 0.1611384313484995,
+          "role": "connector"
+        },
+        {
+          "gene": "CALM3",
+          "centrality": 0.03169737598671892,
+          "role": "connector"
+        },
+        {
+          "gene": "CACNA1C",
+          "centrality": 0.030315013549312694,
+          "role": "connector"
+        },
+        {
+          "gene": "SCN4B",
+          "centrality": 0.02227777177947051,
+          "role": "mediator"
+        }
+      ]
+    },
+    "GO:0098660": {
+      "key_nodes_count": 10,
+      "top_key_nodes": [
+        {
+          "gene": "SCN5A",
+          "centrality": 0.4054180963766816,
+          "role": "hub"
+        },
+        {
+          "gene": "KCNH2",
+          "centrality": 0.1611384313484995,
+          "role": "connector"
+        },
+        {
+          "gene": "CALM3",
+          "centrality": 0.03169737598671892,
+          "role": "connector"
+        },
+        {
+          "gene": "CACNA1C",
+          "centrality": 0.030315013549312694,
+          "role": "connector"
+        },
+        {
+          "gene": "SCN4B",
+          "centrality": 0.02227777177947051,
+          "role": "mediator"
+        }
+      ]
+    }
+  },
+  "stage_4_literature": {
+    "GO:0065008": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "37651922",
+          "title": "Maturation of iPSC-derived cardiomyocytes in a heart-on-a-chip device enables modeling of dilated cardiomyopathy caused by R222Q-SCN5A mutation.",
+          "year": 2023,
+          "relevance": 0.5333333333333333
+        },
+        {
+          "pmid": "37122208",
+          "title": "<i>SCN5A</i> channelopathy: arrhythmia, cardiomyopathy, epilepsy and beyond.",
+          "year": 2023,
+          "relevance": 0.475
+        },
+        {
+          "pmid": "33517668",
+          "title": "Common Variants in <i>KCNE1, KCNH2</i>, and <i>SCN5A</i> May Impact Cardiac Arrhythmia Risk.",
+          "year": 2021,
+          "relevance": 0.4666666666666667
+        }
+      ]
+    },
+    "GO:0065007": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "37651922",
+          "title": "Maturation of iPSC-derived cardiomyocytes in a heart-on-a-chip device enables modeling of dilated cardiomyopathy caused by R222Q-SCN5A mutation.",
+          "year": 2023,
+          "relevance": 0.6583333333333333
+        },
+        {
+          "pmid": "33990324",
+          "title": "Cardiac cell type-specific gene regulatory programs and disease risk association.",
+          "year": 2021,
+          "relevance": 0.6
+        },
+        {
+          "pmid": "31696929",
+          "title": "Variant frequencies of KCNQ1, KCNH2, and SCN5A in a Chinese inherited arrhythmia cohort and other disease cohorts undergoing genetic testing.",
+          "year": 2020,
+          "relevance": 0.5333333333333333
+        }
+      ]
+    },
+    "GO:0032501": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "31696929",
+          "title": "Variant frequencies of KCNQ1, KCNH2, and SCN5A in a Chinese inherited arrhythmia cohort and other disease cohorts undergoing genetic testing.",
+          "year": 2020,
+          "relevance": 0.5333333333333333
+        },
+        {
+          "pmid": "37816059",
+          "title": "Pairwise biosynthesis of ion channels stabilizes excitability and mitigates arrhythmias.",
+          "year": 2023,
+          "relevance": 0.5333333333333333
+        },
+        {
+          "pmid": "37449562",
+          "title": "Screening for Rare Coding Variants That Associate With the QTc Interval in Iceland.",
+          "year": 2023,
+          "relevance": 0.5333333333333333
+        }
+      ]
+    },
+    "GO:0003008": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "37651922",
+          "title": "Maturation of iPSC-derived cardiomyocytes in a heart-on-a-chip device enables modeling of dilated cardiomyopathy caused by R222Q-SCN5A mutation.",
+          "year": 2023,
+          "relevance": 0.5333333333333333
+        },
+        {
+          "pmid": "36388958",
+          "title": "Direct reprogramming of cardiomyocytes into cardiac Purkinje-like cells.",
+          "year": 2022,
+          "relevance": 0.5333333333333333
+        },
+        {
+          "pmid": "31696929",
+          "title": "Variant frequencies of KCNQ1, KCNH2, and SCN5A in a Chinese inherited arrhythmia cohort and other disease cohorts undergoing genetic testing.",
+          "year": 2020,
+          "relevance": 0.5333333333333333
+        }
+      ]
+    },
+    "GO:0051179": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "37816059",
+          "title": "Pairwise biosynthesis of ion channels stabilizes excitability and mitigates arrhythmias.",
+          "year": 2023,
+          "relevance": 0.7833333333333333
+        },
+        {
+          "pmid": "40423607",
+          "title": "Molecular and functional characterization of DENND3 as a novel regulator of ion channel trafficking.",
+          "year": 2025,
+          "relevance": 0.75
+        },
+        {
+          "pmid": "36626562",
+          "title": "<i>KCNH2</i> encodes a nuclear-targeted polypeptide that mediates hERG1 channel gating and expression.",
+          "year": 2023,
+          "relevance": 0.5583333333333333
+        }
+      ]
+    },
+    "GO:0006810": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "31696929",
+          "title": "Variant frequencies of KCNQ1, KCNH2, and SCN5A in a Chinese inherited arrhythmia cohort and other disease cohorts undergoing genetic testing.",
+          "year": 2020,
+          "relevance": 0.5333333333333333
+        },
+        {
+          "pmid": "37816059",
+          "title": "Pairwise biosynthesis of ion channels stabilizes excitability and mitigates arrhythmias.",
+          "year": 2023,
+          "relevance": 0.5333333333333333
+        },
+        {
+          "pmid": "40423607",
+          "title": "Molecular and functional characterization of DENND3 as a novel regulator of ion channel trafficking.",
+          "year": 2025,
+          "relevance": 0.5
+        }
+      ]
+    },
+    "GO:0051234": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "37122208",
+          "title": "<i>SCN5A</i> channelopathy: arrhythmia, cardiomyopathy, epilepsy and beyond.",
+          "year": 2023,
+          "relevance": 0.475
+        },
+        {
+          "pmid": "33517668",
+          "title": "Common Variants in <i>KCNE1, KCNH2</i>, and <i>SCN5A</i> May Impact Cardiac Arrhythmia Risk.",
+          "year": 2021,
+          "relevance": 0.4666666666666667
+        },
+        {
+          "pmid": "37651922",
+          "title": "Maturation of iPSC-derived cardiomyocytes in a heart-on-a-chip device enables modeling of dilated cardiomyopathy caused by R222Q-SCN5A mutation.",
+          "year": 2023,
+          "relevance": 0.4083333333333333
+        }
+      ]
+    },
+    "GO:0006811": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "39865220",
+          "title": "Clinical relevance of macromolecular complexes involving integrins, potassium and sodium ion channels and the sodium/proton antiporter in human breast cancer.",
+          "year": 2025,
+          "relevance": 0.5499999999999999
+        },
+        {
+          "pmid": "37816059",
+          "title": "Pairwise biosynthesis of ion channels stabilizes excitability and mitigates arrhythmias.",
+          "year": 2023,
+          "relevance": 0.5333333333333333
+        },
+        {
+          "pmid": "31696929",
+          "title": "Variant frequencies of KCNQ1, KCNH2, and SCN5A in a Chinese inherited arrhythmia cohort and other disease cohorts undergoing genetic testing.",
+          "year": 2020,
+          "relevance": 0.5333333333333333
+        }
+      ]
+    },
+    "GO:0008015": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "31696929",
+          "title": "Variant frequencies of KCNQ1, KCNH2, and SCN5A in a Chinese inherited arrhythmia cohort and other disease cohorts undergoing genetic testing.",
+          "year": 2020,
+          "relevance": 0.5333333333333333
+        },
+        {
+          "pmid": "37816059",
+          "title": "Pairwise biosynthesis of ion channels stabilizes excitability and mitigates arrhythmias.",
+          "year": 2023,
+          "relevance": 0.5333333333333333
+        },
+        {
+          "pmid": "37449562",
+          "title": "Screening for Rare Coding Variants That Associate With the QTc Interval in Iceland.",
+          "year": 2023,
+          "relevance": 0.5333333333333333
+        }
+      ]
+    },
+    "GO:0003013": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "31696929",
+          "title": "Variant frequencies of KCNQ1, KCNH2, and SCN5A in a Chinese inherited arrhythmia cohort and other disease cohorts undergoing genetic testing.",
+          "year": 2020,
+          "relevance": 0.5333333333333333
+        },
+        {
+          "pmid": "37816059",
+          "title": "Pairwise biosynthesis of ion channels stabilizes excitability and mitigates arrhythmias.",
+          "year": 2023,
+          "relevance": 0.5333333333333333
+        },
+        {
+          "pmid": "37449562",
+          "title": "Screening for Rare Coding Variants That Associate With the QTc Interval in Iceland.",
+          "year": 2023,
+          "relevance": 0.5333333333333333
+        }
+      ]
+    },
+    "GO:0030001": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "39865220",
+          "title": "Clinical relevance of macromolecular complexes involving integrins, potassium and sodium ion channels and the sodium/proton antiporter in human breast cancer.",
+          "year": 2025,
+          "relevance": 0.5499999999999999
+        },
+        {
+          "pmid": "37816059",
+          "title": "Pairwise biosynthesis of ion channels stabilizes excitability and mitigates arrhythmias.",
+          "year": 2023,
+          "relevance": 0.5333333333333333
+        },
+        {
+          "pmid": "31696929",
+          "title": "Variant frequencies of KCNQ1, KCNH2, and SCN5A in a Chinese inherited arrhythmia cohort and other disease cohorts undergoing genetic testing.",
+          "year": 2020,
+          "relevance": 0.5333333333333333
+        }
+      ]
+    },
+    "GO:0006812": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "31696929",
+          "title": "Variant frequencies of KCNQ1, KCNH2, and SCN5A in a Chinese inherited arrhythmia cohort and other disease cohorts undergoing genetic testing.",
+          "year": 2020,
+          "relevance": 0.6166666666666666
+        },
+        {
+          "pmid": "37449562",
+          "title": "Screening for Rare Coding Variants That Associate With the QTc Interval in Iceland.",
+          "year": 2023,
+          "relevance": 0.6166666666666666
+        },
+        {
+          "pmid": "33990324",
+          "title": "Cardiac cell type-specific gene regulatory programs and disease risk association.",
+          "year": 2021,
+          "relevance": 0.5583333333333333
+        }
+      ]
+    },
+    "GO:0055085": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "31696929",
+          "title": "Variant frequencies of KCNQ1, KCNH2, and SCN5A in a Chinese inherited arrhythmia cohort and other disease cohorts undergoing genetic testing.",
+          "year": 2020,
+          "relevance": 0.5333333333333333
+        },
+        {
+          "pmid": "37816059",
+          "title": "Pairwise biosynthesis of ion channels stabilizes excitability and mitigates arrhythmias.",
+          "year": 2023,
+          "relevance": 0.5333333333333333
+        },
+        {
+          "pmid": "37449562",
+          "title": "Screening for Rare Coding Variants That Associate With the QTc Interval in Iceland.",
+          "year": 2023,
+          "relevance": 0.5333333333333333
+        }
+      ]
+    },
+    "GO:0060047": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "37122208",
+          "title": "<i>SCN5A</i> channelopathy: arrhythmia, cardiomyopathy, epilepsy and beyond.",
+          "year": 2023,
+          "relevance": 0.6
+        },
+        {
+          "pmid": "32046907",
+          "title": "Direct and Indirect Suppression of Scn5a Gene Expression Mediates Cardiac Na<sup>+</sup> Channel Inhibition by Wnt Signalling.",
+          "year": 2020,
+          "relevance": 0.6
+        },
+        {
+          "pmid": "37651922",
+          "title": "Maturation of iPSC-derived cardiomyocytes in a heart-on-a-chip device enables modeling of dilated cardiomyopathy caused by R222Q-SCN5A mutation.",
+          "year": 2023,
+          "relevance": 0.5333333333333333
+        }
+      ]
+    },
+    "GO:0003015": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "37651922",
+          "title": "Maturation of iPSC-derived cardiomyocytes in a heart-on-a-chip device enables modeling of dilated cardiomyopathy caused by R222Q-SCN5A mutation.",
+          "year": 2023,
+          "relevance": 0.6583333333333333
+        },
+        {
+          "pmid": "37122208",
+          "title": "<i>SCN5A</i> channelopathy: arrhythmia, cardiomyopathy, epilepsy and beyond.",
+          "year": 2023,
+          "relevance": 0.6
+        },
+        {
+          "pmid": "32046907",
+          "title": "Direct and Indirect Suppression of Scn5a Gene Expression Mediates Cardiac Na<sup>+</sup> Channel Inhibition by Wnt Signalling.",
+          "year": 2020,
+          "relevance": 0.6
+        }
+      ]
+    },
+    "GO:0034220": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "37816059",
+          "title": "Pairwise biosynthesis of ion channels stabilizes excitability and mitigates arrhythmias.",
+          "year": 2023,
+          "relevance": 0.5333333333333333
+        },
+        {
+          "pmid": "31696929",
+          "title": "Variant frequencies of KCNQ1, KCNH2, and SCN5A in a Chinese inherited arrhythmia cohort and other disease cohorts undergoing genetic testing.",
+          "year": 2020,
+          "relevance": 0.5333333333333333
+        },
+        {
+          "pmid": "37449562",
+          "title": "Screening for Rare Coding Variants That Associate With the QTc Interval in Iceland.",
+          "year": 2023,
+          "relevance": 0.5333333333333333
+        }
+      ]
+    },
+    "GO:0003012": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "31696929",
+          "title": "Variant frequencies of KCNQ1, KCNH2, and SCN5A in a Chinese inherited arrhythmia cohort and other disease cohorts undergoing genetic testing.",
+          "year": 2020,
+          "relevance": 0.5333333333333333
+        },
+        {
+          "pmid": "37816059",
+          "title": "Pairwise biosynthesis of ion channels stabilizes excitability and mitigates arrhythmias.",
+          "year": 2023,
+          "relevance": 0.5333333333333333
+        },
+        {
+          "pmid": "37449562",
+          "title": "Screening for Rare Coding Variants That Associate With the QTc Interval in Iceland.",
+          "year": 2023,
+          "relevance": 0.5333333333333333
+        }
+      ]
+    },
+    "GO:0098662": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "31696929",
+          "title": "Variant frequencies of KCNQ1, KCNH2, and SCN5A in a Chinese inherited arrhythmia cohort and other disease cohorts undergoing genetic testing.",
+          "year": 2020,
+          "relevance": 0.5958333333333333
+        },
+        {
+          "pmid": "37449562",
+          "title": "Screening for Rare Coding Variants That Associate With the QTc Interval in Iceland.",
+          "year": 2023,
+          "relevance": 0.5958333333333333
+        },
+        {
+          "pmid": "37816059",
+          "title": "Pairwise biosynthesis of ion channels stabilizes excitability and mitigates arrhythmias.",
+          "year": 2023,
+          "relevance": 0.5333333333333333
+        }
+      ]
+    },
+    "GO:0098655": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "31696929",
+          "title": "Variant frequencies of KCNQ1, KCNH2, and SCN5A in a Chinese inherited arrhythmia cohort and other disease cohorts undergoing genetic testing.",
+          "year": 2020,
+          "relevance": 0.5958333333333333
+        },
+        {
+          "pmid": "37449562",
+          "title": "Screening for Rare Coding Variants That Associate With the QTc Interval in Iceland.",
+          "year": 2023,
+          "relevance": 0.5958333333333333
+        },
+        {
+          "pmid": "37816059",
+          "title": "Pairwise biosynthesis of ion channels stabilizes excitability and mitigates arrhythmias.",
+          "year": 2023,
+          "relevance": 0.5333333333333333
+        }
+      ]
+    },
+    "GO:0098660": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "37816059",
+          "title": "Pairwise biosynthesis of ion channels stabilizes excitability and mitigates arrhythmias.",
+          "year": 2023,
+          "relevance": 0.5333333333333333
+        },
+        {
+          "pmid": "31696929",
+          "title": "Variant frequencies of KCNQ1, KCNH2, and SCN5A in a Chinese inherited arrhythmia cohort and other disease cohorts undergoing genetic testing.",
+          "year": 2020,
+          "relevance": 0.5333333333333333
+        },
+        {
+          "pmid": "37449562",
+          "title": "Screening for Rare Coding Variants That Associate With the QTc Interval in Iceland.",
+          "year": 2023,
+          "relevance": 0.5333333333333333
+        }
+      ]
+    }
+  },
+  "ranked_hypotheses": [
+    {
+      "rank": 1,
+      "pathway_id": "GO:0065008",
+      "pathway_name": "regulation of biological quality",
+      "source_db": "GO:BP",
+      "nes_score": 4.078945939468641,
+      "p_adj": 0.0,
+      "evidence_count": 82,
+      "support_count": 20,
+      "seed_genes": [],
+      "literature_support": false,
+      "citations": [
+        {
+          "pmid": "37651922",
+          "title": "Maturation of iPSC-derived cardiomyocytes in a heart-on-a-chip device enables modeling of dilated cardiomyopathy caused by R222Q-SCN5A mutation.",
+          "year": 2023,
+          "relevance": 0.5333333333333333
+        },
+        {
+          "pmid": "37122208",
+          "title": "<i>SCN5A</i> channelopathy: arrhythmia, cardiomyopathy, epilepsy and beyond.",
+          "year": 2023,
+          "relevance": 0.475
+        },
+        {
+          "pmid": "33517668",
+          "title": "Common Variants in <i>KCNE1, KCNH2</i>, and <i>SCN5A</i> May Impact Cardiac Arrhythmia Risk.",
+          "year": 2021,
+          "relevance": 0.4666666666666667
+        }
+      ],
+      "citation_count": 25,
+      "key_nodes": [
+        {
+          "gene": "SCN5A",
+          "centrality": 0.4054180963766816,
+          "role": "hub"
+        },
+        {
+          "gene": "KCNH2",
+          "centrality": 0.1611384313484995,
+          "role": "connector"
+        },
+        {
+          "gene": "CALM3",
+          "centrality": 0.03169737598671892,
+          "role": "connector"
+        }
+      ],
+      "source_primaries": [
+        "GO:0065008",
+        "GO:0003008",
+        "GO:0006811",
+        "GO:0008015",
+        "GO:0003013",
+        "GO:0030001",
+        "GO:0006812",
+        "GO:0055085",
+        "GO:0060047",
+        "GO:0003015",
+        "GO:0034220",
+        "GO:0003012",
+        "GO:0098662",
+        "GO:0098655",
+        "GO:0098660",
+        "GO:0006936",
+        "GO:0044057",
+        "GO:0042391",
+        "GO:0060048",
+        "GO:0006941"
+      ]
+    },
+    {
+      "rank": 2,
+      "pathway_id": "GO:0065007",
+      "pathway_name": "biological regulation",
+      "source_db": "GO:BP",
+      "nes_score": 4.078945939468641,
+      "p_adj": 0.0,
+      "evidence_count": 82,
+      "support_count": 20,
+      "seed_genes": [],
+      "literature_support": false,
+      "citations": [
+        {
+          "pmid": "37651922",
+          "title": "Maturation of iPSC-derived cardiomyocytes in a heart-on-a-chip device enables modeling of dilated cardiomyopathy caused by R222Q-SCN5A mutation.",
+          "year": 2023,
+          "relevance": 0.6583333333333333
+        },
+        {
+          "pmid": "33990324",
+          "title": "Cardiac cell type-specific gene regulatory programs and disease risk association.",
+          "year": 2021,
+          "relevance": 0.6
+        },
+        {
+          "pmid": "31696929",
+          "title": "Variant frequencies of KCNQ1, KCNH2, and SCN5A in a Chinese inherited arrhythmia cohort and other disease cohorts undergoing genetic testing.",
+          "year": 2020,
+          "relevance": 0.5333333333333333
+        }
+      ],
+      "citation_count": 25,
+      "key_nodes": [
+        {
+          "gene": "SCN5A",
+          "centrality": 0.4054180963766816,
+          "role": "hub"
+        },
+        {
+          "gene": "KCNH2",
+          "centrality": 0.1611384313484995,
+          "role": "connector"
+        },
+        {
+          "gene": "CALM3",
+          "centrality": 0.03169737598671892,
+          "role": "connector"
+        }
+      ],
+      "source_primaries": [
+        "GO:0065008",
+        "GO:0003008",
+        "GO:0006811",
+        "GO:0008015",
+        "GO:0003013",
+        "GO:0030001",
+        "GO:0006812",
+        "GO:0055085",
+        "GO:0060047",
+        "GO:0003015",
+        "GO:0034220",
+        "GO:0003012",
+        "GO:0098662",
+        "GO:0098655",
+        "GO:0098660",
+        "GO:0006936",
+        "GO:0044057",
+        "GO:0042391",
+        "GO:0060048",
+        "GO:0006941"
+      ]
+    },
+    {
+      "rank": 3,
+      "pathway_id": "GO:0032501",
+      "pathway_name": "multicellular organismal process",
+      "source_db": "GO:BP",
+      "nes_score": 4.051625163603055,
+      "p_adj": 0.0,
+      "evidence_count": 77,
+      "support_count": 20,
+      "seed_genes": [],
+      "literature_support": false,
+      "citations": [
+        {
+          "pmid": "31696929",
+          "title": "Variant frequencies of KCNQ1, KCNH2, and SCN5A in a Chinese inherited arrhythmia cohort and other disease cohorts undergoing genetic testing.",
+          "year": 2020,
+          "relevance": 0.5333333333333333
+        },
+        {
+          "pmid": "37816059",
+          "title": "Pairwise biosynthesis of ion channels stabilizes excitability and mitigates arrhythmias.",
+          "year": 2023,
+          "relevance": 0.5333333333333333
+        },
+        {
+          "pmid": "37449562",
+          "title": "Screening for Rare Coding Variants That Associate With the QTc Interval in Iceland.",
+          "year": 2023,
+          "relevance": 0.5333333333333333
+        }
+      ],
+      "citation_count": 25,
+      "key_nodes": [
+        {
+          "gene": "SCN5A",
+          "centrality": 0.4054180963766816,
+          "role": "hub"
+        },
+        {
+          "gene": "KCNH2",
+          "centrality": 0.1611384313484995,
+          "role": "connector"
+        },
+        {
+          "gene": "CALM3",
+          "centrality": 0.03169737598671892,
+          "role": "connector"
+        }
+      ],
+      "source_primaries": [
+        "GO:0065008",
+        "GO:0003008",
+        "GO:0006811",
+        "GO:0008015",
+        "GO:0003013",
+        "GO:0030001",
+        "GO:0006812",
+        "GO:0055085",
+        "GO:0060047",
+        "GO:0003015",
+        "GO:0034220",
+        "GO:0003012",
+        "GO:0098662",
+        "GO:0098655",
+        "GO:0098660",
+        "GO:0006936",
+        "GO:0044057",
+        "GO:0042391",
+        "GO:0060048",
+        "GO:0006941"
+      ]
+    },
+    {
+      "rank": 4,
+      "pathway_id": "GO:0003008",
+      "pathway_name": "system process",
+      "source_db": "GO:BP",
+      "nes_score": 4.022469612767769,
+      "p_adj": 0.0,
+      "evidence_count": 72,
+      "support_count": 20,
+      "seed_genes": [],
+      "literature_support": false,
+      "citations": [
+        {
+          "pmid": "37651922",
+          "title": "Maturation of iPSC-derived cardiomyocytes in a heart-on-a-chip device enables modeling of dilated cardiomyopathy caused by R222Q-SCN5A mutation.",
+          "year": 2023,
+          "relevance": 0.5333333333333333
+        },
+        {
+          "pmid": "36388958",
+          "title": "Direct reprogramming of cardiomyocytes into cardiac Purkinje-like cells.",
+          "year": 2022,
+          "relevance": 0.5333333333333333
+        },
+        {
+          "pmid": "31696929",
+          "title": "Variant frequencies of KCNQ1, KCNH2, and SCN5A in a Chinese inherited arrhythmia cohort and other disease cohorts undergoing genetic testing.",
+          "year": 2020,
+          "relevance": 0.5333333333333333
+        }
+      ],
+      "citation_count": 25,
+      "key_nodes": [
+        {
+          "gene": "SCN5A",
+          "centrality": 0.4054180963766816,
+          "role": "hub"
+        },
+        {
+          "gene": "KCNH2",
+          "centrality": 0.1611384313484995,
+          "role": "connector"
+        },
+        {
+          "gene": "CALM3",
+          "centrality": 0.03169737598671892,
+          "role": "connector"
+        }
+      ],
+      "source_primaries": [
+        "GO:0065008",
+        "GO:0003008",
+        "GO:0006811",
+        "GO:0008015",
+        "GO:0003013",
+        "GO:0030001",
+        "GO:0006812",
+        "GO:0055085",
+        "GO:0060047",
+        "GO:0003015",
+        "GO:0034220",
+        "GO:0003012",
+        "GO:0098662",
+        "GO:0098655",
+        "GO:0098660",
+        "GO:0006936",
+        "GO:0044057",
+        "GO:0042391",
+        "GO:0060048",
+        "GO:0006941"
+      ]
+    },
+    {
+      "rank": 5,
+      "pathway_id": "GO:0051179",
+      "pathway_name": "localization",
+      "source_db": "GO:BP",
+      "nes_score": 4.016396045894965,
+      "p_adj": 0.0,
+      "evidence_count": 71,
+      "support_count": 20,
+      "seed_genes": [],
+      "literature_support": false,
+      "citations": [
+        {
+          "pmid": "37816059",
+          "title": "Pairwise biosynthesis of ion channels stabilizes excitability and mitigates arrhythmias.",
+          "year": 2023,
+          "relevance": 0.7833333333333333
+        },
+        {
+          "pmid": "40423607",
+          "title": "Molecular and functional characterization of DENND3 as a novel regulator of ion channel trafficking.",
+          "year": 2025,
+          "relevance": 0.75
+        },
+        {
+          "pmid": "36626562",
+          "title": "<i>KCNH2</i> encodes a nuclear-targeted polypeptide that mediates hERG1 channel gating and expression.",
+          "year": 2023,
+          "relevance": 0.5583333333333333
+        }
+      ],
+      "citation_count": 25,
+      "key_nodes": [
+        {
+          "gene": "SCN5A",
+          "centrality": 0.4054180963766816,
+          "role": "hub"
+        },
+        {
+          "gene": "KCNH2",
+          "centrality": 0.1611384313484995,
+          "role": "connector"
+        },
+        {
+          "gene": "CALM3",
+          "centrality": 0.03169737598671892,
+          "role": "connector"
+        }
+      ],
+      "source_primaries": [
+        "GO:0065008",
+        "GO:0003008",
+        "GO:0006811",
+        "GO:0008015",
+        "GO:0003013",
+        "GO:0030001",
+        "GO:0006812",
+        "GO:0055085",
+        "GO:0060047",
+        "GO:0003015",
+        "GO:0034220",
+        "GO:0003012",
+        "GO:0098662",
+        "GO:0098655",
+        "GO:0098660",
+        "GO:0006936",
+        "GO:0044057",
+        "GO:0042391",
+        "GO:0060048",
+        "GO:0006941"
+      ]
+    },
+    {
+      "rank": 6,
+      "pathway_id": "GO:0006810",
+      "pathway_name": "transport",
+      "source_db": "GO:BP",
+      "nes_score": 4.010236334624135,
+      "p_adj": 0.0,
+      "evidence_count": 70,
+      "support_count": 20,
+      "seed_genes": [],
+      "literature_support": false,
+      "citations": [
+        {
+          "pmid": "31696929",
+          "title": "Variant frequencies of KCNQ1, KCNH2, and SCN5A in a Chinese inherited arrhythmia cohort and other disease cohorts undergoing genetic testing.",
+          "year": 2020,
+          "relevance": 0.5333333333333333
+        },
+        {
+          "pmid": "37816059",
+          "title": "Pairwise biosynthesis of ion channels stabilizes excitability and mitigates arrhythmias.",
+          "year": 2023,
+          "relevance": 0.5333333333333333
+        },
+        {
+          "pmid": "40423607",
+          "title": "Molecular and functional characterization of DENND3 as a novel regulator of ion channel trafficking.",
+          "year": 2025,
+          "relevance": 0.5
+        }
+      ],
+      "citation_count": 25,
+      "key_nodes": [
+        {
+          "gene": "SCN5A",
+          "centrality": 0.4054180963766816,
+          "role": "hub"
+        },
+        {
+          "gene": "KCNH2",
+          "centrality": 0.1611384313484995,
+          "role": "connector"
+        },
+        {
+          "gene": "CALM3",
+          "centrality": 0.03169737598671892,
+          "role": "connector"
+        }
+      ],
+      "source_primaries": [
+        "GO:0065008",
+        "GO:0003008",
+        "GO:0006811",
+        "GO:0008015",
+        "GO:0003013",
+        "GO:0030001",
+        "GO:0006812",
+        "GO:0055085",
+        "GO:0060047",
+        "GO:0003015",
+        "GO:0034220",
+        "GO:0003012",
+        "GO:0098662",
+        "GO:0098655",
+        "GO:0098660",
+        "GO:0006936",
+        "GO:0044057",
+        "GO:0042391",
+        "GO:0060048",
+        "GO:0006941"
+      ]
+    },
+    {
+      "rank": 7,
+      "pathway_id": "GO:0051234",
+      "pathway_name": "establishment of localization",
+      "source_db": "GO:BP",
+      "nes_score": 4.010236334624135,
+      "p_adj": 0.0,
+      "evidence_count": 70,
+      "support_count": 20,
+      "seed_genes": [],
+      "literature_support": false,
+      "citations": [
+        {
+          "pmid": "37122208",
+          "title": "<i>SCN5A</i> channelopathy: arrhythmia, cardiomyopathy, epilepsy and beyond.",
+          "year": 2023,
+          "relevance": 0.475
+        },
+        {
+          "pmid": "33517668",
+          "title": "Common Variants in <i>KCNE1, KCNH2</i>, and <i>SCN5A</i> May Impact Cardiac Arrhythmia Risk.",
+          "year": 2021,
+          "relevance": 0.4666666666666667
+        },
+        {
+          "pmid": "37651922",
+          "title": "Maturation of iPSC-derived cardiomyocytes in a heart-on-a-chip device enables modeling of dilated cardiomyopathy caused by R222Q-SCN5A mutation.",
+          "year": 2023,
+          "relevance": 0.4083333333333333
+        }
+      ],
+      "citation_count": 25,
+      "key_nodes": [
+        {
+          "gene": "SCN5A",
+          "centrality": 0.4054180963766816,
+          "role": "hub"
+        },
+        {
+          "gene": "KCNH2",
+          "centrality": 0.1611384313484995,
+          "role": "connector"
+        },
+        {
+          "gene": "CALM3",
+          "centrality": 0.03169737598671892,
+          "role": "connector"
+        }
+      ],
+      "source_primaries": [
+        "GO:0065008",
+        "GO:0003008",
+        "GO:0006811",
+        "GO:0008015",
+        "GO:0003013",
+        "GO:0030001",
+        "GO:0006812",
+        "GO:0055085",
+        "GO:0060047",
+        "GO:0003015",
+        "GO:0034220",
+        "GO:0003012",
+        "GO:0098662",
+        "GO:0098655",
+        "GO:0098660",
+        "GO:0006936",
+        "GO:0044057",
+        "GO:0042391",
+        "GO:0060048",
+        "GO:0006941"
+      ]
+    },
+    {
+      "rank": 8,
+      "pathway_id": "GO:0006811",
+      "pathway_name": "monoatomic ion transport",
+      "source_db": "GO:BP",
+      "nes_score": 3.997648454896206,
+      "p_adj": 0.0,
+      "evidence_count": 68,
+      "support_count": 20,
+      "seed_genes": [],
+      "literature_support": false,
+      "citations": [
+        {
+          "pmid": "39865220",
+          "title": "Clinical relevance of macromolecular complexes involving integrins, potassium and sodium ion channels and the sodium/proton antiporter in human breast cancer.",
+          "year": 2025,
+          "relevance": 0.5499999999999999
+        },
+        {
+          "pmid": "37816059",
+          "title": "Pairwise biosynthesis of ion channels stabilizes excitability and mitigates arrhythmias.",
+          "year": 2023,
+          "relevance": 0.5333333333333333
+        },
+        {
+          "pmid": "31696929",
+          "title": "Variant frequencies of KCNQ1, KCNH2, and SCN5A in a Chinese inherited arrhythmia cohort and other disease cohorts undergoing genetic testing.",
+          "year": 2020,
+          "relevance": 0.5333333333333333
+        }
+      ],
+      "citation_count": 25,
+      "key_nodes": [
+        {
+          "gene": "SCN5A",
+          "centrality": 0.4054180963766816,
+          "role": "hub"
+        },
+        {
+          "gene": "KCNH2",
+          "centrality": 0.1611384313484995,
+          "role": "connector"
+        },
+        {
+          "gene": "CALM3",
+          "centrality": 0.03169737598671892,
+          "role": "connector"
+        }
+      ],
+      "source_primaries": [
+        "GO:0065008",
+        "GO:0003008",
+        "GO:0006811",
+        "GO:0008015",
+        "GO:0003013",
+        "GO:0030001",
+        "GO:0006812",
+        "GO:0055085",
+        "GO:0060047",
+        "GO:0003015",
+        "GO:0034220",
+        "GO:0003012",
+        "GO:0098662",
+        "GO:0098655",
+        "GO:0098660",
+        "GO:0006936",
+        "GO:0044057",
+        "GO:0042391",
+        "GO:0060048",
+        "GO:0006941"
+      ]
+    },
+    {
+      "rank": 9,
+      "pathway_id": "GO:0008015",
+      "pathway_name": "blood circulation",
+      "source_db": "GO:BP",
+      "nes_score": 3.9912149966103145,
+      "p_adj": 0.0,
+      "evidence_count": 67,
+      "support_count": 20,
+      "seed_genes": [],
+      "literature_support": false,
+      "citations": [
+        {
+          "pmid": "31696929",
+          "title": "Variant frequencies of KCNQ1, KCNH2, and SCN5A in a Chinese inherited arrhythmia cohort and other disease cohorts undergoing genetic testing.",
+          "year": 2020,
+          "relevance": 0.5333333333333333
+        },
+        {
+          "pmid": "37816059",
+          "title": "Pairwise biosynthesis of ion channels stabilizes excitability and mitigates arrhythmias.",
+          "year": 2023,
+          "relevance": 0.5333333333333333
+        },
+        {
+          "pmid": "37449562",
+          "title": "Screening for Rare Coding Variants That Associate With the QTc Interval in Iceland.",
+          "year": 2023,
+          "relevance": 0.5333333333333333
+        }
+      ],
+      "citation_count": 25,
+      "key_nodes": [
+        {
+          "gene": "SCN5A",
+          "centrality": 0.4054180963766816,
+          "role": "hub"
+        },
+        {
+          "gene": "KCNH2",
+          "centrality": 0.1611384313484995,
+          "role": "connector"
+        },
+        {
+          "gene": "CALM3",
+          "centrality": 0.03169737598671892,
+          "role": "connector"
+        }
+      ],
+      "source_primaries": [
+        "GO:0065008",
+        "GO:0003008",
+        "GO:0006811",
+        "GO:0008015",
+        "GO:0003013",
+        "GO:0030001",
+        "GO:0006812",
+        "GO:0055085",
+        "GO:0060047",
+        "GO:0003015",
+        "GO:0034220",
+        "GO:0003012",
+        "GO:0098662",
+        "GO:0098655",
+        "GO:0098660",
+        "GO:0006936",
+        "GO:0044057",
+        "GO:0042391",
+        "GO:0060048",
+        "GO:0006941"
+      ]
+    },
+    {
+      "rank": 10,
+      "pathway_id": "GO:0003013",
+      "pathway_name": "circulatory system process",
+      "source_db": "GO:BP",
+      "nes_score": 3.9912149966103145,
+      "p_adj": 0.0,
+      "evidence_count": 67,
+      "support_count": 20,
+      "seed_genes": [],
+      "literature_support": false,
+      "citations": [
+        {
+          "pmid": "31696929",
+          "title": "Variant frequencies of KCNQ1, KCNH2, and SCN5A in a Chinese inherited arrhythmia cohort and other disease cohorts undergoing genetic testing.",
+          "year": 2020,
+          "relevance": 0.5333333333333333
+        },
+        {
+          "pmid": "37816059",
+          "title": "Pairwise biosynthesis of ion channels stabilizes excitability and mitigates arrhythmias.",
+          "year": 2023,
+          "relevance": 0.5333333333333333
+        },
+        {
+          "pmid": "37449562",
+          "title": "Screening for Rare Coding Variants That Associate With the QTc Interval in Iceland.",
+          "year": 2023,
+          "relevance": 0.5333333333333333
+        }
+      ],
+      "citation_count": 25,
+      "key_nodes": [
+        {
+          "gene": "SCN5A",
+          "centrality": 0.4054180963766816,
+          "role": "hub"
+        },
+        {
+          "gene": "KCNH2",
+          "centrality": 0.1611384313484995,
+          "role": "connector"
+        },
+        {
+          "gene": "CALM3",
+          "centrality": 0.03169737598671892,
+          "role": "connector"
+        }
+      ],
+      "source_primaries": [
+        "GO:0065008",
+        "GO:0003008",
+        "GO:0006811",
+        "GO:0008015",
+        "GO:0003013",
+        "GO:0030001",
+        "GO:0006812",
+        "GO:0055085",
+        "GO:0060047",
+        "GO:0003015",
+        "GO:0034220",
+        "GO:0003012",
+        "GO:0098662",
+        "GO:0098655",
+        "GO:0098660",
+        "GO:0006936",
+        "GO:0044057",
+        "GO:0042391",
+        "GO:0060048",
+        "GO:0006941"
+      ]
+    },
+    {
+      "rank": 11,
+      "pathway_id": "GO:0030001",
+      "pathway_name": "metal ion transport",
+      "source_db": "GO:BP",
+      "nes_score": 3.9912149966103145,
+      "p_adj": 0.0,
+      "evidence_count": 67,
+      "support_count": 20,
+      "seed_genes": [],
+      "literature_support": false,
+      "citations": [
+        {
+          "pmid": "39865220",
+          "title": "Clinical relevance of macromolecular complexes involving integrins, potassium and sodium ion channels and the sodium/proton antiporter in human breast cancer.",
+          "year": 2025,
+          "relevance": 0.5499999999999999
+        },
+        {
+          "pmid": "37816059",
+          "title": "Pairwise biosynthesis of ion channels stabilizes excitability and mitigates arrhythmias.",
+          "year": 2023,
+          "relevance": 0.5333333333333333
+        },
+        {
+          "pmid": "31696929",
+          "title": "Variant frequencies of KCNQ1, KCNH2, and SCN5A in a Chinese inherited arrhythmia cohort and other disease cohorts undergoing genetic testing.",
+          "year": 2020,
+          "relevance": 0.5333333333333333
+        }
+      ],
+      "citation_count": 25,
+      "key_nodes": [
+        {
+          "gene": "SCN5A",
+          "centrality": 0.4054180963766816,
+          "role": "hub"
+        },
+        {
+          "gene": "KCNH2",
+          "centrality": 0.1611384313484995,
+          "role": "connector"
+        },
+        {
+          "gene": "CALM3",
+          "centrality": 0.03169737598671892,
+          "role": "connector"
+        }
+      ],
+      "source_primaries": [
+        "GO:0065008",
+        "GO:0003008",
+        "GO:0006811",
+        "GO:0008015",
+        "GO:0003013",
+        "GO:0030001",
+        "GO:0006812",
+        "GO:0055085",
+        "GO:0060047",
+        "GO:0003015",
+        "GO:0034220",
+        "GO:0003012",
+        "GO:0098662",
+        "GO:0098655",
+        "GO:0098660",
+        "GO:0006936",
+        "GO:0044057",
+        "GO:0042391",
+        "GO:0060048",
+        "GO:0006941"
+      ]
+    },
+    {
+      "rank": 12,
+      "pathway_id": "GO:0006812",
+      "pathway_name": "monoatomic cation transport",
+      "source_db": "GO:BP",
+      "nes_score": 3.9912149966103145,
+      "p_adj": 0.0,
+      "evidence_count": 67,
+      "support_count": 20,
+      "seed_genes": [],
+      "literature_support": false,
+      "citations": [
+        {
+          "pmid": "31696929",
+          "title": "Variant frequencies of KCNQ1, KCNH2, and SCN5A in a Chinese inherited arrhythmia cohort and other disease cohorts undergoing genetic testing.",
+          "year": 2020,
+          "relevance": 0.6166666666666666
+        },
+        {
+          "pmid": "37449562",
+          "title": "Screening for Rare Coding Variants That Associate With the QTc Interval in Iceland.",
+          "year": 2023,
+          "relevance": 0.6166666666666666
+        },
+        {
+          "pmid": "33990324",
+          "title": "Cardiac cell type-specific gene regulatory programs and disease risk association.",
+          "year": 2021,
+          "relevance": 0.5583333333333333
+        }
+      ],
+      "citation_count": 25,
+      "key_nodes": [
+        {
+          "gene": "SCN5A",
+          "centrality": 0.4054180963766816,
+          "role": "hub"
+        },
+        {
+          "gene": "KCNH2",
+          "centrality": 0.1611384313484995,
+          "role": "connector"
+        },
+        {
+          "gene": "CALM3",
+          "centrality": 0.03169737598671892,
+          "role": "connector"
+        }
+      ],
+      "source_primaries": [
+        "GO:0065008",
+        "GO:0003008",
+        "GO:0006811",
+        "GO:0008015",
+        "GO:0003013",
+        "GO:0030001",
+        "GO:0006812",
+        "GO:0055085",
+        "GO:0060047",
+        "GO:0003015",
+        "GO:0034220",
+        "GO:0003012",
+        "GO:0098662",
+        "GO:0098655",
+        "GO:0098660",
+        "GO:0006936",
+        "GO:0044057",
+        "GO:0042391",
+        "GO:0060048",
+        "GO:0006941"
+      ]
+    },
+    {
+      "rank": 13,
+      "pathway_id": "GO:0055085",
+      "pathway_name": "transmembrane transport",
+      "source_db": "GO:BP",
+      "nes_score": 3.971322245242813,
+      "p_adj": 0.0,
+      "evidence_count": 64,
+      "support_count": 20,
+      "seed_genes": [],
+      "literature_support": false,
+      "citations": [
+        {
+          "pmid": "31696929",
+          "title": "Variant frequencies of KCNQ1, KCNH2, and SCN5A in a Chinese inherited arrhythmia cohort and other disease cohorts undergoing genetic testing.",
+          "year": 2020,
+          "relevance": 0.5333333333333333
+        },
+        {
+          "pmid": "37816059",
+          "title": "Pairwise biosynthesis of ion channels stabilizes excitability and mitigates arrhythmias.",
+          "year": 2023,
+          "relevance": 0.5333333333333333
+        },
+        {
+          "pmid": "37449562",
+          "title": "Screening for Rare Coding Variants That Associate With the QTc Interval in Iceland.",
+          "year": 2023,
+          "relevance": 0.5333333333333333
+        }
+      ],
+      "citation_count": 25,
+      "key_nodes": [
+        {
+          "gene": "SCN5A",
+          "centrality": 0.4054180963766816,
+          "role": "hub"
+        },
+        {
+          "gene": "KCNH2",
+          "centrality": 0.1611384313484995,
+          "role": "connector"
+        },
+        {
+          "gene": "CALM3",
+          "centrality": 0.03169737598671892,
+          "role": "connector"
+        }
+      ],
+      "source_primaries": [
+        "GO:0065008",
+        "GO:0003008",
+        "GO:0006811",
+        "GO:0008015",
+        "GO:0003013",
+        "GO:0030001",
+        "GO:0006812",
+        "GO:0055085",
+        "GO:0060047",
+        "GO:0003015",
+        "GO:0034220",
+        "GO:0003012",
+        "GO:0098662",
+        "GO:0098655",
+        "GO:0098660",
+        "GO:0006936",
+        "GO:0044057",
+        "GO:0042391",
+        "GO:0060048",
+        "GO:0006941"
+      ]
+    },
+    {
+      "rank": 14,
+      "pathway_id": "GO:0060047",
+      "pathway_name": "heart contraction",
+      "source_db": "GO:BP",
+      "nes_score": 3.9644835571250017,
+      "p_adj": 0.0,
+      "evidence_count": 63,
+      "support_count": 20,
+      "seed_genes": [],
+      "literature_support": false,
+      "citations": [
+        {
+          "pmid": "37122208",
+          "title": "<i>SCN5A</i> channelopathy: arrhythmia, cardiomyopathy, epilepsy and beyond.",
+          "year": 2023,
+          "relevance": 0.6
+        },
+        {
+          "pmid": "32046907",
+          "title": "Direct and Indirect Suppression of Scn5a Gene Expression Mediates Cardiac Na<sup>+</sup> Channel Inhibition by Wnt Signalling.",
+          "year": 2020,
+          "relevance": 0.6
+        },
+        {
+          "pmid": "37651922",
+          "title": "Maturation of iPSC-derived cardiomyocytes in a heart-on-a-chip device enables modeling of dilated cardiomyopathy caused by R222Q-SCN5A mutation.",
+          "year": 2023,
+          "relevance": 0.5333333333333333
+        }
+      ],
+      "citation_count": 25,
+      "key_nodes": [
+        {
+          "gene": "SCN5A",
+          "centrality": 0.4054180963766816,
+          "role": "hub"
+        },
+        {
+          "gene": "KCNH2",
+          "centrality": 0.1611384313484995,
+          "role": "connector"
+        },
+        {
+          "gene": "CALM3",
+          "centrality": 0.03169737598671892,
+          "role": "connector"
+        }
+      ],
+      "source_primaries": [
+        "GO:0065008",
+        "GO:0003008",
+        "GO:0006811",
+        "GO:0008015",
+        "GO:0003013",
+        "GO:0030001",
+        "GO:0006812",
+        "GO:0055085",
+        "GO:0060047",
+        "GO:0003015",
+        "GO:0034220",
+        "GO:0003012",
+        "GO:0098662",
+        "GO:0098655",
+        "GO:0098660",
+        "GO:0006936",
+        "GO:0044057",
+        "GO:0042391",
+        "GO:0060048",
+        "GO:0006941"
+      ]
+    },
+    {
+      "rank": 15,
+      "pathway_id": "GO:0003015",
+      "pathway_name": "heart process",
+      "source_db": "GO:BP",
+      "nes_score": 3.9644835571250017,
+      "p_adj": 0.0,
+      "evidence_count": 63,
+      "support_count": 20,
+      "seed_genes": [],
+      "literature_support": false,
+      "citations": [
+        {
+          "pmid": "37651922",
+          "title": "Maturation of iPSC-derived cardiomyocytes in a heart-on-a-chip device enables modeling of dilated cardiomyopathy caused by R222Q-SCN5A mutation.",
+          "year": 2023,
+          "relevance": 0.6583333333333333
+        },
+        {
+          "pmid": "37122208",
+          "title": "<i>SCN5A</i> channelopathy: arrhythmia, cardiomyopathy, epilepsy and beyond.",
+          "year": 2023,
+          "relevance": 0.6
+        },
+        {
+          "pmid": "32046907",
+          "title": "Direct and Indirect Suppression of Scn5a Gene Expression Mediates Cardiac Na<sup>+</sup> Channel Inhibition by Wnt Signalling.",
+          "year": 2020,
+          "relevance": 0.6
+        }
+      ],
+      "citation_count": 25,
+      "key_nodes": [
+        {
+          "gene": "SCN5A",
+          "centrality": 0.4054180963766816,
+          "role": "hub"
+        },
+        {
+          "gene": "KCNH2",
+          "centrality": 0.1611384313484995,
+          "role": "connector"
+        },
+        {
+          "gene": "CALM3",
+          "centrality": 0.03169737598671892,
+          "role": "connector"
+        }
+      ],
+      "source_primaries": [
+        "GO:0065008",
+        "GO:0003008",
+        "GO:0006811",
+        "GO:0008015",
+        "GO:0003013",
+        "GO:0030001",
+        "GO:0006812",
+        "GO:0055085",
+        "GO:0060047",
+        "GO:0003015",
+        "GO:0034220",
+        "GO:0003012",
+        "GO:0098662",
+        "GO:0098655",
+        "GO:0098660",
+        "GO:0006936",
+        "GO:0044057",
+        "GO:0042391",
+        "GO:0060048",
+        "GO:0006941"
+      ]
+    },
+    {
+      "rank": 16,
+      "pathway_id": "GO:0034220",
+      "pathway_name": "monoatomic ion transmembrane transport",
+      "source_db": "GO:BP",
+      "nes_score": 3.9644835571250017,
+      "p_adj": 0.0,
+      "evidence_count": 63,
+      "support_count": 20,
+      "seed_genes": [],
+      "literature_support": false,
+      "citations": [
+        {
+          "pmid": "37816059",
+          "title": "Pairwise biosynthesis of ion channels stabilizes excitability and mitigates arrhythmias.",
+          "year": 2023,
+          "relevance": 0.5333333333333333
+        },
+        {
+          "pmid": "31696929",
+          "title": "Variant frequencies of KCNQ1, KCNH2, and SCN5A in a Chinese inherited arrhythmia cohort and other disease cohorts undergoing genetic testing.",
+          "year": 2020,
+          "relevance": 0.5333333333333333
+        },
+        {
+          "pmid": "37449562",
+          "title": "Screening for Rare Coding Variants That Associate With the QTc Interval in Iceland.",
+          "year": 2023,
+          "relevance": 0.5333333333333333
+        }
+      ],
+      "citation_count": 25,
+      "key_nodes": [
+        {
+          "gene": "SCN5A",
+          "centrality": 0.4054180963766816,
+          "role": "hub"
+        },
+        {
+          "gene": "KCNH2",
+          "centrality": 0.1611384313484995,
+          "role": "connector"
+        },
+        {
+          "gene": "CALM3",
+          "centrality": 0.03169737598671892,
+          "role": "connector"
+        }
+      ],
+      "source_primaries": [
+        "GO:0065008",
+        "GO:0003008",
+        "GO:0006811",
+        "GO:0008015",
+        "GO:0003013",
+        "GO:0030001",
+        "GO:0006812",
+        "GO:0055085",
+        "GO:0060047",
+        "GO:0003015",
+        "GO:0034220",
+        "GO:0003012",
+        "GO:0098662",
+        "GO:0098655",
+        "GO:0098660",
+        "GO:0006936",
+        "GO:0044057",
+        "GO:0042391",
+        "GO:0060048",
+        "GO:0006941"
+      ]
+    },
+    {
+      "rank": 17,
+      "pathway_id": "GO:0003012",
+      "pathway_name": "muscle system process",
+      "source_db": "GO:BP",
+      "nes_score": 3.9575354573361006,
+      "p_adj": 0.0,
+      "evidence_count": 62,
+      "support_count": 20,
+      "seed_genes": [],
+      "literature_support": false,
+      "citations": [
+        {
+          "pmid": "31696929",
+          "title": "Variant frequencies of KCNQ1, KCNH2, and SCN5A in a Chinese inherited arrhythmia cohort and other disease cohorts undergoing genetic testing.",
+          "year": 2020,
+          "relevance": 0.5333333333333333
+        },
+        {
+          "pmid": "37816059",
+          "title": "Pairwise biosynthesis of ion channels stabilizes excitability and mitigates arrhythmias.",
+          "year": 2023,
+          "relevance": 0.5333333333333333
+        },
+        {
+          "pmid": "37449562",
+          "title": "Screening for Rare Coding Variants That Associate With the QTc Interval in Iceland.",
+          "year": 2023,
+          "relevance": 0.5333333333333333
+        }
+      ],
+      "citation_count": 25,
+      "key_nodes": [
+        {
+          "gene": "SCN5A",
+          "centrality": 0.4054180963766816,
+          "role": "hub"
+        },
+        {
+          "gene": "KCNH2",
+          "centrality": 0.1611384313484995,
+          "role": "connector"
+        },
+        {
+          "gene": "CALM3",
+          "centrality": 0.03169737598671892,
+          "role": "connector"
+        }
+      ],
+      "source_primaries": [
+        "GO:0065008",
+        "GO:0003008",
+        "GO:0006811",
+        "GO:0008015",
+        "GO:0003013",
+        "GO:0030001",
+        "GO:0006812",
+        "GO:0055085",
+        "GO:0060047",
+        "GO:0003015",
+        "GO:0034220",
+        "GO:0003012",
+        "GO:0098662",
+        "GO:0098655",
+        "GO:0098660",
+        "GO:0006936",
+        "GO:0044057",
+        "GO:0042391",
+        "GO:0060048",
+        "GO:0006941"
+      ]
+    },
+    {
+      "rank": 18,
+      "pathway_id": "GO:0098662",
+      "pathway_name": "inorganic cation transmembrane transport",
+      "source_db": "GO:BP",
+      "nes_score": 3.9575354573361006,
+      "p_adj": 0.0,
+      "evidence_count": 62,
+      "support_count": 20,
+      "seed_genes": [],
+      "literature_support": false,
+      "citations": [
+        {
+          "pmid": "31696929",
+          "title": "Variant frequencies of KCNQ1, KCNH2, and SCN5A in a Chinese inherited arrhythmia cohort and other disease cohorts undergoing genetic testing.",
+          "year": 2020,
+          "relevance": 0.5958333333333333
+        },
+        {
+          "pmid": "37449562",
+          "title": "Screening for Rare Coding Variants That Associate With the QTc Interval in Iceland.",
+          "year": 2023,
+          "relevance": 0.5958333333333333
+        },
+        {
+          "pmid": "37816059",
+          "title": "Pairwise biosynthesis of ion channels stabilizes excitability and mitigates arrhythmias.",
+          "year": 2023,
+          "relevance": 0.5333333333333333
+        }
+      ],
+      "citation_count": 25,
+      "key_nodes": [
+        {
+          "gene": "SCN5A",
+          "centrality": 0.4054180963766816,
+          "role": "hub"
+        },
+        {
+          "gene": "KCNH2",
+          "centrality": 0.1611384313484995,
+          "role": "connector"
+        },
+        {
+          "gene": "CALM3",
+          "centrality": 0.03169737598671892,
+          "role": "connector"
+        }
+      ],
+      "source_primaries": [
+        "GO:0065008",
+        "GO:0003008",
+        "GO:0006811",
+        "GO:0008015",
+        "GO:0003013",
+        "GO:0030001",
+        "GO:0006812",
+        "GO:0055085",
+        "GO:0060047",
+        "GO:0003015",
+        "GO:0034220",
+        "GO:0003012",
+        "GO:0098662",
+        "GO:0098655",
+        "GO:0098660",
+        "GO:0006936",
+        "GO:0044057",
+        "GO:0042391",
+        "GO:0060048",
+        "GO:0006941"
+      ]
+    },
+    {
+      "rank": 19,
+      "pathway_id": "GO:0098655",
+      "pathway_name": "monoatomic cation transmembrane transport",
+      "source_db": "GO:BP",
+      "nes_score": 3.9575354573361006,
+      "p_adj": 0.0,
+      "evidence_count": 62,
+      "support_count": 20,
+      "seed_genes": [],
+      "literature_support": false,
+      "citations": [
+        {
+          "pmid": "31696929",
+          "title": "Variant frequencies of KCNQ1, KCNH2, and SCN5A in a Chinese inherited arrhythmia cohort and other disease cohorts undergoing genetic testing.",
+          "year": 2020,
+          "relevance": 0.5958333333333333
+        },
+        {
+          "pmid": "37449562",
+          "title": "Screening for Rare Coding Variants That Associate With the QTc Interval in Iceland.",
+          "year": 2023,
+          "relevance": 0.5958333333333333
+        },
+        {
+          "pmid": "37816059",
+          "title": "Pairwise biosynthesis of ion channels stabilizes excitability and mitigates arrhythmias.",
+          "year": 2023,
+          "relevance": 0.5333333333333333
+        }
+      ],
+      "citation_count": 25,
+      "key_nodes": [
+        {
+          "gene": "SCN5A",
+          "centrality": 0.4054180963766816,
+          "role": "hub"
+        },
+        {
+          "gene": "KCNH2",
+          "centrality": 0.1611384313484995,
+          "role": "connector"
+        },
+        {
+          "gene": "CALM3",
+          "centrality": 0.03169737598671892,
+          "role": "connector"
+        }
+      ],
+      "source_primaries": [
+        "GO:0065008",
+        "GO:0003008",
+        "GO:0006811",
+        "GO:0008015",
+        "GO:0003013",
+        "GO:0030001",
+        "GO:0006812",
+        "GO:0055085",
+        "GO:0060047",
+        "GO:0003015",
+        "GO:0034220",
+        "GO:0003012",
+        "GO:0098662",
+        "GO:0098655",
+        "GO:0098660",
+        "GO:0006936",
+        "GO:0044057",
+        "GO:0042391",
+        "GO:0060048",
+        "GO:0006941"
+      ]
+    },
+    {
+      "rank": 20,
+      "pathway_id": "GO:0098660",
+      "pathway_name": "inorganic ion transmembrane transport",
+      "source_db": "GO:BP",
+      "nes_score": 3.9575354573361006,
+      "p_adj": 0.0,
+      "evidence_count": 62,
+      "support_count": 20,
+      "seed_genes": [],
+      "literature_support": false,
+      "citations": [
+        {
+          "pmid": "37816059",
+          "title": "Pairwise biosynthesis of ion channels stabilizes excitability and mitigates arrhythmias.",
+          "year": 2023,
+          "relevance": 0.5333333333333333
+        },
+        {
+          "pmid": "31696929",
+          "title": "Variant frequencies of KCNQ1, KCNH2, and SCN5A in a Chinese inherited arrhythmia cohort and other disease cohorts undergoing genetic testing.",
+          "year": 2020,
+          "relevance": 0.5333333333333333
+        },
+        {
+          "pmid": "37449562",
+          "title": "Screening for Rare Coding Variants That Associate With the QTc Interval in Iceland.",
+          "year": 2023,
+          "relevance": 0.5333333333333333
+        }
+      ],
+      "citation_count": 25,
+      "key_nodes": [
+        {
+          "gene": "SCN5A",
+          "centrality": 0.4054180963766816,
+          "role": "hub"
+        },
+        {
+          "gene": "KCNH2",
+          "centrality": 0.1611384313484995,
+          "role": "connector"
+        },
+        {
+          "gene": "CALM3",
+          "centrality": 0.03169737598671892,
+          "role": "connector"
+        }
+      ],
+      "source_primaries": [
+        "GO:0065008",
+        "GO:0003008",
+        "GO:0006811",
+        "GO:0008015",
+        "GO:0003013",
+        "GO:0030001",
+        "GO:0006812",
+        "GO:0055085",
+        "GO:0060047",
+        "GO:0003015",
+        "GO:0034220",
+        "GO:0003012",
+        "GO:0098662",
+        "GO:0098655",
+        "GO:0098660",
+        "GO:0006936",
+        "GO:0044057",
+        "GO:0042391",
+        "GO:0060048",
+        "GO:0006941"
+      ]
+    },
+    {
+      "rank": 21,
+      "pathway_id": "GO:0051239",
+      "pathway_name": "regulation of multicellular organismal process",
+      "source_db": "GO:BP",
+      "nes_score": 3.9575354573361006,
+      "p_adj": 0.0,
+      "evidence_count": 62,
+      "support_count": 20,
+      "seed_genes": [],
+      "literature_support": false,
+      "citations": [],
+      "citation_count": 0,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0065008",
+        "GO:0003008",
+        "GO:0006811",
+        "GO:0008015",
+        "GO:0003013",
+        "GO:0030001",
+        "GO:0006812",
+        "GO:0055085",
+        "GO:0060047",
+        "GO:0003015",
+        "GO:0034220",
+        "GO:0003012",
+        "GO:0098662",
+        "GO:0098655",
+        "GO:0098660",
+        "GO:0006936",
+        "GO:0044057",
+        "GO:0042391",
+        "GO:0060048",
+        "GO:0006941"
+      ]
+    },
+    {
+      "rank": 22,
+      "pathway_id": "GO:0006936",
+      "pathway_name": "muscle contraction",
+      "source_db": "GO:BP",
+      "nes_score": 3.950474387937133,
+      "p_adj": 0.0,
+      "evidence_count": 61,
+      "support_count": 20,
+      "seed_genes": [],
+      "literature_support": false,
+      "citations": [],
+      "citation_count": 0,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0065008",
+        "GO:0003008",
+        "GO:0006811",
+        "GO:0008015",
+        "GO:0003013",
+        "GO:0030001",
+        "GO:0006812",
+        "GO:0055085",
+        "GO:0060047",
+        "GO:0003015",
+        "GO:0034220",
+        "GO:0003012",
+        "GO:0098662",
+        "GO:0098655",
+        "GO:0098660",
+        "GO:0006936",
+        "GO:0044057",
+        "GO:0042391",
+        "GO:0060048",
+        "GO:0006941"
+      ]
+    },
+    {
+      "rank": 23,
+      "pathway_id": "GO:0042391",
+      "pathway_name": "regulation of membrane potential",
+      "source_db": "GO:BP",
+      "nes_score": 3.950474387937133,
+      "p_adj": 0.0,
+      "evidence_count": 61,
+      "support_count": 20,
+      "seed_genes": [],
+      "literature_support": false,
+      "citations": [],
+      "citation_count": 0,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0065008",
+        "GO:0003008",
+        "GO:0006811",
+        "GO:0008015",
+        "GO:0003013",
+        "GO:0030001",
+        "GO:0006812",
+        "GO:0055085",
+        "GO:0060047",
+        "GO:0003015",
+        "GO:0034220",
+        "GO:0003012",
+        "GO:0098662",
+        "GO:0098655",
+        "GO:0098660",
+        "GO:0006936",
+        "GO:0044057",
+        "GO:0042391",
+        "GO:0060048",
+        "GO:0006941"
+      ]
+    },
+    {
+      "rank": 24,
+      "pathway_id": "GO:0044057",
+      "pathway_name": "regulation of system process",
+      "source_db": "GO:BP",
+      "nes_score": 3.9432966145666546,
+      "p_adj": 0.0,
+      "evidence_count": 60,
+      "support_count": 20,
+      "seed_genes": [],
+      "literature_support": false,
+      "citations": [],
+      "citation_count": 0,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0065008",
+        "GO:0003008",
+        "GO:0006811",
+        "GO:0008015",
+        "GO:0003013",
+        "GO:0030001",
+        "GO:0006812",
+        "GO:0055085",
+        "GO:0060047",
+        "GO:0003015",
+        "GO:0034220",
+        "GO:0003012",
+        "GO:0098662",
+        "GO:0098655",
+        "GO:0098660",
+        "GO:0006936",
+        "GO:0044057",
+        "GO:0042391",
+        "GO:0060048",
+        "GO:0006941"
+      ]
+    },
+    {
+      "rank": 25,
+      "pathway_id": "GO:0001508",
+      "pathway_name": "action potential",
+      "source_db": "GO:BP",
+      "nes_score": 3.921022824406069,
+      "p_adj": 0.0,
+      "evidence_count": 57,
+      "support_count": 20,
+      "seed_genes": [],
+      "literature_support": false,
+      "citations": [],
+      "citation_count": 0,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0065008",
+        "GO:0003008",
+        "GO:0006811",
+        "GO:0008015",
+        "GO:0003013",
+        "GO:0030001",
+        "GO:0006812",
+        "GO:0055085",
+        "GO:0060047",
+        "GO:0003015",
+        "GO:0034220",
+        "GO:0003012",
+        "GO:0098662",
+        "GO:0098655",
+        "GO:0098660",
+        "GO:0006936",
+        "GO:0044057",
+        "GO:0042391",
+        "GO:0060048",
+        "GO:0006941"
+      ]
+    },
+    {
+      "rank": 26,
+      "pathway_id": "GO:0008016",
+      "pathway_name": "regulation of heart contraction",
+      "source_db": "GO:BP",
+      "nes_score": 3.921022824406069,
+      "p_adj": 0.0,
+      "evidence_count": 57,
+      "support_count": 20,
+      "seed_genes": [],
+      "literature_support": false,
+      "citations": [],
+      "citation_count": 0,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0065008",
+        "GO:0003008",
+        "GO:0006811",
+        "GO:0008015",
+        "GO:0003013",
+        "GO:0030001",
+        "GO:0006812",
+        "GO:0055085",
+        "GO:0060047",
+        "GO:0003015",
+        "GO:0034220",
+        "GO:0003012",
+        "GO:0098662",
+        "GO:0098655",
+        "GO:0098660",
+        "GO:0006936",
+        "GO:0044057",
+        "GO:0042391",
+        "GO:0060048",
+        "GO:0006941"
+      ]
+    },
+    {
+      "rank": 27,
+      "pathway_id": "GO:1903522",
+      "pathway_name": "regulation of blood circulation",
+      "source_db": "GO:BP",
+      "nes_score": 3.921022824406069,
+      "p_adj": 0.0,
+      "evidence_count": 57,
+      "support_count": 20,
+      "seed_genes": [],
+      "literature_support": false,
+      "citations": [],
+      "citation_count": 0,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0065008",
+        "GO:0003008",
+        "GO:0006811",
+        "GO:0008015",
+        "GO:0003013",
+        "GO:0030001",
+        "GO:0006812",
+        "GO:0055085",
+        "GO:0060047",
+        "GO:0003015",
+        "GO:0034220",
+        "GO:0003012",
+        "GO:0098662",
+        "GO:0098655",
+        "GO:0098660",
+        "GO:0006936",
+        "GO:0044057",
+        "GO:0042391",
+        "GO:0060048",
+        "GO:0006941"
+      ]
+    },
+    {
+      "rank": 28,
+      "pathway_id": "GO:0060048",
+      "pathway_name": "cardiac muscle contraction",
+      "source_db": "GO:BP",
+      "nes_score": 3.913336925932623,
+      "p_adj": 0.0,
+      "evidence_count": 56,
+      "support_count": 20,
+      "seed_genes": [],
+      "literature_support": false,
+      "citations": [],
+      "citation_count": 0,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0065008",
+        "GO:0003008",
+        "GO:0006811",
+        "GO:0008015",
+        "GO:0003013",
+        "GO:0030001",
+        "GO:0006812",
+        "GO:0055085",
+        "GO:0060047",
+        "GO:0003015",
+        "GO:0034220",
+        "GO:0003012",
+        "GO:0098662",
+        "GO:0098655",
+        "GO:0098660",
+        "GO:0006936",
+        "GO:0044057",
+        "GO:0042391",
+        "GO:0060048",
+        "GO:0006941"
+      ]
+    },
+    {
+      "rank": 29,
+      "pathway_id": "GO:0006941",
+      "pathway_name": "striated muscle contraction",
+      "source_db": "GO:BP",
+      "nes_score": 3.913336925932623,
+      "p_adj": 0.0,
+      "evidence_count": 56,
+      "support_count": 20,
+      "seed_genes": [],
+      "literature_support": false,
+      "citations": [],
+      "citation_count": 0,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0065008",
+        "GO:0003008",
+        "GO:0006811",
+        "GO:0008015",
+        "GO:0003013",
+        "GO:0030001",
+        "GO:0006812",
+        "GO:0055085",
+        "GO:0060047",
+        "GO:0003015",
+        "GO:0034220",
+        "GO:0003012",
+        "GO:0098662",
+        "GO:0098655",
+        "GO:0098660",
+        "GO:0006936",
+        "GO:0044057",
+        "GO:0042391",
+        "GO:0060048",
+        "GO:0006941"
+      ]
+    },
+    {
+      "rank": 30,
+      "pathway_id": "GO:0032879",
+      "pathway_name": "regulation of localization",
+      "source_db": "GO:BP",
+      "nes_score": 3.872724273124173,
+      "p_adj": 0.0,
+      "evidence_count": 51,
+      "support_count": 20,
+      "seed_genes": [],
+      "literature_support": false,
+      "citations": [],
+      "citation_count": 0,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0065008",
+        "GO:0003008",
+        "GO:0006811",
+        "GO:0008015",
+        "GO:0003013",
+        "GO:0030001",
+        "GO:0006812",
+        "GO:0055085",
+        "GO:0060047",
+        "GO:0003015",
+        "GO:0034220",
+        "GO:0003012",
+        "GO:0098662",
+        "GO:0098655",
+        "GO:0098660",
+        "GO:0006936",
+        "GO:0044057",
+        "GO:0042391",
+        "GO:0060048",
+        "GO:0006941"
+      ]
+    },
+    {
+      "rank": 31,
+      "pathway_id": "GO:0086001",
+      "pathway_name": "cardiac muscle cell action potential",
+      "source_db": "GO:BP",
+      "nes_score": 3.8641252657280845,
+      "p_adj": 0.0,
+      "evidence_count": 50,
+      "support_count": 20,
+      "seed_genes": [],
+      "literature_support": false,
+      "citations": [],
+      "citation_count": 0,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0065008",
+        "GO:0003008",
+        "GO:0006811",
+        "GO:0008015",
+        "GO:0003013",
+        "GO:0030001",
+        "GO:0006812",
+        "GO:0055085",
+        "GO:0060047",
+        "GO:0003015",
+        "GO:0034220",
+        "GO:0003012",
+        "GO:0098662",
+        "GO:0098655",
+        "GO:0098660",
+        "GO:0006936",
+        "GO:0044057",
+        "GO:0042391",
+        "GO:0060048",
+        "GO:0006941"
+      ]
+    },
+    {
+      "rank": 32,
+      "pathway_id": "GO:0030029",
+      "pathway_name": "actin filament-based process",
+      "source_db": "GO:BP",
+      "nes_score": 3.8641252657280845,
+      "p_adj": 0.0,
+      "evidence_count": 50,
+      "support_count": 20,
+      "seed_genes": [],
+      "literature_support": false,
+      "citations": [],
+      "citation_count": 0,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0065008",
+        "GO:0003008",
+        "GO:0006811",
+        "GO:0008015",
+        "GO:0003013",
+        "GO:0030001",
+        "GO:0006812",
+        "GO:0055085",
+        "GO:0060047",
+        "GO:0003015",
+        "GO:0034220",
+        "GO:0003012",
+        "GO:0098662",
+        "GO:0098655",
+        "GO:0098660",
+        "GO:0006936",
+        "GO:0044057",
+        "GO:0042391",
+        "GO:0060048",
+        "GO:0006941"
+      ]
+    },
+    {
+      "rank": 33,
+      "pathway_id": "GO:0051049",
+      "pathway_name": "regulation of transport",
+      "source_db": "GO:BP",
+      "nes_score": 3.8641252657280845,
+      "p_adj": 0.0,
+      "evidence_count": 50,
+      "support_count": 20,
+      "seed_genes": [],
+      "literature_support": false,
+      "citations": [],
+      "citation_count": 0,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0065008",
+        "GO:0003008",
+        "GO:0006811",
+        "GO:0008015",
+        "GO:0003013",
+        "GO:0030001",
+        "GO:0006812",
+        "GO:0055085",
+        "GO:0060047",
+        "GO:0003015",
+        "GO:0034220",
+        "GO:0003012",
+        "GO:0098662",
+        "GO:0098655",
+        "GO:0098660",
+        "GO:0006936",
+        "GO:0044057",
+        "GO:0042391",
+        "GO:0060048",
+        "GO:0006941"
+      ]
+    },
+    {
+      "rank": 34,
+      "pathway_id": "GO:0070252",
+      "pathway_name": "actin-mediated cell contraction",
+      "source_db": "GO:BP",
+      "nes_score": 3.855352553308229,
+      "p_adj": 0.0,
+      "evidence_count": 49,
+      "support_count": 20,
+      "seed_genes": [],
+      "literature_support": false,
+      "citations": [],
+      "citation_count": 0,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0065008",
+        "GO:0003008",
+        "GO:0006811",
+        "GO:0008015",
+        "GO:0003013",
+        "GO:0030001",
+        "GO:0006812",
+        "GO:0055085",
+        "GO:0060047",
+        "GO:0003015",
+        "GO:0034220",
+        "GO:0003012",
+        "GO:0098662",
+        "GO:0098655",
+        "GO:0098660",
+        "GO:0006936",
+        "GO:0044057",
+        "GO:0042391",
+        "GO:0060048",
+        "GO:0006941"
+      ]
+    },
+    {
+      "rank": 35,
+      "pathway_id": "GO:0030048",
+      "pathway_name": "actin filament-based movement",
+      "source_db": "GO:BP",
+      "nes_score": 3.855352553308229,
+      "p_adj": 0.0,
+      "evidence_count": 49,
+      "support_count": 20,
+      "seed_genes": [],
+      "literature_support": false,
+      "citations": [],
+      "citation_count": 0,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0065008",
+        "GO:0003008",
+        "GO:0006811",
+        "GO:0008015",
+        "GO:0003013",
+        "GO:0030001",
+        "GO:0006812",
+        "GO:0055085",
+        "GO:0060047",
+        "GO:0003015",
+        "GO:0034220",
+        "GO:0003012",
+        "GO:0098662",
+        "GO:0098655",
+        "GO:0098660",
+        "GO:0006936",
+        "GO:0044057",
+        "GO:0042391",
+        "GO:0060048",
+        "GO:0006941"
+      ]
+    },
+    {
+      "rank": 36,
+      "pathway_id": "GO:0086003",
+      "pathway_name": "cardiac muscle cell contraction",
+      "source_db": "GO:BP",
+      "nes_score": 3.82791825674535,
+      "p_adj": 0.0,
+      "evidence_count": 46,
+      "support_count": 20,
+      "seed_genes": [],
+      "literature_support": false,
+      "citations": [],
+      "citation_count": 0,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0065008",
+        "GO:0003008",
+        "GO:0006811",
+        "GO:0008015",
+        "GO:0003013",
+        "GO:0030001",
+        "GO:0006812",
+        "GO:0055085",
+        "GO:0060047",
+        "GO:0003015",
+        "GO:0034220",
+        "GO:0003012",
+        "GO:0098662",
+        "GO:0098655",
+        "GO:0098660",
+        "GO:0006936",
+        "GO:0044057",
+        "GO:0042391",
+        "GO:0060048",
+        "GO:0006941"
+      ]
+    },
+    {
+      "rank": 37,
+      "pathway_id": "GO:0043269",
+      "pathway_name": "regulation of monoatomic ion transport",
+      "source_db": "GO:BP",
+      "nes_score": 3.82791825674535,
+      "p_adj": 0.0,
+      "evidence_count": 46,
+      "support_count": 20,
+      "seed_genes": [],
+      "literature_support": false,
+      "citations": [],
+      "citation_count": 0,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0065008",
+        "GO:0003008",
+        "GO:0006811",
+        "GO:0008015",
+        "GO:0003013",
+        "GO:0030001",
+        "GO:0006812",
+        "GO:0055085",
+        "GO:0060047",
+        "GO:0003015",
+        "GO:0034220",
+        "GO:0003012",
+        "GO:0098662",
+        "GO:0098655",
+        "GO:0098660",
+        "GO:0006936",
+        "GO:0044057",
+        "GO:0042391",
+        "GO:0060048",
+        "GO:0006941"
+      ]
+    },
+    {
+      "rank": 38,
+      "pathway_id": "GO:0002027",
+      "pathway_name": "regulation of heart rate",
+      "source_db": "GO:BP",
+      "nes_score": 3.808616035426992,
+      "p_adj": 0.0,
+      "evidence_count": 44,
+      "support_count": 20,
+      "seed_genes": [],
+      "literature_support": false,
+      "citations": [],
+      "citation_count": 0,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0065008",
+        "GO:0003008",
+        "GO:0006811",
+        "GO:0008015",
+        "GO:0003013",
+        "GO:0030001",
+        "GO:0006812",
+        "GO:0055085",
+        "GO:0060047",
+        "GO:0003015",
+        "GO:0034220",
+        "GO:0003012",
+        "GO:0098662",
+        "GO:0098655",
+        "GO:0098660",
+        "GO:0006936",
+        "GO:0044057",
+        "GO:0042391",
+        "GO:0060048",
+        "GO:0006941"
+      ]
+    },
+    {
+      "rank": 39,
+      "pathway_id": "GO:0010959",
+      "pathway_name": "regulation of metal ion transport",
+      "source_db": "GO:BP",
+      "nes_score": 3.808616035426992,
+      "p_adj": 0.0,
+      "evidence_count": 44,
+      "support_count": 20,
+      "seed_genes": [],
+      "literature_support": false,
+      "citations": [],
+      "citation_count": 0,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0065008",
+        "GO:0003008",
+        "GO:0006811",
+        "GO:0008015",
+        "GO:0003013",
+        "GO:0030001",
+        "GO:0006812",
+        "GO:0055085",
+        "GO:0060047",
+        "GO:0003015",
+        "GO:0034220",
+        "GO:0003012",
+        "GO:0098662",
+        "GO:0098655",
+        "GO:0098660",
+        "GO:0006936",
+        "GO:0044057",
+        "GO:0042391",
+        "GO:0060048",
+        "GO:0006941"
+      ]
+    },
+    {
+      "rank": 40,
+      "pathway_id": "GO:0061337",
+      "pathway_name": "cardiac conduction",
+      "source_db": "GO:BP",
+      "nes_score": 3.788415862609853,
+      "p_adj": 0.0,
+      "evidence_count": 42,
+      "support_count": 20,
+      "seed_genes": [],
+      "literature_support": false,
+      "citations": [],
+      "citation_count": 0,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0065008",
+        "GO:0003008",
+        "GO:0006811",
+        "GO:0008015",
+        "GO:0003013",
+        "GO:0030001",
+        "GO:0006812",
+        "GO:0055085",
+        "GO:0060047",
+        "GO:0003015",
+        "GO:0034220",
+        "GO:0003012",
+        "GO:0098662",
+        "GO:0098655",
+        "GO:0098660",
+        "GO:0006936",
+        "GO:0044057",
+        "GO:0042391",
+        "GO:0060048",
+        "GO:0006941"
+      ]
+    },
+    {
+      "rank": 41,
+      "pathway_id": "GO:0086002",
+      "pathway_name": "cardiac muscle cell action potential involved in contraction",
+      "source_db": "GO:BP",
+      "nes_score": 3.7779521531161615,
+      "p_adj": 0.0,
+      "evidence_count": 41,
+      "support_count": 20,
+      "seed_genes": [],
+      "literature_support": false,
+      "citations": [],
+      "citation_count": 0,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0065008",
+        "GO:0003008",
+        "GO:0006811",
+        "GO:0008015",
+        "GO:0003013",
+        "GO:0030001",
+        "GO:0006812",
+        "GO:0055085",
+        "GO:0060047",
+        "GO:0003015",
+        "GO:0034220",
+        "GO:0003012",
+        "GO:0098662",
+        "GO:0098655",
+        "GO:0098660",
+        "GO:0006936",
+        "GO:0044057",
+        "GO:0042391",
+        "GO:0060048",
+        "GO:0006941"
+      ]
+    },
+    {
+      "rank": 42,
+      "pathway_id": "GO:0034765",
+      "pathway_name": "regulation of monoatomic ion transmembrane transport",
+      "source_db": "GO:BP",
+      "nes_score": 3.756236617027773,
+      "p_adj": 0.0,
+      "evidence_count": 39,
+      "support_count": 20,
+      "seed_genes": [],
+      "literature_support": false,
+      "citations": [],
+      "citation_count": 0,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0065008",
+        "GO:0003008",
+        "GO:0006811",
+        "GO:0008015",
+        "GO:0003013",
+        "GO:0030001",
+        "GO:0006812",
+        "GO:0055085",
+        "GO:0060047",
+        "GO:0003015",
+        "GO:0034220",
+        "GO:0003012",
+        "GO:0098662",
+        "GO:0098655",
+        "GO:0098660",
+        "GO:0006936",
+        "GO:0044057",
+        "GO:0042391",
+        "GO:0060048",
+        "GO:0006941"
+      ]
+    },
+    {
+      "rank": 43,
+      "pathway_id": "GO:0034762",
+      "pathway_name": "regulation of transmembrane transport",
+      "source_db": "GO:BP",
+      "nes_score": 3.756236617027773,
+      "p_adj": 0.0,
+      "evidence_count": 39,
+      "support_count": 20,
+      "seed_genes": [],
+      "literature_support": false,
+      "citations": [],
+      "citation_count": 0,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0065008",
+        "GO:0003008",
+        "GO:0006811",
+        "GO:0008015",
+        "GO:0003013",
+        "GO:0030001",
+        "GO:0006812",
+        "GO:0055085",
+        "GO:0060047",
+        "GO:0003015",
+        "GO:0034220",
+        "GO:0003012",
+        "GO:0098662",
+        "GO:0098655",
+        "GO:0098660",
+        "GO:0006936",
+        "GO:0044057",
+        "GO:0042391",
+        "GO:0060048",
+        "GO:0006941"
+      ]
+    },
+    {
+      "rank": 44,
+      "pathway_id": "GO:0007267",
+      "pathway_name": "cell-cell signaling",
+      "source_db": "GO:BP",
+      "nes_score": 3.756236617027773,
+      "p_adj": 0.0,
+      "evidence_count": 39,
+      "support_count": 20,
+      "seed_genes": [],
+      "literature_support": false,
+      "citations": [],
+      "citation_count": 0,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0065008",
+        "GO:0003008",
+        "GO:0006811",
+        "GO:0008015",
+        "GO:0003013",
+        "GO:0030001",
+        "GO:0006812",
+        "GO:0055085",
+        "GO:0060047",
+        "GO:0003015",
+        "GO:0034220",
+        "GO:0003012",
+        "GO:0098662",
+        "GO:0098655",
+        "GO:0098660",
+        "GO:0006936",
+        "GO:0044057",
+        "GO:0042391",
+        "GO:0060048",
+        "GO:0006941"
+      ]
+    },
+    {
+      "rank": 45,
+      "pathway_id": "GO:1904062",
+      "pathway_name": "regulation of monoatomic cation transmembrane transport",
+      "source_db": "GO:BP",
+      "nes_score": 3.7333778491068212,
+      "p_adj": 0.0,
+      "evidence_count": 37,
+      "support_count": 20,
+      "seed_genes": [],
+      "literature_support": false,
+      "citations": [],
+      "citation_count": 0,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0065008",
+        "GO:0003008",
+        "GO:0006811",
+        "GO:0008015",
+        "GO:0003013",
+        "GO:0030001",
+        "GO:0006812",
+        "GO:0055085",
+        "GO:0060047",
+        "GO:0003015",
+        "GO:0034220",
+        "GO:0003012",
+        "GO:0098662",
+        "GO:0098655",
+        "GO:0098660",
+        "GO:0006936",
+        "GO:0044057",
+        "GO:0042391",
+        "GO:0060048",
+        "GO:0006941"
+      ]
+    },
+    {
+      "rank": 46,
+      "pathway_id": "GO:0006814",
+      "pathway_name": "sodium ion transport",
+      "source_db": "GO:BP",
+      "nes_score": 3.6836997912174803,
+      "p_adj": 0.0,
+      "evidence_count": 33,
+      "support_count": 20,
+      "seed_genes": [],
+      "literature_support": false,
+      "citations": [],
+      "citation_count": 0,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0065008",
+        "GO:0003008",
+        "GO:0006811",
+        "GO:0008015",
+        "GO:0003013",
+        "GO:0030001",
+        "GO:0006812",
+        "GO:0055085",
+        "GO:0060047",
+        "GO:0003015",
+        "GO:0034220",
+        "GO:0003012",
+        "GO:0098662",
+        "GO:0098655",
+        "GO:0098660",
+        "GO:0006936",
+        "GO:0044057",
+        "GO:0042391",
+        "GO:0060048",
+        "GO:0006941"
+      ]
+    },
+    {
+      "rank": 47,
+      "pathway_id": "GO:0051050",
+      "pathway_name": "positive regulation of transport",
+      "source_db": "GO:BP",
+      "nes_score": 3.670338641127442,
+      "p_adj": 0.0,
+      "evidence_count": 32,
+      "support_count": 20,
+      "seed_genes": [],
+      "literature_support": false,
+      "citations": [],
+      "citation_count": 0,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0065008",
+        "GO:0003008",
+        "GO:0006811",
+        "GO:0008015",
+        "GO:0003013",
+        "GO:0030001",
+        "GO:0006812",
+        "GO:0055085",
+        "GO:0060047",
+        "GO:0003015",
+        "GO:0034220",
+        "GO:0003012",
+        "GO:0098662",
+        "GO:0098655",
+        "GO:0098660",
+        "GO:0006936",
+        "GO:0044057",
+        "GO:0042391",
+        "GO:0060048",
+        "GO:0006941"
+      ]
+    },
+    {
+      "rank": 48,
+      "pathway_id": "GO:0086009",
+      "pathway_name": "membrane repolarization",
+      "source_db": "GO:BP",
+      "nes_score": 3.6565533494747813,
+      "p_adj": 0.0,
+      "evidence_count": 31,
+      "support_count": 20,
+      "seed_genes": [],
+      "literature_support": false,
+      "citations": [],
+      "citation_count": 0,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0065008",
+        "GO:0003008",
+        "GO:0006811",
+        "GO:0008015",
+        "GO:0003013",
+        "GO:0030001",
+        "GO:0006812",
+        "GO:0055085",
+        "GO:0060047",
+        "GO:0003015",
+        "GO:0034220",
+        "GO:0003012",
+        "GO:0098662",
+        "GO:0098655",
+        "GO:0098660",
+        "GO:0006936",
+        "GO:0044057",
+        "GO:0042391",
+        "GO:0060048",
+        "GO:0006941"
+      ]
+    },
+    {
+      "rank": 49,
+      "pathway_id": "GO:0006813",
+      "pathway_name": "potassium ion transport",
+      "source_db": "GO:BP",
+      "nes_score": 3.6565533494747813,
+      "p_adj": 0.0,
+      "evidence_count": 31,
+      "support_count": 20,
+      "seed_genes": [],
+      "literature_support": false,
+      "citations": [],
+      "citation_count": 0,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0065008",
+        "GO:0003008",
+        "GO:0006811",
+        "GO:0008015",
+        "GO:0003013",
+        "GO:0030001",
+        "GO:0006812",
+        "GO:0055085",
+        "GO:0060047",
+        "GO:0003015",
+        "GO:0034220",
+        "GO:0003012",
+        "GO:0098662",
+        "GO:0098655",
+        "GO:0098660",
+        "GO:0006936",
+        "GO:0044057",
+        "GO:0042391",
+        "GO:0060048",
+        "GO:0006941"
+      ]
+    },
+    {
+      "rank": 50,
+      "pathway_id": "KEGG:04261",
+      "pathway_name": "Adrenergic signaling in cardiomyocytes",
+      "source_db": "KEGG",
+      "nes_score": 3.6489451821656727,
+      "p_adj": 0.0,
+      "evidence_count": 22,
+      "support_count": 20,
+      "seed_genes": [],
+      "literature_support": false,
+      "citations": [],
+      "citation_count": 0,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0065008",
+        "GO:0003008",
+        "GO:0006811",
+        "GO:0008015",
+        "GO:0003013",
+        "GO:0030001",
+        "GO:0006812",
+        "GO:0055085",
+        "GO:0060047",
+        "GO:0003015",
+        "GO:0034220",
+        "GO:0003012",
+        "GO:0098662",
+        "GO:0098655",
+        "GO:0098660",
+        "GO:0006936",
+        "GO:0044057",
+        "GO:0042391",
+        "GO:0060048",
+        "GO:0006941"
+      ]
+    },
+    {
+      "rank": 51,
+      "pathway_id": "GO:0071805",
+      "pathway_name": "potassium ion transmembrane transport",
+      "source_db": "GO:BP",
+      "nes_score": 3.6423161026926096,
+      "p_adj": 0.0,
+      "evidence_count": 30,
+      "support_count": 20,
+      "seed_genes": [],
+      "literature_support": false,
+      "citations": [],
+      "citation_count": 0,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0065008",
+        "GO:0003008",
+        "GO:0006811",
+        "GO:0008015",
+        "GO:0003013",
+        "GO:0030001",
+        "GO:0006812",
+        "GO:0055085",
+        "GO:0060047",
+        "GO:0003015",
+        "GO:0034220",
+        "GO:0003012",
+        "GO:0098662",
+        "GO:0098655",
+        "GO:0098660",
+        "GO:0006936",
+        "GO:0044057",
+        "GO:0042391",
+        "GO:0060048",
+        "GO:0006941"
+      ]
+    },
+    {
+      "rank": 52,
+      "pathway_id": "GO:0086065",
+      "pathway_name": "cell communication involved in cardiac conduction",
+      "source_db": "GO:BP",
+      "nes_score": 3.6275962583392505,
+      "p_adj": 0.0,
+      "evidence_count": 29,
+      "support_count": 20,
+      "seed_genes": [],
+      "literature_support": false,
+      "citations": [],
+      "citation_count": 0,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0065008",
+        "GO:0003008",
+        "GO:0006811",
+        "GO:0008015",
+        "GO:0003013",
+        "GO:0030001",
+        "GO:0006812",
+        "GO:0055085",
+        "GO:0060047",
+        "GO:0003015",
+        "GO:0034220",
+        "GO:0003012",
+        "GO:0098662",
+        "GO:0098655",
+        "GO:0098660",
+        "GO:0006936",
+        "GO:0044057",
+        "GO:0042391",
+        "GO:0060048",
+        "GO:0006941"
+      ]
+    },
+    {
+      "rank": 53,
+      "pathway_id": "GO:0035725",
+      "pathway_name": "sodium ion transmembrane transport",
+      "source_db": "GO:BP",
+      "nes_score": 3.6275962583392505,
+      "p_adj": 0.0,
+      "evidence_count": 29,
+      "support_count": 20,
+      "seed_genes": [],
+      "literature_support": false,
+      "citations": [],
+      "citation_count": 0,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0065008",
+        "GO:0003008",
+        "GO:0006811",
+        "GO:0008015",
+        "GO:0003013",
+        "GO:0030001",
+        "GO:0006812",
+        "GO:0055085",
+        "GO:0060047",
+        "GO:0003015",
+        "GO:0034220",
+        "GO:0003012",
+        "GO:0098662",
+        "GO:0098655",
+        "GO:0098660",
+        "GO:0006936",
+        "GO:0044057",
+        "GO:0042391",
+        "GO:0060048",
+        "GO:0006941"
+      ]
+    },
+    {
+      "rank": 54,
+      "pathway_id": "GO:0086091",
+      "pathway_name": "regulation of heart rate by cardiac conduction",
+      "source_db": "GO:BP",
+      "nes_score": 3.612359947967774,
+      "p_adj": 0.0,
+      "evidence_count": 28,
+      "support_count": 20,
+      "seed_genes": [],
+      "literature_support": false,
+      "citations": [],
+      "citation_count": 0,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0065008",
+        "GO:0003008",
+        "GO:0006811",
+        "GO:0008015",
+        "GO:0003013",
+        "GO:0030001",
+        "GO:0006812",
+        "GO:0055085",
+        "GO:0060047",
+        "GO:0003015",
+        "GO:0034220",
+        "GO:0003012",
+        "GO:0098662",
+        "GO:0098655",
+        "GO:0098660",
+        "GO:0006936",
+        "GO:0044057",
+        "GO:0042391",
+        "GO:0060048",
+        "GO:0006941"
+      ]
+    },
+    {
+      "rank": 55,
+      "pathway_id": "GO:0099622",
+      "pathway_name": "cardiac muscle cell membrane repolarization",
+      "source_db": "GO:BP",
+      "nes_score": 3.5965696077640565,
+      "p_adj": 0.0,
+      "evidence_count": 27,
+      "support_count": 20,
+      "seed_genes": [],
+      "literature_support": false,
+      "citations": [],
+      "citation_count": 0,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0065008",
+        "GO:0003008",
+        "GO:0006811",
+        "GO:0008015",
+        "GO:0003013",
+        "GO:0030001",
+        "GO:0006812",
+        "GO:0055085",
+        "GO:0060047",
+        "GO:0003015",
+        "GO:0034220",
+        "GO:0003012",
+        "GO:0098662",
+        "GO:0098655",
+        "GO:0098660",
+        "GO:0006936",
+        "GO:0044057",
+        "GO:0042391",
+        "GO:0060048",
+        "GO:0006941"
+      ]
+    },
+    {
+      "rank": 56,
+      "pathway_id": "GO:0086005",
+      "pathway_name": "ventricular cardiac muscle cell action potential",
+      "source_db": "GO:BP",
+      "nes_score": 3.580183420591038,
+      "p_adj": 0.0,
+      "evidence_count": 26,
+      "support_count": 20,
+      "seed_genes": [],
+      "literature_support": false,
+      "citations": [],
+      "citation_count": 0,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0065008",
+        "GO:0003008",
+        "GO:0006811",
+        "GO:0008015",
+        "GO:0003013",
+        "GO:0030001",
+        "GO:0006812",
+        "GO:0055085",
+        "GO:0060047",
+        "GO:0003015",
+        "GO:0034220",
+        "GO:0003012",
+        "GO:0098662",
+        "GO:0098655",
+        "GO:0098660",
+        "GO:0006936",
+        "GO:0044057",
+        "GO:0042391",
+        "GO:0060048",
+        "GO:0006941"
+      ]
+    },
+    {
+      "rank": 57,
+      "pathway_id": "GO:0060306",
+      "pathway_name": "regulation of membrane repolarization",
+      "source_db": "GO:BP",
+      "nes_score": 3.580183420591038,
+      "p_adj": 0.0,
+      "evidence_count": 26,
+      "support_count": 20,
+      "seed_genes": [],
+      "literature_support": false,
+      "citations": [],
+      "citation_count": 0,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0065008",
+        "GO:0003008",
+        "GO:0006811",
+        "GO:0008015",
+        "GO:0003013",
+        "GO:0030001",
+        "GO:0006812",
+        "GO:0055085",
+        "GO:0060047",
+        "GO:0003015",
+        "GO:0034220",
+        "GO:0003012",
+        "GO:0098662",
+        "GO:0098655",
+        "GO:0098660",
+        "GO:0006936",
+        "GO:0044057",
+        "GO:0042391",
+        "GO:0060048",
+        "GO:0006941"
+      ]
+    },
+    {
+      "rank": 58,
+      "pathway_id": "GO:0055117",
+      "pathway_name": "regulation of cardiac muscle contraction",
+      "source_db": "GO:BP",
+      "nes_score": 3.580183420591038,
+      "p_adj": 0.0,
+      "evidence_count": 26,
+      "support_count": 20,
+      "seed_genes": [],
+      "literature_support": false,
+      "citations": [],
+      "citation_count": 0,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0065008",
+        "GO:0003008",
+        "GO:0006811",
+        "GO:0008015",
+        "GO:0003013",
+        "GO:0030001",
+        "GO:0006812",
+        "GO:0055085",
+        "GO:0060047",
+        "GO:0003015",
+        "GO:0034220",
+        "GO:0003012",
+        "GO:0098662",
+        "GO:0098655",
+        "GO:0098660",
+        "GO:0006936",
+        "GO:0044057",
+        "GO:0042391",
+        "GO:0060048",
+        "GO:0006941"
+      ]
+    },
+    {
+      "rank": 59,
+      "pathway_id": "GO:0051899",
+      "pathway_name": "membrane depolarization",
+      "source_db": "GO:BP",
+      "nes_score": 3.580183420591038,
+      "p_adj": 0.0,
+      "evidence_count": 26,
+      "support_count": 20,
+      "seed_genes": [],
+      "literature_support": false,
+      "citations": [],
+      "citation_count": 0,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0065008",
+        "GO:0003008",
+        "GO:0006811",
+        "GO:0008015",
+        "GO:0003013",
+        "GO:0030001",
+        "GO:0006812",
+        "GO:0055085",
+        "GO:0060047",
+        "GO:0003015",
+        "GO:0034220",
+        "GO:0003012",
+        "GO:0098662",
+        "GO:0098655",
+        "GO:0098660",
+        "GO:0006936",
+        "GO:0044057",
+        "GO:0042391",
+        "GO:0060048",
+        "GO:0006941"
+      ]
+    },
+    {
+      "rank": 60,
+      "pathway_id": "GO:0043270",
+      "pathway_name": "positive regulation of monoatomic ion transport",
+      "source_db": "GO:BP",
+      "nes_score": 3.580183420591038,
+      "p_adj": 0.0,
+      "evidence_count": 26,
+      "support_count": 20,
+      "seed_genes": [],
+      "literature_support": false,
+      "citations": [],
+      "citation_count": 0,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0065008",
+        "GO:0003008",
+        "GO:0006811",
+        "GO:0008015",
+        "GO:0003013",
+        "GO:0030001",
+        "GO:0006812",
+        "GO:0055085",
+        "GO:0060047",
+        "GO:0003015",
+        "GO:0034220",
+        "GO:0003012",
+        "GO:0098662",
+        "GO:0098655",
+        "GO:0098660",
+        "GO:0006936",
+        "GO:0044057",
+        "GO:0042391",
+        "GO:0060048",
+        "GO:0006941"
+      ]
+    },
+    {
+      "rank": 61,
+      "pathway_id": "GO:0099625",
+      "pathway_name": "ventricular cardiac muscle cell membrane repolarization",
+      "source_db": "GO:BP",
+      "nes_score": 3.545430829465351,
+      "p_adj": 0.0,
+      "evidence_count": 24,
+      "support_count": 20,
+      "seed_genes": [],
+      "literature_support": false,
+      "citations": [],
+      "citation_count": 0,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0065008",
+        "GO:0003008",
+        "GO:0006811",
+        "GO:0008015",
+        "GO:0003013",
+        "GO:0030001",
+        "GO:0006812",
+        "GO:0055085",
+        "GO:0060047",
+        "GO:0003015",
+        "GO:0034220",
+        "GO:0003012",
+        "GO:0098662",
+        "GO:0098655",
+        "GO:0098660",
+        "GO:0006936",
+        "GO:0044057",
+        "GO:0042391",
+        "GO:0060048",
+        "GO:0006941"
+      ]
+    },
+    {
+      "rank": 62,
+      "pathway_id": "GO:0086019",
+      "pathway_name": "cell-cell signaling involved in cardiac conduction",
+      "source_db": "GO:BP",
+      "nes_score": 3.545430829465351,
+      "p_adj": 0.0,
+      "evidence_count": 24,
+      "support_count": 20,
+      "seed_genes": [],
+      "literature_support": false,
+      "citations": [],
+      "citation_count": 0,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0065008",
+        "GO:0003008",
+        "GO:0006811",
+        "GO:0008015",
+        "GO:0003013",
+        "GO:0030001",
+        "GO:0006812",
+        "GO:0055085",
+        "GO:0060047",
+        "GO:0003015",
+        "GO:0034220",
+        "GO:0003012",
+        "GO:0098662",
+        "GO:0098655",
+        "GO:0098660",
+        "GO:0006936",
+        "GO:0044057",
+        "GO:0042391",
+        "GO:0060048",
+        "GO:0006941"
+      ]
+    },
+    {
+      "rank": 63,
+      "pathway_id": "GO:0032412",
+      "pathway_name": "regulation of monoatomic ion transmembrane transporter activity",
+      "source_db": "GO:BP",
+      "nes_score": 3.545430829465351,
+      "p_adj": 0.0,
+      "evidence_count": 24,
+      "support_count": 20,
+      "seed_genes": [],
+      "literature_support": false,
+      "citations": [],
+      "citation_count": 0,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0065008",
+        "GO:0003008",
+        "GO:0006811",
+        "GO:0008015",
+        "GO:0003013",
+        "GO:0030001",
+        "GO:0006812",
+        "GO:0055085",
+        "GO:0060047",
+        "GO:0003015",
+        "GO:0034220",
+        "GO:0003012",
+        "GO:0098662",
+        "GO:0098655",
+        "GO:0098660",
+        "GO:0006936",
+        "GO:0044057",
+        "GO:0042391",
+        "GO:0060048",
+        "GO:0006941"
+      ]
+    },
+    {
+      "rank": 64,
+      "pathway_id": "GO:0022898",
+      "pathway_name": "regulation of transmembrane transporter activity",
+      "source_db": "GO:BP",
+      "nes_score": 3.545430829465351,
+      "p_adj": 0.0,
+      "evidence_count": 24,
+      "support_count": 20,
+      "seed_genes": [],
+      "literature_support": false,
+      "citations": [],
+      "citation_count": 0,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0065008",
+        "GO:0003008",
+        "GO:0006811",
+        "GO:0008015",
+        "GO:0003013",
+        "GO:0030001",
+        "GO:0006812",
+        "GO:0055085",
+        "GO:0060047",
+        "GO:0003015",
+        "GO:0034220",
+        "GO:0003012",
+        "GO:0098662",
+        "GO:0098655",
+        "GO:0098660",
+        "GO:0006936",
+        "GO:0044057",
+        "GO:0042391",
+        "GO:0060048",
+        "GO:0006941"
+      ]
+    },
+    {
+      "rank": 65,
+      "pathway_id": "GO:0032409",
+      "pathway_name": "regulation of transporter activity",
+      "source_db": "GO:BP",
+      "nes_score": 3.545430829465351,
+      "p_adj": 0.0,
+      "evidence_count": 24,
+      "support_count": 20,
+      "seed_genes": [],
+      "literature_support": false,
+      "citations": [],
+      "citation_count": 0,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0065008",
+        "GO:0003008",
+        "GO:0006811",
+        "GO:0008015",
+        "GO:0003013",
+        "GO:0030001",
+        "GO:0006812",
+        "GO:0055085",
+        "GO:0060047",
+        "GO:0003015",
+        "GO:0034220",
+        "GO:0003012",
+        "GO:0098662",
+        "GO:0098655",
+        "GO:0098660",
+        "GO:0006936",
+        "GO:0044057",
+        "GO:0042391",
+        "GO:0060048",
+        "GO:0006941"
+      ]
+    },
+    {
+      "rank": 66,
+      "pathway_id": "GO:0098771",
+      "pathway_name": "inorganic ion homeostasis",
+      "source_db": "GO:BP",
+      "nes_score": 3.545430829465351,
+      "p_adj": 0.0,
+      "evidence_count": 24,
+      "support_count": 20,
+      "seed_genes": [],
+      "literature_support": false,
+      "citations": [],
+      "citation_count": 0,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0065008",
+        "GO:0003008",
+        "GO:0006811",
+        "GO:0008015",
+        "GO:0003013",
+        "GO:0030001",
+        "GO:0006812",
+        "GO:0055085",
+        "GO:0060047",
+        "GO:0003015",
+        "GO:0034220",
+        "GO:0003012",
+        "GO:0098662",
+        "GO:0098655",
+        "GO:0098660",
+        "GO:0006936",
+        "GO:0044057",
+        "GO:0042391",
+        "GO:0060048",
+        "GO:0006941"
+      ]
+    },
+    {
+      "rank": 67,
+      "pathway_id": "GO:0098900",
+      "pathway_name": "regulation of action potential",
+      "source_db": "GO:BP",
+      "nes_score": 3.507653513464988,
+      "p_adj": 0.0,
+      "evidence_count": 22,
+      "support_count": 20,
+      "seed_genes": [],
+      "literature_support": false,
+      "citations": [],
+      "citation_count": 0,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0065008",
+        "GO:0003008",
+        "GO:0006811",
+        "GO:0008015",
+        "GO:0003013",
+        "GO:0030001",
+        "GO:0006812",
+        "GO:0055085",
+        "GO:0060047",
+        "GO:0003015",
+        "GO:0034220",
+        "GO:0003012",
+        "GO:0098662",
+        "GO:0098655",
+        "GO:0098660",
+        "GO:0006936",
+        "GO:0044057",
+        "GO:0042391",
+        "GO:0060048",
+        "GO:0006941"
+      ]
+    },
+    {
+      "rank": 68,
+      "pathway_id": "GO:0099623",
+      "pathway_name": "regulation of cardiac muscle cell membrane repolarization",
+      "source_db": "GO:BP",
+      "nes_score": 3.4874565528968584,
+      "p_adj": 0.0,
+      "evidence_count": 21,
+      "support_count": 20,
+      "seed_genes": [],
+      "literature_support": false,
+      "citations": [],
+      "citation_count": 0,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0065008",
+        "GO:0003008",
+        "GO:0006811",
+        "GO:0008015",
+        "GO:0003013",
+        "GO:0030001",
+        "GO:0006812",
+        "GO:0055085",
+        "GO:0060047",
+        "GO:0003015",
+        "GO:0034220",
+        "GO:0003012",
+        "GO:0098662",
+        "GO:0098655",
+        "GO:0098660",
+        "GO:0006936",
+        "GO:0044057",
+        "GO:0042391",
+        "GO:0060048",
+        "GO:0006941"
+      ]
+    },
+    {
+      "rank": 69,
+      "pathway_id": "GO:0060307",
+      "pathway_name": "regulation of ventricular cardiac muscle cell membrane repolarization",
+      "source_db": "GO:BP",
+      "nes_score": 3.466274321789292,
+      "p_adj": 0.0,
+      "evidence_count": 20,
+      "support_count": 20,
+      "seed_genes": [],
+      "literature_support": false,
+      "citations": [],
+      "citation_count": 0,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0065008",
+        "GO:0003008",
+        "GO:0006811",
+        "GO:0008015",
+        "GO:0003013",
+        "GO:0030001",
+        "GO:0006812",
+        "GO:0055085",
+        "GO:0060047",
+        "GO:0003015",
+        "GO:0034220",
+        "GO:0003012",
+        "GO:0098662",
+        "GO:0098655",
+        "GO:0098660",
+        "GO:0006936",
+        "GO:0044057",
+        "GO:0042391",
+        "GO:0060048",
+        "GO:0006941"
+      ]
+    },
+    {
+      "rank": 70,
+      "pathway_id": "GO:0086010",
+      "pathway_name": "membrane depolarization during action potential",
+      "source_db": "GO:BP",
+      "nes_score": 3.466274321789292,
+      "p_adj": 0.0,
+      "evidence_count": 20,
+      "support_count": 20,
+      "seed_genes": [],
+      "literature_support": false,
+      "citations": [],
+      "citation_count": 0,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0065008",
+        "GO:0003008",
+        "GO:0006811",
+        "GO:0008015",
+        "GO:0003013",
+        "GO:0030001",
+        "GO:0006812",
+        "GO:0055085",
+        "GO:0060047",
+        "GO:0003015",
+        "GO:0034220",
+        "GO:0003012",
+        "GO:0098662",
+        "GO:0098655",
+        "GO:0098660",
+        "GO:0006936",
+        "GO:0044057",
+        "GO:0042391",
+        "GO:0060048",
+        "GO:0006941"
+      ]
+    },
+    {
+      "rank": 71,
+      "pathway_id": "GO:0043266",
+      "pathway_name": "regulation of potassium ion transport",
+      "source_db": "GO:BP",
+      "nes_score": 3.466274321789292,
+      "p_adj": 0.0,
+      "evidence_count": 20,
+      "support_count": 20,
+      "seed_genes": [],
+      "literature_support": false,
+      "citations": [],
+      "citation_count": 0,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0065008",
+        "GO:0003008",
+        "GO:0006811",
+        "GO:0008015",
+        "GO:0003013",
+        "GO:0030001",
+        "GO:0006812",
+        "GO:0055085",
+        "GO:0060047",
+        "GO:0003015",
+        "GO:0034220",
+        "GO:0003012",
+        "GO:0098662",
+        "GO:0098655",
+        "GO:0098660",
+        "GO:0006936",
+        "GO:0044057",
+        "GO:0042391",
+        "GO:0060048",
+        "GO:0006941"
+      ]
+    },
+    {
+      "rank": 72,
+      "pathway_id": "GO:0002028",
+      "pathway_name": "regulation of sodium ion transport",
+      "source_db": "GO:BP",
+      "nes_score": 3.466274321789292,
+      "p_adj": 0.0,
+      "evidence_count": 20,
+      "support_count": 20,
+      "seed_genes": [],
+      "literature_support": false,
+      "citations": [],
+      "citation_count": 0,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0065008",
+        "GO:0003008",
+        "GO:0006811",
+        "GO:0008015",
+        "GO:0003013",
+        "GO:0030001",
+        "GO:0006812",
+        "GO:0055085",
+        "GO:0060047",
+        "GO:0003015",
+        "GO:0034220",
+        "GO:0003012",
+        "GO:0098662",
+        "GO:0098655",
+        "GO:0098660",
+        "GO:0006936",
+        "GO:0044057",
+        "GO:0042391",
+        "GO:0060048",
+        "GO:0006941"
+      ]
+    },
+    {
+      "rank": 73,
+      "pathway_id": "GO:0086011",
+      "pathway_name": "membrane repolarization during action potential",
+      "source_db": "GO:BP",
+      "nes_score": 3.4440057389027254,
+      "p_adj": 0.0,
+      "evidence_count": 19,
+      "support_count": 20,
+      "seed_genes": [],
+      "literature_support": false,
+      "citations": [],
+      "citation_count": 0,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0065008",
+        "GO:0003008",
+        "GO:0006811",
+        "GO:0008015",
+        "GO:0003013",
+        "GO:0030001",
+        "GO:0006812",
+        "GO:0055085",
+        "GO:0060047",
+        "GO:0003015",
+        "GO:0034220",
+        "GO:0003012",
+        "GO:0098662",
+        "GO:0098655",
+        "GO:0098660",
+        "GO:0006936",
+        "GO:0044057",
+        "GO:0042391",
+        "GO:0060048",
+        "GO:0006941"
+      ]
+    },
+    {
+      "rank": 74,
+      "pathway_id": "GO:1901379",
+      "pathway_name": "regulation of potassium ion transmembrane transport",
+      "source_db": "GO:BP",
+      "nes_score": 3.4440057389027254,
+      "p_adj": 0.0,
+      "evidence_count": 19,
+      "support_count": 20,
+      "seed_genes": [],
+      "literature_support": false,
+      "citations": [],
+      "citation_count": 0,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0065008",
+        "GO:0003008",
+        "GO:0006811",
+        "GO:0008015",
+        "GO:0003013",
+        "GO:0030001",
+        "GO:0006812",
+        "GO:0055085",
+        "GO:0060047",
+        "GO:0003015",
+        "GO:0034220",
+        "GO:0003012",
+        "GO:0098662",
+        "GO:0098655",
+        "GO:0098660",
+        "GO:0006936",
+        "GO:0044057",
+        "GO:0042391",
+        "GO:0060048",
+        "GO:0006941"
+      ]
+    },
+    {
+      "rank": 75,
+      "pathway_id": "GO:0099587",
+      "pathway_name": "inorganic ion import across plasma membrane",
+      "source_db": "GO:BP",
+      "nes_score": 3.4205333226934997,
+      "p_adj": 0.0,
+      "evidence_count": 18,
+      "support_count": 20,
+      "seed_genes": [],
+      "literature_support": false,
+      "citations": [],
+      "citation_count": 0,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0065008",
+        "GO:0003008",
+        "GO:0006811",
+        "GO:0008015",
+        "GO:0003013",
+        "GO:0030001",
+        "GO:0006812",
+        "GO:0055085",
+        "GO:0060047",
+        "GO:0003015",
+        "GO:0034220",
+        "GO:0003012",
+        "GO:0098662",
+        "GO:0098655",
+        "GO:0098660",
+        "GO:0006936",
+        "GO:0044057",
+        "GO:0042391",
+        "GO:0060048",
+        "GO:0006941"
+      ]
+    },
+    {
+      "rank": 76,
+      "pathway_id": "GO:0098659",
+      "pathway_name": "inorganic cation import across plasma membrane",
+      "source_db": "GO:BP",
+      "nes_score": 3.4205333226934997,
+      "p_adj": 0.0,
+      "evidence_count": 18,
+      "support_count": 20,
+      "seed_genes": [],
+      "literature_support": false,
+      "citations": [],
+      "citation_count": 0,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0065008",
+        "GO:0003008",
+        "GO:0006811",
+        "GO:0008015",
+        "GO:0003013",
+        "GO:0030001",
+        "GO:0006812",
+        "GO:0055085",
+        "GO:0060047",
+        "GO:0003015",
+        "GO:0034220",
+        "GO:0003012",
+        "GO:0098662",
+        "GO:0098655",
+        "GO:0098660",
+        "GO:0006936",
+        "GO:0044057",
+        "GO:0042391",
+        "GO:0060048",
+        "GO:0006941"
+      ]
+    },
+    {
+      "rank": 77,
+      "pathway_id": "GO:0098739",
+      "pathway_name": "import across plasma membrane",
+      "source_db": "GO:BP",
+      "nes_score": 3.4205333226934997,
+      "p_adj": 0.0,
+      "evidence_count": 18,
+      "support_count": 20,
+      "seed_genes": [],
+      "literature_support": false,
+      "citations": [],
+      "citation_count": 0,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0065008",
+        "GO:0003008",
+        "GO:0006811",
+        "GO:0008015",
+        "GO:0003013",
+        "GO:0030001",
+        "GO:0006812",
+        "GO:0055085",
+        "GO:0060047",
+        "GO:0003015",
+        "GO:0034220",
+        "GO:0003012",
+        "GO:0098662",
+        "GO:0098655",
+        "GO:0098660",
+        "GO:0006936",
+        "GO:0044057",
+        "GO:0042391",
+        "GO:0060048",
+        "GO:0006941"
+      ]
+    },
+    {
+      "rank": 78,
+      "pathway_id": "GO:0086013",
+      "pathway_name": "membrane repolarization during cardiac muscle cell action potential",
+      "source_db": "GO:BP",
+      "nes_score": 3.3957194395376415,
+      "p_adj": 0.0,
+      "evidence_count": 17,
+      "support_count": 20,
+      "seed_genes": [],
+      "literature_support": false,
+      "citations": [],
+      "citation_count": 0,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0065008",
+        "GO:0003008",
+        "GO:0006811",
+        "GO:0008015",
+        "GO:0003013",
+        "GO:0030001",
+        "GO:0006812",
+        "GO:0055085",
+        "GO:0060047",
+        "GO:0003015",
+        "GO:0034220",
+        "GO:0003012",
+        "GO:0098662",
+        "GO:0098655",
+        "GO:0098660",
+        "GO:0006936",
+        "GO:0044057",
+        "GO:0042391",
+        "GO:0060048",
+        "GO:0006941"
+      ]
+    },
+    {
+      "rank": 79,
+      "pathway_id": "GO:1904064",
+      "pathway_name": "positive regulation of cation transmembrane transport",
+      "source_db": "GO:BP",
+      "nes_score": 3.3957194395376415,
+      "p_adj": 0.0,
+      "evidence_count": 17,
+      "support_count": 20,
+      "seed_genes": [],
+      "literature_support": false,
+      "citations": [],
+      "citation_count": 0,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0065008",
+        "GO:0003008",
+        "GO:0006811",
+        "GO:0008015",
+        "GO:0003013",
+        "GO:0030001",
+        "GO:0006812",
+        "GO:0055085",
+        "GO:0060047",
+        "GO:0003015",
+        "GO:0034220",
+        "GO:0003012",
+        "GO:0098662",
+        "GO:0098655",
+        "GO:0098660",
+        "GO:0006936",
+        "GO:0044057",
+        "GO:0042391",
+        "GO:0060048",
+        "GO:0006941"
+      ]
+    },
+    {
+      "rank": 80,
+      "pathway_id": "GO:0034767",
+      "pathway_name": "positive regulation of monoatomic ion transmembrane transport",
+      "source_db": "GO:BP",
+      "nes_score": 3.3957194395376415,
+      "p_adj": 0.0,
+      "evidence_count": 17,
+      "support_count": 20,
+      "seed_genes": [],
+      "literature_support": false,
+      "citations": [],
+      "citation_count": 0,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0065008",
+        "GO:0003008",
+        "GO:0006811",
+        "GO:0008015",
+        "GO:0003013",
+        "GO:0030001",
+        "GO:0006812",
+        "GO:0055085",
+        "GO:0060047",
+        "GO:0003015",
+        "GO:0034220",
+        "GO:0003012",
+        "GO:0098662",
+        "GO:0098655",
+        "GO:0098660",
+        "GO:0006936",
+        "GO:0044057",
+        "GO:0042391",
+        "GO:0060048",
+        "GO:0006941"
+      ]
+    },
+    {
+      "rank": 81,
+      "pathway_id": "GO:0086012",
+      "pathway_name": "membrane depolarization during cardiac muscle cell action potential",
+      "source_db": "GO:BP",
+      "nes_score": 3.3694014136966244,
+      "p_adj": 0.0,
+      "evidence_count": 16,
+      "support_count": 20,
+      "seed_genes": [],
+      "literature_support": false,
+      "citations": [],
+      "citation_count": 0,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0065008",
+        "GO:0003008",
+        "GO:0006811",
+        "GO:0008015",
+        "GO:0003013",
+        "GO:0030001",
+        "GO:0006812",
+        "GO:0055085",
+        "GO:0060047",
+        "GO:0003015",
+        "GO:0034220",
+        "GO:0003012",
+        "GO:0098662",
+        "GO:0098655",
+        "GO:0098660",
+        "GO:0006936",
+        "GO:0044057",
+        "GO:0042391",
+        "GO:0060048",
+        "GO:0006941"
+      ]
+    },
+    {
+      "rank": 82,
+      "pathway_id": "GO:0098901",
+      "pathway_name": "regulation of cardiac muscle cell action potential",
+      "source_db": "GO:BP",
+      "nes_score": 3.3694014136966244,
+      "p_adj": 0.0,
+      "evidence_count": 16,
+      "support_count": 20,
+      "seed_genes": [],
+      "literature_support": false,
+      "citations": [],
+      "citation_count": 0,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0065008",
+        "GO:0003008",
+        "GO:0006811",
+        "GO:0008015",
+        "GO:0003013",
+        "GO:0030001",
+        "GO:0006812",
+        "GO:0055085",
+        "GO:0060047",
+        "GO:0003015",
+        "GO:0034220",
+        "GO:0003012",
+        "GO:0098662",
+        "GO:0098655",
+        "GO:0098660",
+        "GO:0006936",
+        "GO:0044057",
+        "GO:0042391",
+        "GO:0060048",
+        "GO:0006941"
+      ]
+    },
+    {
+      "rank": 83,
+      "pathway_id": "GO:1903115",
+      "pathway_name": "regulation of actin filament-based movement",
+      "source_db": "GO:BP",
+      "nes_score": 3.3694014136966244,
+      "p_adj": 0.0,
+      "evidence_count": 16,
+      "support_count": 20,
+      "seed_genes": [],
+      "literature_support": false,
+      "citations": [],
+      "citation_count": 0,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0065008",
+        "GO:0003008",
+        "GO:0006811",
+        "GO:0008015",
+        "GO:0003013",
+        "GO:0030001",
+        "GO:0006812",
+        "GO:0055085",
+        "GO:0060047",
+        "GO:0003015",
+        "GO:0034220",
+        "GO:0003012",
+        "GO:0098662",
+        "GO:0098655",
+        "GO:0098660",
+        "GO:0006936",
+        "GO:0044057",
+        "GO:0042391",
+        "GO:0060048",
+        "GO:0006941"
+      ]
+    },
+    {
+      "rank": 84,
+      "pathway_id": "GO:0086004",
+      "pathway_name": "regulation of cardiac muscle cell contraction",
+      "source_db": "GO:BP",
+      "nes_score": 3.3694014136966244,
+      "p_adj": 0.0,
+      "evidence_count": 16,
+      "support_count": 20,
+      "seed_genes": [],
+      "literature_support": false,
+      "citations": [],
+      "citation_count": 0,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0065008",
+        "GO:0003008",
+        "GO:0006811",
+        "GO:0008015",
+        "GO:0003013",
+        "GO:0030001",
+        "GO:0006812",
+        "GO:0055085",
+        "GO:0060047",
+        "GO:0003015",
+        "GO:0034220",
+        "GO:0003012",
+        "GO:0098662",
+        "GO:0098655",
+        "GO:0098660",
+        "GO:0006936",
+        "GO:0044057",
+        "GO:0042391",
+        "GO:0060048",
+        "GO:0006941"
+      ]
+    },
+    {
+      "rank": 85,
+      "pathway_id": "GO:1902305",
+      "pathway_name": "regulation of sodium ion transmembrane transport",
+      "source_db": "GO:BP",
+      "nes_score": 3.3694014136966244,
+      "p_adj": 0.0,
+      "evidence_count": 16,
+      "support_count": 20,
+      "seed_genes": [],
+      "literature_support": false,
+      "citations": [],
+      "citation_count": 0,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0065008",
+        "GO:0003008",
+        "GO:0006811",
+        "GO:0008015",
+        "GO:0003013",
+        "GO:0030001",
+        "GO:0006812",
+        "GO:0055085",
+        "GO:0060047",
+        "GO:0003015",
+        "GO:0034220",
+        "GO:0003012",
+        "GO:0098662",
+        "GO:0098655",
+        "GO:0098660",
+        "GO:0006936",
+        "GO:0044057",
+        "GO:0042391",
+        "GO:0060048",
+        "GO:0006941"
+      ]
+    },
+    {
+      "rank": 86,
+      "pathway_id": "GO:0003254",
+      "pathway_name": "regulation of membrane depolarization",
+      "source_db": "GO:BP",
+      "nes_score": 3.3694014136966244,
+      "p_adj": 0.0,
+      "evidence_count": 16,
+      "support_count": 20,
+      "seed_genes": [],
+      "literature_support": false,
+      "citations": [],
+      "citation_count": 0,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0065008",
+        "GO:0003008",
+        "GO:0006811",
+        "GO:0008015",
+        "GO:0003013",
+        "GO:0030001",
+        "GO:0006812",
+        "GO:0055085",
+        "GO:0060047",
+        "GO:0003015",
+        "GO:0034220",
+        "GO:0003012",
+        "GO:0098662",
+        "GO:0098655",
+        "GO:0098660",
+        "GO:0006936",
+        "GO:0044057",
+        "GO:0042391",
+        "GO:0060048",
+        "GO:0006941"
+      ]
+    },
+    {
+      "rank": 87,
+      "pathway_id": "GO:2001257",
+      "pathway_name": "regulation of cation channel activity",
+      "source_db": "GO:BP",
+      "nes_score": 3.3694014136966244,
+      "p_adj": 0.0,
+      "evidence_count": 16,
+      "support_count": 20,
+      "seed_genes": [],
+      "literature_support": false,
+      "citations": [],
+      "citation_count": 0,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0065008",
+        "GO:0003008",
+        "GO:0006811",
+        "GO:0008015",
+        "GO:0003013",
+        "GO:0030001",
+        "GO:0006812",
+        "GO:0055085",
+        "GO:0060047",
+        "GO:0003015",
+        "GO:0034220",
+        "GO:0003012",
+        "GO:0098662",
+        "GO:0098655",
+        "GO:0098660",
+        "GO:0006936",
+        "GO:0044057",
+        "GO:0042391",
+        "GO:0060048",
+        "GO:0006941"
+      ]
+    },
+    {
+      "rank": 88,
+      "pathway_id": "GO:0140115",
+      "pathway_name": "export across plasma membrane",
+      "source_db": "GO:BP",
+      "nes_score": 3.341385057697068,
+      "p_adj": 0.0,
+      "evidence_count": 15,
+      "support_count": 20,
+      "seed_genes": [],
+      "literature_support": false,
+      "citations": [],
+      "citation_count": 0,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0065008",
+        "GO:0003008",
+        "GO:0006811",
+        "GO:0008015",
+        "GO:0003013",
+        "GO:0030001",
+        "GO:0006812",
+        "GO:0055085",
+        "GO:0060047",
+        "GO:0003015",
+        "GO:0034220",
+        "GO:0003012",
+        "GO:0098662",
+        "GO:0098655",
+        "GO:0098660",
+        "GO:0006936",
+        "GO:0044057",
+        "GO:0042391",
+        "GO:0060048",
+        "GO:0006941"
+      ]
+    },
+    {
+      "rank": 89,
+      "pathway_id": "GO:0007154",
+      "pathway_name": "cell communication",
+      "source_db": "GO:BP",
+      "nes_score": 3.3241625053855723,
+      "p_adj": 6.061817714453355e-13,
+      "evidence_count": 59,
+      "support_count": 20,
+      "seed_genes": [],
+      "literature_support": false,
+      "citations": [],
+      "citation_count": 0,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0065008",
+        "GO:0003008",
+        "GO:0006811",
+        "GO:0008015",
+        "GO:0003013",
+        "GO:0030001",
+        "GO:0006812",
+        "GO:0055085",
+        "GO:0060047",
+        "GO:0003015",
+        "GO:0034220",
+        "GO:0003012",
+        "GO:0098662",
+        "GO:0098655",
+        "GO:0098660",
+        "GO:0006936",
+        "GO:0044057",
+        "GO:0042391",
+        "GO:0060048",
+        "GO:0006941"
+      ]
+    },
+    {
+      "rank": 90,
+      "pathway_id": "GO:1904063",
+      "pathway_name": "negative regulation of cation transmembrane transport",
+      "source_db": "GO:BP",
+      "nes_score": 3.311435968289161,
+      "p_adj": 0.0,
+      "evidence_count": 14,
+      "support_count": 20,
+      "seed_genes": [],
+      "literature_support": false,
+      "citations": [],
+      "citation_count": 0,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0065008",
+        "GO:0003008",
+        "GO:0006811",
+        "GO:0008015",
+        "GO:0003013",
+        "GO:0030001",
+        "GO:0006812",
+        "GO:0055085",
+        "GO:0060047",
+        "GO:0003015",
+        "GO:0034220",
+        "GO:0003012",
+        "GO:0098662",
+        "GO:0098655",
+        "GO:0098660",
+        "GO:0006936",
+        "GO:0044057",
+        "GO:0042391",
+        "GO:0060048",
+        "GO:0006941"
+      ]
+    },
+    {
+      "rank": 91,
+      "pathway_id": "GO:0034766",
+      "pathway_name": "negative regulation of monoatomic ion transmembrane transport",
+      "source_db": "GO:BP",
+      "nes_score": 3.311435968289161,
+      "p_adj": 0.0,
+      "evidence_count": 14,
+      "support_count": 20,
+      "seed_genes": [],
+      "literature_support": false,
+      "citations": [],
+      "citation_count": 0,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0065008",
+        "GO:0003008",
+        "GO:0006811",
+        "GO:0008015",
+        "GO:0003013",
+        "GO:0030001",
+        "GO:0006812",
+        "GO:0055085",
+        "GO:0060047",
+        "GO:0003015",
+        "GO:0034220",
+        "GO:0003012",
+        "GO:0098662",
+        "GO:0098655",
+        "GO:0098660",
+        "GO:0006936",
+        "GO:0044057",
+        "GO:0042391",
+        "GO:0060048",
+        "GO:0006941"
+      ]
+    },
+    {
+      "rank": 92,
+      "pathway_id": "GO:0098915",
+      "pathway_name": "membrane repolarization during ventricular cardiac muscle cell action potential",
+      "source_db": "GO:BP",
+      "nes_score": 3.279267592772589,
+      "p_adj": 0.0,
+      "evidence_count": 13,
+      "support_count": 20,
+      "seed_genes": [],
+      "literature_support": false,
+      "citations": [],
+      "citation_count": 0,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0065008",
+        "GO:0003008",
+        "GO:0006811",
+        "GO:0008015",
+        "GO:0003013",
+        "GO:0030001",
+        "GO:0006812",
+        "GO:0055085",
+        "GO:0060047",
+        "GO:0003015",
+        "GO:0034220",
+        "GO:0003012",
+        "GO:0098662",
+        "GO:0098655",
+        "GO:0098660",
+        "GO:0006936",
+        "GO:0044057",
+        "GO:0042391",
+        "GO:0060048",
+        "GO:0006941"
+      ]
+    },
+    {
+      "rank": 93,
+      "pathway_id": "GO:0086066",
+      "pathway_name": "atrial cardiac muscle cell to AV node cell communication",
+      "source_db": "GO:BP",
+      "nes_score": 3.279267592772589,
+      "p_adj": 0.0,
+      "evidence_count": 13,
+      "support_count": 20,
+      "seed_genes": [],
+      "literature_support": false,
+      "citations": [],
+      "citation_count": 0,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0065008",
+        "GO:0003008",
+        "GO:0006811",
+        "GO:0008015",
+        "GO:0003013",
+        "GO:0030001",
+        "GO:0006812",
+        "GO:0055085",
+        "GO:0060047",
+        "GO:0003015",
+        "GO:0034220",
+        "GO:0003012",
+        "GO:0098662",
+        "GO:0098655",
+        "GO:0098660",
+        "GO:0006936",
+        "GO:0044057",
+        "GO:0042391",
+        "GO:0060048",
+        "GO:0006941"
+      ]
+    },
+    {
+      "rank": 94,
+      "pathway_id": "GO:0086014",
+      "pathway_name": "atrial cardiac muscle cell action potential",
+      "source_db": "GO:BP",
+      "nes_score": 3.279267592772589,
+      "p_adj": 0.0,
+      "evidence_count": 13,
+      "support_count": 20,
+      "seed_genes": [],
+      "literature_support": false,
+      "citations": [],
+      "citation_count": 0,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0065008",
+        "GO:0003008",
+        "GO:0006811",
+        "GO:0008015",
+        "GO:0003013",
+        "GO:0030001",
+        "GO:0006812",
+        "GO:0055085",
+        "GO:0060047",
+        "GO:0003015",
+        "GO:0034220",
+        "GO:0003012",
+        "GO:0098662",
+        "GO:0098655",
+        "GO:0098660",
+        "GO:0006936",
+        "GO:0044057",
+        "GO:0042391",
+        "GO:0060048",
+        "GO:0006941"
+      ]
+    },
+    {
+      "rank": 95,
+      "pathway_id": "GO:0086026",
+      "pathway_name": "atrial cardiac muscle cell to AV node cell signaling",
+      "source_db": "GO:BP",
+      "nes_score": 3.279267592772589,
+      "p_adj": 0.0,
+      "evidence_count": 13,
+      "support_count": 20,
+      "seed_genes": [],
+      "literature_support": false,
+      "citations": [],
+      "citation_count": 0,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0065008",
+        "GO:0003008",
+        "GO:0006811",
+        "GO:0008015",
+        "GO:0003013",
+        "GO:0030001",
+        "GO:0006812",
+        "GO:0055085",
+        "GO:0060047",
+        "GO:0003015",
+        "GO:0034220",
+        "GO:0003012",
+        "GO:0098662",
+        "GO:0098655",
+        "GO:0098660",
+        "GO:0006936",
+        "GO:0044057",
+        "GO:0042391",
+        "GO:0060048",
+        "GO:0006941"
+      ]
+    },
+    {
+      "rank": 96,
+      "pathway_id": "GO:0050789",
+      "pathway_name": "regulation of biological process",
+      "source_db": "GO:BP",
+      "nes_score": 3.2632790331431667,
+      "p_adj": 3.418835659019237e-09,
+      "evidence_count": 74,
+      "support_count": 20,
+      "seed_genes": [],
+      "literature_support": false,
+      "citations": [],
+      "citation_count": 0,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0065008",
+        "GO:0003008",
+        "GO:0006811",
+        "GO:0008015",
+        "GO:0003013",
+        "GO:0030001",
+        "GO:0006812",
+        "GO:0055085",
+        "GO:0060047",
+        "GO:0003015",
+        "GO:0034220",
+        "GO:0003012",
+        "GO:0098662",
+        "GO:0098655",
+        "GO:0098660",
+        "GO:0006936",
+        "GO:0044057",
+        "GO:0042391",
+        "GO:0060048",
+        "GO:0006941"
+      ]
+    },
+    {
+      "rank": 97,
+      "pathway_id": "GO:0048731",
+      "pathway_name": "system development",
+      "source_db": "GO:BP",
+      "nes_score": 3.263067178830913,
+      "p_adj": 9.00390872971002e-14,
+      "evidence_count": 48,
+      "support_count": 20,
+      "seed_genes": [],
+      "literature_support": false,
+      "citations": [],
+      "citation_count": 0,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0065008",
+        "GO:0003008",
+        "GO:0006811",
+        "GO:0008015",
+        "GO:0003013",
+        "GO:0030001",
+        "GO:0006812",
+        "GO:0055085",
+        "GO:0060047",
+        "GO:0003015",
+        "GO:0034220",
+        "GO:0003012",
+        "GO:0098662",
+        "GO:0098655",
+        "GO:0098660",
+        "GO:0006936",
+        "GO:0044057",
+        "GO:0042391",
+        "GO:0060048",
+        "GO:0006941"
+      ]
+    },
+    {
+      "rank": 98,
+      "pathway_id": "KEGG:05414",
+      "pathway_name": "Dilated cardiomyopathy",
+      "source_db": "KEGG",
+      "nes_score": 2.8479985135402357,
+      "p_adj": 3.8835601401387976e-13,
+      "evidence_count": 14,
+      "support_count": 20,
+      "seed_genes": [],
+      "literature_support": false,
+      "citations": [],
+      "citation_count": 0,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0065008",
+        "GO:0003008",
+        "GO:0006811",
+        "GO:0008015",
+        "GO:0003013",
+        "GO:0030001",
+        "GO:0006812",
+        "GO:0055085",
+        "GO:0060047",
+        "GO:0003015",
+        "GO:0034220",
+        "GO:0003012",
+        "GO:0098662",
+        "GO:0098655",
+        "GO:0098660",
+        "GO:0006936",
+        "GO:0044057",
+        "GO:0042391",
+        "GO:0060048",
+        "GO:0006941"
+      ]
+    },
+    {
+      "rank": 99,
+      "pathway_id": "KEGG:05410",
+      "pathway_name": "Hypertrophic cardiomyopathy",
+      "source_db": "KEGG",
+      "nes_score": 2.6007022603462775,
+      "p_adj": 1.1797695043114231e-09,
+      "evidence_count": 11,
+      "support_count": 20,
+      "seed_genes": [],
+      "literature_support": false,
+      "citations": [],
+      "citation_count": 0,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0065008",
+        "GO:0003008",
+        "GO:0006811",
+        "GO:0008015",
+        "GO:0003013",
+        "GO:0030001",
+        "GO:0006812",
+        "GO:0055085",
+        "GO:0060047",
+        "GO:0003015",
+        "GO:0034220",
+        "GO:0003012",
+        "GO:0098662",
+        "GO:0098655",
+        "GO:0098660",
+        "GO:0006936",
+        "GO:0044057",
+        "GO:0042391",
+        "GO:0060048",
+        "GO:0006941"
+      ]
+    },
+    {
+      "rank": 100,
+      "pathway_id": "KEGG:05412",
+      "pathway_name": "Arrhythmogenic right ventricular cardiomyopathy",
+      "source_db": "KEGG",
+      "nes_score": 2.5306707101740744,
+      "p_adj": 4.418125199023848e-09,
+      "evidence_count": 10,
+      "support_count": 20,
+      "seed_genes": [],
+      "literature_support": false,
+      "citations": [],
+      "citation_count": 0,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0065008",
+        "GO:0003008",
+        "GO:0006811",
+        "GO:0008015",
+        "GO:0003013",
+        "GO:0030001",
+        "GO:0006812",
+        "GO:0055085",
+        "GO:0060047",
+        "GO:0003015",
+        "GO:0034220",
+        "GO:0003012",
+        "GO:0098662",
+        "GO:0098655",
+        "GO:0098660",
+        "GO:0006936",
+        "GO:0044057",
+        "GO:0042391",
+        "GO:0060048",
+        "GO:0006941"
+      ]
+    },
+    {
+      "rank": 101,
+      "pathway_id": "WP:WP2118",
+      "pathway_name": "Arrhythmogenic right ventricular cardiomyopathy",
+      "source_db": "WP",
+      "nes_score": 2.188225329177084,
+      "p_adj": 2.1089778367011647e-06,
+      "evidence_count": 8,
+      "support_count": 20,
+      "seed_genes": [],
+      "literature_support": false,
+      "citations": [],
+      "citation_count": 0,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0065008",
+        "GO:0003008",
+        "GO:0006811",
+        "GO:0008015",
+        "GO:0003013",
+        "GO:0030001",
+        "GO:0006812",
+        "GO:0055085",
+        "GO:0060047",
+        "GO:0003015",
+        "GO:0034220",
+        "GO:0003012",
+        "GO:0098662",
+        "GO:0098655",
+        "GO:0098660",
+        "GO:0006936",
+        "GO:0044057",
+        "GO:0042391",
+        "GO:0060048",
+        "GO:0006941"
+      ]
+    },
+    {
+      "rank": 102,
+      "pathway_id": "WP:WP5344",
+      "pathway_name": "Cardiomyocyte signaling converging on titin",
+      "source_db": "WP",
+      "nes_score": 1.6189269435040194,
+      "p_adj": 0.00019482361991118857,
+      "evidence_count": 4,
+      "support_count": 2,
+      "seed_genes": [],
+      "literature_support": false,
+      "citations": [],
+      "citation_count": 0,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0065008",
+        "GO:0003008"
+      ]
+    },
+    {
+      "rank": 103,
+      "pathway_id": "GO:0003294",
+      "pathway_name": "atrial ventricular junction remodeling",
+      "source_db": "GO:BP",
+      "nes_score": 1.6059904946982184,
+      "p_adj": 3.4861002973229915e-14,
+      "evidence_count": 1,
+      "support_count": 15,
+      "seed_genes": [],
+      "literature_support": false,
+      "citations": [],
+      "citation_count": 0,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0065008",
+        "GO:0003008",
+        "GO:0006811",
+        "GO:0008015",
+        "GO:0003013",
+        "GO:0055085",
+        "GO:0060047",
+        "GO:0003015",
+        "GO:0034220",
+        "GO:0003012",
+        "GO:0006936",
+        "GO:0044057",
+        "GO:0042391",
+        "GO:0060048",
+        "GO:0006941"
+      ]
+    },
+    {
+      "rank": 104,
+      "pathway_id": "WP:WP2406",
+      "pathway_name": "Cardiac progenitor differentiation",
+      "source_db": "WP",
+      "nes_score": 1.4875968929825836,
+      "p_adj": 0.006274770126938778,
+      "evidence_count": 4,
+      "support_count": 11,
+      "seed_genes": [],
+      "literature_support": false,
+      "citations": [],
+      "citation_count": 0,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0065008",
+        "GO:0003008",
+        "GO:0008015",
+        "GO:0003013",
+        "GO:0060047",
+        "GO:0003015",
+        "GO:0003012",
+        "GO:0006936",
+        "GO:0044057",
+        "GO:0060048",
+        "GO:0006941"
+      ]
+    },
+    {
+      "rank": 105,
+      "pathway_id": "GO:0003179",
+      "pathway_name": "heart valve morphogenesis",
+      "source_db": "GO:BP",
+      "nes_score": 1.2071313010443698,
+      "p_adj": 0.0019574989452562086,
+      "evidence_count": 2,
+      "support_count": 4,
+      "seed_genes": [],
+      "literature_support": false,
+      "citations": [],
+      "citation_count": 0,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0060047",
+        "GO:0003015",
+        "GO:0044057",
+        "GO:0042391"
+      ]
+    },
+    {
+      "rank": 106,
+      "pathway_id": "GO:0060979",
+      "pathway_name": "vasculogenesis involved in coronary vascular morphogenesis",
+      "source_db": "GO:BP",
+      "nes_score": 1.1735563832180664,
+      "p_adj": 1.7519437980784147e-05,
+      "evidence_count": 1,
+      "support_count": 8,
+      "seed_genes": [],
+      "literature_support": false,
+      "citations": [],
+      "citation_count": 0,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0065008",
+        "GO:0003008",
+        "GO:0008015",
+        "GO:0003013",
+        "GO:0060047",
+        "GO:0003015",
+        "GO:0044057",
+        "GO:0042391"
+      ]
+    }
+  ],
+  "testable_hypotheses": [
+    {
+      "hypothesis": "Pathway 'regulation of biological quality' is involved in cardiovascular disease and phenotype processes",
+      "pathway_id": "GO:0065008",
+      "nes_score": 4.078945939468641,
+      "experimental_approaches": [
+        "Functional enrichment analysis in cardiac tissue",
+        "Gene expression profiling",
+        "Pathway perturbation studies"
+      ]
+    },
+    {
+      "hypothesis": "Pathway 'biological regulation' is involved in cardiovascular disease and phenotype processes",
+      "pathway_id": "GO:0065007",
+      "nes_score": 4.078945939468641,
+      "experimental_approaches": [
+        "Functional enrichment analysis in cardiac tissue",
+        "Gene expression profiling",
+        "Pathway perturbation studies"
+      ]
+    },
+    {
+      "hypothesis": "Pathway 'multicellular organismal process' is involved in cardiovascular disease and phenotype processes",
+      "pathway_id": "GO:0032501",
+      "nes_score": 4.051625163603055,
+      "experimental_approaches": [
+        "Functional enrichment analysis in cardiac tissue",
+        "Gene expression profiling",
+        "Pathway perturbation studies"
+      ]
+    },
+    {
+      "hypothesis": "Pathway 'system process' is involved in cardiovascular disease and phenotype processes",
+      "pathway_id": "GO:0003008",
+      "nes_score": 4.022469612767769,
+      "experimental_approaches": [
+        "Functional enrichment analysis in cardiac tissue",
+        "Gene expression profiling",
+        "Pathway perturbation studies"
+      ]
+    },
+    {
+      "hypothesis": "Pathway 'localization' is involved in cardiovascular disease and phenotype processes",
+      "pathway_id": "GO:0051179",
+      "nes_score": 4.016396045894965,
+      "experimental_approaches": [
+        "Functional enrichment analysis in cardiac tissue",
+        "Gene expression profiling",
+        "Pathway perturbation studies"
+      ]
+    }
+  ],
+  "conclusion": "Analysis identified 106 novel pathway hypotheses. The top-ranked hypothesis is 'regulation of biological quality' (NES: 4.08), which shows strong evidence for involvement in cardiovascular disease and phenotype processes based on functional network analysis and literature mining.",
+  "top_genes": [
+    {
+      "gene": "SCN5A",
+      "importance": 145.511,
+      "frequency": 20,
+      "avg_nes": 3.996,
+      "avg_cardiac_relevance": 0.0,
+      "avg_centrality": 0.405,
+      "druggability": "FDA Approved",
+      "pathways": [
+        "regulation of biological quality",
+        "biological regulation",
+        "multicellular organismal process",
+        "system process",
+        "localization"
+      ]
+    },
+    {
+      "gene": "KCNH2",
+      "importance": 145.511,
+      "frequency": 20,
+      "avg_nes": 3.996,
+      "avg_cardiac_relevance": 0.0,
+      "avg_centrality": 0.161,
+      "druggability": "FDA Approved",
+      "pathways": [
+        "regulation of biological quality",
+        "biological regulation",
+        "multicellular organismal process",
+        "system process",
+        "localization"
+      ]
+    },
+    {
+      "gene": "CALM3",
+      "importance": 145.511,
+      "frequency": 20,
+      "avg_nes": 3.996,
+      "avg_cardiac_relevance": 0.0,
+      "avg_centrality": 0.032,
+      "druggability": "Research",
+      "pathways": [
+        "regulation of biological quality",
+        "biological regulation",
+        "multicellular organismal process",
+        "system process",
+        "localization"
+      ]
+    },
+    {
+      "gene": "CACNA1C",
+      "importance": 145.511,
+      "frequency": 20,
+      "avg_nes": 3.996,
+      "avg_cardiac_relevance": 0.0,
+      "avg_centrality": 0.03,
+      "druggability": "Clinical Trial",
+      "pathways": [
+        "regulation of biological quality",
+        "biological regulation",
+        "multicellular organismal process",
+        "system process",
+        "localization"
+      ]
+    },
+    {
+      "gene": "SCN4B",
+      "importance": 145.511,
+      "frequency": 20,
+      "avg_nes": 3.996,
+      "avg_cardiac_relevance": 0.0,
+      "avg_centrality": 0.022,
+      "druggability": "Druggable",
+      "pathways": [
+        "regulation of biological quality",
+        "biological regulation",
+        "multicellular organismal process",
+        "system process",
+        "localization"
+      ]
+    }
+  ]
+}

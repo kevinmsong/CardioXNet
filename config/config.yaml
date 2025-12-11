@@ -1,0 +1,113 @@
+# CardioXNet Configuration
+
+# Application Settings
+app_name: "CardioXNet"
+environment: "development"
+debug: false
+
+# Server Settings
+host: "0.0.0.0"
+port: 8000
+
+# CORS Settings
+cors_origins:
+  - "http://localhost:3000"
+  - "http://localhost:3001"
+  - "http://localhost:3002"
+  - "http://localhost:5173"
+
+# Logging Settings
+log_level: "INFO"
+
+# Directory Paths
+data_dir: "data"
+output_dir: "outputs"
+config_dir: "config"
+
+# NETS Pipeline Configuration
+nets:
+  # API Versions
+  string_version: "11.5"
+  gprofiler_version: "e104_eg51_p15"
+  reactome_version: "79"
+  
+  # Analysis Parameters for comprehensive cardiovascular pathway discovery
+  string_neighbor_count: 100          # Broad network expansion for discovery
+  string_score_threshold: 0.60        # Moderate confidence threshold for interactions
+  fdr_threshold: 0.05                 # FDR threshold set to 0.05
+  top_hypotheses_count: 20            # Top 20 hypotheses for faster testing
+  semantic_max_hypotheses_for_literature: 20  # Mine literature for top 20 pathways for speed
+  n_permutations: 25                  # Permutations for statistical testing
+  
+  # Database Weights
+  db_weight_reactome: 1.5
+  db_weight_kegg: 1.5
+  db_weight_wikipathways: 1.2
+  db_weight_gobp: 1.0
+  
+  # API Endpoints
+  string_api_url: "https://string-db.org/api"
+  gprofiler_api_url: "https://biit.cs.ut.ee/gprofiler/api"
+  reactome_api_url: "https://reactome.org/ContentService"
+  
+  # Retry Configuration (Optimized for speed)
+  max_retries: 2                      # Reduced for faster failures
+  retry_backoff_factor: 1.5           # Faster retries
+  request_timeout: 15                 # Reduced timeout for faster processing
+  
+  # Aggregation Configuration
+  aggregation_strategy: "frequency"     # Options: intersection, frequency, weighted
+  min_support_threshold: 1            # Minimum pathway support count required
+  
+  # Literature Mining for cardiovascular disease focus
+  pubmed_max_results: 30              # Maximum literature context for comprehensive evidence
+  literature_relevance_threshold: 0.3 # Relevance threshold for literature-derived genes
+  
+  # Enhanced Semantic Filtering for cardiovascular pathway discovery
+  semantic_relevance_threshold: 0.01  # Cardiac relevance scoring threshold
+  semantic_disease_boost: 1.8         # Boost multiplier for disease-specific pathways
+  semantic_max_results: 150           # Return top 150 most relevant pathways
+  semantic_progressive_thresholds:    # Progressive thresholds for multi-tier discovery
+    high_disease: 0.20                # High cardiovascular disease relevance (lowered for testing)
+    medium_disease: 0.10              # Medium cardiovascular disease relevance (lowered for testing)
+    low_disease: 0.01                 # Low cardiovascular disease relevance (lowered for testing)
+  
+  # Pathway Redundancy Detection
+  enable_redundancy_detection: true   # Remove highly overlapping pathways
+  redundancy_jaccard_threshold: 0.85  # 85% gene overlap threshold for redundancy filtering
+  
+  # Generic Pathway Filtering
+  filter_generic_pathways: true       # Pre-filter generic pathways before literature mining
+  
+  # Disease-specific Filtering (IMPORTANT: Used throughout pipeline for targeted discovery)
+  disease_context: null               # Optional: "heart_failure", "myocardial_infarction", "cardiomyopathy", "diabetic_cardiomyopathy", "arrhythmia"
+                                      # NOTE: When set, this context is used for:
+                                      #   - Literature mining queries (Stage 2b)
+                                      #   - Semantic relevance scoring (Stage 3.5)
+                                      #   - Final pathway name filtering (Stage 4.9)
+  
+  # Final Strict Name Filter (Stage 4b) - MANDATORY
+  # This filter is ALWAYS ENABLED and cannot be disabled
+  # Ensures 100% of final pathway names contain cardiac/disease terms
+  # Strategy: Be permissive early (broad discovery), strict at the end (cardiac-focused results)
+  
+  # Cardiovascular Disease Context
+  min_cardiac_expression_ratio: 0.5   # Minimum cardiac tissue expression requirement
+  cardiovascular_disease_focus: true  # Enable cardiovascular disease filtering
+  
+  # Output Formats (Optimized for speed)
+  output_formats:
+    - "json"
+    - "pdf"
+
+# Performance Configuration (Speed optimizations)
+performance:
+  max_concurrent_requests: 10         # Increased concurrent API requests
+  batch_size: 20                      # Larger batch processing
+  cache_ttl: 14400                    # 4 hour cache TTL for better reuse
+  enable_aggressive_caching: true     # Enable aggressive result caching
+  
+  # Parallel Processing (Optimized)
+  max_workers_semantic: 6             # Increased semantic filtering workers
+  max_workers_literature: 4           # Increased literature mining workers
+  max_concurrent_pubmed: 6            # Increased concurrent PubMed requests

@@ -1,0 +1,2203 @@
+{
+  "analysis_id": "analysis_20251209_115606",
+  "timestamp": "2025-12-09T12:01:25.087993",
+  "input_summary": {
+    "total_seed_genes": 2,
+    "valid_genes": 2,
+    "invalid_genes": 0,
+    "gene_list": [
+      "EGFR",
+      "MYC"
+    ],
+    "warnings": []
+  },
+  "stage_1": {
+    "fn_size": 196,
+    "seed_count": 2,
+    "neighbor_count": 194,
+    "contributions": {
+      "EGFR": 94,
+      "MYC": 100
+    }
+  },
+  "stage_2a": {
+    "primary_pathways_count": 4410,
+    "known_pathways_filtered": 130,
+    "top_pathways": [
+      {
+        "name": "positive regulation of cellular process",
+        "nes": 11115.0,
+        "p_adj": 9.201423410190065e-66
+      },
+      {
+        "name": "positive regulation of biological process",
+        "nes": 11115.0,
+        "p_adj": 5.29691564071058e-62
+      },
+      {
+        "name": "regulation of macromolecule metabolic process",
+        "nes": 10350.897257484618,
+        "p_adj": 7.086640025699953e-50
+      },
+      {
+        "name": "anatomical structure development",
+        "nes": 10244.125468752729,
+        "p_adj": 1.336507584582136e-50
+      },
+      {
+        "name": "developmental process",
+        "nes": 10228.018341548994,
+        "p_adj": 2.7158827007407265e-49
+      }
+    ]
+  },
+  "stage_2b": {
+    "total_secondary_pathways": 4927,
+    "union_genes_processed": 0,
+    "genes_successfully_processed": 0,
+    "literature_stats": {
+      "primaries_processed": 20,
+      "total_secondaries": 89668,
+      "unique_secondaries": 4927
+    }
+  },
+  "stage_2c": {
+    "final_pathways_count": 4927,
+    "aggregation_strategy": "rigorous_statistical",
+    "min_support_threshold": 1
+  },
+  "stage_3": {
+    "total_hypotheses": 14,
+    "top_nes_score": 3.5476067930302015
+  },
+  "stage_4_topology": {},
+  "stage_4_literature": {
+    "GO:0009653": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "36949106",
+          "title": "A defect in mitochondrial protein translation influences mitonuclear communication in the heart.",
+          "year": 2023,
+          "relevance": 0.5583333333333333
+        },
+        {
+          "pmid": "39524990",
+          "title": "Causal Links Between Renal Function and Cardiac Structure, Function, and Disease Risk.",
+          "year": 2024,
+          "relevance": 0.5583333333333333
+        },
+        {
+          "pmid": "37344348",
+          "title": "Fibulin7 Mediated Pathological Cardiac Remodeling through EGFR Binding and EGFR-Dependent FAK/AKT Signaling Activation.",
+          "year": 2023,
+          "relevance": 0.475
+        }
+      ]
+    },
+    "GO:0065007": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "37344348",
+          "title": "Fibulin7 Mediated Pathological Cardiac Remodeling through EGFR Binding and EGFR-Dependent FAK/AKT Signaling Activation.",
+          "year": 2023,
+          "relevance": 0.6
+        },
+        {
+          "pmid": "36949106",
+          "title": "A defect in mitochondrial protein translation influences mitonuclear communication in the heart.",
+          "year": 2023,
+          "relevance": 0.6
+        },
+        {
+          "pmid": "32802181",
+          "title": "Mydgf promotes Cardiomyocyte proliferation and Neonatal Heart regeneration.",
+          "year": 2020,
+          "relevance": 0.475
+        }
+      ]
+    },
+    "GO:0007166": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "37344348",
+          "title": "Fibulin7 Mediated Pathological Cardiac Remodeling through EGFR Binding and EGFR-Dependent FAK/AKT Signaling Activation.",
+          "year": 2023,
+          "relevance": 0.6249999999999999
+        },
+        {
+          "pmid": "34564708",
+          "title": "Cardiac Wnt5a and Wnt11 promote fibrosis by the crosstalk of FZD5 and EGFR signaling under pressure overload.",
+          "year": 2021,
+          "relevance": 0.6249999999999999
+        },
+        {
+          "pmid": "32802181",
+          "title": "Mydgf promotes Cardiomyocyte proliferation and Neonatal Heart regeneration.",
+          "year": 2020,
+          "relevance": 0.5750000000000001
+        }
+      ]
+    },
+    "GO:0030154": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "37344348",
+          "title": "Fibulin7 Mediated Pathological Cardiac Remodeling through EGFR Binding and EGFR-Dependent FAK/AKT Signaling Activation.",
+          "year": 2023,
+          "relevance": 0.725
+        },
+        {
+          "pmid": "32802181",
+          "title": "Mydgf promotes Cardiomyocyte proliferation and Neonatal Heart regeneration.",
+          "year": 2020,
+          "relevance": 0.6
+        },
+        {
+          "pmid": "39636639",
+          "title": "Cardiac Events and Survival in Patients With EGFR-Mutant Non-Small Cell Lung Cancer Treated With Osimertinib.",
+          "year": 2024,
+          "relevance": 0.6
+        }
+      ]
+    },
+    "GO:0008283": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "32802181",
+          "title": "Mydgf promotes Cardiomyocyte proliferation and Neonatal Heart regeneration.",
+          "year": 2020,
+          "relevance": 0.6416666666666667
+        },
+        {
+          "pmid": "39636639",
+          "title": "Cardiac Events and Survival in Patients With EGFR-Mutant Non-Small Cell Lung Cancer Treated With Osimertinib.",
+          "year": 2024,
+          "relevance": 0.6416666666666667
+        },
+        {
+          "pmid": "40931092",
+          "title": "Heart failure-specific cardiac fibroblasts contribute to cardiac dysfunction via the MYC-CXCL1-CXCR2 axis.",
+          "year": 2025,
+          "relevance": 0.575
+        }
+      ]
+    },
+    "GO:0050793": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "36949106",
+          "title": "A defect in mitochondrial protein translation influences mitonuclear communication in the heart.",
+          "year": 2023,
+          "relevance": 0.6
+        },
+        {
+          "pmid": "37344348",
+          "title": "Fibulin7 Mediated Pathological Cardiac Remodeling through EGFR Binding and EGFR-Dependent FAK/AKT Signaling Activation.",
+          "year": 2023,
+          "relevance": 0.5375
+        },
+        {
+          "pmid": "32802181",
+          "title": "Mydgf promotes Cardiomyocyte proliferation and Neonatal Heart regeneration.",
+          "year": 2020,
+          "relevance": 0.475
+        }
+      ]
+    },
+    "GO:0035556": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "37344348",
+          "title": "Fibulin7 Mediated Pathological Cardiac Remodeling through EGFR Binding and EGFR-Dependent FAK/AKT Signaling Activation.",
+          "year": 2023,
+          "relevance": 0.6416666666666667
+        },
+        {
+          "pmid": "34564708",
+          "title": "Cardiac Wnt5a and Wnt11 promote fibrosis by the crosstalk of FZD5 and EGFR signaling under pressure overload.",
+          "year": 2021,
+          "relevance": 0.5583333333333333
+        },
+        {
+          "pmid": "32802181",
+          "title": "Mydgf promotes Cardiomyocyte proliferation and Neonatal Heart regeneration.",
+          "year": 2020,
+          "relevance": 0.475
+        }
+      ]
+    },
+    "GO:0090304": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "37344348",
+          "title": "Fibulin7 Mediated Pathological Cardiac Remodeling through EGFR Binding and EGFR-Dependent FAK/AKT Signaling Activation.",
+          "year": 2023,
+          "relevance": 0.5375
+        },
+        {
+          "pmid": "36949106",
+          "title": "A defect in mitochondrial protein translation influences mitonuclear communication in the heart.",
+          "year": 2023,
+          "relevance": 0.5375
+        },
+        {
+          "pmid": "39524990",
+          "title": "Causal Links Between Renal Function and Cardiac Structure, Function, and Disease Risk.",
+          "year": 2024,
+          "relevance": 0.5375
+        }
+      ]
+    },
+    "KEGG:04151": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "37344348",
+          "title": "Fibulin7 Mediated Pathological Cardiac Remodeling through EGFR Binding and EGFR-Dependent FAK/AKT Signaling Activation.",
+          "year": 2023,
+          "relevance": 0.5583333333333333
+        },
+        {
+          "pmid": "32802181",
+          "title": "Mydgf promotes Cardiomyocyte proliferation and Neonatal Heart regeneration.",
+          "year": 2020,
+          "relevance": 0.5583333333333333
+        },
+        {
+          "pmid": "36949106",
+          "title": "A defect in mitochondrial protein translation influences mitonuclear communication in the heart.",
+          "year": 2023,
+          "relevance": 0.5583333333333333
+        }
+      ]
+    },
+    "GO:0006950": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "37344348",
+          "title": "Fibulin7 Mediated Pathological Cardiac Remodeling through EGFR Binding and EGFR-Dependent FAK/AKT Signaling Activation.",
+          "year": 2023,
+          "relevance": 0.5583333333333333
+        },
+        {
+          "pmid": "36949106",
+          "title": "A defect in mitochondrial protein translation influences mitonuclear communication in the heart.",
+          "year": 2023,
+          "relevance": 0.5583333333333333
+        },
+        {
+          "pmid": "40162940",
+          "title": "Interplay of Chronic Kidney Disease and\u00a0the Effects of Tirzepatide in Patients With Heart\u00a0Failure, Preserved Ejection\u00a0Fraction, and Obesity: The SUMMIT Trial.",
+          "year": 2025,
+          "relevance": 0.525
+        }
+      ]
+    },
+    "GO:0048513": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "34564708",
+          "title": "Cardiac Wnt5a and Wnt11 promote fibrosis by the crosstalk of FZD5 and EGFR signaling under pressure overload.",
+          "year": 2021,
+          "relevance": 0.5583333333333333
+        },
+        {
+          "pmid": "36653095",
+          "title": "Albuminuria and Heart\u00a0Failure: JACC State-of-the-Art Review.",
+          "year": 2023,
+          "relevance": 0.525
+        },
+        {
+          "pmid": "37344348",
+          "title": "Fibulin7 Mediated Pathological Cardiac Remodeling through EGFR Binding and EGFR-Dependent FAK/AKT Signaling Activation.",
+          "year": 2023,
+          "relevance": 0.475
+        }
+      ]
+    },
+    "GO:0019538": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "37344348",
+          "title": "Fibulin7 Mediated Pathological Cardiac Remodeling through EGFR Binding and EGFR-Dependent FAK/AKT Signaling Activation.",
+          "year": 2023,
+          "relevance": 0.6416666666666667
+        },
+        {
+          "pmid": "36949106",
+          "title": "A defect in mitochondrial protein translation influences mitonuclear communication in the heart.",
+          "year": 2023,
+          "relevance": 0.6416666666666667
+        },
+        {
+          "pmid": "32802181",
+          "title": "Mydgf promotes Cardiomyocyte proliferation and Neonatal Heart regeneration.",
+          "year": 2020,
+          "relevance": 0.5583333333333333
+        }
+      ]
+    },
+    "GO:0042221": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "37344348",
+          "title": "Fibulin7 Mediated Pathological Cardiac Remodeling through EGFR Binding and EGFR-Dependent FAK/AKT Signaling Activation.",
+          "year": 2023,
+          "relevance": 0.5583333333333333
+        },
+        {
+          "pmid": "40162940",
+          "title": "Interplay of Chronic Kidney Disease and\u00a0the Effects of Tirzepatide in Patients With Heart\u00a0Failure, Preserved Ejection\u00a0Fraction, and Obesity: The SUMMIT Trial.",
+          "year": 2025,
+          "relevance": 0.525
+        },
+        {
+          "pmid": "32802181",
+          "title": "Mydgf promotes Cardiomyocyte proliferation and Neonatal Heart regeneration.",
+          "year": 2020,
+          "relevance": 0.475
+        }
+      ]
+    },
+    "GO:0016310": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "37344348",
+          "title": "Fibulin7 Mediated Pathological Cardiac Remodeling through EGFR Binding and EGFR-Dependent FAK/AKT Signaling Activation.",
+          "year": 2023,
+          "relevance": 0.725
+        },
+        {
+          "pmid": "34564708",
+          "title": "Cardiac Wnt5a and Wnt11 promote fibrosis by the crosstalk of FZD5 and EGFR signaling under pressure overload.",
+          "year": 2021,
+          "relevance": 0.725
+        },
+        {
+          "pmid": "36380187",
+          "title": "Alteration in tyrosine phosphorylation of cardiac proteome and EGFR pathway contribute to hypertrophic cardiomyopathy.",
+          "year": 2022,
+          "relevance": 0.725
+        }
+      ]
+    },
+    "GO:0048584": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "37344348",
+          "title": "Fibulin7 Mediated Pathological Cardiac Remodeling through EGFR Binding and EGFR-Dependent FAK/AKT Signaling Activation.",
+          "year": 2023,
+          "relevance": 0.5166666666666666
+        },
+        {
+          "pmid": "36949106",
+          "title": "A defect in mitochondrial protein translation influences mitonuclear communication in the heart.",
+          "year": 2023,
+          "relevance": 0.5166666666666666
+        },
+        {
+          "pmid": "40162940",
+          "title": "Interplay of Chronic Kidney Disease and\u00a0the Effects of Tirzepatide in Patients With Heart\u00a0Failure, Preserved Ejection\u00a0Fraction, and Obesity: The SUMMIT Trial.",
+          "year": 2025,
+          "relevance": 0.4833333333333333
+        }
+      ]
+    },
+    "GO:0048646": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "36949106",
+          "title": "A defect in mitochondrial protein translation influences mitonuclear communication in the heart.",
+          "year": 2023,
+          "relevance": 0.5583333333333333
+        },
+        {
+          "pmid": "32802181",
+          "title": "Mydgf promotes Cardiomyocyte proliferation and Neonatal Heart regeneration.",
+          "year": 2020,
+          "relevance": 0.5166666666666666
+        },
+        {
+          "pmid": "39524990",
+          "title": "Causal Links Between Renal Function and Cardiac Structure, Function, and Disease Risk.",
+          "year": 2024,
+          "relevance": 0.5166666666666666
+        }
+      ]
+    },
+    "GO:0007169": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "37344348",
+          "title": "Fibulin7 Mediated Pathological Cardiac Remodeling through EGFR Binding and EGFR-Dependent FAK/AKT Signaling Activation.",
+          "year": 2023,
+          "relevance": 0.6625
+        },
+        {
+          "pmid": "39636639",
+          "title": "Cardiac Events and Survival in Patients With EGFR-Mutant Non-Small Cell Lung Cancer Treated With Osimertinib.",
+          "year": 2024,
+          "relevance": 0.6
+        },
+        {
+          "pmid": "32802181",
+          "title": "Mydgf promotes Cardiomyocyte proliferation and Neonatal Heart regeneration.",
+          "year": 2020,
+          "relevance": 0.56875
+        }
+      ]
+    },
+    "GO:0035239": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "37344348",
+          "title": "Fibulin7 Mediated Pathological Cardiac Remodeling through EGFR Binding and EGFR-Dependent FAK/AKT Signaling Activation.",
+          "year": 2023,
+          "relevance": 0.475
+        },
+        {
+          "pmid": "32802181",
+          "title": "Mydgf promotes Cardiomyocyte proliferation and Neonatal Heart regeneration.",
+          "year": 2020,
+          "relevance": 0.475
+        },
+        {
+          "pmid": "36949106",
+          "title": "A defect in mitochondrial protein translation influences mitonuclear communication in the heart.",
+          "year": 2023,
+          "relevance": 0.475
+        }
+      ]
+    },
+    "GO:0009892": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "36949106",
+          "title": "A defect in mitochondrial protein translation influences mitonuclear communication in the heart.",
+          "year": 2023,
+          "relevance": 0.5750000000000001
+        },
+        {
+          "pmid": "37344348",
+          "title": "Fibulin7 Mediated Pathological Cardiac Remodeling through EGFR Binding and EGFR-Dependent FAK/AKT Signaling Activation.",
+          "year": 2023,
+          "relevance": 0.525
+        },
+        {
+          "pmid": "39524990",
+          "title": "Causal Links Between Renal Function and Cardiac Structure, Function, and Disease Risk.",
+          "year": 2024,
+          "relevance": 0.525
+        }
+      ]
+    },
+    "GO:0008219": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "37344348",
+          "title": "Fibulin7 Mediated Pathological Cardiac Remodeling through EGFR Binding and EGFR-Dependent FAK/AKT Signaling Activation.",
+          "year": 2023,
+          "relevance": 0.725
+        },
+        {
+          "pmid": "39636639",
+          "title": "Cardiac Events and Survival in Patients With EGFR-Mutant Non-Small Cell Lung Cancer Treated With Osimertinib.",
+          "year": 2024,
+          "relevance": 0.725
+        },
+        {
+          "pmid": "38553324",
+          "title": "QT-Interval Prolongation, Torsades de Pointes, and Heart Failure With EGFR Tyrosine Kinase Inhibitors in Non-Small Cell Lung Cancer: Systematic Review.",
+          "year": 2024,
+          "relevance": 0.625
+        }
+      ]
+    },
+    "GO:0045595": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "37344348",
+          "title": "Fibulin7 Mediated Pathological Cardiac Remodeling through EGFR Binding and EGFR-Dependent FAK/AKT Signaling Activation.",
+          "year": 2023,
+          "relevance": 0.6
+        },
+        {
+          "pmid": "32802181",
+          "title": "Mydgf promotes Cardiomyocyte proliferation and Neonatal Heart regeneration.",
+          "year": 2020,
+          "relevance": 0.5375
+        },
+        {
+          "pmid": "36949106",
+          "title": "A defect in mitochondrial protein translation influences mitonuclear communication in the heart.",
+          "year": 2023,
+          "relevance": 0.5375
+        }
+      ]
+    },
+    "GO:0008284": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "32802181",
+          "title": "Mydgf promotes Cardiomyocyte proliferation and Neonatal Heart regeneration.",
+          "year": 2020,
+          "relevance": 0.5583333333333333
+        },
+        {
+          "pmid": "39636639",
+          "title": "Cardiac Events and Survival in Patients With EGFR-Mutant Non-Small Cell Lung Cancer Treated With Osimertinib.",
+          "year": 2024,
+          "relevance": 0.5583333333333333
+        },
+        {
+          "pmid": "37344348",
+          "title": "Fibulin7 Mediated Pathological Cardiac Remodeling through EGFR Binding and EGFR-Dependent FAK/AKT Signaling Activation.",
+          "year": 2023,
+          "relevance": 0.5166666666666666
+        }
+      ]
+    },
+    "KEGG:04012": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "34564708",
+          "title": "Cardiac Wnt5a and Wnt11 promote fibrosis by the crosstalk of FZD5 and EGFR signaling under pressure overload.",
+          "year": 2021,
+          "relevance": 0.6416666666666667
+        },
+        {
+          "pmid": "37344348",
+          "title": "Fibulin7 Mediated Pathological Cardiac Remodeling through EGFR Binding and EGFR-Dependent FAK/AKT Signaling Activation.",
+          "year": 2023,
+          "relevance": 0.5583333333333333
+        },
+        {
+          "pmid": "32802181",
+          "title": "Mydgf promotes Cardiomyocyte proliferation and Neonatal Heart regeneration.",
+          "year": 2020,
+          "relevance": 0.5583333333333333
+        }
+      ]
+    },
+    "GO:0051128": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "37344348",
+          "title": "Fibulin7 Mediated Pathological Cardiac Remodeling through EGFR Binding and EGFR-Dependent FAK/AKT Signaling Activation.",
+          "year": 2023,
+          "relevance": 0.525
+        },
+        {
+          "pmid": "36949106",
+          "title": "A defect in mitochondrial protein translation influences mitonuclear communication in the heart.",
+          "year": 2023,
+          "relevance": 0.525
+        },
+        {
+          "pmid": "32802181",
+          "title": "Mydgf promotes Cardiomyocyte proliferation and Neonatal Heart regeneration.",
+          "year": 2020,
+          "relevance": 0.475
+        }
+      ]
+    },
+    "GO:0065008": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "37344348",
+          "title": "Fibulin7 Mediated Pathological Cardiac Remodeling through EGFR Binding and EGFR-Dependent FAK/AKT Signaling Activation.",
+          "year": 2023,
+          "relevance": 0.5375
+        },
+        {
+          "pmid": "36949106",
+          "title": "A defect in mitochondrial protein translation influences mitonuclear communication in the heart.",
+          "year": 2023,
+          "relevance": 0.5375
+        },
+        {
+          "pmid": "40162940",
+          "title": "Interplay of Chronic Kidney Disease and\u00a0the Effects of Tirzepatide in Patients With Heart\u00a0Failure, Preserved Ejection\u00a0Fraction, and Obesity: The SUMMIT Trial.",
+          "year": 2025,
+          "relevance": 0.5041666666666667
+        }
+      ]
+    },
+    "GO:0009719": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "37344348",
+          "title": "Fibulin7 Mediated Pathological Cardiac Remodeling through EGFR Binding and EGFR-Dependent FAK/AKT Signaling Activation.",
+          "year": 2023,
+          "relevance": 0.5375
+        },
+        {
+          "pmid": "40162940",
+          "title": "Interplay of Chronic Kidney Disease and\u00a0the Effects of Tirzepatide in Patients With Heart\u00a0Failure, Preserved Ejection\u00a0Fraction, and Obesity: The SUMMIT Trial.",
+          "year": 2025,
+          "relevance": 0.5041666666666667
+        },
+        {
+          "pmid": "32802181",
+          "title": "Mydgf promotes Cardiomyocyte proliferation and Neonatal Heart regeneration.",
+          "year": 2020,
+          "relevance": 0.475
+        }
+      ]
+    },
+    "GO:0002376": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "37344348",
+          "title": "Fibulin7 Mediated Pathological Cardiac Remodeling through EGFR Binding and EGFR-Dependent FAK/AKT Signaling Activation.",
+          "year": 2023,
+          "relevance": 0.5583333333333333
+        },
+        {
+          "pmid": "36949106",
+          "title": "A defect in mitochondrial protein translation influences mitonuclear communication in the heart.",
+          "year": 2023,
+          "relevance": 0.5583333333333333
+        },
+        {
+          "pmid": "32802181",
+          "title": "Mydgf promotes Cardiomyocyte proliferation and Neonatal Heart regeneration.",
+          "year": 2020,
+          "relevance": 0.475
+        }
+      ]
+    },
+    "KEGG:04550": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "37344348",
+          "title": "Fibulin7 Mediated Pathological Cardiac Remodeling through EGFR Binding and EGFR-Dependent FAK/AKT Signaling Activation.",
+          "year": 2023,
+          "relevance": 0.5107142857142857
+        },
+        {
+          "pmid": "32802181",
+          "title": "Mydgf promotes Cardiomyocyte proliferation and Neonatal Heart regeneration.",
+          "year": 2020,
+          "relevance": 0.5107142857142857
+        },
+        {
+          "pmid": "36949106",
+          "title": "A defect in mitochondrial protein translation influences mitonuclear communication in the heart.",
+          "year": 2023,
+          "relevance": 0.5107142857142857
+        }
+      ]
+    },
+    "GO:0006996": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "37344348",
+          "title": "Fibulin7 Mediated Pathological Cardiac Remodeling through EGFR Binding and EGFR-Dependent FAK/AKT Signaling Activation.",
+          "year": 2023,
+          "relevance": 0.475
+        },
+        {
+          "pmid": "32802181",
+          "title": "Mydgf promotes Cardiomyocyte proliferation and Neonatal Heart regeneration.",
+          "year": 2020,
+          "relevance": 0.475
+        },
+        {
+          "pmid": "36949106",
+          "title": "A defect in mitochondrial protein translation influences mitonuclear communication in the heart.",
+          "year": 2023,
+          "relevance": 0.475
+        }
+      ]
+    },
+    "GO:2000026": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "36949106",
+          "title": "A defect in mitochondrial protein translation influences mitonuclear communication in the heart.",
+          "year": 2023,
+          "relevance": 0.525
+        },
+        {
+          "pmid": "36653095",
+          "title": "Albuminuria and Heart\u00a0Failure: JACC State-of-the-Art Review.",
+          "year": 2023,
+          "relevance": 0.4916666666666667
+        },
+        {
+          "pmid": "37344348",
+          "title": "Fibulin7 Mediated Pathological Cardiac Remodeling through EGFR Binding and EGFR-Dependent FAK/AKT Signaling Activation.",
+          "year": 2023,
+          "relevance": 0.475
+        }
+      ]
+    },
+    "WP:WP2406": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "37344348",
+          "title": "Fibulin7 Mediated Pathological Cardiac Remodeling through EGFR Binding and EGFR-Dependent FAK/AKT Signaling Activation.",
+          "year": 2023,
+          "relevance": 0.6416666666666667
+        },
+        {
+          "pmid": "32802181",
+          "title": "Mydgf promotes Cardiomyocyte proliferation and Neonatal Heart regeneration.",
+          "year": 2020,
+          "relevance": 0.5583333333333333
+        },
+        {
+          "pmid": "36949106",
+          "title": "A defect in mitochondrial protein translation influences mitonuclear communication in the heart.",
+          "year": 2023,
+          "relevance": 0.5583333333333333
+        }
+      ]
+    },
+    "GO:0060411": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "37344348",
+          "title": "Fibulin7 Mediated Pathological Cardiac Remodeling through EGFR Binding and EGFR-Dependent FAK/AKT Signaling Activation.",
+          "year": 2023,
+          "relevance": 0.5583333333333333
+        },
+        {
+          "pmid": "32802181",
+          "title": "Mydgf promotes Cardiomyocyte proliferation and Neonatal Heart regeneration.",
+          "year": 2020,
+          "relevance": 0.5583333333333333
+        },
+        {
+          "pmid": "36949106",
+          "title": "A defect in mitochondrial protein translation influences mitonuclear communication in the heart.",
+          "year": 2023,
+          "relevance": 0.5583333333333333
+        }
+      ]
+    },
+    "WP:WP2456": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "37344348",
+          "title": "Fibulin7 Mediated Pathological Cardiac Remodeling through EGFR Binding and EGFR-Dependent FAK/AKT Signaling Activation.",
+          "year": 2023,
+          "relevance": 0.5583333333333333
+        },
+        {
+          "pmid": "40162940",
+          "title": "Interplay of Chronic Kidney Disease and\u00a0the Effects of Tirzepatide in Patients With Heart\u00a0Failure, Preserved Ejection\u00a0Fraction, and Obesity: The SUMMIT Trial.",
+          "year": 2025,
+          "relevance": 0.4833333333333333
+        },
+        {
+          "pmid": "36949106",
+          "title": "A defect in mitochondrial protein translation influences mitonuclear communication in the heart.",
+          "year": 2023,
+          "relevance": 0.475
+        }
+      ]
+    },
+    "REAC:R-HSA-9733709": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "37344348",
+          "title": "Fibulin7 Mediated Pathological Cardiac Remodeling through EGFR Binding and EGFR-Dependent FAK/AKT Signaling Activation.",
+          "year": 2023,
+          "relevance": 0.475
+        },
+        {
+          "pmid": "32802181",
+          "title": "Mydgf promotes Cardiomyocyte proliferation and Neonatal Heart regeneration.",
+          "year": 2020,
+          "relevance": 0.475
+        },
+        {
+          "pmid": "36949106",
+          "title": "A defect in mitochondrial protein translation influences mitonuclear communication in the heart.",
+          "year": 2023,
+          "relevance": 0.475
+        }
+      ]
+    },
+    "GO:0003181": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "37344348",
+          "title": "Fibulin7 Mediated Pathological Cardiac Remodeling through EGFR Binding and EGFR-Dependent FAK/AKT Signaling Activation.",
+          "year": 2023,
+          "relevance": 0.475
+        },
+        {
+          "pmid": "32802181",
+          "title": "Mydgf promotes Cardiomyocyte proliferation and Neonatal Heart regeneration.",
+          "year": 2020,
+          "relevance": 0.475
+        },
+        {
+          "pmid": "36949106",
+          "title": "A defect in mitochondrial protein translation influences mitonuclear communication in the heart.",
+          "year": 2023,
+          "relevance": 0.475
+        }
+      ]
+    },
+    "WP:WP1559": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "36949106",
+          "title": "A defect in mitochondrial protein translation influences mitonuclear communication in the heart.",
+          "year": 2023,
+          "relevance": 0.56875
+        },
+        {
+          "pmid": "39636639",
+          "title": "Cardiac Events and Survival in Patients With EGFR-Mutant Non-Small Cell Lung Cancer Treated With Osimertinib.",
+          "year": 2024,
+          "relevance": 0.56875
+        },
+        {
+          "pmid": "37344348",
+          "title": "Fibulin7 Mediated Pathological Cardiac Remodeling through EGFR Binding and EGFR-Dependent FAK/AKT Signaling Activation.",
+          "year": 2023,
+          "relevance": 0.5375
+        }
+      ]
+    },
+    "GO:0003252": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "31547508",
+          "title": "Molecular Mechanisms of Cardiac Remodeling and Regeneration in Physical Exercise.",
+          "year": 2019,
+          "relevance": 0.6916666666666667
+        },
+        {
+          "pmid": "32802181",
+          "title": "Mydgf promotes Cardiomyocyte proliferation and Neonatal Heart regeneration.",
+          "year": 2020,
+          "relevance": 0.5750000000000001
+        },
+        {
+          "pmid": "37344348",
+          "title": "Fibulin7 Mediated Pathological Cardiac Remodeling through EGFR Binding and EGFR-Dependent FAK/AKT Signaling Activation.",
+          "year": 2023,
+          "relevance": 0.525
+        }
+      ]
+    },
+    "GO:0060981": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "32802181",
+          "title": "Mydgf promotes Cardiomyocyte proliferation and Neonatal Heart regeneration.",
+          "year": 2020,
+          "relevance": 0.5583333333333333
+        },
+        {
+          "pmid": "37344348",
+          "title": "Fibulin7 Mediated Pathological Cardiac Remodeling through EGFR Binding and EGFR-Dependent FAK/AKT Signaling Activation.",
+          "year": 2023,
+          "relevance": 0.5166666666666666
+        },
+        {
+          "pmid": "39636639",
+          "title": "Cardiac Events and Survival in Patients With EGFR-Mutant Non-Small Cell Lung Cancer Treated With Osimertinib.",
+          "year": 2024,
+          "relevance": 0.5166666666666666
+        }
+      ]
+    },
+    "WP:WP1528": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "37344348",
+          "title": "Fibulin7 Mediated Pathological Cardiac Remodeling through EGFR Binding and EGFR-Dependent FAK/AKT Signaling Activation.",
+          "year": 2023,
+          "relevance": 0.5464285714285714
+        },
+        {
+          "pmid": "36949106",
+          "title": "A defect in mitochondrial protein translation influences mitonuclear communication in the heart.",
+          "year": 2023,
+          "relevance": 0.5464285714285714
+        },
+        {
+          "pmid": "32802181",
+          "title": "Mydgf promotes Cardiomyocyte proliferation and Neonatal Heart regeneration.",
+          "year": 2020,
+          "relevance": 0.5107142857142857
+        }
+      ]
+    },
+    "GO:0003179": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "37344348",
+          "title": "Fibulin7 Mediated Pathological Cardiac Remodeling through EGFR Binding and EGFR-Dependent FAK/AKT Signaling Activation.",
+          "year": 2023,
+          "relevance": 0.5583333333333333
+        },
+        {
+          "pmid": "32802181",
+          "title": "Mydgf promotes Cardiomyocyte proliferation and Neonatal Heart regeneration.",
+          "year": 2020,
+          "relevance": 0.5583333333333333
+        },
+        {
+          "pmid": "36949106",
+          "title": "A defect in mitochondrial protein translation influences mitonuclear communication in the heart.",
+          "year": 2023,
+          "relevance": 0.5583333333333333
+        }
+      ]
+    },
+    "GO:2000136": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "32802181",
+          "title": "Mydgf promotes Cardiomyocyte proliferation and Neonatal Heart regeneration.",
+          "year": 2020,
+          "relevance": 0.6
+        },
+        {
+          "pmid": "37344348",
+          "title": "Fibulin7 Mediated Pathological Cardiac Remodeling through EGFR Binding and EGFR-Dependent FAK/AKT Signaling Activation.",
+          "year": 2023,
+          "relevance": 0.5375
+        },
+        {
+          "pmid": "36949106",
+          "title": "A defect in mitochondrial protein translation influences mitonuclear communication in the heart.",
+          "year": 2023,
+          "relevance": 0.5375
+        }
+      ]
+    },
+    "GO:0060978": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "39524990",
+          "title": "Causal Links Between Renal Function and Cardiac Structure, Function, and Disease Risk.",
+          "year": 2024,
+          "relevance": 0.5583333333333333
+        },
+        {
+          "pmid": "32802181",
+          "title": "Mydgf promotes Cardiomyocyte proliferation and Neonatal Heart regeneration.",
+          "year": 2020,
+          "relevance": 0.5166666666666666
+        },
+        {
+          "pmid": "36927680",
+          "title": "Outcomes with Finerenone in Participants with Stage 4 CKD and Type 2 Diabetes: A FIDELITY Subgroup Analysis.",
+          "year": 2023,
+          "relevance": 0.5166666666666666
+        }
+      ]
+    },
+    "GO:0003222": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "37344348",
+          "title": "Fibulin7 Mediated Pathological Cardiac Remodeling through EGFR Binding and EGFR-Dependent FAK/AKT Signaling Activation.",
+          "year": 2023,
+          "relevance": 0.5375
+        },
+        {
+          "pmid": "39524990",
+          "title": "Causal Links Between Renal Function and Cardiac Structure, Function, and Disease Risk.",
+          "year": 2024,
+          "relevance": 0.5375
+        },
+        {
+          "pmid": "32802181",
+          "title": "Mydgf promotes Cardiomyocyte proliferation and Neonatal Heart regeneration.",
+          "year": 2020,
+          "relevance": 0.475
+        }
+      ]
+    },
+    "GO:0003251": {
+      "citation_count": 25,
+      "top_citations": [
+        {
+          "pmid": "32802181",
+          "title": "Mydgf promotes Cardiomyocyte proliferation and Neonatal Heart regeneration.",
+          "year": 2020,
+          "relevance": 0.5750000000000001
+        },
+        {
+          "pmid": "37344348",
+          "title": "Fibulin7 Mediated Pathological Cardiac Remodeling through EGFR Binding and EGFR-Dependent FAK/AKT Signaling Activation.",
+          "year": 2023,
+          "relevance": 0.525
+        },
+        {
+          "pmid": "36949106",
+          "title": "A defect in mitochondrial protein translation influences mitonuclear communication in the heart.",
+          "year": 2023,
+          "relevance": 0.525
+        }
+      ]
+    }
+  },
+  "ranked_hypotheses": [
+    {
+      "rank": 574,
+      "pathway_id": "WP:WP2406",
+      "pathway_name": "Cardiac progenitor differentiation",
+      "source_db": "WP",
+      "nes_score": 3.5476067930302015,
+      "p_adj": 1.5068004288742998e-08,
+      "evidence_count": 11,
+      "support_count": 20,
+      "seed_genes": [
+        "EGFR",
+        "MYC"
+      ],
+      "literature_support": false,
+      "citations": [
+        {
+          "pmid": "37344348",
+          "title": "Fibulin7 Mediated Pathological Cardiac Remodeling through EGFR Binding and EGFR-Dependent FAK/AKT Signaling Activation.",
+          "year": 2023,
+          "relevance": 0.6416666666666667
+        },
+        {
+          "pmid": "32802181",
+          "title": "Mydgf promotes Cardiomyocyte proliferation and Neonatal Heart regeneration.",
+          "year": 2020,
+          "relevance": 0.5583333333333333
+        },
+        {
+          "pmid": "36949106",
+          "title": "A defect in mitochondrial protein translation influences mitonuclear communication in the heart.",
+          "year": 2023,
+          "relevance": 0.5583333333333333
+        }
+      ],
+      "citation_count": 25,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0048522",
+        "GO:0048518",
+        "GO:0060255",
+        "GO:0048856",
+        "GO:0032502",
+        "GO:0080090",
+        "GO:0019222",
+        "GO:0050794",
+        "GO:0051716",
+        "GO:0009893",
+        "GO:0050789",
+        "GO:0010604",
+        "GO:0007275",
+        "GO:0048583",
+        "GO:0050896",
+        "GO:0023052",
+        "GO:0048519",
+        "GO:0065007",
+        "GO:0048523",
+        "GO:0007154"
+      ]
+    },
+    {
+      "rank": 1178,
+      "pathway_id": "GO:0060411",
+      "pathway_name": "cardiac septum morphogenesis",
+      "source_db": "GO:BP",
+      "nes_score": 2.848410940120693,
+      "p_adj": 1.9984014443252818e-13,
+      "evidence_count": 3,
+      "support_count": 20,
+      "seed_genes": [
+        "EGFR",
+        "MYC"
+      ],
+      "literature_support": false,
+      "citations": [
+        {
+          "pmid": "37344348",
+          "title": "Fibulin7 Mediated Pathological Cardiac Remodeling through EGFR Binding and EGFR-Dependent FAK/AKT Signaling Activation.",
+          "year": 2023,
+          "relevance": 0.5583333333333333
+        },
+        {
+          "pmid": "32802181",
+          "title": "Mydgf promotes Cardiomyocyte proliferation and Neonatal Heart regeneration.",
+          "year": 2020,
+          "relevance": 0.5583333333333333
+        },
+        {
+          "pmid": "36949106",
+          "title": "A defect in mitochondrial protein translation influences mitonuclear communication in the heart.",
+          "year": 2023,
+          "relevance": 0.5583333333333333
+        }
+      ],
+      "citation_count": 25,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0048522",
+        "GO:0048518",
+        "GO:0060255",
+        "GO:0048856",
+        "GO:0032502",
+        "GO:0080090",
+        "GO:0019222",
+        "GO:0050794",
+        "GO:0051716",
+        "GO:0009893",
+        "GO:0050789",
+        "GO:0010604",
+        "GO:0007275",
+        "GO:0048583",
+        "GO:0050896",
+        "GO:0023052",
+        "GO:0048519",
+        "GO:0065007",
+        "GO:0048523",
+        "GO:0007154"
+      ]
+    },
+    {
+      "rank": 1290,
+      "pathway_id": "WP:WP2456",
+      "pathway_name": "HIF1A and PPARG in hypertrophic cardiomyopathy",
+      "source_db": "WP",
+      "nes_score": 2.7658417269069053,
+      "p_adj": 2.475797344914099e-14,
+      "evidence_count": 2,
+      "support_count": 17,
+      "seed_genes": [
+        "EGFR",
+        "MYC"
+      ],
+      "literature_support": false,
+      "citations": [
+        {
+          "pmid": "37344348",
+          "title": "Fibulin7 Mediated Pathological Cardiac Remodeling through EGFR Binding and EGFR-Dependent FAK/AKT Signaling Activation.",
+          "year": 2023,
+          "relevance": 0.5583333333333333
+        },
+        {
+          "pmid": "40162940",
+          "title": "Interplay of Chronic Kidney Disease and\u00a0the Effects of Tirzepatide in Patients With Heart\u00a0Failure, Preserved Ejection\u00a0Fraction, and Obesity: The SUMMIT Trial.",
+          "year": 2025,
+          "relevance": 0.4833333333333333
+        },
+        {
+          "pmid": "36949106",
+          "title": "A defect in mitochondrial protein translation influences mitonuclear communication in the heart.",
+          "year": 2023,
+          "relevance": 0.475
+        }
+      ],
+      "citation_count": 25,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0048522",
+        "GO:0048518",
+        "GO:0060255",
+        "GO:0080090",
+        "GO:0019222",
+        "GO:0050794",
+        "GO:0051716",
+        "GO:0009893",
+        "GO:0050789",
+        "GO:0010604",
+        "GO:0048583",
+        "GO:0050896",
+        "GO:0023052",
+        "GO:0048519",
+        "GO:0065007",
+        "GO:0048523",
+        "GO:0007154"
+      ]
+    },
+    {
+      "rank": 1451,
+      "pathway_id": "REAC:R-HSA-9733709",
+      "pathway_name": "Cardiogenesis",
+      "source_db": "REAC",
+      "nes_score": 2.66964897996405,
+      "p_adj": 0.00014355354541606413,
+      "evidence_count": 5,
+      "support_count": 20,
+      "seed_genes": [
+        "EGFR",
+        "MYC"
+      ],
+      "literature_support": false,
+      "citations": [
+        {
+          "pmid": "37344348",
+          "title": "Fibulin7 Mediated Pathological Cardiac Remodeling through EGFR Binding and EGFR-Dependent FAK/AKT Signaling Activation.",
+          "year": 2023,
+          "relevance": 0.475
+        },
+        {
+          "pmid": "32802181",
+          "title": "Mydgf promotes Cardiomyocyte proliferation and Neonatal Heart regeneration.",
+          "year": 2020,
+          "relevance": 0.475
+        },
+        {
+          "pmid": "36949106",
+          "title": "A defect in mitochondrial protein translation influences mitonuclear communication in the heart.",
+          "year": 2023,
+          "relevance": 0.475
+        }
+      ],
+      "citation_count": 25,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0048522",
+        "GO:0048518",
+        "GO:0060255",
+        "GO:0048856",
+        "GO:0032502",
+        "GO:0080090",
+        "GO:0019222",
+        "GO:0050794",
+        "GO:0051716",
+        "GO:0009893",
+        "GO:0050789",
+        "GO:0010604",
+        "GO:0007275",
+        "GO:0048583",
+        "GO:0050896",
+        "GO:0023052",
+        "GO:0048519",
+        "GO:0065007",
+        "GO:0048523",
+        "GO:0007154"
+      ]
+    },
+    {
+      "rank": 1649,
+      "pathway_id": "GO:0003181",
+      "pathway_name": "atrioventricular valve morphogenesis",
+      "source_db": "GO:BP",
+      "nes_score": 2.5705633106020946,
+      "p_adj": 3.9013237085328e-13,
+      "evidence_count": 2,
+      "support_count": 20,
+      "seed_genes": [
+        "EGFR",
+        "MYC"
+      ],
+      "literature_support": false,
+      "citations": [
+        {
+          "pmid": "37344348",
+          "title": "Fibulin7 Mediated Pathological Cardiac Remodeling through EGFR Binding and EGFR-Dependent FAK/AKT Signaling Activation.",
+          "year": 2023,
+          "relevance": 0.475
+        },
+        {
+          "pmid": "32802181",
+          "title": "Mydgf promotes Cardiomyocyte proliferation and Neonatal Heart regeneration.",
+          "year": 2020,
+          "relevance": 0.475
+        },
+        {
+          "pmid": "36949106",
+          "title": "A defect in mitochondrial protein translation influences mitonuclear communication in the heart.",
+          "year": 2023,
+          "relevance": 0.475
+        }
+      ],
+      "citation_count": 25,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0048522",
+        "GO:0048518",
+        "GO:0060255",
+        "GO:0048856",
+        "GO:0032502",
+        "GO:0080090",
+        "GO:0019222",
+        "GO:0050794",
+        "GO:0051716",
+        "GO:0009893",
+        "GO:0050789",
+        "GO:0010604",
+        "GO:0007275",
+        "GO:0048583",
+        "GO:0050896",
+        "GO:0023052",
+        "GO:0048519",
+        "GO:0065007",
+        "GO:0048523",
+        "GO:0007154"
+      ]
+    },
+    {
+      "rank": 1785,
+      "pathway_id": "WP:WP1559",
+      "pathway_name": "Transcription factors regulate miRNAs related to cardiac hypertrophy",
+      "source_db": "WP",
+      "nes_score": 2.5146598492414127,
+      "p_adj": 4.238868122941053e-05,
+      "evidence_count": 4,
+      "support_count": 20,
+      "seed_genes": [
+        "EGFR",
+        "MYC"
+      ],
+      "literature_support": false,
+      "citations": [
+        {
+          "pmid": "36949106",
+          "title": "A defect in mitochondrial protein translation influences mitonuclear communication in the heart.",
+          "year": 2023,
+          "relevance": 0.56875
+        },
+        {
+          "pmid": "39636639",
+          "title": "Cardiac Events and Survival in Patients With EGFR-Mutant Non-Small Cell Lung Cancer Treated With Osimertinib.",
+          "year": 2024,
+          "relevance": 0.56875
+        },
+        {
+          "pmid": "37344348",
+          "title": "Fibulin7 Mediated Pathological Cardiac Remodeling through EGFR Binding and EGFR-Dependent FAK/AKT Signaling Activation.",
+          "year": 2023,
+          "relevance": 0.5375
+        }
+      ],
+      "citation_count": 25,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0048522",
+        "GO:0048518",
+        "GO:0060255",
+        "GO:0048856",
+        "GO:0032502",
+        "GO:0080090",
+        "GO:0019222",
+        "GO:0050794",
+        "GO:0051716",
+        "GO:0009893",
+        "GO:0050789",
+        "GO:0010604",
+        "GO:0007275",
+        "GO:0048583",
+        "GO:0050896",
+        "GO:0023052",
+        "GO:0048519",
+        "GO:0065007",
+        "GO:0048523",
+        "GO:0007154"
+      ]
+    },
+    {
+      "rank": 2427,
+      "pathway_id": "GO:0003252",
+      "pathway_name": "negative regulation of cell proliferation involved in heart valve morphogenesis",
+      "source_db": "GO:BP",
+      "nes_score": 2.2482833590642737,
+      "p_adj": 1.20570220474292e-13,
+      "evidence_count": 1,
+      "support_count": 20,
+      "seed_genes": [
+        "EGFR",
+        "MYC"
+      ],
+      "literature_support": false,
+      "citations": [
+        {
+          "pmid": "31547508",
+          "title": "Molecular Mechanisms of Cardiac Remodeling and Regeneration in Physical Exercise.",
+          "year": 2019,
+          "relevance": 0.6916666666666667
+        },
+        {
+          "pmid": "32802181",
+          "title": "Mydgf promotes Cardiomyocyte proliferation and Neonatal Heart regeneration.",
+          "year": 2020,
+          "relevance": 0.5750000000000001
+        },
+        {
+          "pmid": "37344348",
+          "title": "Fibulin7 Mediated Pathological Cardiac Remodeling through EGFR Binding and EGFR-Dependent FAK/AKT Signaling Activation.",
+          "year": 2023,
+          "relevance": 0.525
+        }
+      ],
+      "citation_count": 25,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0048522",
+        "GO:0048518",
+        "GO:0060255",
+        "GO:0048856",
+        "GO:0032502",
+        "GO:0080090",
+        "GO:0019222",
+        "GO:0050794",
+        "GO:0051716",
+        "GO:0009893",
+        "GO:0050789",
+        "GO:0010604",
+        "GO:0007275",
+        "GO:0048583",
+        "GO:0050896",
+        "GO:0023052",
+        "GO:0048519",
+        "GO:0065007",
+        "GO:0048523",
+        "GO:0007154"
+      ]
+    },
+    {
+      "rank": 2463,
+      "pathway_id": "GO:0060981",
+      "pathway_name": "cell migration involved in coronary angiogenesis",
+      "source_db": "GO:BP",
+      "nes_score": 2.2312071888245817,
+      "p_adj": 6.661338147750939e-16,
+      "evidence_count": 1,
+      "support_count": 18,
+      "seed_genes": [
+        "EGFR",
+        "MYC"
+      ],
+      "literature_support": false,
+      "citations": [
+        {
+          "pmid": "32802181",
+          "title": "Mydgf promotes Cardiomyocyte proliferation and Neonatal Heart regeneration.",
+          "year": 2020,
+          "relevance": 0.5583333333333333
+        },
+        {
+          "pmid": "37344348",
+          "title": "Fibulin7 Mediated Pathological Cardiac Remodeling through EGFR Binding and EGFR-Dependent FAK/AKT Signaling Activation.",
+          "year": 2023,
+          "relevance": 0.5166666666666666
+        },
+        {
+          "pmid": "39636639",
+          "title": "Cardiac Events and Survival in Patients With EGFR-Mutant Non-Small Cell Lung Cancer Treated With Osimertinib.",
+          "year": 2024,
+          "relevance": 0.5166666666666666
+        }
+      ],
+      "citation_count": 25,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0048522",
+        "GO:0048518",
+        "GO:0060255",
+        "GO:0048856",
+        "GO:0032502",
+        "GO:0080090",
+        "GO:0019222",
+        "GO:0050794",
+        "GO:0051716",
+        "GO:0009893",
+        "GO:0050789",
+        "GO:0010604",
+        "GO:0007275",
+        "GO:0048583",
+        "GO:0050896",
+        "GO:0023052",
+        "GO:0065007",
+        "GO:0007154"
+      ]
+    },
+    {
+      "rank": 2779,
+      "pathway_id": "WP:WP1528",
+      "pathway_name": "Physiological and pathological hypertrophy of the heart",
+      "source_db": "WP",
+      "nes_score": 2.104219811508828,
+      "p_adj": 0.002056630878832455,
+      "evidence_count": 4,
+      "support_count": 19,
+      "seed_genes": [
+        "EGFR",
+        "MYC"
+      ],
+      "literature_support": false,
+      "citations": [
+        {
+          "pmid": "37344348",
+          "title": "Fibulin7 Mediated Pathological Cardiac Remodeling through EGFR Binding and EGFR-Dependent FAK/AKT Signaling Activation.",
+          "year": 2023,
+          "relevance": 0.5464285714285714
+        },
+        {
+          "pmid": "36949106",
+          "title": "A defect in mitochondrial protein translation influences mitonuclear communication in the heart.",
+          "year": 2023,
+          "relevance": 0.5464285714285714
+        },
+        {
+          "pmid": "32802181",
+          "title": "Mydgf promotes Cardiomyocyte proliferation and Neonatal Heart regeneration.",
+          "year": 2020,
+          "relevance": 0.5107142857142857
+        }
+      ],
+      "citation_count": 25,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0048522",
+        "GO:0048518",
+        "GO:0060255",
+        "GO:0048856",
+        "GO:0032502",
+        "GO:0080090",
+        "GO:0019222",
+        "GO:0050794",
+        "GO:0051716",
+        "GO:0009893",
+        "GO:0050789",
+        "GO:0010604",
+        "GO:0007275",
+        "GO:0050896",
+        "GO:0023052",
+        "GO:0048519",
+        "GO:0065007",
+        "GO:0048523",
+        "GO:0007154"
+      ]
+    },
+    {
+      "rank": 2993,
+      "pathway_id": "GO:0003179",
+      "pathway_name": "heart valve morphogenesis",
+      "source_db": "GO:BP",
+      "nes_score": 2.0071271741160652,
+      "p_adj": 0.004170317625714293,
+      "evidence_count": 4,
+      "support_count": 20,
+      "seed_genes": [
+        "EGFR",
+        "MYC"
+      ],
+      "literature_support": false,
+      "citations": [
+        {
+          "pmid": "37344348",
+          "title": "Fibulin7 Mediated Pathological Cardiac Remodeling through EGFR Binding and EGFR-Dependent FAK/AKT Signaling Activation.",
+          "year": 2023,
+          "relevance": 0.5583333333333333
+        },
+        {
+          "pmid": "32802181",
+          "title": "Mydgf promotes Cardiomyocyte proliferation and Neonatal Heart regeneration.",
+          "year": 2020,
+          "relevance": 0.5583333333333333
+        },
+        {
+          "pmid": "36949106",
+          "title": "A defect in mitochondrial protein translation influences mitonuclear communication in the heart.",
+          "year": 2023,
+          "relevance": 0.5583333333333333
+        }
+      ],
+      "citation_count": 25,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0048522",
+        "GO:0048518",
+        "GO:0060255",
+        "GO:0048856",
+        "GO:0032502",
+        "GO:0080090",
+        "GO:0019222",
+        "GO:0050794",
+        "GO:0051716",
+        "GO:0009893",
+        "GO:0050789",
+        "GO:0010604",
+        "GO:0007275",
+        "GO:0048583",
+        "GO:0050896",
+        "GO:0023052",
+        "GO:0048519",
+        "GO:0065007",
+        "GO:0048523",
+        "GO:0007154"
+      ]
+    },
+    {
+      "rank": 3217,
+      "pathway_id": "GO:2000136",
+      "pathway_name": "regulation of cell proliferation involved in heart morphogenesis",
+      "source_db": "GO:BP",
+      "nes_score": 1.9206636875936296,
+      "p_adj": 0.0011708373513765746,
+      "evidence_count": 3,
+      "support_count": 20,
+      "seed_genes": [
+        "EGFR",
+        "MYC"
+      ],
+      "literature_support": false,
+      "citations": [
+        {
+          "pmid": "32802181",
+          "title": "Mydgf promotes Cardiomyocyte proliferation and Neonatal Heart regeneration.",
+          "year": 2020,
+          "relevance": 0.6
+        },
+        {
+          "pmid": "37344348",
+          "title": "Fibulin7 Mediated Pathological Cardiac Remodeling through EGFR Binding and EGFR-Dependent FAK/AKT Signaling Activation.",
+          "year": 2023,
+          "relevance": 0.5375
+        },
+        {
+          "pmid": "36949106",
+          "title": "A defect in mitochondrial protein translation influences mitonuclear communication in the heart.",
+          "year": 2023,
+          "relevance": 0.5375
+        }
+      ],
+      "citation_count": 25,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0048522",
+        "GO:0048518",
+        "GO:0060255",
+        "GO:0048856",
+        "GO:0032502",
+        "GO:0080090",
+        "GO:0019222",
+        "GO:0050794",
+        "GO:0051716",
+        "GO:0009893",
+        "GO:0050789",
+        "GO:0010604",
+        "GO:0007275",
+        "GO:0048583",
+        "GO:0050896",
+        "GO:0023052",
+        "GO:0048519",
+        "GO:0065007",
+        "GO:0048523",
+        "GO:0007154"
+      ]
+    },
+    {
+      "rank": 3911,
+      "pathway_id": "GO:0060978",
+      "pathway_name": "angiogenesis involved in coronary vascular morphogenesis",
+      "source_db": "GO:BP",
+      "nes_score": 1.6453876600257813,
+      "p_adj": 0.001832169415888374,
+      "evidence_count": 2,
+      "support_count": 18,
+      "seed_genes": [
+        "EGFR",
+        "MYC"
+      ],
+      "literature_support": false,
+      "citations": [
+        {
+          "pmid": "39524990",
+          "title": "Causal Links Between Renal Function and Cardiac Structure, Function, and Disease Risk.",
+          "year": 2024,
+          "relevance": 0.5583333333333333
+        },
+        {
+          "pmid": "32802181",
+          "title": "Mydgf promotes Cardiomyocyte proliferation and Neonatal Heart regeneration.",
+          "year": 2020,
+          "relevance": 0.5166666666666666
+        },
+        {
+          "pmid": "36927680",
+          "title": "Outcomes with Finerenone in Participants with Stage 4 CKD and Type 2 Diabetes: A FIDELITY Subgroup Analysis.",
+          "year": 2023,
+          "relevance": 0.5166666666666666
+        }
+      ],
+      "citation_count": 25,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0048522",
+        "GO:0048518",
+        "GO:0060255",
+        "GO:0048856",
+        "GO:0032502",
+        "GO:0080090",
+        "GO:0019222",
+        "GO:0050794",
+        "GO:0051716",
+        "GO:0009893",
+        "GO:0050789",
+        "GO:0010604",
+        "GO:0007275",
+        "GO:0048583",
+        "GO:0050896",
+        "GO:0023052",
+        "GO:0065007",
+        "GO:0007154"
+      ]
+    },
+    {
+      "rank": 4349,
+      "pathway_id": "GO:0003222",
+      "pathway_name": "ventricular trabecula myocardium morphogenesis",
+      "source_db": "GO:BP",
+      "nes_score": 1.4221902606372119,
+      "p_adj": 0.012234908443905734,
+      "evidence_count": 2,
+      "support_count": 20,
+      "seed_genes": [
+        "EGFR",
+        "MYC"
+      ],
+      "literature_support": false,
+      "citations": [
+        {
+          "pmid": "37344348",
+          "title": "Fibulin7 Mediated Pathological Cardiac Remodeling through EGFR Binding and EGFR-Dependent FAK/AKT Signaling Activation.",
+          "year": 2023,
+          "relevance": 0.5375
+        },
+        {
+          "pmid": "39524990",
+          "title": "Causal Links Between Renal Function and Cardiac Structure, Function, and Disease Risk.",
+          "year": 2024,
+          "relevance": 0.5375
+        },
+        {
+          "pmid": "32802181",
+          "title": "Mydgf promotes Cardiomyocyte proliferation and Neonatal Heart regeneration.",
+          "year": 2020,
+          "relevance": 0.475
+        }
+      ],
+      "citation_count": 25,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0048522",
+        "GO:0048518",
+        "GO:0060255",
+        "GO:0048856",
+        "GO:0032502",
+        "GO:0080090",
+        "GO:0019222",
+        "GO:0050794",
+        "GO:0051716",
+        "GO:0009893",
+        "GO:0050789",
+        "GO:0010604",
+        "GO:0007275",
+        "GO:0048583",
+        "GO:0050896",
+        "GO:0023052",
+        "GO:0048519",
+        "GO:0065007",
+        "GO:0048523",
+        "GO:0007154"
+      ]
+    },
+    {
+      "rank": 4736,
+      "pathway_id": "GO:0003251",
+      "pathway_name": "positive regulation of cell proliferation involved in heart valve morphogenesis",
+      "source_db": "GO:BP",
+      "nes_score": 1.0316940046154888,
+      "p_adj": 0.016522871260018057,
+      "evidence_count": 1,
+      "support_count": 20,
+      "seed_genes": [
+        "EGFR",
+        "MYC"
+      ],
+      "literature_support": false,
+      "citations": [
+        {
+          "pmid": "32802181",
+          "title": "Mydgf promotes Cardiomyocyte proliferation and Neonatal Heart regeneration.",
+          "year": 2020,
+          "relevance": 0.5750000000000001
+        },
+        {
+          "pmid": "37344348",
+          "title": "Fibulin7 Mediated Pathological Cardiac Remodeling through EGFR Binding and EGFR-Dependent FAK/AKT Signaling Activation.",
+          "year": 2023,
+          "relevance": 0.525
+        },
+        {
+          "pmid": "36949106",
+          "title": "A defect in mitochondrial protein translation influences mitonuclear communication in the heart.",
+          "year": 2023,
+          "relevance": 0.525
+        }
+      ],
+      "citation_count": 25,
+      "key_nodes": [],
+      "source_primaries": [
+        "GO:0048522",
+        "GO:0048518",
+        "GO:0060255",
+        "GO:0048856",
+        "GO:0032502",
+        "GO:0080090",
+        "GO:0019222",
+        "GO:0050794",
+        "GO:0051716",
+        "GO:0009893",
+        "GO:0050789",
+        "GO:0010604",
+        "GO:0007275",
+        "GO:0048583",
+        "GO:0050896",
+        "GO:0023052",
+        "GO:0048519",
+        "GO:0065007",
+        "GO:0048523",
+        "GO:0007154"
+      ]
+    }
+  ],
+  "testable_hypotheses": [
+    {
+      "hypothesis": "Pathway 'Cardiac progenitor differentiation' is involved in cardiovascular disease and phenotype processes",
+      "pathway_id": "WP:WP2406",
+      "nes_score": 3.5476067930302015,
+      "experimental_approaches": [
+        "Functional enrichment analysis in cardiac tissue",
+        "Gene expression profiling",
+        "Pathway perturbation studies"
+      ]
+    },
+    {
+      "hypothesis": "Pathway 'cardiac septum morphogenesis' is involved in cardiovascular disease and phenotype processes",
+      "pathway_id": "GO:0060411",
+      "nes_score": 2.848410940120693,
+      "experimental_approaches": [
+        "Functional enrichment analysis in cardiac tissue",
+        "Gene expression profiling",
+        "Pathway perturbation studies"
+      ]
+    },
+    {
+      "hypothesis": "Pathway 'HIF1A and PPARG in hypertrophic cardiomyopathy' is involved in cardiovascular disease and phenotype processes",
+      "pathway_id": "WP:WP2456",
+      "nes_score": 2.7658417269069053,
+      "experimental_approaches": [
+        "Functional enrichment analysis in cardiac tissue",
+        "Gene expression profiling",
+        "Pathway perturbation studies"
+      ]
+    },
+    {
+      "hypothesis": "Pathway 'Cardiogenesis' is involved in cardiovascular disease and phenotype processes",
+      "pathway_id": "REAC:R-HSA-9733709",
+      "nes_score": 2.66964897996405,
+      "experimental_approaches": [
+        "Functional enrichment analysis in cardiac tissue",
+        "Gene expression profiling",
+        "Pathway perturbation studies"
+      ]
+    },
+    {
+      "hypothesis": "Pathway 'atrioventricular valve morphogenesis' is involved in cardiovascular disease and phenotype processes",
+      "pathway_id": "GO:0003181",
+      "nes_score": 2.5705633106020946,
+      "experimental_approaches": [
+        "Functional enrichment analysis in cardiac tissue",
+        "Gene expression profiling",
+        "Pathway perturbation studies"
+      ]
+    }
+  ],
+  "conclusion": "Analysis identified 14 novel pathway hypotheses. The top-ranked hypothesis is 'Cardiac progenitor differentiation' (NES: 3.55), which shows strong evidence for involvement in cardiovascular disease and phenotype processes based on functional network analysis and literature mining.",
+  "top_genes": [
+    {
+      "gene": "NOTCH1",
+      "pathway_count": 7,
+      "importance_score": 6.300000000000001,
+      "druggability_tier": "medium",
+      "is_druggable": true,
+      "is_fda_approved": false,
+      "is_clinical_trial": true,
+      "centrality": 0.0,
+      "disgenet_cardiac_score": 0.85,
+      "final_score": 13.466250000000002
+    },
+    {
+      "gene": "SMAD4",
+      "pathway_count": 6,
+      "importance_score": 5.319999999999999,
+      "druggability_tier": "unknown",
+      "is_druggable": true,
+      "is_fda_approved": false,
+      "is_clinical_trial": false,
+      "centrality": 0.0,
+      "disgenet_cardiac_score": 0.72,
+      "final_score": 9.522799999999998
+    },
+    {
+      "gene": "TGFB1",
+      "pathway_count": 3,
+      "importance_score": 2.78,
+      "druggability_tier": "medium",
+      "is_druggable": true,
+      "is_fda_approved": false,
+      "is_clinical_trial": true,
+      "centrality": 0.0,
+      "disgenet_cardiac_score": 0.0,
+      "final_score": 4.17
+    },
+    {
+      "gene": "CTNNB1",
+      "pathway_count": 2,
+      "importance_score": 1.7799999999999998,
+      "druggability_tier": "unknown",
+      "is_druggable": true,
+      "is_fda_approved": false,
+      "is_clinical_trial": false,
+      "centrality": 0.0,
+      "disgenet_cardiac_score": 0.7,
+      "final_score": 3.1594999999999995
+    },
+    {
+      "gene": "FGF2",
+      "pathway_count": 2,
+      "importance_score": 1.82,
+      "druggability_tier": "unknown",
+      "is_druggable": true,
+      "is_fda_approved": false,
+      "is_clinical_trial": false,
+      "centrality": 0.0,
+      "disgenet_cardiac_score": 0.0,
+      "final_score": 2.275
+    },
+    {
+      "gene": "STAT3",
+      "pathway_count": 2,
+      "importance_score": 1.78,
+      "druggability_tier": "unknown",
+      "is_druggable": true,
+      "is_fda_approved": false,
+      "is_clinical_trial": false,
+      "centrality": 0.0,
+      "disgenet_cardiac_score": 0.0,
+      "final_score": 2.225
+    },
+    {
+      "gene": "PDGFRB",
+      "pathway_count": 2,
+      "importance_score": 1.6800000000000002,
+      "druggability_tier": "unknown",
+      "is_druggable": true,
+      "is_fda_approved": false,
+      "is_clinical_trial": false,
+      "centrality": 0.0,
+      "disgenet_cardiac_score": 0.0,
+      "final_score": 2.1
+    },
+    {
+      "gene": "NRG1",
+      "pathway_count": 2,
+      "importance_score": 1.8,
+      "druggability_tier": "unknown",
+      "is_druggable": false,
+      "is_fda_approved": false,
+      "is_clinical_trial": false,
+      "centrality": 0.0,
+      "disgenet_cardiac_score": 0.0,
+      "final_score": 1.8
+    },
+    {
+      "gene": "GSK3B",
+      "pathway_count": 1,
+      "importance_score": 1.02,
+      "druggability_tier": "unknown",
+      "is_druggable": true,
+      "is_fda_approved": false,
+      "is_clinical_trial": false,
+      "centrality": 0.0,
+      "disgenet_cardiac_score": 0.0,
+      "final_score": 1.275
+    },
+    {
+      "gene": "PDGFRA",
+      "pathway_count": 1,
+      "importance_score": 1.02,
+      "druggability_tier": "unknown",
+      "is_druggable": true,
+      "is_fda_approved": false,
+      "is_clinical_trial": false,
+      "centrality": 0.0,
+      "disgenet_cardiac_score": 0.0,
+      "final_score": 1.275
+    },
+    {
+      "gene": "IGF1",
+      "pathway_count": 1,
+      "importance_score": 1.02,
+      "druggability_tier": "unknown",
+      "is_druggable": true,
+      "is_fda_approved": false,
+      "is_clinical_trial": false,
+      "centrality": 0.0,
+      "disgenet_cardiac_score": 0.0,
+      "final_score": 1.275
+    },
+    {
+      "gene": "INS",
+      "pathway_count": 1,
+      "importance_score": 1.02,
+      "druggability_tier": "unknown",
+      "is_druggable": true,
+      "is_fda_approved": false,
+      "is_clinical_trial": false,
+      "centrality": 0.0,
+      "disgenet_cardiac_score": 0.0,
+      "final_score": 1.275
+    },
+    {
+      "gene": "TP53",
+      "pathway_count": 1,
+      "importance_score": 1.0,
+      "druggability_tier": "unknown",
+      "is_druggable": true,
+      "is_fda_approved": false,
+      "is_clinical_trial": false,
+      "centrality": 0.0,
+      "disgenet_cardiac_score": 0.0,
+      "final_score": 1.25
+    },
+    {
+      "gene": "HIF1A",
+      "pathway_count": 1,
+      "importance_score": 0.98,
+      "druggability_tier": "unknown",
+      "is_druggable": true,
+      "is_fda_approved": false,
+      "is_clinical_trial": false,
+      "centrality": 0.0,
+      "disgenet_cardiac_score": 0.0,
+      "final_score": 1.225
+    },
+    {
+      "gene": "NFKB1",
+      "pathway_count": 1,
+      "importance_score": 0.92,
+      "druggability_tier": "unknown",
+      "is_druggable": true,
+      "is_fda_approved": false,
+      "is_clinical_trial": false,
+      "centrality": 0.0,
+      "disgenet_cardiac_score": 0.0,
+      "final_score": 1.1500000000000001
+    },
+    {
+      "gene": "AKT1",
+      "pathway_count": 1,
+      "importance_score": 0.92,
+      "druggability_tier": "unknown",
+      "is_druggable": true,
+      "is_fda_approved": false,
+      "is_clinical_trial": false,
+      "centrality": 0.0,
+      "disgenet_cardiac_score": 0.0,
+      "final_score": 1.1500000000000001
+    },
+    {
+      "gene": "MAPK1",
+      "pathway_count": 1,
+      "importance_score": 0.86,
+      "druggability_tier": "unknown",
+      "is_druggable": true,
+      "is_fda_approved": false,
+      "is_clinical_trial": false,
+      "centrality": 0.0,
+      "disgenet_cardiac_score": 0.0,
+      "final_score": 1.075
+    },
+    {
+      "gene": "FOS",
+      "pathway_count": 1,
+      "importance_score": 0.86,
+      "druggability_tier": "unknown",
+      "is_druggable": true,
+      "is_fda_approved": false,
+      "is_clinical_trial": false,
+      "centrality": 0.0,
+      "disgenet_cardiac_score": 0.0,
+      "final_score": 1.075
+    },
+    {
+      "gene": "JUN",
+      "pathway_count": 1,
+      "importance_score": 0.86,
+      "druggability_tier": "unknown",
+      "is_druggable": true,
+      "is_fda_approved": false,
+      "is_clinical_trial": false,
+      "centrality": 0.0,
+      "disgenet_cardiac_score": 0.0,
+      "final_score": 1.075
+    },
+    {
+      "gene": "SMAD2",
+      "pathway_count": 1,
+      "importance_score": 0.84,
+      "druggability_tier": "unknown",
+      "is_druggable": true,
+      "is_fda_approved": false,
+      "is_clinical_trial": false,
+      "centrality": 0.0,
+      "disgenet_cardiac_score": 0.0,
+      "final_score": 1.05
+    }
+  ]
+}
