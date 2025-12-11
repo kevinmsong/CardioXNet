@@ -6,6 +6,52 @@ CardioXNet implements the **NETS (Neighborhood Enrichment Triage and Scoring)** 
 
 ---
 
+## 📸 Demo: Sample Analysis Walkthrough
+
+See CardioXNet in action with a sample cardiomyopathy gene set: **TTN, MYH7, MYBPC3, TNNT2, LMNA**
+
+### 1. Gene Input
+Enter your seed genes on the home page and configure analysis parameters.
+
+![Home Page - Gene Input](docs/screenshots/01-home-input.png)
+
+### 2. Analysis Progress
+Track real-time progress through the 9-stage NETS pipeline.
+
+![Progress Tracking](docs/screenshots/02-progress.png)
+
+### 3. Results Overview
+View comprehensive results including pathway rankings, NES scores, and clinical impact metrics.
+
+![Results Overview](docs/screenshots/03-results-overview.png)
+
+### 4. Key Genes Discovery
+Identify genes at pathway intersections using weighted scoring algorithm.
+
+![Key Genes](docs/screenshots/04-key-genes.png)
+
+### 5. Final Pathways Table
+Browse discovered pathways with sortable columns for NES score, clinical impact, evidence genes, and literature support.
+
+![Pathways Table](docs/screenshots/05-pathways-table.png)
+
+### 6. Pathway Details
+Explore detailed pathway information including NES scores, clinical impact, and gene lists.
+
+![Pathway Details](docs/screenshots/06-details-page.png)
+
+### 7. Pathway Discovery Lineage
+Visualize how pathways were discovered through network expansion and aggregation.
+
+![Pathway Lineage](docs/screenshots/07-pathway-lineage.png)
+
+### 8. Literature Evidence
+Access clickable PubMed links for cardiovascular disease literature validation.
+
+![Literature Evidence](docs/screenshots/08-literature-evidence.png)
+
+---
+
 ## Features
 
 - **🧬 Network Expansion** - Protein-protein interaction networks via STRING database
@@ -129,6 +175,7 @@ CardioXNet/
 │   │   └── utils/        # Utility functions
 │   └── public/           # Static assets
 ├── data/                  # Data files and databases
+├── docs/                  # Documentation and screenshots
 ├── outputs/               # Analysis results
 └── requirements.txt       # Python dependencies
 ```
