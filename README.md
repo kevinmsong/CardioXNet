@@ -269,10 +269,10 @@ Where:
 If you use CardioXNet in your research, please cite:
 
 ```bibtex
-@software{cardioxnet2024,
+@software{cardioxnet2025,
   title={CardioXNet: AI-Powered Cardiovascular Pathway Discovery},
   author={Song, Kevin M},
-  year={2024},
+  year={2025},
   url={https://github.com/kevinmsong/CardioXNet}
 }
 ```
