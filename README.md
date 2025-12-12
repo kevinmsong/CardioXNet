@@ -307,7 +307,7 @@ For issues, questions, or feature requests:
 
 ## Acknowledgments
 
-- **UAB Bioinformatics** - Research support
+- **UAB Department of Biomedical Engineering** - Research support
 - **STRING Database** - Protein interaction data
 - **g:Profiler** - Pathway enrichment tools
 - **NCBI PubMed** - Literature database
