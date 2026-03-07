@@ -915,14 +915,18 @@ class Pipeline:
                 len(top_hypotheses),
                 max(1, getattr(self.settings, "max_workers_validation", getattr(self.settings, "max_workers_literature", 4)))
             ) if top_hypotheses else 1
+            gtex_top_n = min(
+                len(top_hypotheses),
+                max(0, getattr(self.settings.nets, "gtex_top_pathways", len(top_hypotheses)))
+            ) if top_hypotheses and getattr(self.settings.nets, "tissue_expression_validation", True) else 0
             live_target_top_n = min(
                 len(top_hypotheses),
-                max(1, getattr(self.settings.nets, "external_druggability_top_pathways", 8))
-            ) if top_hypotheses else 0
+                max(0, getattr(self.settings.nets, "external_druggability_top_pathways", 8))
+            ) if top_hypotheses and getattr(self.settings.nets, "external_druggability_enabled", True) else 0
             permutation_top_n = min(
                 len(top_hypotheses),
-                max(1, getattr(self.settings.nets, "permutation_top_pathways", len(top_hypotheses)))
-            ) if top_hypotheses else 0
+                max(0, getattr(self.settings.nets, "permutation_top_pathways", len(top_hypotheses)))
+            ) if top_hypotheses and self.settings.nets.permutation_test_enabled else 0
             logger.info(f"Stage 3c: running enhanced validation with up to {validation_workers} workers")
 
             async def _validate_hypothesis(i: int, hypothesis) -> Dict[str, int]:
@@ -932,6 +936,10 @@ class Pipeline:
 
                 tissue_failed = 0
                 high_druggability_hit = 0
+                use_tissue_validation = (
+                    i < gtex_top_n
+                    and getattr(self.settings.nets, "tissue_expression_validation", True)
+                )
                 use_live_lookup = i < live_target_top_n
                 use_permutation = (
                     i < permutation_top_n
@@ -942,9 +950,6 @@ class Pipeline:
                 )
 
                 async_tasks = {
-                    "tissue": asyncio.create_task(
-                        self.tissue_validator.calculate_expression_score(pathway_genes)
-                    ),
                     "druggability": asyncio.create_task(
                         asyncio.to_thread(
                             self.druggability_analyzer.calculate_druggability_score,
@@ -953,6 +958,10 @@ class Pipeline:
                         )
                     ),
                 }
+                if use_tissue_validation:
+                    async_tasks["tissue"] = asyncio.create_task(
+                        self.tissue_validator.calculate_expression_score(pathway_genes)
+                    )
                 if use_permutation:
                     min_perm = max(5, min(10, max(1, self.settings.nets.n_permutations // 2)))
                     if getattr(self.settings.nets, "adaptive_permutation_enabled", True):
@@ -1018,6 +1027,12 @@ class Pipeline:
                     hypothesis.score_components['permutation_z_score'] = None
                     hypothesis.score_components['permutation_skipped'] = not use_permutation
 
+                if not use_tissue_validation:
+                    hypothesis.score_components['tissue_validation_passed'] = None
+                    hypothesis.score_components['tissue_validation_skipped'] = True
+                else:
+                    hypothesis.score_components['tissue_validation_skipped'] = False
+
                 druggability_result = task_results.get("druggability")
                 if isinstance(druggability_result, Exception):
                     logger.warning(f"Druggability analysis failed for hypothesis {i}: {str(druggability_result)}")
@@ -1069,8 +1084,11 @@ class Pipeline:
                 "total_hypotheses": scored_hypotheses.total_count,
                 "validation_scope": f"top_{len(top_hypotheses)}_only",
                 "tissue_expression": {
+                    "applied": bool(gtex_top_n > 0),
+                    "top_pathways_tested": gtex_top_n,
+                    "skipped_count": max(0, len(top_hypotheses) - gtex_top_n),
                     "low_expression_count": tissue_filtered,
-                    "passed_count": len(top_hypotheses) - tissue_filtered
+                    "passed_count": max(0, gtex_top_n - tissue_filtered)
                 },
                 "permutation_testing": {
                     "applied": bool(all_genes and fn_genes and self.settings.nets.permutation_test_enabled),

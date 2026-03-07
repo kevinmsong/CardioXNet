@@ -255,6 +255,7 @@ export interface ConfigDefaults {
     pubmed_max_results?: number;
     permutation_test_enabled?: boolean;
     n_permutations?: number;
+    gtex_top_pathways?: number;
     seed_overlap_threshold?: number;
     db_weights?: Record<string, number>;
   };

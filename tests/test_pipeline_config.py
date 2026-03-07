@@ -24,3 +24,26 @@ def test_pipeline_preserves_context_and_syncs_service_settings():
     finally:
         pipeline.close()
         get_settings.cache_clear()
+
+
+def test_pipeline_preserves_zero_valued_stage8_limits():
+    get_settings.cache_clear()
+    pipeline = Pipeline(
+        config_overrides={
+            "gtex_top_pathways": 0,
+            "permutation_top_pathways": 0,
+            "external_druggability_top_pathways": 0,
+            "external_druggability_enabled": False,
+            "permutation_test_enabled": False,
+        }
+    )
+
+    try:
+        assert pipeline.settings.nets.gtex_top_pathways == 0
+        assert pipeline.settings.nets.permutation_top_pathways == 0
+        assert pipeline.settings.nets.external_druggability_top_pathways == 0
+        assert pipeline.settings.nets.external_druggability_enabled is False
+        assert pipeline.settings.nets.permutation_test_enabled is False
+    finally:
+        pipeline.close()
+        get_settings.cache_clear()

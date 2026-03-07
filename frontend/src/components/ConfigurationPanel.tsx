@@ -40,6 +40,7 @@ const FALLBACK_DEFAULTS = {
   pubmed_max_results: 25,
   permutation_test_enabled: true,
   n_permutations: 50,
+  gtex_top_pathways: 10,
   external_druggability_enabled: true,
   external_druggability_top_pathways: 8,
   permutation_top_pathways: 12,
@@ -58,6 +59,7 @@ const OVERRIDABLE_KEYS = [
   'pubmed_max_results',
   'permutation_test_enabled',
   'n_permutations',
+  'gtex_top_pathways',
   'external_druggability_enabled',
   'external_druggability_top_pathways',
   'permutation_top_pathways',
@@ -110,6 +112,7 @@ export default function ConfigurationPanel({ onConfigChange }: ConfigurationPane
         pubmed_max_results: 10,
         permutation_test_enabled: false,
         n_permutations: 25,
+        gtex_top_pathways: 6,
         permutation_top_pathways: 0,
         external_druggability_enabled: false,
         external_druggability_top_pathways: 0,
@@ -118,6 +121,7 @@ export default function ConfigurationPanel({ onConfigChange }: ConfigurationPane
         top_hypotheses_count: 16,
         permutation_test_enabled: true,
         n_permutations: 50,
+        gtex_top_pathways: 10,
       },
       deep: {
         top_hypotheses_count: 20,
@@ -125,6 +129,7 @@ export default function ConfigurationPanel({ onConfigChange }: ConfigurationPane
         pubmed_max_results: 40,
         permutation_test_enabled: true,
         n_permutations: 100,
+        gtex_top_pathways: 14,
       },
     };
 

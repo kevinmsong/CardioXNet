@@ -51,6 +51,9 @@ class GTExClient:
         self.settings = get_settings()
         self.base_url = "https://gtexportal.org/api/v2"
         self.session = requests.Session()
+        self._gencode_cache: Dict[str, Optional[str]] = {}
+        self._expression_cache: Dict[tuple, List[GTExExpression]] = {}
+        self._cardiac_specificity_cache: Dict[str, Optional[CardiacExpressionProfile]] = {}
         
         # GTEx cardiac tissue identifiers - focused on heart-specific validation
         self.cardiac_tissues = {
@@ -75,6 +78,10 @@ class GTExClient:
         
         GTEx API v2 requires versioned GENCODE IDs (e.g., ENSG00000173020.15)
         """
+        normalized_symbol = gene_symbol.upper()
+        if normalized_symbol in self._gencode_cache:
+            return self._gencode_cache[normalized_symbol]
+
         # Comprehensive cardiovascular gene mappings with versions (GTEx v8 compatible)
         symbol_to_gencode = {
             # Natriuretic peptides and signaling (corrected from API lookup)
@@ -142,7 +149,7 @@ class GTExClient:
         }
         
         # Try static mapping first for performance
-        gencode_id = symbol_to_gencode.get(gene_symbol.upper())
+        gencode_id = symbol_to_gencode.get(normalized_symbol)
         
         # If not in static mapping, always try dynamic lookup
         if not gencode_id:
@@ -150,7 +157,8 @@ class GTExClient:
             # Cache successful lookups for future use
             if gencode_id:
                 logger.debug(f"Caching dynamic lookup: {gene_symbol} -> {gencode_id}")
-            
+        
+        self._gencode_cache[normalized_symbol] = gencode_id
         return gencode_id
     
     def _lookup_gene_id_dynamic(self, gene_symbol: str) -> Optional[str]:
@@ -217,10 +225,19 @@ class GTExClient:
         Returns:
             List of GTExExpression objects for each tissue
         """
+        cache_key = (
+            gene_symbol.upper(),
+            tuple(sorted(tissues)) if tissues else ("__all__",),
+        )
+        cached_expressions = self._expression_cache.get(cache_key)
+        if cached_expressions is not None:
+            return cached_expressions
+
         # Convert gene symbol to Ensembl ID
         gencode_id = self._get_versioned_gencode_id(gene_symbol)
         if not gencode_id:
             logger.warning(f"No versioned GENCODE mapping found for gene symbol: {gene_symbol}")
+            self._expression_cache[cache_key] = []
             return []
         
         logger.debug(f"Using GENCODE ID {gencode_id} for gene {gene_symbol}")
@@ -268,6 +285,7 @@ class GTExClient:
                         # Calculate cardiac specificity metrics
                         cardiac_count = len([exp for exp in expressions if exp.tissue in self.cardiac_tissue_ids])
                         logger.info(f"Retrieved GTEx cardiac expression for {gene_symbol}: {cardiac_count}/{len(expressions)} cardiac tissues")
+                        self._expression_cache[cache_key] = expressions
                         return expressions
                 else:
                     logger.debug(f"No median expression data returned for {gene_symbol} (GENCODE: {gencode_id})")
@@ -276,10 +294,12 @@ class GTExClient:
             
             # If API call failed, log and return empty list for fallback handling
             logger.debug(f"GTEx API unavailable for {gene_symbol}, using cardiac gene classification fallback")
+            self._expression_cache[cache_key] = []
             return []
             
         except Exception as e:
             logger.debug(f"GTEx expression query error for {gene_symbol}: {e}")
+            self._expression_cache[cache_key] = []
             return []
     
     async def calculate_cardiac_specificity(
@@ -297,10 +317,15 @@ class GTExClient:
         Returns:
             CardiacExpressionProfile with specificity metrics
         """
+        normalized_symbol = gene_symbol.upper()
+        if normalized_symbol in self._cardiac_specificity_cache:
+            return self._cardiac_specificity_cache[normalized_symbol]
+
         try:
             expressions = await self.get_gene_expression(gene_symbol)
             
             if not expressions:
+                self._cardiac_specificity_cache[normalized_symbol] = None
                 return None
             
             # Separate cardiac and non-cardiac tissues
@@ -315,6 +340,7 @@ class GTExClient:
             
             if not cardiac_expressions:
                 logger.warning(f"No cardiac expression data found for {gene_symbol}")
+                self._cardiac_specificity_cache[normalized_symbol] = None
                 return None
             
             # Calculate cardiac metrics
@@ -339,7 +365,7 @@ class GTExClient:
                     cardiac_rank = i
                     break
             
-            return CardiacExpressionProfile(
+            profile = CardiacExpressionProfile(
                 gene_symbol=gene_symbol,
                 cardiac_median_tpm=cardiac_median_tpm,
                 cardiac_mean_tpm=cardiac_mean_tpm,
@@ -348,9 +374,12 @@ class GTExClient:
                 total_tissues=len(expressions),
                 cardiac_rank=cardiac_rank
             )
+            self._cardiac_specificity_cache[normalized_symbol] = profile
+            return profile
             
         except Exception as e:
             logger.error(f"Cardiac specificity calculation failed for {gene_symbol}: {e}")
+            self._cardiac_specificity_cache[normalized_symbol] = None
             return None
     
     async def batch_cardiac_specificity(
@@ -369,6 +398,18 @@ class GTExClient:
             Dictionary mapping gene symbols to expression profiles
         """
         semaphore = asyncio.Semaphore(max_concurrent)
+        profiles: Dict[str, CardiacExpressionProfile] = {}
+        uncached_genes: List[str] = []
+
+        for gene in gene_symbols:
+            normalized_gene = gene.upper()
+            if normalized_gene in self._cardiac_specificity_cache:
+                cached_profile = self._cardiac_specificity_cache[normalized_gene]
+                if cached_profile:
+                    profiles[gene] = cached_profile
+                continue
+            if gene not in uncached_genes:
+                uncached_genes.append(gene)
         
         async def _get_specificity_with_semaphore(gene: str):
             async with semaphore:
@@ -380,12 +421,11 @@ class GTExClient:
                     return gene, None
         
         # Execute concurrent requests
-        tasks = [_get_specificity_with_semaphore(gene) for gene in gene_symbols]
+        tasks = [_get_specificity_with_semaphore(gene) for gene in uncached_genes]
         results = await asyncio.gather(*tasks)
         
         # Process results
-        profiles = {}
-        successful = 0
+        successful = sum(1 for profile in profiles.values() if profile)
         failed = 0
         
         for gene, profile in results:
