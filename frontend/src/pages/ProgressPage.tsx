@@ -169,7 +169,27 @@ export default function ProgressPage() {
 
   const currentStageIndex = getCurrentStageIndex(currentStage);
 
-  const estimatedTimeRemaining = Math.max(0, Math.round((100 - progress) / 100 * 5)); // ~5 min total
+  const stageEstimateFloor: { [key: string]: number } = {
+    'Stage 1': 12,
+    'Stage 2': 11,
+    'Stage 3': 9,
+    'Stage 4': 7,
+    'Stage 5': 6,
+    'Stage 6': 5,
+    'Stage 7': 4,
+    'Stage 8': 4,
+    'Stage 9': 2,
+    'Complete': 0,
+  };
+
+  // Use a conservative total-duration estimate and keep stage-specific floors
+  // so the UI stops promising unrealistically short runtimes.
+  const progressBasedEstimate = Math.ceil(((100 - progress) / 100) * 14);
+  const stageBasedFloor = stageEstimateFloor[currentStage.split(':')[0]] ?? 6;
+  const estimatedTimeRemaining =
+    status === 'completed'
+      ? 0
+      : Math.max(stageBasedFloor, progressBasedEstimate);
 
   return (
     <Box>
