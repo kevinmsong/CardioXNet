@@ -198,7 +198,7 @@ class NETSConfig(BaseSettings):
         description="Minimum ratio of pathway genes expressed in cardiac tissue (0.30 for comprehensive coverage, validated range: 0.1-0.8)"
     )
     gtex_top_pathways: int = Field(
-        default=10,
+        default=6,
         ge=0,
         le=100,
         description="Only the top N validated pathways run GTEx tissue validation during Stage 8; lower-ranked pathways skip this step for speed"
@@ -220,7 +220,7 @@ class NETSConfig(BaseSettings):
         description="Use adaptive early-stopping degree-preserving permutations during Stage 8 validation"
     )
     permutation_top_pathways: int = Field(
-        default=12,
+        default=8,
         ge=0,
         le=100,
         description="Only the top N validated pathways run degree-preserving permutation testing; lower-ranked pathways skip this step for speed"
@@ -257,7 +257,7 @@ class NETSConfig(BaseSettings):
         description="Maximum evidence genes per pathway to query against live therapeutic target APIs"
     )
     external_druggability_top_pathways: int = Field(
-        default=8,
+        default=4,
         ge=0,
         le=50,
         description="Only the top N validated pathways use live therapeutic target lookups; lower-ranked pathways use curated fallback"

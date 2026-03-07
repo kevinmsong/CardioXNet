@@ -929,6 +929,33 @@ class Pipeline:
             ) if top_hypotheses and self.settings.nets.permutation_test_enabled else 0
             logger.info(f"Stage 3c: running enhanced validation with up to {validation_workers} workers")
 
+            if gtex_top_n > 0:
+                gtex_prefetch_genes = sorted(
+                    {
+                        gene.upper()
+                        for hypothesis in top_hypotheses[:gtex_top_n]
+                        for gene in hypothesis.aggregated_pathway.pathway.evidence_genes
+                        if gene
+                    }
+                )
+                await self.tissue_validator.warm_gene_cache(
+                    gtex_prefetch_genes,
+                    max_concurrent=max(4, validation_workers * 2),
+                )
+
+            if live_target_top_n > 0:
+                live_target_prefetch_genes = []
+                for hypothesis in top_hypotheses[:live_target_top_n]:
+                    pathway_genes = hypothesis.aggregated_pathway.pathway.evidence_genes
+                    live_target_prefetch_genes.extend(
+                        self.druggability_analyzer.select_external_lookup_genes(pathway_genes)
+                    )
+                await asyncio.to_thread(
+                    self.druggability_analyzer.prefetch_gene_evidence,
+                    live_target_prefetch_genes,
+                    max(2, validation_workers),
+                )
+
             async def _validate_hypothesis(i: int, hypothesis) -> Dict[str, int]:
                 pathway_genes = hypothesis.aggregated_pathway.pathway.evidence_genes
                 if not hypothesis.score_components:

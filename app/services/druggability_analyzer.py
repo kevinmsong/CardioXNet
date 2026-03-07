@@ -2,6 +2,7 @@
 
 import logging
 import threading
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional, Set
 
@@ -443,6 +444,10 @@ class DruggabilityAnalyzer:
         remaining = [gene for gene in unique_genes if gene not in curated_priority]
         return (curated_priority + remaining)[: self.external_druggability_gene_limit]
 
+    def select_external_lookup_genes(self, pathway_genes: List[str]) -> List[str]:
+        """Public wrapper for bounded live therapeutic-target gene selection."""
+        return self._select_external_lookup_genes(pathway_genes)
+
     def _query_open_targets(self, gene_symbol: str) -> Optional[Dict[str, Any]]:
         """Fetch live target evidence from Open Targets for a gene symbol."""
         response = requests.post(
@@ -548,6 +553,41 @@ class DruggabilityAnalyzer:
     def get_cached_gene_evidence(self, gene_symbol: str) -> Optional[Dict[str, Any]]:
         """Return cached therapeutic evidence without triggering a new lookup."""
         return self._gene_evidence_cache.get(gene_symbol.upper())
+
+    def prefetch_gene_evidence(self, gene_symbols: List[str], max_workers: int = 4) -> None:
+        """
+        Warm live therapeutic-evidence cache for a deduplicated gene set.
+
+        This avoids repeated Open Targets lookups for the same genes across
+        multiple top-ranked pathways during Stage 8.
+        """
+        if not self.external_druggability_enabled:
+            return
+
+        unique_genes: List[str] = []
+        seen: Set[str] = set()
+        for gene_symbol in gene_symbols:
+            normalized = gene_symbol.upper()
+            if not normalized or normalized in seen:
+                continue
+            seen.add(normalized)
+            if normalized in self._gene_evidence_cache:
+                continue
+            unique_genes.append(normalized)
+
+        if not unique_genes:
+            return
+
+        worker_count = min(len(unique_genes), max(1, max_workers))
+        logger.info("Prefetching live therapeutic evidence for %s genes", len(unique_genes))
+
+        with ThreadPoolExecutor(max_workers=worker_count) as executor:
+            futures = [executor.submit(self.get_gene_evidence, gene_symbol) for gene_symbol in unique_genes]
+            for future in as_completed(futures):
+                try:
+                    future.result()
+                except Exception as exc:
+                    logger.debug("Live therapeutic evidence prefetch failed: %s", exc)
 
     def calculate_druggability_score(
         self, pathway_genes: List[str], use_live_lookup: Optional[bool] = None

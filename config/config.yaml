@@ -41,7 +41,7 @@ nets:
   secondary_literature_expansion_top_n: 8     # Only top primaries get PubMed-based expansion in Stage 4
   n_permutations: 25                  # Permutations for statistical testing
   adaptive_permutation_enabled: true  # Early-stop degree-preserving permutations in Stage 8
-  permutation_top_pathways: 12        # Only the top validated pathways run permutation tests
+  permutation_top_pathways: 8         # Only the top validated pathways run permutation tests
   
   # Database Weights
   db_weight_reactome: 1.5
@@ -97,11 +97,11 @@ nets:
   
   # Cardiovascular Disease Context
   min_cardiac_expression_ratio: 0.5   # Minimum cardiac tissue expression requirement
-  gtex_top_pathways: 10               # Only top validated pathways run GTEx validation in Stage 8
+  gtex_top_pathways: 6                # Only top validated pathways run GTEx validation in Stage 8
   cardiovascular_disease_focus: true  # Enable cardiovascular disease filtering
   external_druggability_enabled: true # Use live therapeutic target evidence in Stage 8
   external_druggability_gene_limit: 8 # Query a bounded number of evidence genes per pathway
-  external_druggability_top_pathways: 8 # Only the top validated pathways use live target lookups
+  external_druggability_top_pathways: 4 # Only the top validated pathways use live target lookups
   external_drug_examples_per_gene: 5  # Show a few representative drugs per target
   external_druggability_timeout: 12   # Keep live therapeutic evidence bounded in Stage 8
   opentargets_api_url: "https://api.platform.opentargets.org/api/v4/graphql"

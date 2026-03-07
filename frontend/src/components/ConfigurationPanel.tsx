@@ -40,10 +40,10 @@ const FALLBACK_DEFAULTS = {
   pubmed_max_results: 25,
   permutation_test_enabled: true,
   n_permutations: 50,
-  gtex_top_pathways: 10,
+  gtex_top_pathways: 6,
   external_druggability_enabled: true,
-  external_druggability_top_pathways: 8,
-  permutation_top_pathways: 12,
+  external_druggability_top_pathways: 4,
+  permutation_top_pathways: 8,
   seed_overlap_threshold: 0.45,
 };
 
@@ -112,7 +112,7 @@ export default function ConfigurationPanel({ onConfigChange }: ConfigurationPane
         pubmed_max_results: 10,
         permutation_test_enabled: false,
         n_permutations: 25,
-        gtex_top_pathways: 6,
+        gtex_top_pathways: 3,
         permutation_top_pathways: 0,
         external_druggability_enabled: false,
         external_druggability_top_pathways: 0,
@@ -121,7 +121,7 @@ export default function ConfigurationPanel({ onConfigChange }: ConfigurationPane
         top_hypotheses_count: 16,
         permutation_test_enabled: true,
         n_permutations: 50,
-        gtex_top_pathways: 10,
+        gtex_top_pathways: 6,
       },
       deep: {
         top_hypotheses_count: 20,
@@ -129,7 +129,9 @@ export default function ConfigurationPanel({ onConfigChange }: ConfigurationPane
         pubmed_max_results: 40,
         permutation_test_enabled: true,
         n_permutations: 100,
-        gtex_top_pathways: 14,
+        gtex_top_pathways: 10,
+        external_druggability_top_pathways: 6,
+        permutation_top_pathways: 10,
       },
     };
 

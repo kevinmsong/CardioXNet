@@ -241,6 +241,30 @@ class TissueExpressionValidator:
         )
         self._expression_cache[cache_key] = score
         return score
+
+    async def warm_gene_cache(
+        self,
+        gene_symbols: List[str],
+        max_concurrent: int = 8
+    ) -> None:
+        """
+        Prefetch GTEx cardiac-specificity profiles for a shared gene set.
+
+        This is used to avoid repeated per-pathway GTEx lookups during Stage 8
+        when the same genes recur across many top-ranked pathways.
+        """
+        unique_genes = sorted({gene.upper() for gene in gene_symbols if gene})
+        if not unique_genes:
+            return
+
+        logger.info(
+            "Warming GTEx cache for %s unique genes before pathway validation",
+            len(unique_genes),
+        )
+        await self.gtex_client.batch_cardiac_specificity(
+            unique_genes,
+            max_concurrent=max_concurrent,
+        )
     
     async def filter_by_expression(
         self,
