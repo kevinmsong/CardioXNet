@@ -658,7 +658,7 @@ export default function ResultsPage() {
           </Typography>
           <Typography variant="body2" color="text.secondary">
             <strong>Scoring:</strong> Importance = (Pathway Frequency<sup>1.2</sup>) × (Avg NES) × (1 + Cardiac Relevance). 
-            Druggability annotations from curated databases identify translational opportunities.
+            Curated annotations and Open Targets evidence identify translational opportunities where available.
           </Typography>
         </Box>
 
@@ -681,6 +681,7 @@ export default function ResultsPage() {
               isFDAApproved: Boolean(gene.is_fda_approved),
               isClinicalTrial: Boolean(gene.is_clinical_trial),
               druggabilitySource: gene.druggability_source || null,
+              externalDrugEvidence: gene.external_drug_evidence || null,
             }));
           } else {
             // Fallback: Calculate from ranked_hypotheses
@@ -816,6 +817,11 @@ export default function ResultsPage() {
                                   {gene.druggabilitySource}
                                 </Typography>
                               )}
+                              {gene.externalDrugEvidence?.approved_name && (
+                                <Typography variant="caption" color="text.secondary">
+                                  {gene.externalDrugEvidence.approved_name}
+                                </Typography>
+                              )}
                             </Stack>
                           );
                         })()}
@@ -856,9 +862,62 @@ export default function ResultsPage() {
                               {gene.avgNES.toFixed(2)}
                             </Typography>
                           </Box>
+                          {gene.externalDrugEvidence && (
+                            <>
+                              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600 }}>
+                                  Known Drugs:
+                                </Typography>
+                                <Typography variant="caption" sx={{ fontWeight: 700 }}>
+                                  {gene.externalDrugEvidence.known_drug_count || 0}
+                                </Typography>
+                              </Box>
+
+                              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600 }}>
+                                  Max Phase:
+                                </Typography>
+                                <Typography variant="caption" sx={{ fontWeight: 700 }}>
+                                  {gene.externalDrugEvidence.max_clinical_phase || 0}
+                                </Typography>
+                              </Box>
+                            </>
+                          )}
 
 
                         </Stack>
+                        {gene.externalDrugEvidence && (
+                          <Stack spacing={0.75}>
+                            <Stack direction="row" spacing={0.5} flexWrap="wrap" useFlexGap>
+                              {gene.externalDrugEvidence.has_cardiovascular_evidence && (
+                                <Chip
+                                  label={`Cardiovascular evidence (${gene.externalDrugEvidence.cardiovascular_example_count || 0})`}
+                                  size="small"
+                                  color="success"
+                                  variant="outlined"
+                                  sx={{ height: 22, fontSize: '0.68rem' }}
+                                />
+                              )}
+                              {(gene.externalDrugEvidence.tractability_labels || []).slice(0, 2).map((label: string) => (
+                                <Chip
+                                  key={`${gene.symbol}-${label}`}
+                                  label={label}
+                                  size="small"
+                                  variant="outlined"
+                                  sx={{ height: 22, fontSize: '0.68rem' }}
+                                />
+                              ))}
+                            </Stack>
+                            {!!gene.externalDrugEvidence.top_drugs?.length && (
+                              <Typography variant="caption" color="text.secondary">
+                                Top drugs: {gene.externalDrugEvidence.top_drugs
+                                  .slice(0, 2)
+                                  .map((drug: { name?: string }) => drug.name || 'Unknown')
+                                  .join(', ')}
+                              </Typography>
+                            )}
+                          </Stack>
+                        )}
                       </Stack>
                     </CardContent>
                   </Card>
@@ -875,7 +934,13 @@ export default function ResultsPage() {
               This metric prioritizes genes appearing in multiple high-scoring pathways with strong cardiac context.
             </Typography>
           </Alert>
-          
+          <Alert severity="info">
+            <Typography variant="body2">
+              <strong>Therapeutic Evidence:</strong> Important gene cards include curated target annotations and, when available,
+              Open Targets-derived evidence such as known drug counts, highest clinical phase, cardiovascular disease examples,
+              tractability labels, and example drugs.
+            </Typography>
+          </Alert>
 
         </Stack>
       </Paper>

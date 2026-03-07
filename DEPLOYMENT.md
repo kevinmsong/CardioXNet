@@ -306,8 +306,8 @@ pip install -r requirements.txt --upgrade
 
 # Update frontend dependencies
 cd frontend
-pnpm install
-pnpm build
+npm install
+npm run build
 ```
 
 ---
@@ -315,7 +315,7 @@ pnpm build
 ## Support
 
 For issues or questions:
-- Check documentation: `IMPLEMENTATION_SUMMARY.md`, `FINAL_IMPLEMENTATION_REPORT.md`
+- Check the main documentation: `README.md`, `docs/index.md`, `docs/CONFIGURATION.md`
 - Review API docs: `http://localhost:8000/docs`
 - Check logs for error messages
 

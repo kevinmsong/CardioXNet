@@ -53,7 +53,7 @@ The pipeline combines multiple evidence types:
 - Reactome and other pathway databases for pathway-level evidence
 - PubMed for rapid literature screening
 - GTEx for tissue-expression context
-- curated cardiovascular annotations and bounded live therapeutic target lookups for translational review
+- curated cardiovascular annotations and bounded live Open Targets lookups for translational review
 
 The final pathway ranking is not based on a single score alone. Important fields on the results and detail pages include:
 
@@ -217,6 +217,7 @@ A completed analysis can produce:
 - ranked final pathways
 - pathway detail views with lineage and evidence summaries
 - important-gene summaries
+- important-gene summaries with curated and Open Targets-derived therapeutic evidence when available
 - CSV export
 - downloadable reports in supported formats
 - generated artifacts under `outputs/`
