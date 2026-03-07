@@ -552,7 +552,7 @@ export default function UltraDetailPageFixed() {
         </Typography>
 
         <Typography variant="body2">
-          <strong>Pathway Discovery:</strong> Identified through AI-powered network expansion and multi-dimensional validation using the NETS algorithm.
+          <strong>Pathway Discovery:</strong> Identified through network expansion and multi-dimensional validation using the NETS algorithm.
         </Typography>
       </Paper>
     </Box>
