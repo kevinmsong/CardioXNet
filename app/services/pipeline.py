@@ -915,6 +915,10 @@ class Pipeline:
                 len(top_hypotheses),
                 max(1, getattr(self.settings, "max_workers_validation", getattr(self.settings, "max_workers_literature", 4)))
             ) if top_hypotheses else 1
+            live_target_top_n = min(
+                len(top_hypotheses),
+                max(1, getattr(self.settings.nets, "external_druggability_top_pathways", 8))
+            ) if top_hypotheses else 0
             logger.info(f"Stage 3c: running enhanced validation with up to {validation_workers} workers")
 
             async def _validate_hypothesis(i: int, hypothesis) -> Dict[str, int]:
@@ -924,25 +928,23 @@ class Pipeline:
 
                 tissue_failed = 0
                 high_druggability_hit = 0
+                use_live_lookup = i < live_target_top_n
 
-                try:
-                    tissue_score = await self.tissue_validator.calculate_expression_score(pathway_genes)
-                    hypothesis.score_components['cardiac_expression_ratio'] = tissue_score.cardiac_expression_ratio
-                    hypothesis.score_components['cardiac_expressed_genes'] = tissue_score.expressed_genes
-                    hypothesis.score_components['tissue_validation_passed'] = tissue_score.validation_passed
-                    hypothesis.score_components['mean_cardiac_tpm'] = tissue_score.mean_cardiac_tpm
-                    hypothesis.score_components['cardiac_specificity_ratio'] = tissue_score.mean_cardiac_specificity_ratio
-
-                    if not tissue_score.validation_passed:
-                        tissue_failed = 1
-                except Exception as e:
-                    logger.warning(f"GTEx tissue validation failed for hypothesis {i}: {str(e)}")
-                    hypothesis.score_components['tissue_validation_passed'] = False
-                    tissue_failed = 1
-
-                try:
-                    if all_genes and fn_genes and gene_degrees and self.settings.nets.permutation_test_enabled:
-                        empirical_p, perm_stats = await asyncio.to_thread(
+                async_tasks = {
+                    "tissue": asyncio.create_task(
+                        self.tissue_validator.calculate_expression_score(pathway_genes)
+                    ),
+                    "druggability": asyncio.create_task(
+                        asyncio.to_thread(
+                            self.druggability_analyzer.calculate_druggability_score,
+                            pathway_genes,
+                            use_live_lookup
+                        )
+                    ),
+                }
+                if all_genes and fn_genes and gene_degrees and self.settings.nets.permutation_test_enabled:
+                    async_tasks["permutation"] = asyncio.create_task(
+                        asyncio.to_thread(
                             self.permutation_tester.calculate_degree_preserving_pvalue,
                             pathway_genes,
                             fn_genes,
@@ -950,36 +952,66 @@ class Pipeline:
                             all_genes,
                             self.settings.nets.n_permutations
                         )
-                        hypothesis.score_components['empirical_pvalue'] = empirical_p
-                        hypothesis.score_components['permutation_z_score'] = perm_stats.get('z_score', 0)
-                        hypothesis.score_components['observed_overlap'] = perm_stats.get('observed_overlap', 0)
-                        hypothesis.score_components['expected_overlap'] = perm_stats.get('mean_null_overlap', 0)
-                        hypothesis.score_components['n_permutations_used'] = perm_stats.get('n_permutations', 100)
-                        hypothesis.score_components['degree_preserved'] = perm_stats.get('degree_preserved', True)
-                    else:
-                        hypothesis.score_components['empirical_pvalue'] = None
-                        hypothesis.score_components['permutation_z_score'] = None
-                except Exception as e:
-                    logger.warning(f"Permutation testing failed for hypothesis {i}: {str(e)}")
+                    )
+
+                task_results = dict(
+                    zip(
+                        async_tasks.keys(),
+                        await asyncio.gather(*async_tasks.values(), return_exceptions=True)
+                    )
+                )
+
+                tissue_result = task_results.get("tissue")
+                if isinstance(tissue_result, Exception):
+                    logger.warning(f"GTEx tissue validation failed for hypothesis {i}: {str(tissue_result)}")
+                    hypothesis.score_components['tissue_validation_passed'] = False
+                    tissue_failed = 1
+                elif tissue_result is not None:
+                    hypothesis.score_components['cardiac_expression_ratio'] = tissue_result.cardiac_expression_ratio
+                    hypothesis.score_components['cardiac_expressed_genes'] = tissue_result.expressed_genes
+                    hypothesis.score_components['tissue_validation_passed'] = tissue_result.validation_passed
+                    hypothesis.score_components['mean_cardiac_tpm'] = tissue_result.mean_cardiac_tpm
+                    hypothesis.score_components['cardiac_specificity_ratio'] = tissue_result.mean_cardiac_specificity_ratio
+                    if not tissue_result.validation_passed:
+                        tissue_failed = 1
+
+                permutation_result = task_results.get("permutation")
+                if isinstance(permutation_result, Exception):
+                    logger.warning(f"Permutation testing failed for hypothesis {i}: {str(permutation_result)}")
+                    hypothesis.score_components['empirical_pvalue'] = None
+                    hypothesis.score_components['permutation_z_score'] = None
+                elif permutation_result is not None:
+                    empirical_p, perm_stats = permutation_result
+                    hypothesis.score_components['empirical_pvalue'] = empirical_p
+                    hypothesis.score_components['permutation_z_score'] = perm_stats.get('z_score', 0)
+                    hypothesis.score_components['observed_overlap'] = perm_stats.get('observed_overlap', 0)
+                    hypothesis.score_components['expected_overlap'] = perm_stats.get('mean_null_overlap', 0)
+                    hypothesis.score_components['n_permutations_used'] = perm_stats.get('n_permutations', 100)
+                    hypothesis.score_components['degree_preserved'] = perm_stats.get('degree_preserved', True)
+                else:
                     hypothesis.score_components['empirical_pvalue'] = None
                     hypothesis.score_components['permutation_z_score'] = None
 
-                try:
-                    drug_score = await asyncio.to_thread(
-                        self.druggability_analyzer.calculate_druggability_score,
-                        pathway_genes
-                    )
-                    hypothesis.score_components['druggable_genes'] = drug_score.druggable_genes
-                    hypothesis.score_components['druggable_ratio'] = drug_score.druggable_ratio
-                    hypothesis.score_components['approved_drug_count'] = drug_score.approved_drug_count
-                    hypothesis.score_components['clinical_trial_count'] = drug_score.clinical_trial_count
-                    hypothesis.score_components['druggability_tier'] = drug_score.druggability_tier
-
-                    if drug_score.druggability_tier == 'high':
-                        high_druggability_hit = 1
-                except Exception as e:
-                    logger.warning(f"Druggability analysis failed for hypothesis {i}: {str(e)}")
+                druggability_result = task_results.get("druggability")
+                if isinstance(druggability_result, Exception):
+                    logger.warning(f"Druggability analysis failed for hypothesis {i}: {str(druggability_result)}")
                     hypothesis.score_components['druggability_tier'] = 'unknown'
+                    hypothesis.score_components['druggability_source'] = 'unavailable'
+                elif druggability_result is not None:
+                    hypothesis.score_components['druggable_genes'] = druggability_result.druggable_genes
+                    hypothesis.score_components['druggable_ratio'] = druggability_result.druggable_ratio
+                    hypothesis.score_components['approved_drug_count'] = druggability_result.approved_drug_count
+                    hypothesis.score_components['clinical_trial_count'] = druggability_result.clinical_trial_count
+                    hypothesis.score_components['druggability_tier'] = druggability_result.druggability_tier
+                    hypothesis.score_components['druggability_source'] = druggability_result.druggability_source
+                    hypothesis.score_components['external_target_count'] = druggability_result.external_target_count
+                    hypothesis.score_components['external_approved_target_count'] = druggability_result.external_approved_target_count
+                    hypothesis.score_components['external_clinical_target_count'] = druggability_result.external_clinical_target_count
+                    hypothesis.score_components['cardiovascular_target_count'] = druggability_result.cardiovascular_target_count
+                    hypothesis.score_components['target_evidence'] = druggability_result.target_evidence
+                    hypothesis.score_components['used_live_target_lookup'] = use_live_lookup
+                    if druggability_result.druggability_tier == 'high':
+                        high_druggability_hit = 1
 
                 return {
                     "tissue_failed": tissue_failed,
@@ -1020,7 +1052,8 @@ class Pipeline:
                 },
                 "druggability": {
                     "high_tier_count": high_druggability,
-                    "analyzed_count": len(top_hypotheses)
+                    "analyzed_count": len(top_hypotheses),
+                    "live_target_lookup_top_n": live_target_top_n
                 }
             }
             
@@ -1427,6 +1460,20 @@ class Pipeline:
                     gene_scores[gene_symbol]['is_clinical_trial'] = True
                     if gene_scores[gene_symbol]['druggability_tier'] == 'unknown':
                         gene_scores[gene_symbol]['druggability_tier'] = 'medium'
+
+                live_target_evidence = druggability_analyzer.get_cached_gene_evidence(gene_symbol)
+                if live_target_evidence:
+                    gene_scores[gene_symbol]['external_drug_evidence'] = live_target_evidence
+                    gene_scores[gene_symbol]['druggability_source'] = live_target_evidence.get('source', 'Open Targets')
+                    if live_target_evidence.get('known_drug_count', 0) > 0 or live_target_evidence.get('tractability_labels'):
+                        gene_scores[gene_symbol]['is_druggable'] = True
+                    if live_target_evidence.get('has_approved_drug'):
+                        gene_scores[gene_symbol]['is_fda_approved'] = True
+                        gene_scores[gene_symbol]['druggability_tier'] = 'high'
+                    elif live_target_evidence.get('has_clinical_drug'):
+                        gene_scores[gene_symbol]['is_clinical_trial'] = True
+                        if gene_scores[gene_symbol]['druggability_tier'] == 'unknown':
+                            gene_scores[gene_symbol]['druggability_tier'] = 'medium'
         
         # Centrality not used - removed topology analysis for speed
         

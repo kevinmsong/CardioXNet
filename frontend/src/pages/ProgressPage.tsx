@@ -139,7 +139,7 @@ export default function ProgressPage() {
     'Stage 5': 'Aggregating pathways and tracking complete lineage',
     'Stage 6': 'Filtering pathways by strict cardiac term matching',
     'Stage 7': 'Computing NETS (Neighborhood Enrichment Triage and Scoring) scores',
-    'Stage 8': 'Enhanced validation (GTEx cardiac expression, druggability, therapeutic targets)',
+    'Stage 8': 'Enhanced validation (GTEx cardiac expression, live therapeutic target evidence, druggability)',
     'Stage 9': 'Mining PubMed for cardiovascular disease literature evidence',
   };
 

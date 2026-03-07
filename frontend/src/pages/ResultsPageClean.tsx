@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import {
@@ -17,6 +18,7 @@ import {
   Download,
   BiotechOutlined,
   Hub,
+  LocalHospital,
 } from '@mui/icons-material';
 import api from '../api/endpoints';
 import UltraComprehensiveTable from '../components/UltraComprehensiveTable';
@@ -40,6 +42,126 @@ export default function ResultsPage() {
     },
     enabled: !!analysisId,
   });
+
+  const therapeuticSummary = useMemo(() => {
+    const hypotheses = results?.hypotheses?.hypotheses || [];
+    const pathwaysWithEvidence = hypotheses
+      .map((hypothesis: any) => {
+        const scoreComponents = hypothesis.score_components || {};
+        return {
+          pathwayName:
+            hypothesis.aggregated_pathway?.pathway?.pathway_name ||
+            hypothesis.pathway_name ||
+            'Unknown',
+          source: scoreComponents.druggability_source || 'curated',
+          approvedTargetCount: scoreComponents.external_approved_target_count || 0,
+          clinicalTargetCount: scoreComponents.external_clinical_target_count || 0,
+          cardiovascularTargetCount: scoreComponents.cardiovascular_target_count || 0,
+          liveTargetCount: scoreComponents.external_target_count || 0,
+          targetEvidence: scoreComponents.target_evidence || [],
+        };
+      })
+      .filter((item) => item.liveTargetCount > 0);
+
+    const targetMap = new Map<string, any>();
+    pathwaysWithEvidence.forEach((pathway) => {
+      pathway.targetEvidence.forEach((target: any) => {
+        if (!target?.gene_symbol) {
+          return;
+        }
+
+        if (!targetMap.has(target.gene_symbol)) {
+          targetMap.set(target.gene_symbol, {
+            geneSymbol: target.gene_symbol,
+            source: target.source || pathway.source,
+            knownDrugCount: target.known_drug_count || 0,
+            hasApprovedDrug: Boolean(target.has_approved_drug),
+            hasClinicalDrug: Boolean(target.has_clinical_drug),
+            hasCardiovascularEvidence: Boolean(target.has_cardiovascular_evidence),
+            pathways: new Set<string>(),
+            topDrugs: [],
+          });
+        }
+
+        const existing = targetMap.get(target.gene_symbol);
+        existing.knownDrugCount = Math.max(existing.knownDrugCount, target.known_drug_count || 0);
+        existing.hasApprovedDrug = existing.hasApprovedDrug || Boolean(target.has_approved_drug);
+        existing.hasClinicalDrug = existing.hasClinicalDrug || Boolean(target.has_clinical_drug);
+        existing.hasCardiovascularEvidence =
+          existing.hasCardiovascularEvidence || Boolean(target.has_cardiovascular_evidence);
+        existing.pathways.add(pathway.pathwayName);
+
+        (target.top_drugs || []).forEach((drug: any) => {
+          if (existing.topDrugs.length >= 3) {
+            return;
+          }
+          const duplicate = existing.topDrugs.some(
+            (entry: any) => entry.name === drug.name && entry.disease === drug.disease
+          );
+          if (!duplicate) {
+            existing.topDrugs.push(drug);
+          }
+        });
+      });
+    });
+
+    const topTargets = Array.from(targetMap.values())
+      .map((target) => ({
+        ...target,
+        pathwayCount: target.pathways.size,
+        pathways: Array.from(target.pathways),
+      }))
+      .sort((a, b) => {
+        const scoreA =
+          (a.hasApprovedDrug ? 1000 : 0) +
+          (a.hasCardiovascularEvidence ? 200 : 0) +
+          (a.hasClinicalDrug ? 100 : 0) +
+          a.knownDrugCount +
+          a.pathwayCount * 5;
+        const scoreB =
+          (b.hasApprovedDrug ? 1000 : 0) +
+          (b.hasCardiovascularEvidence ? 200 : 0) +
+          (b.hasClinicalDrug ? 100 : 0) +
+          b.knownDrugCount +
+          b.pathwayCount * 5;
+        return scoreB - scoreA;
+      })
+      .slice(0, 6);
+
+    return {
+      pathwayCount: pathwaysWithEvidence.length,
+      approvedPathwayCount: pathwaysWithEvidence.filter((item) => item.approvedTargetCount > 0).length,
+      cardiovascularPathwayCount: pathwaysWithEvidence.filter(
+        (item) => item.cardiovascularTargetCount > 0
+      ).length,
+      topTargets,
+    };
+  }, [results?.hypotheses?.hypotheses]);
+
+  const summaryMetrics = useMemo(() => {
+    const hypotheses = results?.hypotheses?.hypotheses || [];
+    const nesValues = hypotheses.map((hypothesis: any) => hypothesis.nes_score || 0).sort((a: number, b: number) => a - b);
+    const medianNES =
+      nesValues.length === 0
+        ? 0
+        : nesValues.length % 2 === 1
+          ? nesValues[(nesValues.length - 1) / 2]
+          : (nesValues[nesValues.length / 2 - 1] + nesValues[nesValues.length / 2]) / 2;
+
+    return {
+      finalPathways: hypotheses.length,
+      literatureBacked: hypotheses.filter(
+        (hypothesis: any) => (hypothesis.literature_associations?.total_citations || 0) > 0
+      ).length,
+      tissueValidated: hypotheses.filter(
+        (hypothesis: any) => Boolean(hypothesis.score_components?.tissue_validation_passed)
+      ).length,
+      approvedTargetPathways: hypotheses.filter(
+        (hypothesis: any) => (hypothesis.score_components?.approved_drug_count || 0) > 0
+      ).length,
+      medianNES,
+    };
+  }, [results?.hypotheses?.hypotheses]);
 
   if (isLoading) {
     return (
@@ -118,6 +240,10 @@ export default function ResultsPage() {
         database: hypothesis.aggregated_pathway?.pathway?.source_db || hypothesis.source_db || 'Unknown',
         gtex_cardiac_specificity: ((hypothesis.score_components as any)?.cardiac_specificity_ratio || 0).toFixed(2),
         disease_context_score: ((hypothesis.score_components?.disease_context_score || 0) * 100).toFixed(1) + '%',
+        therapeutic_source: (hypothesis.score_components as any)?.druggability_source || 'curated',
+        live_target_genes: (hypothesis.score_components as any)?.external_target_count || 0,
+        approved_target_genes: (hypothesis.score_components as any)?.approved_drug_count || 0,
+        clinical_target_genes: (hypothesis.score_components as any)?.clinical_trial_count || 0,
         hub_genes_count: hubGenesInPathway.length,
         hub_genes_list: hubGenesInPathway.join(';'),
         top_hub_score: hubGenesInPathway.length > 0 ? 
@@ -230,6 +356,74 @@ export default function ResultsPage() {
           </Stack>
         </Stack>
       </Paper>
+
+      <Grid container spacing={2} sx={{ mb: 3 }}>
+        <Grid item xs={12} sm={6} lg={2.4}>
+          <Card sx={{ height: '100%', border: '1px solid #D8E8E2', boxShadow: 'none' }}>
+            <CardContent>
+              <Typography variant="body2" color="text.secondary">Final Pathways</Typography>
+              <Typography variant="h4" sx={{ fontWeight: 700, color: 'primary.main' }}>
+                {summaryMetrics.finalPathways}
+              </Typography>
+              <Typography variant="caption" color="text.secondary">
+                Pathways that survived the full funnel and final ranking.
+              </Typography>
+            </CardContent>
+          </Card>
+        </Grid>
+        <Grid item xs={12} sm={6} lg={2.4}>
+          <Card sx={{ height: '100%', border: '1px solid #D8E8E2', boxShadow: 'none' }}>
+            <CardContent>
+              <Typography variant="body2" color="text.secondary">Median NES</Typography>
+              <Typography variant="h4" sx={{ fontWeight: 700, color: 'primary.main' }}>
+                {summaryMetrics.medianNES.toFixed(2)}
+              </Typography>
+              <Typography variant="caption" color="text.secondary">
+                Middle-ranked enrichment strength across final pathways.
+              </Typography>
+            </CardContent>
+          </Card>
+        </Grid>
+        <Grid item xs={12} sm={6} lg={2.4}>
+          <Card sx={{ height: '100%', border: '1px solid #D8E8E2', boxShadow: 'none' }}>
+            <CardContent>
+              <Typography variant="body2" color="text.secondary">Literature-backed</Typography>
+              <Typography variant="h4" sx={{ fontWeight: 700, color: 'primary.main' }}>
+                {summaryMetrics.literatureBacked}
+              </Typography>
+              <Typography variant="caption" color="text.secondary">
+                Final pathways with PubMed query hits in the report data.
+              </Typography>
+            </CardContent>
+          </Card>
+        </Grid>
+        <Grid item xs={12} sm={6} lg={2.4}>
+          <Card sx={{ height: '100%', border: '1px solid #D8E8E2', boxShadow: 'none' }}>
+            <CardContent>
+              <Typography variant="body2" color="text.secondary">GTEx Tissue-passing</Typography>
+              <Typography variant="h4" sx={{ fontWeight: 700, color: 'primary.main' }}>
+                {summaryMetrics.tissueValidated}
+              </Typography>
+              <Typography variant="caption" color="text.secondary">
+                Final pathways passing cardiac tissue validation in Stage 8.
+              </Typography>
+            </CardContent>
+          </Card>
+        </Grid>
+        <Grid item xs={12} sm={6} lg={2.4}>
+          <Card sx={{ height: '100%', border: '1px solid #D8E8E2', boxShadow: 'none' }}>
+            <CardContent>
+              <Typography variant="body2" color="text.secondary">Approved-target Pathways</Typography>
+              <Typography variant="h4" sx={{ fontWeight: 700, color: 'primary.main' }}>
+                {summaryMetrics.approvedTargetPathways}
+              </Typography>
+              <Typography variant="caption" color="text.secondary">
+                Final pathways with at least one approved therapeutic target.
+              </Typography>
+            </CardContent>
+          </Card>
+        </Grid>
+      </Grid>
 
       {/* Seed Genes - Compact */}
       <Paper sx={{ p: 2, mb: 3, bgcolor: '#FAFAFA' }}>
@@ -361,6 +555,90 @@ export default function ResultsPage() {
       })()}
 
       {/* Top Genes Across All Pathways - MOVED ABOVE TABLE FOR VISIBILITY */}
+      {therapeuticSummary.pathwayCount > 0 && (
+        <Paper
+          sx={{
+            p: 3,
+            mb: 3,
+            background: 'linear-gradient(135deg, #F9FCFB 0%, #F1F7F4 100%)',
+            border: '1px solid #D8E8E2',
+            borderRadius: 2,
+          }}
+        >
+          <Box sx={{ mb: 2 }}>
+            <Typography variant="h5" sx={{ fontWeight: 700, color: 'primary.main', mb: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
+              <LocalHospital sx={{ fontSize: 30, color: '#FFB81C' }} />
+              Therapeutic Target Evidence
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Stage 8 now annotates final pathways with live therapeutic target evidence from Open Targets, with curated fallback when no live match is available.
+            </Typography>
+          </Box>
+
+          <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap sx={{ mb: 2 }}>
+            <Chip label={`${therapeuticSummary.pathwayCount} pathways with live target evidence`} color="primary" variant="outlined" />
+            <Chip label={`${therapeuticSummary.approvedPathwayCount} pathways with approved targets`} sx={{ borderColor: '#1E6B52', color: '#1E6B52' }} variant="outlined" />
+            <Chip label={`${therapeuticSummary.cardiovascularPathwayCount} pathways with cardiovascular drug evidence`} sx={{ borderColor: '#FFB81C', color: '#A66C00' }} variant="outlined" />
+          </Stack>
+
+          <Grid container spacing={2}>
+            {therapeuticSummary.topTargets.map((target) => (
+              <Grid item xs={12} md={6} lg={4} key={target.geneSymbol}>
+                <Card
+                  sx={{
+                    height: '100%',
+                    border: '1px solid #D8E8E2',
+                    boxShadow: 'none',
+                  }}
+                >
+                  <CardContent>
+                    <Stack spacing={1.25}>
+                      <Stack direction="row" justifyContent="space-between" alignItems="center">
+                        <Typography variant="h6" sx={{ fontWeight: 700, color: 'primary.main', fontFamily: 'monospace' }}>
+                          {target.geneSymbol}
+                        </Typography>
+                        <Chip
+                          size="small"
+                          label={target.hasApprovedDrug ? 'Approved target' : target.hasClinicalDrug ? 'Clinical target' : 'Tractable'}
+                          sx={{
+                            bgcolor: target.hasApprovedDrug ? '#1E6B52' : target.hasClinicalDrug ? '#FFB81C' : '#4A9B7F',
+                            color: '#FFFFFF',
+                            fontWeight: 600,
+                          }}
+                        />
+                      </Stack>
+
+                      <Typography variant="caption" color="text.secondary">
+                        Source: {target.source} · {target.knownDrugCount} known drugs · in {target.pathwayCount} final pathway{target.pathwayCount === 1 ? '' : 's'}
+                      </Typography>
+
+                      <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+                        {target.hasCardiovascularEvidence && (
+                          <Chip size="small" label="Cardiovascular evidence" sx={{ bgcolor: '#FFF6DF', color: '#8A5A00' }} />
+                        )}
+                        {target.pathways.slice(0, 2).map((pathway: string) => (
+                          <Chip key={pathway} size="small" label={pathway} variant="outlined" sx={{ maxWidth: '100%' }} />
+                        ))}
+                      </Stack>
+
+                      {target.topDrugs.length > 0 && (
+                        <Stack spacing={0.5}>
+                          {target.topDrugs.slice(0, 2).map((drug: any) => (
+                            <Typography key={`${target.geneSymbol}-${drug.name}-${drug.disease}`} variant="body2" color="text.secondary">
+                              <strong>{drug.name}</strong>{drug.disease ? ` for ${drug.disease}` : ''}{drug.phase ? ` (Phase ${drug.phase})` : ''}
+                            </Typography>
+                          ))}
+                        </Stack>
+                      )}
+                    </Stack>
+                  </CardContent>
+                </Card>
+              </Grid>
+            ))}
+          </Grid>
+        </Paper>
+      )}
+
       <Paper 
         sx={{ 
           p: 3, 
@@ -398,7 +676,11 @@ export default function ResultsPage() {
               avgNES: gene.importance_score || 0,
               pathways: gene.pathways || [],
               cardiacRelevance: gene.disgenet_cardiac_score || 0,
-              importanceScore: gene.final_score || 0
+              importanceScore: gene.final_score || 0,
+              druggabilityTier: gene.druggability_tier || 'unknown',
+              isFDAApproved: Boolean(gene.is_fda_approved),
+              isClinicalTrial: Boolean(gene.is_clinical_trial),
+              druggabilitySource: gene.druggability_source || null,
             }));
           } else {
             // Fallback: Calculate from ranked_hypotheses
@@ -508,19 +790,33 @@ export default function ResultsPage() {
 
                         {/* Druggability Badge */}
                         {(() => {
-                          const drugStatus = getDruggabilityInfo(gene.symbol);
+                          const drugStatus =
+                            gene.isFDAApproved
+                              ? { label: 'Approved Target', color: '#1E6B52' }
+                              : gene.isClinicalTrial
+                                ? { label: 'Clinical Target', color: '#FFB81C' }
+                                : gene.druggabilityTier && gene.druggabilityTier !== 'unknown'
+                                  ? { label: 'Tractable', color: '#4A9B7F' }
+                                  : getDruggabilityInfo(gene.symbol);
                           return (
-                            <Chip
-                              label={drugStatus.label}
-                              size="small"
-                              sx={{
-                                bgcolor: drugStatus.color,
-                                color: 'white',
-                                fontWeight: 600,
-                                fontSize: '0.65rem',
-                                height: 20,
-                              }}
-                            />
+                            <Stack spacing={0.5}>
+                              <Chip
+                                label={drugStatus.label}
+                                size="small"
+                                sx={{
+                                  bgcolor: drugStatus.color,
+                                  color: 'white',
+                                  fontWeight: 600,
+                                  fontSize: '0.65rem',
+                                  height: 20,
+                                }}
+                              />
+                              {gene.druggabilitySource && (
+                                <Typography variant="caption" color="text.secondary">
+                                  {gene.druggabilitySource}
+                                </Typography>
+                              )}
+                            </Stack>
                           );
                         })()}
 

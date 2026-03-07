@@ -167,6 +167,11 @@ class TissueExpressionValidator:
                 validation_passed=False,
                 gtex_profiles={}
             )
+
+        cache_key = tuple(sorted({gene.upper() for gene in pathway_genes if gene}))
+        cached_score = self._expression_cache.get(cache_key)
+        if cached_score is not None:
+            return cached_score
         
         # Get GTEx cardiac specificity profiles for all genes
         logger.info(f"Querying GTEx for {len(pathway_genes)} pathway genes")
@@ -187,7 +192,7 @@ class TissueExpressionValidator:
             cardiac_expression_ratio = len(expressed_genes) / len(pathway_genes)
             validation_passed = cardiac_expression_ratio >= min_ratio
             
-            return TissueExpressionScore(
+            score = TissueExpressionScore(
                 cardiac_expression_ratio=cardiac_expression_ratio,
                 expressed_genes=expressed_genes,
                 total_genes=len(pathway_genes),
@@ -196,6 +201,8 @@ class TissueExpressionValidator:
                 validation_passed=validation_passed,
                 gtex_profiles={}
             )
+            self._expression_cache[cache_key] = score
+            return score
         
         # Calculate metrics from GTEx data
         expressed_genes = []
@@ -223,7 +230,7 @@ class TissueExpressionValidator:
             f"mean specificity: {mean_specificity_ratio:.2f}), passed: {validation_passed}"
         )
         
-        return TissueExpressionScore(
+        score = TissueExpressionScore(
             cardiac_expression_ratio=cardiac_expression_ratio,
             expressed_genes=expressed_genes,
             total_genes=total_genes,
@@ -232,6 +239,8 @@ class TissueExpressionValidator:
             validation_passed=validation_passed,
             gtex_profiles=gtex_profiles
         )
+        self._expression_cache[cache_key] = score
+        return score
     
     async def filter_by_expression(
         self,

@@ -230,6 +230,38 @@ class NETSConfig(BaseSettings):
         default=True,
         description="Enable druggable target identification"
     )
+    external_druggability_enabled: bool = Field(
+        default=True,
+        description="Enable live therapeutic target evidence lookup for Stage 8 validation"
+    )
+    external_druggability_gene_limit: int = Field(
+        default=8,
+        ge=1,
+        le=25,
+        description="Maximum evidence genes per pathway to query against live therapeutic target APIs"
+    )
+    external_druggability_top_pathways: int = Field(
+        default=8,
+        ge=1,
+        le=50,
+        description="Only the top N validated pathways use live therapeutic target lookups; lower-ranked pathways use curated fallback"
+    )
+    external_drug_examples_per_gene: int = Field(
+        default=5,
+        ge=1,
+        le=10,
+        description="Maximum example drugs to retain per target gene from external evidence"
+    )
+    external_druggability_timeout: int = Field(
+        default=12,
+        ge=5,
+        le=60,
+        description="Timeout in seconds for live therapeutic target evidence queries"
+    )
+    opentargets_api_url: str = Field(
+        default="https://api.platform.opentargets.org/api/v4/graphql",
+        description="Open Targets GraphQL endpoint for live therapeutic target evidence"
+    )
     
     # Output Configuration
     output_formats: List[str] = Field(

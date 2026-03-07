@@ -92,6 +92,36 @@ export interface PathwayHypothesis {
     tissue_validation_passed?: boolean;
     mean_cardiac_tpm?: number;
     cardiac_specificity_ratio?: number;
+    druggable_genes?: string[];
+    druggable_ratio?: number;
+    approved_drug_count?: number;
+    clinical_trial_count?: number;
+    druggability_tier?: string;
+    druggability_source?: string;
+    external_target_count?: number;
+    external_approved_target_count?: number;
+    external_clinical_target_count?: number;
+    cardiovascular_target_count?: number;
+    target_evidence?: Array<{
+      gene_symbol: string;
+      approved_name?: string;
+      source: string;
+      known_drug_count: number;
+      has_approved_drug: boolean;
+      has_clinical_drug: boolean;
+      has_cardiovascular_evidence: boolean;
+      cardiovascular_example_count?: number;
+      max_clinical_phase?: number;
+      tractability_labels?: string[];
+      top_drugs?: Array<{
+        name: string;
+        drug_id?: string;
+        disease?: string;
+        phase?: number;
+        status?: string;
+        is_cardiovascular?: boolean;
+      }>;
+    }>;
   };
   // Backward compatibility fields for test data
   pathway_id?: string;

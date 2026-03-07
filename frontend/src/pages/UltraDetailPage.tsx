@@ -93,6 +93,18 @@ export default function UltraDetailPageFixed() {
   const clinicalSignificance = calculateClinicalSignificance(hypothesisData);
   const tissueSpecificity = calculateTissueSpecificity(hypothesisData);
   const pathwayComplexity = calculatePathwayComplexity(hypothesisData);
+  const scoreComponents: any = hypothesisData.score_components || {};
+  const targetEvidence = scoreComponents.target_evidence || [];
+  const validationSummary = [
+    { label: 'Adjusted p-value', value: normalized.p_adj ? normalized.p_adj.toExponential(2) : 'N/A' },
+    { label: 'Support count', value: hypothesisData.aggregated_pathway?.support_count ?? 'N/A' },
+    { label: 'Empirical p-value', value: scoreComponents.empirical_pvalue ? Number(scoreComponents.empirical_pvalue).toExponential(2) : 'N/A' },
+    { label: 'Permutation z-score', value: scoreComponents.permutation_z_score ? Number(scoreComponents.permutation_z_score).toFixed(2) : 'N/A' },
+    { label: 'Cardiac expression ratio', value: scoreComponents.cardiac_expression_ratio ? `${(scoreComponents.cardiac_expression_ratio * 100).toFixed(1)}%` : 'N/A' },
+    { label: 'Mean cardiac TPM', value: scoreComponents.mean_cardiac_tpm ? Number(scoreComponents.mean_cardiac_tpm).toFixed(1) : 'N/A' },
+    { label: 'Druggability tier', value: scoreComponents.druggability_tier || 'unknown' },
+    { label: 'Therapeutic source', value: scoreComponents.druggability_source || 'curated' },
+  ];
 
   return (
     <Box sx={{ py: 2, px: 3 }}>
@@ -139,9 +151,43 @@ export default function UltraDetailPageFixed() {
         <PathwayLineage lineage={hypothesisData.lineage} />
       )}
 
+      <Paper elevation={2} sx={{ p: 3, mb: 3 }}>
+        <Typography variant="h6" gutterBottom>
+          Why This Pathway Surfaced
+        </Typography>
+        <Divider sx={{ my: 2 }} />
+        <Grid container spacing={2}>
+          <Grid item xs={12} md={4}>
+            <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 0.5 }}>
+              Discovery funnel
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              This pathway survived primary enrichment, secondary expansion, aggregation, semantic cardiac filtering, and Stage 8 validation before reaching the final ranked list.
+            </Typography>
+          </Grid>
+          <Grid item xs={12} md={4}>
+            <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 0.5 }}>
+              Replication support
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Support count: <strong>{hypothesisData.aggregated_pathway?.support_count ?? 'N/A'}</strong>.
+              Source primaries: <strong>{hypothesisData.aggregated_pathway?.source_primary_pathways?.length ?? 0}</strong>.
+            </Typography>
+          </Grid>
+          <Grid item xs={12} md={4}>
+            <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 0.5 }}>
+              Final rationale
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Ranked using NES, statistical support, cardiac relevance, tissue specificity, literature review, and therapeutic tractability.
+            </Typography>
+          </Grid>
+        </Grid>
+      </Paper>
+
       {/* Key Metrics Cards */}
       <Grid container spacing={3} sx={{ mb: 4 }}>
-        <Grid item xs={12} md={6}>
+        <Grid item xs={12} md={3}>
           <Card elevation={3}>
             <CardContent>
               <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1 }}>
@@ -162,7 +208,7 @@ export default function UltraDetailPageFixed() {
           </Card>
         </Grid>
 
-        <Grid item xs={12} md={6}>
+        <Grid item xs={12} md={3}>
           <Card elevation={3}>
             <CardContent>
               <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 1 }}>
@@ -180,7 +226,62 @@ export default function UltraDetailPageFixed() {
             </CardContent>
           </Card>
         </Grid>
+        <Grid item xs={12} md={3}>
+          <Card elevation={3}>
+            <CardContent>
+              <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 1 }}>
+                GTEx Tissue Validation
+              </Typography>
+              <Typography variant="h3" sx={{ fontWeight: 700, color: 'primary.main' }}>
+                {scoreComponents.tissue_validation_passed ? 'Pass' : 'Review'}
+              </Typography>
+              <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                {scoreComponents.cardiac_expression_ratio
+                  ? `${(scoreComponents.cardiac_expression_ratio * 100).toFixed(1)}% pathway genes meet the cardiac expression threshold.`
+                  : 'Cardiac tissue expression data were limited or unavailable.'}
+              </Typography>
+            </CardContent>
+          </Card>
+        </Grid>
+        <Grid item xs={12} md={3}>
+          <Card elevation={3}>
+            <CardContent>
+              <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 1 }}>
+                Therapeutic Targets
+              </Typography>
+              <Typography variant="h3" sx={{ fontWeight: 700, color: 'primary.main' }}>
+                {scoreComponents.external_target_count || 0}
+              </Typography>
+              <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                {scoreComponents.approved_drug_count || 0} approved target gene{(scoreComponents.approved_drug_count || 0) === 1 ? '' : 's'} and {scoreComponents.clinical_trial_count || 0} clinical target gene{(scoreComponents.clinical_trial_count || 0) === 1 ? '' : 's'}.
+              </Typography>
+            </CardContent>
+          </Card>
+        </Grid>
       </Grid>
+
+      <Paper elevation={2} sx={{ p: 3, mb: 3 }}>
+        <Typography variant="h6" gutterBottom>
+          Validation Snapshot
+        </Typography>
+        <Divider sx={{ my: 2 }} />
+        <Grid container spacing={2}>
+          {validationSummary.map((item) => (
+            <Grid item xs={12} sm={6} md={3} key={item.label}>
+              <Card variant="outlined" sx={{ height: '100%' }}>
+                <CardContent>
+                  <Typography variant="caption" color="text.secondary">
+                    {item.label}
+                  </Typography>
+                  <Typography variant="h6" sx={{ mt: 0.5, fontWeight: 700, color: 'primary.main' }}>
+                    {item.value}
+                  </Typography>
+                </CardContent>
+              </Card>
+            </Grid>
+          ))}
+        </Grid>
+      </Paper>
 
       {/* Evidence Genes Section */}
       <Paper elevation={2} sx={{ p: 3, mb: 3 }}>
@@ -272,6 +373,60 @@ export default function UltraDetailPageFixed() {
               />
             ))}
           </Stack>
+        </Paper>
+      )}
+
+      {targetEvidence.length > 0 && (
+        <Paper elevation={2} sx={{ p: 3, mb: 3 }}>
+          <Typography variant="h6" gutterBottom>
+            Therapeutic Target Evidence
+          </Typography>
+          <Divider sx={{ my: 2 }} />
+          <Typography variant="body2" color="text.secondary" paragraph>
+            Live Stage 8 therapeutic evidence highlights target genes with known drugs or tractability signals. Cardiovascular disease examples are especially relevant to translational follow-up.
+          </Typography>
+          <Grid container spacing={2}>
+            {targetEvidence.map((target: any) => (
+              <Grid item xs={12} md={6} key={target.gene_symbol}>
+                <Card variant="outlined" sx={{ height: '100%' }}>
+                  <CardContent>
+                    <Stack spacing={1}>
+                      <Stack direction="row" justifyContent="space-between" alignItems="center">
+                        <Typography variant="h6" sx={{ fontWeight: 700, color: 'primary.main', fontFamily: 'monospace' }}>
+                          {target.gene_symbol}
+                        </Typography>
+                        <Chip
+                          size="small"
+                          label={target.has_approved_drug ? 'Approved target' : target.has_clinical_drug ? 'Clinical target' : 'Tractable'}
+                          sx={{
+                            bgcolor: target.has_approved_drug ? '#1E6B52' : target.has_clinical_drug ? '#FFB81C' : '#4A9B7F',
+                            color: '#fff',
+                            fontWeight: 700,
+                          }}
+                        />
+                      </Stack>
+                      <Typography variant="body2" color="text.secondary">
+                        {target.source} · {target.known_drug_count} known drugs · max phase {target.max_clinical_phase || 'N/A'}
+                      </Typography>
+                      <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+                        {target.has_cardiovascular_evidence && (
+                          <Chip size="small" label="Cardiovascular evidence" sx={{ bgcolor: '#FFF6DF', color: '#8A5A00' }} />
+                        )}
+                        {(target.tractability_labels || []).slice(0, 3).map((label: string) => (
+                          <Chip key={`${target.gene_symbol}-${label}`} size="small" label={label} variant="outlined" />
+                        ))}
+                      </Stack>
+                      {(target.top_drugs || []).slice(0, 3).map((drug: any) => (
+                        <Typography key={`${target.gene_symbol}-${drug.name}-${drug.disease}`} variant="body2" color="text.secondary">
+                          <strong>{drug.name}</strong>{drug.disease ? ` for ${drug.disease}` : ''}{drug.phase ? ` (Phase ${drug.phase})` : ''}
+                        </Typography>
+                      ))}
+                    </Stack>
+                  </CardContent>
+                </Card>
+              </Grid>
+            ))}
+          </Grid>
         </Paper>
       )}
 
