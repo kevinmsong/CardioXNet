@@ -222,10 +222,10 @@ export default function Layout({ children }: LayoutProps) {
               direction={{ xs: 'column', sm: 'row' }} 
               spacing={2}
               justifyContent="space-between"
-              alignItems="center"
+              alignItems={{ xs: 'flex-start', sm: 'center' }}
             >
-              <Typography variant="caption" color="text.secondary">
-                CardioXNet for cardiovascular pathway discovery and review.
+              <Typography variant="caption" color="text.secondary" sx={{ textAlign: 'left' }}>
+                Copyright © 2026 Yajing Wang and Jay Zhang Labs, The University of Alabama at Birmingham. All rights reserved.
               </Typography>
               <Stack direction="row" spacing={2}>
                 <Typography 

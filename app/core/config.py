@@ -294,6 +294,7 @@ class Settings(BaseSettings):
     # Parallel Processing Configuration (Optimized for comprehensive analysis)
     max_workers_semantic: int = Field(default=8, description="Max workers for semantic filtering")
     max_workers_literature: int = Field(default=6, description="Max workers for literature mining")
+    max_workers_validation: int = Field(default=4, description="Max workers for enhanced biological validation")
     max_concurrent_pubmed: int = Field(default=10, description="Max concurrent PubMed requests")
     
     # NETS Pipeline Configuration

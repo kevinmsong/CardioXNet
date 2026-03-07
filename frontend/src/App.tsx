@@ -62,65 +62,66 @@ const theme = createTheme({
     },
   },
   typography: {
+    htmlFontSize: 17,
     fontFamily: '"IBM Plex Sans", "Segoe UI", sans-serif',
     h1: {
-      fontSize: '2.25rem',
+      fontSize: '2.4rem',
       fontWeight: 500,
-      letterSpacing: '-0.01562em',
+      letterSpacing: '-0.012em',
       color: '#1A1A1A',
     },
     h2: {
-      fontSize: '1.8rem',
+      fontSize: '1.95rem',
       fontWeight: 500,
-      letterSpacing: '-0.00833em',
+      letterSpacing: '-0.006em',
       color: '#1A1A1A',
     },
     h3: {
-      fontSize: '1.575rem',
+      fontSize: '1.7rem',
       fontWeight: 500,
       letterSpacing: '0em',
       color: '#1A1A1A',
     },
     h4: {
-      fontSize: '1.35rem',
+      fontSize: '1.45rem',
       fontWeight: 500,
-      letterSpacing: '0.00735em',
+      letterSpacing: '0.004em',
       color: '#1A1A1A',
     },
     h5: {
-      fontSize: '1.125rem',
+      fontSize: '1.2rem',
       fontWeight: 500,
       letterSpacing: '0em',
       color: '#1A1A1A',
     },
     h6: {
-      fontSize: '1.0rem',
+      fontSize: '1.05rem',
       fontWeight: 500,
-      letterSpacing: '0.0075em',
+      letterSpacing: '0.004em',
       color: '#1A1A1A',
     },
     subtitle1: {
-      fontSize: '0.9rem',
+      fontSize: '1rem',
       fontWeight: 400,
-      letterSpacing: '0.00938em',
+      letterSpacing: '0.004em',
       color: '#4A4A4A',
     },
     body1: {
-      fontSize: '0.9rem',
+      fontSize: '1rem',
       fontWeight: 400,
-      letterSpacing: '0.00938em',
-      lineHeight: 1.6,
+      letterSpacing: '0.003em',
+      lineHeight: 1.65,
     },
     body2: {
-      fontSize: '0.8rem',
+      fontSize: '0.92rem',
       fontWeight: 400,
-      letterSpacing: '0.01071em',
-      lineHeight: 1.5,
+      letterSpacing: '0.003em',
+      lineHeight: 1.55,
     },
     button: {
       textTransform: 'none', // More professional, less shouty
       fontWeight: 400,
-      fontSize: '0.875rem',
+      fontSize: '0.95rem',
     },
   },
   shape: {
@@ -158,6 +159,7 @@ const theme = createTheme({
       styleOverrides: {
         body: {
           backgroundColor: '#F4F8F6',
+          fontSize: '1rem',
           scrollbarColor: '#BDBDBD #F5F5F5',
           '&::-webkit-scrollbar, & *::-webkit-scrollbar': {
             width: 8,
@@ -185,8 +187,8 @@ const theme = createTheme({
       styleOverrides: {
         root: {
           borderRadius: 5,
-          padding: '7px 18px',
-          fontSize: '0.875rem',
+          padding: '8px 18px',
+          fontSize: '0.95rem',
           fontWeight: 400,
         },
         contained: {

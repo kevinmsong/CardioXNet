@@ -112,4 +112,5 @@ performance:
   # Parallel Processing (Optimized)
   max_workers_semantic: 6             # Increased semantic filtering workers
   max_workers_literature: 4           # Increased literature mining workers
+  max_workers_validation: 4           # Parallel Stage 8 validation without overloading GTEx
   max_concurrent_pubmed: 6            # Increased concurrent PubMed requests

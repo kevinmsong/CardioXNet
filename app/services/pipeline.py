@@ -905,88 +905,105 @@ class Pipeline:
                 logger.warning("No interaction data available, using uniform degrees")
                 print(f"[STAGE 3C DEBUG] Using uniform degrees for {len(all_genes)} genes")
             
-            # Track statistics
-            tissue_filtered = 0
-            high_druggability = 0
-            
             print(f"[STAGE 3C DEBUG] Starting hypothesis processing...")
             
             # Respect the configured validation count so UI and backend stay aligned.
             top_hypotheses = scored_hypotheses.hypotheses[:validation_limit]
             print(f"[STAGE 3C DEBUG] Limiting enhanced validation to top {len(top_hypotheses)} hypotheses")
-            
-            # Process each hypothesis
-            for i, hypothesis in enumerate(top_hypotheses):
-                if i % 10 == 0:
-                    print(f"[STAGE 3C DEBUG] Processing hypothesis {i+1}/{len(top_hypotheses)}")
-                    
+
+            validation_workers = min(
+                len(top_hypotheses),
+                max(1, getattr(self.settings, "max_workers_validation", getattr(self.settings, "max_workers_literature", 4)))
+            ) if top_hypotheses else 1
+            logger.info(f"Stage 3c: running enhanced validation with up to {validation_workers} workers")
+
+            async def _validate_hypothesis(i: int, hypothesis) -> Dict[str, int]:
+                pathway_genes = hypothesis.aggregated_pathway.pathway.evidence_genes
+                if not hypothesis.score_components:
+                    hypothesis.score_components = {}
+
+                tissue_failed = 0
+                high_druggability_hit = 0
+
                 try:
-                    pathway_genes = hypothesis.aggregated_pathway.pathway.evidence_genes
-                    
-                    # Initialize score_components if needed
-                    if not hypothesis.score_components:
-                        hypothesis.score_components = {}
-                    
-                    # 1. Cardiac Tissue Expression Validation with GTEx
-                    try:
-                        tissue_score = await self.tissue_validator.calculate_expression_score(pathway_genes)
-                        hypothesis.score_components['cardiac_expression_ratio'] = tissue_score.cardiac_expression_ratio
-                        hypothesis.score_components['cardiac_expressed_genes'] = tissue_score.expressed_genes
-                        hypothesis.score_components['tissue_validation_passed'] = tissue_score.validation_passed
-                        hypothesis.score_components['mean_cardiac_tpm'] = tissue_score.mean_cardiac_tpm
-                        hypothesis.score_components['cardiac_specificity_ratio'] = tissue_score.mean_cardiac_specificity_ratio
-                        
-                        if not tissue_score.validation_passed:
-                            tissue_filtered += 1
-                    except Exception as e:
-                        logger.warning(f"GTEx tissue validation failed for hypothesis {i}: {str(e)}")
-                        hypothesis.score_components['tissue_validation_passed'] = False
-                        tissue_filtered += 1
-                
-                    # 2. Permutation Testing (Optional for performance - degree-preserving empirical p-value)
-                    # SCIENTIFIC RIGOR: Use degree-preserving permutation to control for network topology
-                    # Reduced from 1000 to 100 permutations for performance while maintaining statistical validity
-                    try:
-                        if all_genes and fn_genes and gene_degrees and self.settings.nets.permutation_test_enabled:
-                            empirical_p, perm_stats = self.permutation_tester.calculate_degree_preserving_pvalue(
-                                pathway_genes,
-                                fn_genes,
-                                gene_degrees,
-                                all_genes,
-                                n_permutations=self.settings.nets.n_permutations
-                            )
-                            hypothesis.score_components['empirical_pvalue'] = empirical_p
-                            hypothesis.score_components['permutation_z_score'] = perm_stats.get('z_score', 0)
-                            hypothesis.score_components['observed_overlap'] = perm_stats.get('observed_overlap', 0)
-                            hypothesis.score_components['expected_overlap'] = perm_stats.get('mean_null_overlap', 0)
-                            hypothesis.score_components['n_permutations_used'] = perm_stats.get('n_permutations', 100)
-                            hypothesis.score_components['degree_preserved'] = perm_stats.get('degree_preserved', True)
-                        else:
-                            hypothesis.score_components['empirical_pvalue'] = None
-                            hypothesis.score_components['permutation_z_score'] = None
-                    except Exception as e:
-                        logger.warning(f"Permutation testing failed for hypothesis {i}: {str(e)}")
+                    tissue_score = await self.tissue_validator.calculate_expression_score(pathway_genes)
+                    hypothesis.score_components['cardiac_expression_ratio'] = tissue_score.cardiac_expression_ratio
+                    hypothesis.score_components['cardiac_expressed_genes'] = tissue_score.expressed_genes
+                    hypothesis.score_components['tissue_validation_passed'] = tissue_score.validation_passed
+                    hypothesis.score_components['mean_cardiac_tpm'] = tissue_score.mean_cardiac_tpm
+                    hypothesis.score_components['cardiac_specificity_ratio'] = tissue_score.mean_cardiac_specificity_ratio
+
+                    if not tissue_score.validation_passed:
+                        tissue_failed = 1
+                except Exception as e:
+                    logger.warning(f"GTEx tissue validation failed for hypothesis {i}: {str(e)}")
+                    hypothesis.score_components['tissue_validation_passed'] = False
+                    tissue_failed = 1
+
+                try:
+                    if all_genes and fn_genes and gene_degrees and self.settings.nets.permutation_test_enabled:
+                        empirical_p, perm_stats = await asyncio.to_thread(
+                            self.permutation_tester.calculate_degree_preserving_pvalue,
+                            pathway_genes,
+                            fn_genes,
+                            gene_degrees,
+                            all_genes,
+                            self.settings.nets.n_permutations
+                        )
+                        hypothesis.score_components['empirical_pvalue'] = empirical_p
+                        hypothesis.score_components['permutation_z_score'] = perm_stats.get('z_score', 0)
+                        hypothesis.score_components['observed_overlap'] = perm_stats.get('observed_overlap', 0)
+                        hypothesis.score_components['expected_overlap'] = perm_stats.get('mean_null_overlap', 0)
+                        hypothesis.score_components['n_permutations_used'] = perm_stats.get('n_permutations', 100)
+                        hypothesis.score_components['degree_preserved'] = perm_stats.get('degree_preserved', True)
+                    else:
                         hypothesis.score_components['empirical_pvalue'] = None
                         hypothesis.score_components['permutation_z_score'] = None
-                    
-                    # 3. Druggability Analysis
-                    try:
-                        drug_score = self.druggability_analyzer.calculate_druggability_score(pathway_genes)
-                        hypothesis.score_components['druggable_genes'] = drug_score.druggable_genes
-                        hypothesis.score_components['druggable_ratio'] = drug_score.druggable_ratio
-                        hypothesis.score_components['approved_drug_count'] = drug_score.approved_drug_count
-                        hypothesis.score_components['clinical_trial_count'] = drug_score.clinical_trial_count
-                        hypothesis.score_components['druggability_tier'] = drug_score.druggability_tier
-                        
-                        if drug_score.druggability_tier == 'high':
-                            high_druggability += 1
-                    except Exception as e:
-                        logger.warning(f"Druggability analysis failed for hypothesis {i}: {str(e)}")
-                        hypothesis.score_components['druggability_tier'] = 'unknown'
-                        
                 except Exception as e:
-                    logger.error(f"Failed to process hypothesis {i}: {str(e)}")
-                    continue  # Skip this hypothesis and continue with the next
+                    logger.warning(f"Permutation testing failed for hypothesis {i}: {str(e)}")
+                    hypothesis.score_components['empirical_pvalue'] = None
+                    hypothesis.score_components['permutation_z_score'] = None
+
+                try:
+                    drug_score = await asyncio.to_thread(
+                        self.druggability_analyzer.calculate_druggability_score,
+                        pathway_genes
+                    )
+                    hypothesis.score_components['druggable_genes'] = drug_score.druggable_genes
+                    hypothesis.score_components['druggable_ratio'] = drug_score.druggable_ratio
+                    hypothesis.score_components['approved_drug_count'] = drug_score.approved_drug_count
+                    hypothesis.score_components['clinical_trial_count'] = drug_score.clinical_trial_count
+                    hypothesis.score_components['druggability_tier'] = drug_score.druggability_tier
+
+                    if drug_score.druggability_tier == 'high':
+                        high_druggability_hit = 1
+                except Exception as e:
+                    logger.warning(f"Druggability analysis failed for hypothesis {i}: {str(e)}")
+                    hypothesis.score_components['druggability_tier'] = 'unknown'
+
+                return {
+                    "tissue_failed": tissue_failed,
+                    "high_druggability": high_druggability_hit
+                }
+
+            semaphore = asyncio.Semaphore(validation_workers)
+
+            async def _validate_with_semaphore(i: int, hypothesis) -> Dict[str, int]:
+                async with semaphore:
+                    if i % 10 == 0:
+                        print(f"[STAGE 3C DEBUG] Processing hypothesis {i+1}/{len(top_hypotheses)}")
+                    try:
+                        return await _validate_hypothesis(i, hypothesis)
+                    except Exception as e:
+                        logger.error(f"Failed to process hypothesis {i}: {str(e)}")
+                        return {"tissue_failed": 0, "high_druggability": 0}
+
+            validation_results = await asyncio.gather(
+                *[_validate_with_semaphore(i, hypothesis) for i, hypothesis in enumerate(top_hypotheses)]
+            )
+
+            tissue_filtered = sum(result["tissue_failed"] for result in validation_results)
+            high_druggability = sum(result["high_druggability"] for result in validation_results)
             
             # Store validation results
             self.results["stage_3_6_enhanced_validation"] = {
