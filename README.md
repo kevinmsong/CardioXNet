@@ -32,7 +32,7 @@ Do not use it to:
 
 ## Discovery Workflow
 
-The live implementation in [workflow_diagram.mmd](/c:/Users/kevin/Documents/Research/CardioXNet/CardioXNet/workflow_diagram.mmd) follows this order:
+The live implementation in [workflow_diagram.mmd](workflow_diagram.mmd) follows this order:
 
 1. Seed genes are validated and normalized.
 2. A functional neighborhood is built from STRING interactions.
@@ -164,7 +164,7 @@ Backend configuration can still be controlled through:
 3. environment variables
 4. per-request `config_overrides`
 
-High-impact backend parameters are described in [docs/CONFIGURATION.md](/c:/Users/kevin/Documents/Research/CardioXNet/CardioXNet/docs/CONFIGURATION.md).
+High-impact backend parameters are described in [docs/CONFIGURATION.md](docs/CONFIGURATION.md).
 
 ## Running an Analysis
 
@@ -280,11 +280,11 @@ Additional frontend commands:
 
 ## Documentation
 
-- Overview: [docs/index.md](/c:/Users/kevin/Documents/Research/CardioXNet/CardioXNet/docs/index.md)
-- Configuration guide: [docs/CONFIGURATION.md](/c:/Users/kevin/Documents/Research/CardioXNet/CardioXNet/docs/CONFIGURATION.md)
+- Overview: [docs/index.md](docs/index.md)
+- Configuration guide: [docs/CONFIGURATION.md](docs/CONFIGURATION.md)
 - In-app documentation: `/documentation`
 - In-app API reference: `/api-reference`
-- Deployment notes: [DEPLOYMENT.md](/c:/Users/kevin/Documents/Research/CardioXNet/CardioXNet/DEPLOYMENT.md)
+- Deployment notes: [DEPLOYMENT.md](DEPLOYMENT.md)
 
 ## Notes for Scientific Use
 
