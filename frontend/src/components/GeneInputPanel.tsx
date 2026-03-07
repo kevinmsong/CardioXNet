@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import {
   Box,
@@ -26,29 +26,34 @@ interface GeneInputPanelProps {
 
 const DISEASE_OPTIONS = [
   {
+    value: '',
+    label: 'General Cardiovascular Discovery',
+    description: 'Broad cardiac pathway prioritization without narrowing to a single disease'
+  },
+  {
+    value: 'cardiomyopathy',
+    label: 'Cardiomyopathy',
+    description: 'Inherited or acquired myocardial dysfunction and remodeling'
+  },
+  {
+    value: 'heart_failure',
+    label: 'Heart Failure',
+    description: 'Pump dysfunction, remodeling, stress response, and maladaptive signaling'
+  },
+  {
     value: 'diabetic_cardiomyopathy',
     label: 'Diabetic Cardiomyopathy',
     description: 'Heart dysfunction related to diabetes and metabolic dysfunction'
   },
   {
-    value: 'hypertensive_remodeling',
-    label: 'Hypertensive Heart Disease',
-    description: 'Heart remodeling and dysfunction caused by high blood pressure'
+    value: 'myocardial_infarction',
+    label: 'Myocardial Infarction',
+    description: 'Ischemic injury, repair signaling, and post-infarct remodeling'
   },
   {
-    value: 'pressure_overload_hf',
-    label: 'Pressure-Overload Heart Failure',
-    description: 'Heart failure from mechanical pressure (aortic stenosis, etc.)'
-  },
-  {
-    value: 'anthracycline_cardiomyopathy',
-    label: 'Chemotherapy-Induced Cardiomyopathy',
-    description: 'Heart damage from cancer treatment (anthracycline chemotherapy)'
-  },
-  {
-    value: 'obesity_metabolic_cardiomyopathy',
-    label: 'Obesity-Related Heart Disease',
-    description: 'Heart dysfunction linked to obesity and metabolic syndrome'
+    value: 'arrhythmia',
+    label: 'Arrhythmia',
+    description: 'Conduction, ion channel, and rhythm-associated pathway focus'
   }
 ];
 
@@ -84,6 +89,11 @@ export default function GeneInputPanel({
       .filter(gene => gene.length > 0); // Remove empty strings
   };
 
+  const parsedInputCount = useMemo(
+    () => inputValue.split(/[\s,\n\r,]+/).filter((gene) => gene.length > 0).length,
+    [inputValue]
+  );
+
   const handleAddGenes = () => {
     if (inputValue.trim()) {
       const parsedGenes = parseGeneList(inputValue);
@@ -114,8 +124,7 @@ export default function GeneInputPanel({
           <Select
             value={selectedDisease}
             onChange={(e) => setSelectedDisease(e.target.value)}
-            label="Disease Context (Required)"
-            required
+            label="Disease Context"
           >
             {DISEASE_OPTIONS.map((disease) => (
               <MenuItem key={disease.value} value={disease.value}>
@@ -142,13 +151,13 @@ export default function GeneInputPanel({
             </Typography>
             <Box sx={{ mt: 1.5, p: 1.5, bgcolor: 'rgba(25, 118, 210, 0.08)', borderRadius: 1, borderLeft: '3px solid #1976d2' }}>
               <Typography variant="caption" fontWeight={600} display="block" sx={{ mb: 0.5 }}>
-                Analysis Benefits:
+                What this changes:
               </Typography>
               <Typography variant="caption" component="div" sx={{ fontSize: '0.75rem', lineHeight: 1.6 }}>
-                <strong>• Targeted Analysis:</strong> Focuses on genetic associations specific to this disease<br/>
-                <strong>• Tissue Expression:</strong> Pathways are validated against disease-relevant tissue expression<br/>
-                <strong>• Literature Priority:</strong> Emphasizes publications relevant to your disease context<br/>
-                <strong>• Higher Precision:</strong> Returns only pathways with strong disease relevance
+                <strong>• Funnel control:</strong> Prioritizes pathway branches relevant to this disease<br/>
+                <strong>• Semantic focus:</strong> Raises the score of disease-matched pathway language<br/>
+                <strong>• Literature focus:</strong> Centers PubMed queries on the selected context<br/>
+                <strong>• Interpretability:</strong> Makes final rankings easier to review in one disease frame
               </Typography>
             </Box>
           </Alert>
@@ -167,8 +176,8 @@ export default function GeneInputPanel({
               handleAddGenes();
             }
           }}
-          placeholder="Example: BRCA1 TP53 PTEN&#10;or: BRCA1, TP53, PTEN&#10;or paste a list from Excel"
-          helperText={`Enter genes separated by spaces, commas, or newlines. Multiple formats supported. ${inputValue.split(/[\s,\n]+/).filter(g => g.length > 0).length} genes will be added.`}
+          placeholder="Example: PIK3R1 ITGB1 SRC"
+          helperText={`${parsedInputCount} gene symbol${parsedInputCount === 1 ? '' : 's'} detected`}
           disabled={validateMutation.isPending}
           sx={{
             '& .MuiInputBase-root': {
@@ -192,8 +201,9 @@ export default function GeneInputPanel({
             variant="outlined"
             onClick={() => {
               const exampleGenes = ['PIK3R1', 'ITGB1', 'SRC'];
-              onGenesChange([...selectedGenes, ...exampleGenes]);
-              validateMutation.mutate([...selectedGenes, ...exampleGenes]);
+              const mergedGenes = [...new Set([...selectedGenes, ...exampleGenes])];
+              onGenesChange(mergedGenes);
+              validateMutation.mutate(mergedGenes);
             }}
             disabled={validateMutation.isPending}
           >

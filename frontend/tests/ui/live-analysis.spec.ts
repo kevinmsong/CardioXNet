@@ -28,13 +28,9 @@ test('submits a live analysis through the UI and verifies PDF export', async ({ 
   await page.getByRole('button', { name: 'Add Genes' }).click();
   await expect(page.getByText(/validated successfully/i)).toBeVisible({ timeout: 60_000 });
 
-  await page.getByText('Advanced Configuration').click();
-  await page.getByLabel('STRING Neighbor Count').fill('10');
-  await page.getByLabel('Top Hypotheses to Validate').fill('5');
-  await page.getByLabel('Literature Mining Count').fill('3');
-  await page.getByLabel('PubMed Max Results').fill('10');
-  await page.getByLabel('Permutation Count').fill('50');
-  await page.getByRole('checkbox', { name: /Permutation Testing/i }).uncheck();
+  await page.getByRole('button', { name: 'Focused' }).click();
+  await page.getByLabel('Evidence depth').click();
+  await page.getByRole('option', { name: 'Fast screening' }).click();
 
   await page.screenshot({
     path: path.join(artifactsDir, 'live-ui-home-configured.png'),

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Alert, Snackbar } from '@mui/material';
 import { Warning } from '@mui/icons-material';
+import api from '../api/endpoints';
 
 interface ApiStatusNotificationProps {
   show?: boolean;
@@ -21,7 +22,7 @@ export default function ApiStatusNotification({ show = false }: ApiStatusNotific
       try {
         // In production, you would actually check API endpoints here
         // For now, we'll only show if there's an explicit failure
-        const response = await fetch('/api/v1/health', { 
+        const response = await fetch(api.getHealthUrl(), {
           method: 'GET',
           signal: AbortSignal.timeout(3000) 
         });

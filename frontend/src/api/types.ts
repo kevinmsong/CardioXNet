@@ -212,19 +212,21 @@ export interface StageResult {
 
 export interface ConfigDefaults {
   config: {
-    // ... existing config properties ...
-    nets: {
-      // ... existing nets properties ...
-      semantic_relevance_threshold: number;
-      semantic_repair_boost: number;
-      semantic_max_results: number;
-      semantic_progressive_thresholds: {
-        high_cardiac: number;
-        medium_cardiac: number;
-        low_cardiac: number;
-      };
-      // ... rest of nets properties ...
-    };
+    string_neighbor_count?: number;
+    string_score_threshold?: number;
+    fdr_threshold?: number;
+    top_hypotheses_count?: number;
+    primary_pathways_to_expand?: number;
+    aggregation_strategy?: string;
+    min_support_threshold?: number;
+    semantic_relevance_threshold?: number;
+    semantic_max_results?: number;
+    semantic_max_hypotheses_for_literature?: number;
+    pubmed_max_results?: number;
+    permutation_test_enabled?: boolean;
+    n_permutations?: number;
+    seed_overlap_threshold?: number;
+    db_weights?: Record<string, number>;
   };
 }
 

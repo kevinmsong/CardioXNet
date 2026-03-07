@@ -76,7 +76,7 @@ export default function ResultsPage() {
   }
 
   const handleDownloadReport = () => {
-    const url = `http://localhost:8000/api/v1/analysis/${analysisId}/report/pdf`;
+    const url = api.getReportDownloadUrl(analysisId!, 'pdf');
     window.open(url, '_blank');
   };
 
@@ -147,14 +147,14 @@ export default function ResultsPage() {
     <Box sx={{ py: 3 }}>
       {/* Professional Results Header */}
       <Paper
-        elevation={4}
+        elevation={0}
         sx={{
           p: { xs: 3, md: 5 },
           mb: 4,
-          background: 'linear-gradient(135deg, #1E6B52 0%, #145A43 100%)',
-          color: 'white',
+          background: 'linear-gradient(180deg, #FFFFFF 0%, #F3FAF7 100%)',
+          color: '#163C30',
           borderRadius: 3,
-          boxShadow: '0 12px 48px rgba(30, 107, 82, 0.2)',
+          border: '1px solid #D8E8E2',
           position: 'relative',
           overflow: 'hidden',
         }}
@@ -168,7 +168,7 @@ export default function ResultsPage() {
             width: 350,
             height: 350,
             borderRadius: '50%',
-            background: 'rgba(255, 184, 28, 0.08)',
+            background: 'rgba(31, 90, 70, 0.05)',
             zIndex: 0,
           }}
         />
@@ -180,14 +180,14 @@ export default function ResultsPage() {
               sx={{ 
                 fontWeight: 800, 
                 mb: 1, 
-                color: '#FFFFFF',
+                color: '#163C30',
                 fontSize: { xs: '2rem', md: '2.5rem' },
                 letterSpacing: '-0.5px',
               }}
             >
               Analysis Results
             </Typography>
-            <Typography variant="body2" sx={{ opacity: 0.9, color: 'rgba(255,255,255,0.85)' }}>
+            <Typography variant="body2" sx={{ opacity: 0.9, color: '#4D6A60' }}>
               Analysis ID: <strong>{analysisId}</strong>
             </Typography>
           </Box>
@@ -198,14 +198,13 @@ export default function ResultsPage() {
               onClick={handleDownloadCSV}
               fullWidth
               sx={{ 
-                borderColor: 'white',
-                color: 'white',
+                borderColor: '#1F5A46',
+                color: '#1F5A46',
                 fontWeight: 700,
-                borderWidth: '2px',
                 fontSize: '0.9rem',
                 '&:hover': { 
-                  borderColor: '#FFB81C',
-                  bgcolor: 'rgba(255, 184, 28, 0.15)',
+                  borderColor: '#163C30',
+                  bgcolor: 'rgba(31, 90, 70, 0.06)',
                 }
               }}
             >
@@ -217,14 +216,12 @@ export default function ResultsPage() {
               onClick={handleDownloadReport}
               fullWidth
               sx={{ 
-                bgcolor: '#FFB81C',
-                color: '#000',
-                fontWeight: 800,
-                boxShadow: '0 6px 16px rgba(255, 184, 28, 0.4)',
+                bgcolor: '#1F5A46',
+                color: '#FFFFFF',
+                fontWeight: 700,
                 fontSize: '0.9rem',
                 '&:hover': { 
-                  bgcolor: '#E5A31A',
-                  boxShadow: '0 8px 20px rgba(255, 184, 28, 0.5)',
+                  bgcolor: '#163C30',
                 }
               }}
             >
@@ -378,8 +375,8 @@ export default function ResultsPage() {
             Important Genes
           </Typography>
           <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-            <strong>Novel Discovery:</strong> These genes were prioritized by AI through network expansion, frequency across high-scoring pathways, 
-            and aggregate importance scoring—many may not have been in your original seed list.
+            <strong>Priority Ranking:</strong> These genes were prioritized through network
+            expansion, recurrence across high-scoring pathways, and aggregate importance scoring.
           </Typography>
           <Typography variant="body2" color="text.secondary">
             <strong>Scoring:</strong> Importance = (Pathway Frequency<sup>1.2</sup>) × (Avg NES) × (1 + Cardiac Relevance). 

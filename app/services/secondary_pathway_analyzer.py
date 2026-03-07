@@ -72,7 +72,11 @@ class SecondaryPathwayAnalyzer:
         # Store seed genes for novelty filtering
         self.seed_genes = seed_genes
         
-        top_n = top_n or self.settings.nets.top_hypotheses_count
+        top_n = top_n or getattr(
+            self.settings.nets,
+            "primary_pathways_to_expand",
+            max(self.settings.nets.top_hypotheses_count, 30)
+        )
         
         logger.info(
             f"[STAGE 2B] Starting per-primary secondary pathway discovery "

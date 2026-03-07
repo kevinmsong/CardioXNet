@@ -26,6 +26,12 @@ logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/v1", tags=["analysis"])
 
 
+@router.get("/health")
+async def api_health():
+    """Versioned API health check for frontend clients."""
+    return {"status": "healthy"}
+
+
 @router.options("/genes/validate")
 async def options_validate_genes():
     """Handle OPTIONS preflight for gene validation."""
@@ -539,8 +545,16 @@ async def get_config_defaults():
         "string_score_threshold": settings.nets.string_score_threshold,
         "fdr_threshold": settings.nets.fdr_threshold,
         "top_hypotheses_count": settings.nets.top_hypotheses_count,
+        "primary_pathways_to_expand": settings.nets.primary_pathways_to_expand,
         "aggregation_strategy": settings.nets.aggregation_strategy,
         "min_support_threshold": settings.nets.min_support_threshold,
+        "semantic_relevance_threshold": settings.nets.semantic_relevance_threshold,
+        "semantic_max_results": settings.nets.semantic_max_results,
+        "semantic_max_hypotheses_for_literature": settings.nets.semantic_max_hypotheses_for_literature,
+        "pubmed_max_results": settings.nets.pubmed_max_results,
+        "permutation_test_enabled": settings.nets.permutation_test_enabled,
+        "n_permutations": settings.nets.n_permutations,
+        "seed_overlap_threshold": settings.nets.seed_overlap_threshold,
         "db_weights": settings.nets.db_weights
     }
     
@@ -578,46 +592,15 @@ async def download_report(analysis_id: str, format: str):
     
     # Check if report exists and is valid
     if format not in report_files or not Path(report_files[format]).exists():
-        logger.info(f"Report not found for {analysis_id}, generating on-demand...")
-        
-        # Generate report on-demand
-        try:
-            from app.services import ReportGenerator
-            
-            # Extract data from analysis results
-            results = analysis.get("results", {})
-            seed_genes = _extract_seed_genes(results)
-            hypotheses = _extract_hypotheses(results)
-            topology = _extract_topology(results)
-            literature = _extract_literature(results)
-            
-            # Generate report
-            from app.services.fast_service_init import get_service_fast
-            report_generator = get_service_fast("report_generator")
-            output_files = report_generator.generate_report(
-                analysis_id=analysis_id,
-                seed_genes=seed_genes,
-                hypotheses=hypotheses,
-                topology_analysis=topology,
-                literature_evidence=literature,
-                output_formats=[format]
-            )
-            
-            # Update analysis store with new report files
-            report_files.update(output_files)
-            analysis_store.update_analysis(
-                analysis_id,
-                report_files=report_files
-            )
-            
-            report_path = Path(output_files[format])
-            logger.info(f"Report generated successfully: {report_path}")
-            
-        except Exception as e:
-            logger.error(f"Failed to generate report: {str(e)}")
+        candidate_paths = [
+            Path(f"outputs/{analysis_id}_report.{format}"),
+            Path(f"outputs/{analysis_id}/{format}.{'json' if format == 'json' else format}"),
+        ]
+        report_path = next((path for path in candidate_paths if path.exists()), None)
+        if report_path is None:
             raise HTTPException(
-                status_code=500,
-                detail=f"Failed to generate report: {str(e)}"
+                status_code=404,
+                detail=f"Report format '{format}' is not available for analysis {analysis_id}"
             )
     else:
         report_path = Path(report_files[format])

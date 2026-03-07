@@ -233,7 +233,7 @@ export default function HypothesesTable({ hypotheses, analysisId }: HypothesesTa
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                   Literature
                   <Tooltip 
-                    title="Literature Association: Indicates whether this pathway has been reported in scientific literature to be associated with your seed genes. Based on PubMed co-mention analysis with cardiac context."
+                    title="PubMed query hits retrieved for this pathway in cardiac context. Zero hits means the automated search did not retrieve support; it does not prove absence from the literature."
                     arrow
                     placement="top"
                   >
@@ -290,16 +290,16 @@ key={hypothesis.aggregated_pathway?.pathway?.pathway_id || hypothesis.pathway_id
                       arrow
                     >
                       <Chip
-                        label="Reported"
+                        label="Query Hits"
                         size="small"
                         color="success"
                         sx={{ fontWeight: 600, minWidth: 90 }}
                       />
                     </Tooltip>
                   ) : hypothesis.literature_associations ? (
-                    <Tooltip title="No literature evidence found for pathway-seed gene association - this may represent a novel finding" arrow>
+                    <Tooltip title="No PubMed hits were retrieved for this automated query. Treat this as a literature-screening gap, not proof of novelty." arrow>
                       <Chip
-                        label="Not Reported"
+                        label="No Query Hits"
                         size="small"
                         sx={{ 
                           fontWeight: 600, 

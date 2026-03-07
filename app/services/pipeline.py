@@ -68,6 +68,11 @@ class Pipeline:
             logger.info(f"Applying {len(config_overrides)} configuration overrides: {config_overrides}")
             for key, value in config_overrides.items():
                 if hasattr(self.settings.nets, key):
+                    nets_attr = getattr(type(self.settings.nets), key, None)
+                    if isinstance(nets_attr, property) and nets_attr.fset is None:
+                        logger.warning(f"Skipping read-only configuration parameter: {key}")
+                        continue
+
                     old_value = getattr(self.settings.nets, key)
                     setattr(self.settings.nets, key, value)
                     logger.info(f"Override: {key} = {old_value} -> {value}")
@@ -351,7 +356,29 @@ class Pipeline:
                     logger.warning(warning_msg)
                     print(warning_msg)
                     self.warnings.append(warning_msg)
-                    
+
+                # Align literature evidence with the final ranked pathway set.
+                # Pre-filter literature mining can miss pathways retained by the
+                # strict cardiac name filter, which leads to misleading zero-hit
+                # displays on the results page.
+                if scored_hypotheses.total_count > 0:
+                    await self._update_progress("Stage 9", 84, "Refreshing literature evidence for final pathways")
+                    literature_limit = getattr(
+                        self.settings.nets,
+                        "semantic_max_hypotheses_for_literature",
+                        self.settings.nets.top_hypotheses_count
+                    )
+                    final_literature_top_n = min(literature_limit, scored_hypotheses.total_count)
+                    literature_evidence = await self._run_stage_6_literature(
+                        scored_hypotheses,
+                        validation_result.valid_genes,
+                        top_n=final_literature_top_n
+                    )
+                    logger.info(
+                        "Refreshed literature evidence for %s final pathways after the strict cardiac filter",
+                        final_literature_top_n,
+                    )
+                
             except Exception as e:
                 elapsed = time.time() - stage_start_time
                 error_msg = f"Stage 4b MANDATORY filter failed: {str(e)}"

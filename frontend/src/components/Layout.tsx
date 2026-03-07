@@ -4,14 +4,14 @@ import { useQueryClient } from '@tanstack/react-query';
 import {
   AppBar,
   Box,
-  Toolbar,
-  Typography,
   Button,
   Container,
   Divider,
   Stack,
+  Toolbar,
+  Typography,
 } from '@mui/material';
-import { Home, BiotechOutlined, AccountTreeOutlined } from '@mui/icons-material';
+import { Api, Home, BiotechOutlined, MenuBook } from '@mui/icons-material';
 import { clearAnalysisMemory } from '../utils/analysisMemory';
 import ApiStatusNotification from './ApiStatusNotification';
 
@@ -31,48 +31,44 @@ export default function Layout({ children }: LayoutProps) {
   };
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', bgcolor: '#FFFFFF' }}>
+    <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', bgcolor: '#F4F8F6' }}>
       {/* API Status Notification */}
       <ApiStatusNotification />
       
-      {/* Professional Header with UAB Green */}
       <AppBar 
         position="sticky"
-        elevation={3}
+        elevation={0}
         sx={{ 
-          background: 'linear-gradient(135deg, #1E6B52 0%, #145A43 100%)',
-          borderBottom: '3px solid #FFB81C',
-          boxShadow: '0 4px 16px rgba(30, 107, 82, 0.2)',
+          background: '#163C30',
+          borderBottom: '1px solid rgba(255,255,255,0.08)',
+          boxShadow: '0 10px 24px rgba(15, 43, 34, 0.14)',
         }}
       >
-        <Toolbar sx={{ py: 1.5 }}>
+        <Toolbar sx={{ py: 1.25 }}>
           <Stack direction="row" spacing={2} alignItems="center" sx={{ flexGrow: 1 }}>
             <Box
               sx={{
-                background: 'rgba(255, 184, 28, 0.2)',
-                borderRadius: '10px',
-                p: 0.8,
+                background: 'rgba(255, 255, 255, 0.08)',
+                borderRadius: '12px',
+                p: 1,
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                border: '2px solid #FFB81C',
               }}
             >
-              <BiotechOutlined sx={{ fontSize: 28, color: '#FFB81C' }} />
+              <BiotechOutlined sx={{ fontSize: 24, color: '#B9E3D3' }} />
             </Box>
             <Typography 
-              variant="h5" 
+              variant="h6" 
               component="div" 
               onClick={handleHomeClick}
               sx={{ 
                 fontWeight: 700,
                 color: '#FFFFFF',
-                letterSpacing: '-0.5px',
+                letterSpacing: '-0.2px',
                 cursor: 'pointer',
-                transition: 'all 0.2s ease-in-out',
                 '&:hover': {
-                  color: '#FFB81C',
-                  transform: 'scale(1.02)',
+                  color: '#D7EFE6',
                 },
               }}
             >
@@ -90,16 +86,14 @@ export default function Layout({ children }: LayoutProps) {
                 }
               }}
               sx={{
-                color: location.pathname === '/' ? '#FFB81C' : '#FFFFFF',
+                color: location.pathname === '/' ? '#163C30' : '#FFFFFF',
                 fontWeight: location.pathname === '/' ? 700 : 600,
                 px: 2,
                 borderRadius: 2,
-                bgcolor: location.pathname === '/' ? 'rgba(255,184,28,0.15)' : 'transparent',
+                bgcolor: location.pathname === '/' ? '#D7EFE6' : 'transparent',
                 cursor: location.pathname === '/' ? 'default' : 'pointer',
                 '&:hover': {
-                  bgcolor: location.pathname === '/' ? 'rgba(255,184,28,0.15)' : 'rgba(255,184,28,0.2)',
-                  borderColor: '#FFB81C',
-                  border: '1px solid',
+                  bgcolor: location.pathname === '/' ? '#D7EFE6' : 'rgba(255,255,255,0.08)',
                 },
               }}
             >
@@ -107,7 +101,7 @@ export default function Layout({ children }: LayoutProps) {
             </Button>
             <Button
               color="inherit"
-              startIcon={<AccountTreeOutlined />}
+              startIcon={<MenuBook />}
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
@@ -116,53 +110,70 @@ export default function Layout({ children }: LayoutProps) {
                 }
               }}
               sx={{
-                color: location.pathname === '/documentation' ? '#FFB81C' : '#FFFFFF',
+                color: location.pathname === '/documentation' ? '#163C30' : '#FFFFFF',
                 fontWeight: location.pathname === '/documentation' ? 700 : 600,
                 px: 2,
                 borderRadius: 2,
-                bgcolor: location.pathname === '/documentation' ? 'rgba(255,184,28,0.15)' : 'transparent',
+                bgcolor: location.pathname === '/documentation' ? '#D7EFE6' : 'transparent',
                 cursor: location.pathname === '/documentation' ? 'default' : 'pointer',
                 pointerEvents: 'auto',
                 '&:hover': {
-                  bgcolor: location.pathname === '/documentation' ? 'rgba(255,184,28,0.15)' : 'rgba(255,184,28,0.2)',
-                  borderColor: '#FFB81C',
-                  border: '1px solid',
+                  bgcolor: location.pathname === '/documentation' ? '#D7EFE6' : 'rgba(255,255,255,0.08)',
                 },
               }}
             >
               Documentation
             </Button>
+            <Button
+              color="inherit"
+              startIcon={<Api />}
+              onClick={() => {
+                if (location.pathname !== '/api-reference') {
+                  navigate('/api-reference');
+                }
+              }}
+              sx={{
+                color: location.pathname === '/api-reference' ? '#163C30' : '#FFFFFF',
+                fontWeight: location.pathname === '/api-reference' ? 700 : 600,
+                px: 2,
+                borderRadius: 2,
+                bgcolor: location.pathname === '/api-reference' ? '#D7EFE6' : 'transparent',
+                '&:hover': {
+                  bgcolor: location.pathname === '/api-reference' ? '#D7EFE6' : 'rgba(255,255,255,0.08)',
+                },
+              }}
+            >
+              API
+            </Button>
           </Stack>
         </Toolbar>
       </AppBar>
 
-      {/* Main Content Area - Wider layout with 30% narrower margins */}
       <Container 
-        maxWidth="xl" 
+        maxWidth={false}
         sx={{ 
-          mt: 1.5, 
-          mb: 2, 
+          mt: 2, 
+          mb: 3, 
           flexGrow: 1,
-          px: { xs: 0.7, sm: 1, md: 1.4 },  // 30% narrower margins (was 1, 1.5, 2)
-          maxWidth: '1800px !important',  // Wider max width (was 1400px)
+          px: { xs: 1.5, sm: 2, md: 3 },
+          maxWidth: '1320px',
         }}
       >
         {children}
       </Container>
 
-      {/* Enhanced Footer */}
       <Box
         component="footer"
         sx={{
-          py: 3,
+          py: 2.5,
           px: 2,
           mt: 'auto',
-          bgcolor: '#F5F5F5',
-          borderTop: '3px solid #1E6B52',
+          bgcolor: '#EEF5F1',
+          borderTop: '1px solid #D8E8E2',
         }}
       >
         <Container maxWidth="lg">
-          <Stack spacing={2.5}>
+          <Stack spacing={2}>
             <Stack 
               direction={{ xs: 'column', sm: 'row' }} 
               spacing={3}
@@ -172,23 +183,22 @@ export default function Layout({ children }: LayoutProps) {
               <Stack direction="row" spacing={1.5} alignItems="center">
                 <Box
                   sx={{
-                    background: 'linear-gradient(135deg, #1E6B52 0%, #145A43 100%)',
-                    borderRadius: '10px',
+                    background: '#163C30',
+                    borderRadius: '12px',
                     p: 0.8,
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    border: '2px solid #FFB81C',
                   }}
                 >
-                  <BiotechOutlined sx={{ color: '#FFB81C', fontSize: 24 }} />
+                  <BiotechOutlined sx={{ color: '#D7EFE6', fontSize: 22 }} />
                 </Box>
                 <Box>
-                  <Typography variant="body1" sx={{ color: '#1E6B52', fontWeight: 700 }}>
+                  <Typography variant="body1" sx={{ color: '#163C30', fontWeight: 700 }}>
                     CardioXNet
                   </Typography>
                   <Typography variant="caption" color="text.secondary">
-                    NETS (Neighborhood Enrichment Triage and Scoring) Algorithm Platform
+                    Cardiovascular pathway discovery and review
                   </Typography>
                 </Box>
               </Stack>
@@ -212,7 +222,7 @@ export default function Layout({ children }: LayoutProps) {
               alignItems="center"
             >
               <Typography variant="caption" color="text.secondary">
-                © Yajing Wang & Jay Zhang Labs • The University of Alabama at Birmingham • All rights reserved.
+                CardioXNet for cardiovascular pathway discovery and review.
               </Typography>
               <Stack direction="row" spacing={2}>
                 <Typography 

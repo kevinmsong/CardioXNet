@@ -151,17 +151,17 @@ export default function LiteratureEvidenceDisplay({
               </Avatar>
               <Box sx={{ flexGrow: 1 }}>
                 <Typography variant="h6" fontWeight={600}>
-                  {hasLiteratureSupport ? 'Literature Support Found' : 'Novel Finding - No Prior Literature'}
+                  {hasLiteratureSupport ? 'PubMed Query Support Found' : 'No PubMed Query Hits Retrieved'}
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
                   {hasLiteratureSupport 
-                    ? `Found ${totalCitations} publications linking this pathway to ${tracedSeedGenes.length} seed gene(s)`
-                    : 'No existing literature evidence found for this pathway-seed gene association. This may represent a novel discovery.'
+                    ? `Retrieved ${totalCitations} PubMed hits for this pathway-focused query across ${tracedSeedGenes.length} contributing seed gene(s)`
+                    : 'The automated PubMed query did not retrieve supporting hits. This is a query-level gap, not proof that the pathway is absent from the literature.'
                   }
                 </Typography>
               </Box>
               <Chip 
-                label={hasLiteratureSupport ? 'Reported' : 'Not Reported'}
+                label={hasLiteratureSupport ? 'Query Hits' : 'No Query Hits'}
                 color={hasLiteratureSupport ? 'success' : 'warning'}
                 sx={{ fontWeight: 600 }}
               />
@@ -199,7 +199,7 @@ export default function LiteratureEvidenceDisplay({
                 <Typography variant="body2">
                   <strong>Targeted Literature Mining:</strong> Citations below were found by searching for publications 
                   that discuss "{hypothesis?.aggregated_pathway?.pathway?.pathway_name}" in combination with these specific 
-                  contributing seed genes, providing more relevant evidence than generic pathway literature.
+                  contributing seed genes, providing a narrow automated co-mention screen rather than a comprehensive proof of prior reporting.
                 </Typography>
               </Alert>
             </CardContent>

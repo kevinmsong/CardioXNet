@@ -1582,10 +1582,14 @@ class SemanticFilter:
         disease_context: Optional[str] = None
     ) -> List[ScoredPathway]:
         """
-        Apply FINAL STRICT filter requiring pathway names to contain cardiac/disease terms.
+        Apply the final cardiac prioritization filter.
         
-        This is the last filtering stage to ensure all final pathways have explicit
-        cardiac/disease terminology in their names, guaranteeing disease-focused results.
+        Pathways are retained if they:
+        1. Explicitly contain cardiac or disease terms in the pathway name, or
+        2. Show strong semantic cardiac relevance plus replication/statistical support.
+        
+        This keeps the late-stage filter disease-focused without collapsing the
+        output into pathway-name bias alone.
         
         Args:
             hypotheses: List of scored hypotheses
@@ -1596,15 +1600,34 @@ class SemanticFilter:
         """
         filtered = []
         filtered_out = []
+        rescued_without_name_match = 0
         
         for hypothesis in hypotheses:
             if hasattr(hypothesis, 'aggregated_pathway'):
                 pathway_name = hypothesis.aggregated_pathway.pathway.pathway_name
+                support_count = hypothesis.aggregated_pathway.support_count
+                p_adj = hypothesis.aggregated_pathway.pathway.p_adj
+                evidence_count = hypothesis.aggregated_pathway.pathway.evidence_count
             else:
                 pathway_name = getattr(hypothesis, 'pathway_name', 'Unknown')
-            
-            if self.pathway_name_contains_cardiac_terms(pathway_name, disease_context):
+                support_count = getattr(hypothesis, 'support_count', 0)
+                p_adj = getattr(hypothesis, 'p_adj', 1.0)
+                evidence_count = getattr(hypothesis, 'evidence_count', 0)
+
+            score_components = getattr(hypothesis, "score_components", {}) or {}
+            cardiac_relevance = score_components.get("cardiac_relevance", 0.0)
+            name_match = self.pathway_name_contains_cardiac_terms(pathway_name, disease_context)
+            semantic_rescue = (
+                cardiac_relevance >= max(self.settings.nets.semantic_relevance_threshold * 1.5, 0.32)
+                and support_count >= max(self.settings.nets.min_support_threshold, 2)
+                and evidence_count >= 2
+                and p_adj <= self.settings.nets.fdr_threshold
+            )
+
+            if name_match or semantic_rescue:
                 filtered.append(hypothesis)
+                if semantic_rescue and not name_match:
+                    rescued_without_name_match += 1
             else:
                 filtered_out.append(pathway_name)
                 logger.debug(f"FINAL FILTER: Removed '{pathway_name}' - no cardiac terms in pathway name")
@@ -1614,7 +1637,8 @@ class SemanticFilter:
         
         logger.info(
             f"FINAL STRICT NAME FILTER: {len(filtered)}/{len(hypotheses)} pathways retained "
-            f"({retention_rate:.1f}%), {filtered_count} pathways removed"
+            f"({retention_rate:.1f}%), {filtered_count} pathways removed, "
+            f"{rescued_without_name_match} retained via semantic rescue"
         )
         
         if filtered_count > 0 and filtered_count <= 10:

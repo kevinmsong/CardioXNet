@@ -61,6 +61,11 @@ data/cache/
 *.log
 *.sqlite
 .pytest_cache/
+frontend/tests/artifacts/
+frontend/test-results/
+frontend/playwright-report/
+*.backup
+*.broken
 
 # Keep example outputs
 !outputs/.gitkeep

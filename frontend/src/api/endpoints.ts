@@ -1,4 +1,4 @@
-import apiClient from './client';
+import apiClient, { getApiPath, getWebSocketUrl } from './client';
 import type {
   ValidationResult,
   AnalysisRequest,
@@ -52,11 +52,15 @@ export const api = {
 
   // WebSocket connection
   connectWebSocket: (analysisId: string): WebSocket => {
-    const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
-    const host = import.meta.env.VITE_WS_URL || `${window.location.hostname}:8000`;
-    const wsUrl = `${protocol}://${host}/api/v1/analysis/${analysisId}/progress`;
-    return new WebSocket(wsUrl);
+    return new WebSocket(getWebSocketUrl(`/api/v1/analysis/${analysisId}/progress`));
   },
+
+  getReportDownloadUrl: (
+    analysisId: string,
+    format: 'pdf' | 'json' | 'html' | 'markdown' = 'pdf'
+  ): string => getApiPath(`/api/v1/analysis/${analysisId}/report/${format}`),
+
+  getHealthUrl: (): string => getApiPath('/api/v1/health'),
 };
 
 export default api;

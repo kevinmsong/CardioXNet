@@ -376,12 +376,32 @@ class ReportGenerator:
             return "No significant pathway hypotheses were identified."
         
         top_hypothesis = scored_hypotheses.hypotheses[0]
+        supported_hypotheses = sum(
+            1
+            for hypothesis in scored_hypotheses.hypotheses
+            if hypothesis.literature_associations
+            and hypothesis.literature_associations.get("has_literature_support", False)
+        )
+
+        total_hypotheses = scored_hypotheses.total_count
+        top_name = top_hypothesis.aggregated_pathway.pathway.pathway_name
+        top_nes = top_hypothesis.nes_score
+
+        if supported_hypotheses > 0:
+            return (
+                f"Analysis prioritized {total_hypotheses} cardiac-relevant pathway hypotheses. "
+                f"The top-ranked pathway is '{top_name}' (NES: {top_nes:.2f}). "
+                f"Automated PubMed co-mention searches found direct support for "
+                f"{supported_hypotheses} of {total_hypotheses} final pathways. "
+                f"These results should be treated as candidate associations pending expert review."
+            )
         
         return (
-            f"Analysis identified {scored_hypotheses.total_count} novel pathway hypotheses. "
-            f"The top-ranked hypothesis is '{top_hypothesis.aggregated_pathway.pathway.pathway_name}' "
-            f"(NES: {top_hypothesis.nes_score:.2f}), which shows strong evidence for involvement in "
-            f"cardiovascular disease and phenotype processes based on functional network analysis and literature mining."
+            f"Analysis prioritized {total_hypotheses} cardiac-relevant pathway hypotheses. "
+            f"The top-ranked pathway is '{top_name}' (NES: {top_nes:.2f}). "
+            f"Automated PubMed co-mention searches did not retrieve direct support for the final ranked pathways; "
+            f"that should be interpreted as an unresolved literature gap in this query strategy, not proof of novelty "
+            f"or absence from the literature."
         )
     
     def _generate_markdown(self, analysis_id: str, report_data: Dict) -> str:

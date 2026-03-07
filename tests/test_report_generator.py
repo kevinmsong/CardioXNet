@@ -104,3 +104,76 @@ def test_generate_report_keeps_json_when_pdf_unavailable(tmp_path, monkeypatch):
     assert "json" in output_files
     assert "pdf" not in output_files
     assert Path(output_files["json"]).exists()
+
+
+def test_build_conclusion_avoids_claiming_novelty_without_literature_support():
+    generator = ReportGenerator()
+    pathway = PathwayEntry(
+        pathway_id="KEGG:05415",
+        pathway_name="Diabetic cardiomyopathy",
+        source_db="KEGG",
+        p_value=1e-6,
+        p_adj=1e-5,
+        evidence_count=5,
+        evidence_genes=["PIK3R1"],
+    )
+    aggregated = AggregatedPathway(
+        pathway=pathway,
+        support_count=2,
+        source_primary_pathways=["primary-1", "primary-2"],
+        aggregation_score=1.0,
+    )
+    scored = ScoredPathway(
+        aggregated_pathway=aggregated,
+        nes_score=3.2,
+        rank=1,
+        traced_seed_genes=["PIK3R1"],
+        literature_associations={
+            "has_literature_support": False,
+            "total_citations": 0,
+            "associations": [],
+        },
+    )
+
+    conclusion = generator._build_conclusion(
+        ScoredHypotheses(hypotheses=[scored], total_count=1)
+    )
+
+    assert "novel pathway hypotheses" not in conclusion
+    assert "not proof of novelty" in conclusion
+
+
+def test_build_conclusion_reports_supported_final_pathways():
+    generator = ReportGenerator()
+    pathway = PathwayEntry(
+        pathway_id="KEGG:04151",
+        pathway_name="PI3K-Akt signaling pathway",
+        source_db="KEGG",
+        p_value=1e-8,
+        p_adj=1e-7,
+        evidence_count=8,
+        evidence_genes=["PIK3R1", "AKT1"],
+    )
+    aggregated = AggregatedPathway(
+        pathway=pathway,
+        support_count=3,
+        source_primary_pathways=["primary-1", "primary-2", "primary-3"],
+        aggregation_score=1.0,
+    )
+    scored = ScoredPathway(
+        aggregated_pathway=aggregated,
+        nes_score=3.8,
+        rank=1,
+        traced_seed_genes=["PIK3R1"],
+        literature_associations={
+            "has_literature_support": True,
+            "total_citations": 4,
+            "associations": [{"seed_gene": "PIK3R1", "citation_count": 4, "has_support": True}],
+        },
+    )
+
+    conclusion = generator._build_conclusion(
+        ScoredHypotheses(hypotheses=[scored], total_count=1)
+    )
+
+    assert "direct support for 1 of 1 final pathways" in conclusion

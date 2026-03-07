@@ -19,7 +19,6 @@ const queryClient = new QueryClient({
   },
 });
 
-// UAB Green branded theme with professional scientific look
 const theme = createTheme({
   palette: {
     mode: 'light',
@@ -36,8 +35,8 @@ const theme = createTheme({
       contrastText: '#000000',
     },
     background: {
-      default: '#FFFFFF', // Pure white background
-      paper: '#FAFAFA', // Subtle off-white for cards
+      default: '#F4F8F6',
+      paper: '#FFFFFF',
     },
     text: {
       primary: '#1A1A1A',
@@ -63,7 +62,7 @@ const theme = createTheme({
     },
   },
   typography: {
-    fontFamily: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif',
+    fontFamily: '"IBM Plex Sans", "Segoe UI", sans-serif',
     h1: {
       fontSize: '2.25rem',
       fontWeight: 600,
@@ -123,7 +122,7 @@ const theme = createTheme({
     },
   },
   shape: {
-    borderRadius: 7, // Slightly rounded for modern look
+    borderRadius: 10,
   },
   shadows: [
     'none',
@@ -156,7 +155,7 @@ const theme = createTheme({
     MuiCssBaseline: {
       styleOverrides: {
         body: {
-          backgroundColor: '#FFFFFF',
+          backgroundColor: '#F4F8F6',
           scrollbarColor: '#BDBDBD #F5F5F5',
           '&::-webkit-scrollbar, & *::-webkit-scrollbar': {
             width: 8,
@@ -210,7 +209,6 @@ const theme = createTheme({
 function App() {
   // Clear any previous analysis data on app startup
   useEffect(() => {
-    console.log('[APP] Clearing previous analysis data on startup');
     localStorage.removeItem('currentAnalysisId');
     localStorage.removeItem('analysisResults');
     sessionStorage.removeItem('currentAnalysisId');

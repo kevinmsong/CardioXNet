@@ -35,8 +35,9 @@ nets:
   string_neighbor_count: 100          # Broad network expansion for discovery
   string_score_threshold: 0.60        # Moderate confidence threshold for interactions
   fdr_threshold: 0.05                 # FDR threshold set to 0.05
-  top_hypotheses_count: 20            # Top 20 hypotheses for faster testing
-  semantic_max_hypotheses_for_literature: 20  # Mine literature for top 20 pathways for speed
+  top_hypotheses_count: 20            # Top 20 final hypotheses for detailed validation
+  primary_pathways_to_expand: 30      # Broader funnel from strong primaries into secondary discovery
+  semantic_max_hypotheses_for_literature: 15  # Mine literature for final candidate pathways
   n_permutations: 25                  # Permutations for statistical testing
   
   # Database Weights
@@ -57,7 +58,7 @@ nets:
   
   # Aggregation Configuration
   aggregation_strategy: "frequency"     # Options: intersection, frequency, weighted
-  min_support_threshold: 1            # Minimum pathway support count required
+  min_support_threshold: 2            # Require replication across at least two primaries by default
   
   # Literature Mining for cardiovascular disease focus
   pubmed_max_results: 30              # Maximum literature context for comprehensive evidence

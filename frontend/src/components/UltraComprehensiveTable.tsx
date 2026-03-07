@@ -58,7 +58,7 @@ const columnTooltips: Record<string, string> = {
   cardiac_relevance: 'Cardiac-specific relevance score (0-100%) based on: cardiovascular keywords, literature support, evidence genes, and NES score.',
   clinical_significance: 'Clinical impact score (0-100%) combining: statistical significance (p-value), effect size (NES), and literature validation.',
   evidence_count: 'Number of genes from the functional neighborhood (seed + neighbors) that overlap with this pathway.',
-  literature_support: 'Number of PubMed citations reported in literature linking seed genes to pathway-related concepts. Higher counts indicate well-studied pathway-gene associations with published evidence.',
+  literature_support: 'Number of PubMed hits retrieved for the automated pathway-focused literature query. Higher counts indicate stronger query-level support; zero does not prove the pathway is unreported.',
   tissue_specificity: 'GTEx cardiac tissue specificity score (0-100%): Ratio of cardiac vs. non-cardiac tissue expression for pathway genes. Higher = more cardiac-specific.',
   pathway_complexity: 'Pathway size and complexity score (0-100%) based on number of evidence genes and seed gene contributors.',
   cardiac_disease_score: 'Cardiac disease association score (0-1) based on curated database of cardiovascular disease genes. Weighted average of top cardiac genes in pathway.',
@@ -71,7 +71,7 @@ const headCells = [
   { id: 'nes_score' as OrderBy, label: 'NES Score', align: 'center' as const, width: 110, tooltip: columnTooltips.nes_score },
   { id: 'clinical_significance' as OrderBy, label: 'Clinical Impact', align: 'center' as const, width: 110, tooltip: columnTooltips.clinical_significance },
   { id: 'evidence_count' as OrderBy, label: 'Evidence Genes', align: 'center' as const, width: 100, tooltip: columnTooltips.evidence_count },
-  { id: 'literature_support' as OrderBy, label: 'Literature Reported', align: 'center' as const, width: 120, tooltip: columnTooltips.literature_support },
+  { id: 'literature_support' as OrderBy, label: 'PubMed Query Hits', align: 'center' as const, width: 120, tooltip: columnTooltips.literature_support },
   { id: 'tissue_specificity' as OrderBy, label: 'GTEx Cardiac Specificity', align: 'center' as const, width: 140, tooltip: columnTooltips.tissue_specificity },
   { id: 'actions' as const, label: 'Details', align: 'center' as const, width: 70, tooltip: 'View comprehensive pathway details, gene lists, and evidence' },
 ];

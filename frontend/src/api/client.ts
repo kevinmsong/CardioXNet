@@ -1,6 +1,34 @@
 import axios from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+const getBrowserHostname = () => {
+  if (typeof window === 'undefined') {
+    return '127.0.0.1';
+  }
+
+  return window.location.hostname || '127.0.0.1';
+};
+
+export const getApiBaseUrl = () =>
+  import.meta.env.VITE_API_URL || `http://${getBrowserHostname()}:8000`;
+
+export const getApiPath = (path: string) => `${getApiBaseUrl()}${path}`;
+
+export const getWebSocketUrl = (path: string) => {
+  if (import.meta.env.VITE_WS_URL) {
+    const explicit = import.meta.env.VITE_WS_URL;
+    if (explicit.startsWith('ws://') || explicit.startsWith('wss://')) {
+      return `${explicit}${path}`;
+    }
+
+    const protocol = typeof window !== 'undefined' && window.location.protocol === 'https:' ? 'wss' : 'ws';
+    return `${protocol}://${explicit}${path}`;
+  }
+
+  const protocol = typeof window !== 'undefined' && window.location.protocol === 'https:' ? 'wss' : 'ws';
+  return `${protocol}://${getBrowserHostname()}:8000${path}`;
+};
+
+const API_BASE_URL = getApiBaseUrl();
 
 export const apiClient = axios.create({
   baseURL: API_BASE_URL,

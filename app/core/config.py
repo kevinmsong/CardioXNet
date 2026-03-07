@@ -64,6 +64,12 @@ class NETSConfig(BaseSettings):
         le=100,
         description="Number of top hypotheses to validate (20 for comprehensive coverage, validated range: 5-100)"
     )
+    primary_pathways_to_expand: int = Field(
+        default=30,
+        ge=10,
+        le=100,
+        description="Number of primary pathways to expand into the secondary funnel before final filtering"
+    )
     
     # Database Weights (Comprehensive pathway coverage)
     db_weight_reactome: float = Field(default=2.0, description="Reactome database weight (highest quality)")
@@ -102,10 +108,10 @@ class NETSConfig(BaseSettings):
         description="Pathway aggregation strategy: intersection, frequency, or weighted (weighted for comprehensive discovery)"
     )
     min_support_threshold: int = Field(
-        default=1,  # Inclusive for comprehensive pathway coverage
+        default=2,
         ge=1,
         le=10,
-        description="Minimum support count for pathway replication (1 for comprehensive coverage, validated range: 1-10)"
+        description="Minimum support count for pathway replication in final prioritization"
     )
     
     # Literature Mining Configuration (Comprehensive cardiovascular disease focus)
@@ -139,7 +145,7 @@ class NETSConfig(BaseSettings):
     )
 
     semantic_max_hypotheses_for_literature: int = Field(
-        default=20,
+        default=15,
         ge=1,
         le=200,
         description="Maximum hypotheses to validate during literature mining"
@@ -209,7 +215,7 @@ class NETSConfig(BaseSettings):
     )
     enforce_final_name_filter: bool = Field(
         default=True,
-        description="Require final pathway names to contain explicit cardiac terminology"
+        description="Apply a final cardiac prioritization filter with pathway-name matches and semantic rescue"
     )
     
     # Druggability Analysis Configuration

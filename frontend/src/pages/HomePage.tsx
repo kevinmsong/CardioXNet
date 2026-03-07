@@ -32,13 +32,13 @@ export default function HomePage() {
     <Box>
       {/* Professional Hero Section */}
       <Paper
-        elevation={4}
+        elevation={0}
         sx={{
           mb: 4,
           p: { xs: 3, md: 5 },
-          background: 'linear-gradient(135deg, #1E6B52 0%, #145A43 100%)',
+          background: 'linear-gradient(180deg, #FFFFFF 0%, #F3FAF7 100%)',
+          border: '1px solid #D8E8E2',
           borderRadius: 3,
-          boxShadow: '0 12px 48px rgba(30, 107, 82, 0.2)',
           position: 'relative',
           overflow: 'hidden',
         }}
@@ -48,7 +48,7 @@ export default function HomePage() {
             variant="h2"
             sx={{
               fontWeight: 800,
-              color: '#FFFFFF',
+              color: '#153F32',
               mb: 0.5,
               fontSize: { xs: '2rem', md: '2.8rem' },
               letterSpacing: '-0.5px',
@@ -59,31 +59,41 @@ export default function HomePage() {
           <Typography
             variant="h6"
             sx={{
-              color: '#FFB81C',
+              color: '#1F5A46',
               fontWeight: 600,
               mb: 2.5,
               fontSize: { xs: '0.95rem', md: '1.1rem' },
               letterSpacing: '0.5px',
             }}
           >
-            AI-Powered Cardiovascular Pathway Discovery Platform
+            Seed Genes to Prioritized Cardiac Pathways
           </Typography>
 
           <Stack spacing={1.2} sx={{ mb: 2.5 }}>
             <Typography
               variant="body1"
               sx={{
-                color: 'rgba(255,255,255,0.95)',
+                color: '#35594C',
                 lineHeight: 1.7,
                 fontSize: '0.95rem',
               }}
             >
-              Discover novel cardiovascular disease pathways through the NETS (Neighborhood Enrichment Triage and Scoring) algorithm. 
-              Integrates multiple pathway databases, literature validation, and tissue expression analysis for comprehensive cardiac pathway discovery.
+              CardioXNet expands outward from a seed gene list, keeps a broader primary funnel, and
+              then filters down to pathways supported by replication, semantic cardiac relevance,
+              and literature review.
+            </Typography>
+            <Typography
+              variant="body1"
+              sx={{
+                color: '#35594C',
+                lineHeight: 1.7,
+                fontSize: '0.95rem',
+              }}
+            >
+              The configuration has been reduced to a few presets so you can choose focused,
+              balanced, or exploratory discovery behavior without tuning raw backend knobs.
             </Typography>
           </Stack>
-
-
         </Box>
       </Paper>
 
@@ -146,7 +156,7 @@ export default function HomePage() {
                 Analysis Configuration
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                Customize pipeline parameters for optimal results
+                Use presets instead of raw algorithm knobs
               </Typography>
             </Box>
             <ConfigurationPanel
