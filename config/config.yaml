@@ -40,6 +40,8 @@ nets:
   semantic_max_hypotheses_for_literature: 15  # Mine literature for final candidate pathways
   secondary_literature_expansion_top_n: 8     # Only top primaries get PubMed-based expansion in Stage 4
   n_permutations: 25                  # Permutations for statistical testing
+  adaptive_permutation_enabled: true  # Early-stop degree-preserving permutations in Stage 8
+  permutation_top_pathways: 12        # Only the top validated pathways run permutation tests
   
   # Database Weights
   db_weight_reactome: 1.5

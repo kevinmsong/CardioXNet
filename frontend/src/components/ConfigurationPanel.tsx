@@ -40,6 +40,9 @@ const FALLBACK_DEFAULTS = {
   pubmed_max_results: 25,
   permutation_test_enabled: true,
   n_permutations: 50,
+  external_druggability_enabled: true,
+  external_druggability_top_pathways: 8,
+  permutation_top_pathways: 12,
   seed_overlap_threshold: 0.45,
 };
 
@@ -55,6 +58,9 @@ const OVERRIDABLE_KEYS = [
   'pubmed_max_results',
   'permutation_test_enabled',
   'n_permutations',
+  'external_druggability_enabled',
+  'external_druggability_top_pathways',
+  'permutation_top_pathways',
   'seed_overlap_threshold',
 ] as const;
 
@@ -99,16 +105,22 @@ export default function ConfigurationPanel({ onConfigChange }: ConfigurationPane
 
     const evidenceOverrides: Record<EvidenceDepth, Record<string, any>> = {
       fast: {
-        semantic_max_hypotheses_for_literature: 8,
-        pubmed_max_results: 12,
+        top_hypotheses_count: 10,
+        semantic_max_hypotheses_for_literature: 6,
+        pubmed_max_results: 10,
         permutation_test_enabled: false,
-        n_permutations: 50,
+        n_permutations: 25,
+        permutation_top_pathways: 0,
+        external_druggability_enabled: false,
+        external_druggability_top_pathways: 0,
       },
       standard: {
+        top_hypotheses_count: 16,
         permutation_test_enabled: true,
         n_permutations: 50,
       },
       deep: {
+        top_hypotheses_count: 20,
         semantic_max_hypotheses_for_literature: 30,
         pubmed_max_results: 40,
         permutation_test_enabled: true,
@@ -120,7 +132,6 @@ export default function ConfigurationPanel({ onConfigChange }: ConfigurationPane
       ...defaults,
       ...profileOverrides[analysisProfile],
       ...evidenceOverrides[evidenceDepth],
-      top_hypotheses_count: 20,
       seed_overlap_threshold: strictNovelty ? 0.35 : defaults.seed_overlap_threshold,
     };
   }, [analysisProfile, defaults, evidenceDepth, strictNovelty]);
@@ -236,6 +247,14 @@ export default function ConfigurationPanel({ onConfigChange }: ConfigurationPane
                 overrideConfig.permutation_test_enabled
                   ? `${overrideConfig.n_permutations} permutations`
                   : 'No permutations'
+              }
+              variant="outlined"
+            />
+            <Chip
+              label={
+                overrideConfig.external_druggability_enabled
+                  ? 'Live target evidence on'
+                  : 'Curated target review only'
               }
               variant="outlined"
             />

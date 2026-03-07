@@ -209,6 +209,16 @@ class NETSConfig(BaseSettings):
         le=1000,
         description="Number of permutations for empirical p-value (100 for robust validation, validated range: 25-1000)"
     )
+    adaptive_permutation_enabled: bool = Field(
+        default=True,
+        description="Use adaptive early-stopping degree-preserving permutations during Stage 8 validation"
+    )
+    permutation_top_pathways: int = Field(
+        default=12,
+        ge=1,
+        le=100,
+        description="Only the top N validated pathways run degree-preserving permutation testing; lower-ranked pathways skip this step for speed"
+    )
 
     enable_redundancy_detection: bool = Field(
         default=True,

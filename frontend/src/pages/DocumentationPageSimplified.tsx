@@ -147,7 +147,7 @@ export default function DocumentationPageSimplified() {
           <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
             <Chip label="Seed-gene driven" variant="outlined" />
             <Chip label="Funnel and filter workflow" variant="outlined" />
-            <Chip label="Stage 8 validation" variant="outlined" />
+            <Chip label="Multi-layer validation" variant="outlined" />
             <Chip label="Hypothesis prioritization, not proof of novelty" variant="outlined" />
           </Stack>
         </Stack>
@@ -298,7 +298,7 @@ export default function DocumentationPageSimplified() {
                       Primary and secondary enrichment expand beyond direct seed overlap.
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
-                      Stage 8 adds tissue, permutation, and therapeutic evidence.
+                      Validation layers add tissue, permutation, and therapeutic evidence.
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
                       Literature review remains necessary before making strong novelty claims.

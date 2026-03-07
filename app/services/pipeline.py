@@ -919,6 +919,10 @@ class Pipeline:
                 len(top_hypotheses),
                 max(1, getattr(self.settings.nets, "external_druggability_top_pathways", 8))
             ) if top_hypotheses else 0
+            permutation_top_n = min(
+                len(top_hypotheses),
+                max(1, getattr(self.settings.nets, "permutation_top_pathways", len(top_hypotheses)))
+            ) if top_hypotheses else 0
             logger.info(f"Stage 3c: running enhanced validation with up to {validation_workers} workers")
 
             async def _validate_hypothesis(i: int, hypothesis) -> Dict[str, int]:
@@ -929,6 +933,13 @@ class Pipeline:
                 tissue_failed = 0
                 high_druggability_hit = 0
                 use_live_lookup = i < live_target_top_n
+                use_permutation = (
+                    i < permutation_top_n
+                    and all_genes
+                    and fn_genes
+                    and gene_degrees
+                    and self.settings.nets.permutation_test_enabled
+                )
 
                 async_tasks = {
                     "tissue": asyncio.create_task(
@@ -942,17 +953,31 @@ class Pipeline:
                         )
                     ),
                 }
-                if all_genes and fn_genes and gene_degrees and self.settings.nets.permutation_test_enabled:
-                    async_tasks["permutation"] = asyncio.create_task(
-                        asyncio.to_thread(
-                            self.permutation_tester.calculate_degree_preserving_pvalue,
-                            pathway_genes,
-                            fn_genes,
-                            gene_degrees,
-                            all_genes,
-                            self.settings.nets.n_permutations
+                if use_permutation:
+                    min_perm = max(5, min(10, max(1, self.settings.nets.n_permutations // 2)))
+                    if getattr(self.settings.nets, "adaptive_permutation_enabled", True):
+                        async_tasks["permutation"] = asyncio.create_task(
+                            asyncio.to_thread(
+                                self.permutation_tester.calculate_degree_preserving_pvalue_adaptive,
+                                pathway_genes,
+                                fn_genes,
+                                gene_degrees,
+                                all_genes,
+                                min_perm,
+                                self.settings.nets.n_permutations
+                            )
                         )
-                    )
+                    else:
+                        async_tasks["permutation"] = asyncio.create_task(
+                            asyncio.to_thread(
+                                self.permutation_tester.calculate_degree_preserving_pvalue,
+                                pathway_genes,
+                                fn_genes,
+                                gene_degrees,
+                                all_genes,
+                                self.settings.nets.n_permutations
+                            )
+                        )
 
                 task_results = dict(
                     zip(
@@ -991,6 +1016,7 @@ class Pipeline:
                 else:
                     hypothesis.score_components['empirical_pvalue'] = None
                     hypothesis.score_components['permutation_z_score'] = None
+                    hypothesis.score_components['permutation_skipped'] = not use_permutation
 
                 druggability_result = task_results.get("druggability")
                 if isinstance(druggability_result, Exception):
@@ -1048,7 +1074,9 @@ class Pipeline:
                 },
                 "permutation_testing": {
                     "applied": bool(all_genes and fn_genes and self.settings.nets.permutation_test_enabled),
-                    "n_permutations": self.settings.nets.n_permutations
+                    "n_permutations": self.settings.nets.n_permutations,
+                    "top_pathways_tested": permutation_top_n,
+                    "adaptive": bool(getattr(self.settings.nets, "adaptive_permutation_enabled", True))
                 },
                 "druggability": {
                     "high_tier_count": high_druggability,

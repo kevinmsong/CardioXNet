@@ -5,6 +5,7 @@ import random
 from typing import List, Dict, Set, Tuple, Any, Optional
 import numpy as np
 from collections import Counter
+import threading
 
 from app.core.config import get_settings
 
@@ -35,6 +36,8 @@ class PermutationTester:
         self.n_permutations = self.settings.nets.n_permutations if hasattr(
             self.settings.nets, 'n_permutations'
         ) else 50
+        self._cache: Dict[Tuple[Any, ...], Tuple[float, Dict]] = {}
+        self._cache_lock = threading.Lock()
         
         logger.info(f"PermutationTester initialized with {self.n_permutations} permutations")
     
@@ -301,6 +304,112 @@ class PermutationTester:
         }
         
         return empirical_p, statistics
+
+    def calculate_degree_preserving_pvalue_adaptive(
+        self,
+        pathway_genes: List[str],
+        fn_genes: List[str],
+        gene_degrees: Dict[str, int],
+        all_genes: List[str],
+        min_permutations: int = 10,
+        max_permutations: Optional[int] = None
+    ) -> Tuple[float, Dict]:
+        """
+        Calculate degree-preserving empirical p-value with early stopping.
+
+        The degree-preserving null is retained, but borderline pathways receive the
+        full permutation budget while clearly significant or clearly null pathways stop early.
+        """
+        if max_permutations is None:
+            max_permutations = self.n_permutations
+
+        pathway_key = tuple(sorted(set(pathway_genes)))
+        fn_key = tuple(sorted(set(fn_genes)))
+        degree_key = tuple(sorted((gene, gene_degrees.get(gene, 0)) for gene in all_genes))
+        cache_key = (
+            pathway_key,
+            fn_key,
+            degree_key,
+            min_permutations,
+            max_permutations,
+            "adaptive_degree",
+        )
+        with self._cache_lock:
+            cached = self._cache.get(cache_key)
+        if cached is not None:
+            return cached
+
+        pathway_set = set(pathway_genes)
+        fn_set = set(fn_genes)
+
+        observed_overlap = len(pathway_set & fn_set)
+        if observed_overlap == 0:
+            result = (
+                1.0,
+                {
+                    'observed_overlap': 0,
+                    'mean_null_overlap': 0,
+                    'std_null_overlap': 0,
+                    'null_overlaps': [],
+                    'n_permutations': min_permutations,
+                    'early_stop': True,
+                    'stop_reason': 'no_overlap',
+                    'degree_preserved': True,
+                },
+            )
+            with self._cache_lock:
+                self._cache[cache_key] = result
+            return result
+
+        degree_bins = self._bin_genes_by_degree(gene_degrees, all_genes)
+        min_permutations = max(5, min(min_permutations, max_permutations))
+        null_overlaps = []
+
+        for _ in range(min_permutations):
+            permuted_fn = self._sample_preserving_degree(fn_genes, degree_bins, gene_degrees)
+            null_overlaps.append(len(pathway_set & permuted_fn))
+
+        n_greater_equal = sum(1 for null in null_overlaps if null >= observed_overlap)
+        prelim_p = (n_greater_equal + 1) / (min_permutations + 1)
+        early_stop = False
+        stop_reason = None
+
+        if prelim_p <= 0.01:
+            early_stop = True
+            stop_reason = 'highly_significant'
+        elif prelim_p >= 0.2:
+            early_stop = True
+            stop_reason = 'not_significant'
+        else:
+            for _ in range(max_permutations - min_permutations):
+                permuted_fn = self._sample_preserving_degree(fn_genes, degree_bins, gene_degrees)
+                null_overlaps.append(len(pathway_set & permuted_fn))
+
+        n_permutations = len(null_overlaps)
+        n_greater_equal = sum(1 for null in null_overlaps if null >= observed_overlap)
+        empirical_p = (n_greater_equal + 1) / (n_permutations + 1)
+        mean_null = np.mean(null_overlaps)
+        std_null = np.std(null_overlaps)
+
+        result = (
+            empirical_p,
+            {
+                'observed_overlap': observed_overlap,
+                'mean_null_overlap': mean_null,
+                'std_null_overlap': std_null,
+                'null_overlaps': null_overlaps,
+                'n_permutations': n_permutations,
+                'z_score': (observed_overlap - mean_null) / std_null if std_null > 0 else 0,
+                'early_stop': early_stop,
+                'stop_reason': stop_reason,
+                'min_permutations': min_permutations,
+                'max_permutations': max_permutations,
+                'degree_preserved': True,
+            },
+        )
+        with self._cache_lock:
+            self._cache[cache_key] = result
+        return result
     
     def _bin_genes_by_degree(
         self,
