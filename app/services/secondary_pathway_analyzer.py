@@ -4,6 +4,7 @@ import logging
 import math
 from typing import List, Set, Dict, Tuple, Optional
 from collections import defaultdict
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 from app.models import (
     GeneInfo,
@@ -92,44 +93,71 @@ class SecondaryPathwayAnalyzer:
         logger.info(f"[STAGE 2B] Processing {len(primary_pathways)} primary pathways:")
         for i, p in enumerate(primary_pathways, 1):
             logger.info(f"[STAGE 2B]   {i}. {p.pathway_name} - {len(p.evidence_genes)} member genes")
+
+        literature_expansion_top_n = min(
+            len(primary_pathways),
+            max(
+                0,
+                getattr(self.settings.nets, "secondary_literature_expansion_top_n", 8)
+            )
+        )
+        max_workers = min(
+            max(len(primary_pathways), 1),
+            max(1, getattr(self.settings, "max_workers_literature", 4))
+        )
+        logger.info(
+            f"[STAGE 2B] Literature expansion enabled for top {literature_expansion_top_n} primaries; "
+            f"running with up to {max_workers} workers"
+        )
         
         # Process each primary pathway separately
         all_secondary_pathways = []
         pathway_to_primaries = {}  # Track which primaries support each secondary
-        
-        for i, primary_pathway in enumerate(primary_pathways, 1):
+
+        def process_ranked_primary(index: int, primary_pathway: ScoredPathwayEntry):
+            use_literature_expansion = index < literature_expansion_top_n
             logger.info(
-                f"[STAGE 2B] Processing primary {i}/{len(primary_pathways)}: "
-                f"{primary_pathway.pathway_name}"
+                f"[STAGE 2B] Processing primary {index + 1}/{len(primary_pathways)}: "
+                f"{primary_pathway.pathway_name} "
+                f"(literature_expansion={'on' if use_literature_expansion else 'off'})"
             )
-            
-            try:
-                # Process this primary pathway
-                secondary_pathways = self._process_primary_pathway(
-                    primary_pathway,
-                    known_pathway_ids
-                )
-                
-                all_secondary_pathways.extend(secondary_pathways)
-                
-                # Track which primaries support each secondary pathway
-                for sec_pathway in secondary_pathways:
-                    pathway_id = sec_pathway.pathway_id
-                    if pathway_id not in pathway_to_primaries:
-                        pathway_to_primaries[pathway_id] = []
-                    pathway_to_primaries[pathway_id].append(primary_pathway.pathway_id)
-                
-                logger.info(
-                    f"[STAGE 2B] Primary {i} produced {len(secondary_pathways)} "
-                    f"secondary pathways"
-                )
-                
-            except Exception as e:
-                logger.warning(
-                    f"[STAGE 2B] Failed to process primary pathway "
-                    f"{primary_pathway.pathway_name}: {str(e)}"
-                )
-                continue
+            secondary_pathways = self._process_primary_pathway(
+                primary_pathway,
+                known_pathway_ids,
+                allow_literature_expansion=use_literature_expansion
+            )
+            return index, primary_pathway, secondary_pathways
+
+        with ThreadPoolExecutor(max_workers=max_workers) as executor:
+            future_to_primary = {
+                executor.submit(process_ranked_primary, i, primary_pathway): (i, primary_pathway)
+                for i, primary_pathway in enumerate(primary_pathways)
+            }
+
+            for future in as_completed(future_to_primary):
+                i, primary_pathway = future_to_primary[future]
+
+                try:
+                    _, completed_primary, secondary_pathways = future.result()
+                    all_secondary_pathways.extend(secondary_pathways)
+
+                    for sec_pathway in secondary_pathways:
+                        pathway_id = sec_pathway.pathway_id
+                        if pathway_id not in pathway_to_primaries:
+                            pathway_to_primaries[pathway_id] = []
+                        pathway_to_primaries[pathway_id].append(completed_primary.pathway_id)
+
+                    logger.info(
+                        f"[STAGE 2B] Primary {i + 1} produced {len(secondary_pathways)} "
+                        f"secondary pathways"
+                    )
+
+                except Exception as e:
+                    logger.warning(
+                        f"[STAGE 2B] Failed to process primary pathway "
+                        f"{primary_pathway.pathway_name}: {str(e)}"
+                    )
+                    continue
         
         # Aggregate pathways and calculate support metrics
         logger.info(f"[STAGE 2B] Aggregating {len(all_secondary_pathways)} total secondary pathways")
@@ -169,7 +197,8 @@ class SecondaryPathwayAnalyzer:
     def _process_primary_pathway(
         self,
         primary_pathway: ScoredPathwayEntry,
-        known_pathway_ids: Set[str]
+        known_pathway_ids: Set[str],
+        allow_literature_expansion: bool = True
     ) -> List[ScoredPathwayEntry]:
         """
         Process a single primary pathway to discover secondary pathways.
@@ -188,8 +217,15 @@ class SecondaryPathwayAnalyzer:
             f"Primary pathway '{primary_pathway.pathway_name}' has {len(member_genes)} member genes"
         )
         
-        # Step 1.5: Check if pathway is too generic (skip literature mining for generic pathways)
-        if getattr(self.settings.nets, 'filter_generic_pathways', True):
+        # Step 1.5: Check if literature expansion should run for this primary
+        if not allow_literature_expansion:
+            logger.debug(
+                f"Skipping literature expansion for lower-ranked primary pathway "
+                f"'{primary_pathway.pathway_name}' to keep Stage 2b responsive"
+            )
+            expanded_genes = []
+        # Step 1.6: Check if pathway is too generic (skip literature mining for generic pathways)
+        elif getattr(self.settings.nets, 'filter_generic_pathways', True):
             pathway_desc = getattr(primary_pathway, 'pathway_description', '')
             if self.semantic_filter.is_generic_pathway(
                 primary_pathway.pathway_name,

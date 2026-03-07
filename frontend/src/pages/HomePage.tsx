@@ -78,20 +78,10 @@ export default function HomePage() {
                 fontSize: '0.95rem',
               }}
             >
-              CardioXNet expands outward from a seed gene list, keeps a broader primary funnel, and
-              then filters down to pathways supported by replication, semantic cardiac relevance,
-              and literature review.
-            </Typography>
-            <Typography
-              variant="body1"
-              sx={{
-                color: '#35594C',
-                lineHeight: 1.7,
-                fontSize: '0.95rem',
-              }}
-            >
-              The configuration has been reduced to a few presets so you can choose focused,
-              balanced, or exploratory discovery behavior without tuning raw backend knobs.
+              CardioXNet expands from a seed gene list through network and pathway
+              enrichment, keeps a broader primary funnel for discovery, and then filters down to
+              pathways supported by replication across signals, semantic cardiac relevance, and
+              literature review.
             </Typography>
           </Stack>
         </Box>
@@ -156,7 +146,7 @@ export default function HomePage() {
                 Analysis Configuration
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                Use presets instead of raw algorithm knobs
+                Configure the discovery workflow
               </Typography>
             </Box>
             <ConfigurationPanel

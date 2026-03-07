@@ -155,9 +155,6 @@ export default function ConfigurationPanel({ onConfigChange }: ConfigurationPane
                 <Typography variant="h6" sx={{ fontWeight: 700 }}>
                   Analysis Presets
                 </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  Use a few operating modes instead of tuning every internal threshold.
-                </Typography>
               </Box>
             </Stack>
           </Stack>

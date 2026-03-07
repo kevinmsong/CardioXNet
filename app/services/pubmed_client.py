@@ -284,17 +284,13 @@ class PubMedClient:
         
         logger.debug(f"PubMed query: {query}")
         
-        # Search PubMed
-        pmids = self._search_pubmed(query, max_results)
-        
-        if not pmids:
+        papers = self.search(query, max_results)
+
+        if not papers:
             logger.info(f"No results found for gene '{gene_symbol}'")
             return []
         
-        logger.info(f"Found {len(pmids)} papers for gene '{gene_symbol}'")
-        
-        # Fetch paper details
-        papers = self._fetch_papers(pmids)
+        logger.info(f"Found {len(papers)} papers for gene '{gene_symbol}'")
         
         return papers
     
@@ -563,14 +559,11 @@ class PubMedClient:
         
         logger.debug(f"PubMed query: {query}")
         
-        # Search and fetch
-        pmids = self._search_pubmed(query, max_results)
-        
-        if not pmids:
+        papers = self.search(query, max_results)
+
+        if not papers:
             logger.info(f"No results found for pathway '{pathway_name}'")
             return []
-        
-        papers = self._fetch_papers(pmids)
         
         logger.info(f"Found {len(papers)} papers for pathway '{pathway_name}'")
         

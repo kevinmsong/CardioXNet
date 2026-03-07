@@ -151,6 +151,13 @@ class NETSConfig(BaseSettings):
         description="Maximum hypotheses to validate during literature mining"
     )
 
+    secondary_literature_expansion_top_n: int = Field(
+        default=8,
+        ge=0,
+        le=50,
+        description="Number of top primary pathways that receive literature expansion during secondary discovery"
+    )
+
     semantic_disease_boost: float = Field(
         default=1.8,
         ge=1.0,

@@ -38,6 +38,7 @@ nets:
   top_hypotheses_count: 20            # Top 20 final hypotheses for detailed validation
   primary_pathways_to_expand: 30      # Broader funnel from strong primaries into secondary discovery
   semantic_max_hypotheses_for_literature: 15  # Mine literature for final candidate pathways
+  secondary_literature_expansion_top_n: 8     # Only top primaries get PubMed-based expansion in Stage 4
   n_permutations: 25                  # Permutations for statistical testing
   
   # Database Weights

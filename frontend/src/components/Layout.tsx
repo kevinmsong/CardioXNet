@@ -39,8 +39,8 @@ export default function Layout({ children }: LayoutProps) {
         position="sticky"
         elevation={0}
         sx={{ 
-          background: '#163C30',
-          borderBottom: '1px solid rgba(255,255,255,0.08)',
+          background: 'linear-gradient(180deg, #1E6B52 0%, #174B3B 100%)',
+          borderBottom: '3px solid #FFB81C',
           boxShadow: '0 10px 24px rgba(15, 43, 34, 0.14)',
         }}
       >
@@ -48,27 +48,28 @@ export default function Layout({ children }: LayoutProps) {
           <Stack direction="row" spacing={2} alignItems="center" sx={{ flexGrow: 1 }}>
             <Box
               sx={{
-                background: 'rgba(255, 255, 255, 0.08)',
+                background: 'rgba(255, 184, 28, 0.14)',
                 borderRadius: '12px',
                 p: 1,
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
+                border: '1px solid rgba(255, 184, 28, 0.4)',
               }}
             >
-              <BiotechOutlined sx={{ fontSize: 24, color: '#B9E3D3' }} />
+              <BiotechOutlined sx={{ fontSize: 24, color: '#FFB81C' }} />
             </Box>
             <Typography 
               variant="h6" 
               component="div" 
               onClick={handleHomeClick}
               sx={{ 
-                fontWeight: 700,
+                fontWeight: 600,
                 color: '#FFFFFF',
-                letterSpacing: '-0.2px',
+                letterSpacing: '0',
                 cursor: 'pointer',
                 '&:hover': {
-                  color: '#D7EFE6',
+                  color: '#FFDD87',
                 },
               }}
             >
@@ -87,13 +88,13 @@ export default function Layout({ children }: LayoutProps) {
               }}
               sx={{
                 color: location.pathname === '/' ? '#163C30' : '#FFFFFF',
-                fontWeight: location.pathname === '/' ? 700 : 600,
+                fontWeight: location.pathname === '/' ? 600 : 500,
                 px: 2,
                 borderRadius: 2,
-                bgcolor: location.pathname === '/' ? '#D7EFE6' : 'transparent',
+                bgcolor: location.pathname === '/' ? '#FFB81C' : 'transparent',
                 cursor: location.pathname === '/' ? 'default' : 'pointer',
                 '&:hover': {
-                  bgcolor: location.pathname === '/' ? '#D7EFE6' : 'rgba(255,255,255,0.08)',
+                  bgcolor: location.pathname === '/' ? '#FFB81C' : 'rgba(255,184,28,0.16)',
                 },
               }}
             >
@@ -111,14 +112,14 @@ export default function Layout({ children }: LayoutProps) {
               }}
               sx={{
                 color: location.pathname === '/documentation' ? '#163C30' : '#FFFFFF',
-                fontWeight: location.pathname === '/documentation' ? 700 : 600,
+                fontWeight: location.pathname === '/documentation' ? 600 : 500,
                 px: 2,
                 borderRadius: 2,
-                bgcolor: location.pathname === '/documentation' ? '#D7EFE6' : 'transparent',
+                bgcolor: location.pathname === '/documentation' ? '#FFB81C' : 'transparent',
                 cursor: location.pathname === '/documentation' ? 'default' : 'pointer',
                 pointerEvents: 'auto',
                 '&:hover': {
-                  bgcolor: location.pathname === '/documentation' ? '#D7EFE6' : 'rgba(255,255,255,0.08)',
+                  bgcolor: location.pathname === '/documentation' ? '#FFB81C' : 'rgba(255,184,28,0.16)',
                 },
               }}
             >
@@ -134,12 +135,12 @@ export default function Layout({ children }: LayoutProps) {
               }}
               sx={{
                 color: location.pathname === '/api-reference' ? '#163C30' : '#FFFFFF',
-                fontWeight: location.pathname === '/api-reference' ? 700 : 600,
+                fontWeight: location.pathname === '/api-reference' ? 600 : 500,
                 px: 2,
                 borderRadius: 2,
-                bgcolor: location.pathname === '/api-reference' ? '#D7EFE6' : 'transparent',
+                bgcolor: location.pathname === '/api-reference' ? '#FFB81C' : 'transparent',
                 '&:hover': {
-                  bgcolor: location.pathname === '/api-reference' ? '#D7EFE6' : 'rgba(255,255,255,0.08)',
+                  bgcolor: location.pathname === '/api-reference' ? '#FFB81C' : 'rgba(255,184,28,0.16)',
                 },
               }}
             >
@@ -168,8 +169,9 @@ export default function Layout({ children }: LayoutProps) {
           py: 2.5,
           px: 2,
           mt: 'auto',
-          bgcolor: '#EEF5F1',
-          borderTop: '1px solid #D8E8E2',
+          bgcolor: '#F5F8F6',
+          borderTop: '3px solid #1E6B52',
+          boxShadow: 'inset 0 1px 0 rgba(255, 184, 28, 0.45)',
         }}
       >
         <Container maxWidth="lg">
@@ -183,18 +185,19 @@ export default function Layout({ children }: LayoutProps) {
               <Stack direction="row" spacing={1.5} alignItems="center">
                 <Box
                   sx={{
-                    background: '#163C30',
+                    background: 'linear-gradient(180deg, #1E6B52 0%, #174B3B 100%)',
                     borderRadius: '12px',
                     p: 0.8,
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
+                    border: '1px solid rgba(255, 184, 28, 0.45)',
                   }}
                 >
-                  <BiotechOutlined sx={{ color: '#D7EFE6', fontSize: 22 }} />
+                  <BiotechOutlined sx={{ color: '#FFB81C', fontSize: 22 }} />
                 </Box>
                 <Box>
-                  <Typography variant="body1" sx={{ color: '#163C30', fontWeight: 700 }}>
+                  <Typography variant="body1" sx={{ color: '#163C30', fontWeight: 600 }}>
                     CardioXNet
                   </Typography>
                   <Typography variant="caption" color="text.secondary">
@@ -204,7 +207,7 @@ export default function Layout({ children }: LayoutProps) {
               </Stack>
               
               <Stack spacing={0.5} alignItems={{ xs: 'center', sm: 'flex-end' }}>
-                <Typography variant="body2" color="text.secondary" fontWeight={600}>
+                <Typography variant="body2" color="text.secondary" fontWeight={500}>
                   Cardiovascular Disease Pathway Discovery
                 </Typography>
                 <Typography variant="caption" color="text.secondary">
@@ -235,8 +238,8 @@ export default function Layout({ children }: LayoutProps) {
                     }
                   }}
                   sx={{ 
-                    color: location.pathname === '/documentation' ? '#145A43' : '#1E6B52', 
-                    fontWeight: location.pathname === '/documentation' ? 700 : 600, 
+                    color: location.pathname === '/documentation' ? '#A66C00' : '#1E6B52', 
+                    fontWeight: location.pathname === '/documentation' ? 600 : 500, 
                     cursor: location.pathname === '/documentation' ? 'default' : 'pointer', 
                     '&:hover': { textDecoration: location.pathname === '/documentation' ? 'none' : 'underline' } 
                   }}
@@ -253,8 +256,8 @@ export default function Layout({ children }: LayoutProps) {
                     }
                   }}
                   sx={{ 
-                    color: location.pathname === '/api-reference' ? '#145A43' : '#1E6B52', 
-                    fontWeight: location.pathname === '/api-reference' ? 700 : 600, 
+                    color: location.pathname === '/api-reference' ? '#A66C00' : '#1E6B52', 
+                    fontWeight: location.pathname === '/api-reference' ? 600 : 500, 
                     cursor: location.pathname === '/api-reference' ? 'default' : 'pointer', 
                     '&:hover': { textDecoration: location.pathname === '/api-reference' ? 'none' : 'underline' } 
                   }}
@@ -267,7 +270,7 @@ export default function Layout({ children }: LayoutProps) {
                   href="mailto:kmsong@uab.edu"
                   sx={{ 
                     color: '#1E6B52', 
-                    fontWeight: 600, 
+                    fontWeight: 500, 
                     textDecoration: 'none',
                     '&:hover': { textDecoration: 'underline' } 
                   }}
