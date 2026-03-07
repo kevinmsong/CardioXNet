@@ -35,7 +35,7 @@ export function normalizeHypothesis(hyp: any): NormalizedHypothesis {
     return {
       pathway_id: pathway.pathway_id || '',
       pathway_name: pathway.pathway_name || 'Unknown Pathway',
-      source_db: pathway.source || pathway.database || 'Unknown',
+      source_db: pathway.source_db || pathway.source || pathway.database || 'Unknown',
       nes_score: hyp.nes_score || 0,
       p_adj: pathway.p_adj || 1,
       evidence_count: pathway.evidence_genes?.length || 0,
@@ -44,7 +44,7 @@ export function normalizeHypothesis(hyp: any): NormalizedHypothesis {
       key_nodes: hyp.key_nodes || [],
       literature_citations: hyp.literature_associations?.total_citations || 0,
       score_components: hyp.score_components || {},
-      support_count: hyp.support_count || 0,
+      support_count: hyp.aggregated_pathway.support_count || hyp.support_count || 0,
       citation_count: hyp.literature_associations?.total_citations || 0,
     };
   }
@@ -90,6 +90,7 @@ export function getPathwayId(hyp: any): string {
  */
 export function getSourceDb(hyp: any): string {
   return hyp.source_db || 
+         hyp.aggregated_pathway?.pathway?.source_db || 
          hyp.aggregated_pathway?.pathway?.source || 
          hyp.aggregated_pathway?.pathway?.database || 
          'Unknown';

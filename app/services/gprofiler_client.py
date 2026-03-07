@@ -117,6 +117,10 @@ class GProfilerClient:
                     logger.error(f"g:Profiler query failed: {error_msg}")
                     print(f"[GPROFILER ERROR] {error_msg}")
                     raise APIClientError(f"g:Profiler query failed: {error_msg}")
+
+    def close(self):
+        """g:Profiler library client does not require explicit teardown."""
+        return None
     
     def _parse_library_response(
         self,

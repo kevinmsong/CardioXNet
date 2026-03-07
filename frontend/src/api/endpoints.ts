@@ -52,7 +52,9 @@ export const api = {
 
   // WebSocket connection
   connectWebSocket: (analysisId: string): WebSocket => {
-    const wsUrl = `ws://localhost:8000/api/v1/analysis/${analysisId}/progress`;
+    const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
+    const host = import.meta.env.VITE_WS_URL || `${window.location.hostname}:8000`;
+    const wsUrl = `${protocol}://${host}/api/v1/analysis/${analysisId}/progress`;
     return new WebSocket(wsUrl);
   },
 };

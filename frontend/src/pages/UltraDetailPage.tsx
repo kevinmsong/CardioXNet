@@ -1,4 +1,3 @@
-import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import {
@@ -35,7 +34,6 @@ import {
   calculateClinicalSignificance,
   calculateTissueSpecificity,
   calculatePathwayComplexity,
-  formatPValue,
 } from '../utils/hypothesisUtils';
 
 export default function UltraDetailPageFixed() {

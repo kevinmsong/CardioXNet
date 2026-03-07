@@ -14,6 +14,8 @@ import {
   Select,
   MenuItem,
   Chip,
+  FormControlLabel,
+  Switch,
 } from '@mui/material';
 import { ExpandMore, Settings, Info } from '@mui/icons-material';
 
@@ -110,10 +112,10 @@ export default function ConfigurationPanel({ config, onConfigChange }: Configura
                 fullWidth
                 label="STRING Confidence Score"
                 type="number"
-                defaultValue={0.6}
+                defaultValue={0.7}
                 onChange={(e) => handleChange('string_score_threshold', parseFloat(e.target.value))}
                 inputProps={{ step: 0.05, min: 0.4, max: 0.95 }}
-                helperText="Range: 0.4-0.95 (default: 0.6)"
+                helperText="Range: 0.4-0.95 (default: 0.7)"
                 InputProps={{
                   endAdornment: <Info sx={{ fontSize: 18, color: 'text.secondary' }} />,
                 }}
@@ -217,10 +219,10 @@ export default function ConfigurationPanel({ config, onConfigChange }: Configura
                 fullWidth
                 label="Semantic Cardiac Threshold"
                 type="number"
-                defaultValue={0.01}
+                defaultValue={0.15}
                 onChange={(e) => handleChange('semantic_relevance_threshold', parseFloat(e.target.value))}
                 inputProps={{ step: 0.005, min: 0.001, max: 0.7 }}
-                helperText="Range: 0.001-0.7 (default: 0.01)"
+                helperText="Range: 0.001-0.7 (default: 0.15)"
                 InputProps={{
                   endAdornment: <Info sx={{ fontSize: 18, color: 'text.secondary' }} />,
                 }}
@@ -259,10 +261,10 @@ export default function ConfigurationPanel({ config, onConfigChange }: Configura
                 fullWidth
                 label="Max Pathway Results"
                 type="number"
-                defaultValue={150}
+                defaultValue={100}
                 onChange={(e) => handleChange('semantic_max_results', parseInt(e.target.value))}
                 inputProps={{ min: 25, max: 500 }}
-                helperText="Range: 25-500 (default: 150)"
+                helperText="Range: 25-500 (default: 100)"
                 InputProps={{
                   endAdornment: <Info sx={{ fontSize: 18, color: 'text.secondary' }} />,
                 }}
@@ -280,10 +282,10 @@ export default function ConfigurationPanel({ config, onConfigChange }: Configura
                 fullWidth
                 label="Literature Relevance"
                 type="number"
-                defaultValue={0.3}
+                defaultValue={0.4}
                 onChange={(e) => handleChange('literature_relevance_threshold', parseFloat(e.target.value))}
                 inputProps={{ step: 0.05, min: 0.1, max: 0.6 }}
-                helperText="Range: 0.1-0.6 (default: 0.3)"
+                helperText="Range: 0.1-0.6 (default: 0.4)"
                 InputProps={{
                   endAdornment: <Info sx={{ fontSize: 18, color: 'text.secondary' }} />,
                 }}
@@ -301,10 +303,10 @@ export default function ConfigurationPanel({ config, onConfigChange }: Configura
                 fullWidth
                 label="PubMed Max Results"
                 type="number"
-                defaultValue={30}
+                defaultValue={50}
                 onChange={(e) => handleChange('pubmed_max_results', parseInt(e.target.value))}
                 inputProps={{ min: 10, max: 500 }}
-                helperText="Range: 10-500 (default: 30)"
+                helperText="Range: 10-500 (default: 50)"
                 InputProps={{
                   endAdornment: <Info sx={{ fontSize: 18, color: 'text.secondary' }} />,
                 }}
@@ -345,10 +347,10 @@ export default function ConfigurationPanel({ config, onConfigChange }: Configura
                 fullWidth
                 label="Top Hypotheses to Validate"
                 type="number"
-                defaultValue={150}
+                defaultValue={20}
                 onChange={(e) => handleChange('top_hypotheses_count', parseInt(e.target.value))}
                 inputProps={{ min: 5, max: 200 }}
-                helperText="Range: 5-200 (default: 150)"
+                helperText="Range: 5-200 (default: 20)"
                 InputProps={{
                   endAdornment: <Info sx={{ fontSize: 18, color: 'text.secondary' }} />,
                 }}
@@ -365,14 +367,14 @@ export default function ConfigurationPanel({ config, onConfigChange }: Configura
               <FormControl fullWidth>
                 <InputLabel>Aggregation Strategy</InputLabel>
                 <Select
-                  defaultValue="frequency"
+                  defaultValue="weighted"
                   onChange={(e) => handleChange('aggregation_strategy', e.target.value)}
                   label="Aggregation Strategy"
                   endAdornment={<Info sx={{ fontSize: 18, color: 'text.secondary', mr: 3 }} />}
                 >
                   <MenuItem value="frequency">Frequency (Recommended)</MenuItem>
                   <MenuItem value="intersection">Intersection (Strict)</MenuItem>
-                  <MenuItem value="weighted">Weighted (Experimental)</MenuItem>
+                  <MenuItem value="weighted">Weighted (Default)</MenuItem>
                 </Select>
                 <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, ml: 1.5 }}>
                   How to combine pathways across primaries
@@ -391,10 +393,10 @@ export default function ConfigurationPanel({ config, onConfigChange }: Configura
                 fullWidth
                 label="Cardiac Expression Ratio"
                 type="number"
-                defaultValue={0.5}
+                defaultValue={0.3}
                 onChange={(e) => handleChange('min_cardiac_expression_ratio', parseFloat(e.target.value))}
                 inputProps={{ step: 0.05, min: 0.1, max: 0.9 }}
-                helperText="Range: 0.1-0.9 (default: 0.5)"
+                helperText="Range: 0.1-0.9 (default: 0.3)"
                 InputProps={{
                   endAdornment: <Info sx={{ fontSize: 18, color: 'text.secondary' }} />,
                 }}
@@ -412,10 +414,10 @@ export default function ConfigurationPanel({ config, onConfigChange }: Configura
                 fullWidth
                 label="Redundancy Threshold"
                 type="number"
-                defaultValue={0.85}
+                defaultValue={0.7}
                 onChange={(e) => handleChange('redundancy_jaccard_threshold', parseFloat(e.target.value))}
                 inputProps={{ step: 0.05, min: 0.5, max: 0.95 }}
-                helperText="Range: 0.5-0.95 (default: 0.85)"
+                helperText="Range: 0.5-0.95 (default: 0.7)"
                 InputProps={{
                   endAdornment: <Info sx={{ fontSize: 18, color: 'text.secondary' }} />,
                 }}
@@ -433,14 +435,43 @@ export default function ConfigurationPanel({ config, onConfigChange }: Configura
                 fullWidth
                 label="Literature Mining Count"
                 type="number"
-                defaultValue={100}
+                defaultValue={20}
                 onChange={(e) => handleChange('semantic_max_hypotheses_for_literature', parseInt(e.target.value))}
-                inputProps={{ min: 10, max: 150 }}
-                helperText="Range: 10-150 (default: 100)"
+                inputProps={{ min: 1, max: 150 }}
+                helperText="Range: 1-150 (default: 20)"
                 InputProps={{
                   endAdornment: <Info sx={{ fontSize: 18, color: 'text.secondary' }} />,
                 }}
               />
+            </Tooltip>
+          </Grid>
+
+          <Grid item xs={12} sm={6} md={4}>
+            <Tooltip
+              title="Enable or disable empirical permutation testing. Disable this for faster exploratory smoke runs; keep it enabled for full statistical rigor."
+              arrow
+              placement="top"
+            >
+              <Box sx={{ p: 1, border: '1px solid #E0E0E0', borderRadius: 1, minHeight: 86, display: 'flex', alignItems: 'center' }}>
+                <FormControlLabel
+                  control={
+                    <Switch
+                      defaultChecked
+                      onChange={(e) => handleChange('permutation_test_enabled', e.target.checked)}
+                    />
+                  }
+                  label={
+                    <Box>
+                      <Typography variant="body2" fontWeight={600}>
+                        Permutation Testing
+                      </Typography>
+                      <Typography variant="caption" color="text.secondary">
+                        Enabled by default for rigorous runs
+                      </Typography>
+                    </Box>
+                  }
+                />
+              </Box>
             </Tooltip>
           </Grid>
 

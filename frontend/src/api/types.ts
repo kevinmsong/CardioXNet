@@ -36,6 +36,8 @@ export interface AnalysisStatus {
 export interface PathwayHypothesis {
   rank: number;
   nes_score: number;
+  cardiac_disease_score?: number;
+  lineage?: any;
   traced_seed_genes?: string[];
   literature_associations?: {
     has_literature_support: boolean;
@@ -130,6 +132,8 @@ export interface AnalysisResults {
   analysis_id: string;
   status: string;
   seed_genes: GeneInfo[];
+  ranked_hypotheses?: any[];
+  top_genes?: Array<Record<string, any>>;
   hypotheses?: {
     hypotheses: PathwayHypothesis[];
     total_count: number;

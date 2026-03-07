@@ -139,6 +139,26 @@ Access the application at `http://localhost:3000`
 
 ---
 
+## Automated Smoke Test
+
+Run the backend regression tests and the live UI smoke test locally:
+
+```bash
+# Backend tests
+python -m pytest -q
+
+# Frontend smoke test (headless)
+cd frontend
+npm run test:ui:smoke
+
+# Frontend smoke test with visible browser
+npm run test:ui:live
+```
+
+The UI smoke test submits a real small analysis, waits for progress completion, verifies the results page, and downloads the generated PDF report.
+
+---
+
 ## Pipeline Overview
 
 CardioXNet processes gene lists through a 9-stage pipeline:

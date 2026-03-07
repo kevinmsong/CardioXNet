@@ -109,6 +109,10 @@ class STRINGClient:
                 "score_threshold": score_threshold,
                 "error": error_msg
             }
+
+    def close(self):
+        """Close the underlying HTTP session."""
+        self.session.close()
     
     def _get_network_data(
         self,

@@ -50,6 +50,12 @@ Thumbs.db
 
 # Project specific
 outputs/*/
+outputs/*_report.json
+outputs/*_report.pdf
+outputs/*_report.md
+outputs/*_report.html
+outputs/*_report_direct.json
+outputs/*_smoke.json
 data/cache/
 *.log
 *.sqlite

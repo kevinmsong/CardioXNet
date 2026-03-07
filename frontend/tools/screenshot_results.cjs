@@ -1,12 +1,16 @@
 const { chromium } = require('playwright');
+const fs = require('fs');
+const path = require('path');
 
 const ANALYSIS_ID = process.env.ANALYSIS_ID || 'fast_analysis_20251017_070137';
 const HOST = process.env.FRONTEND_HOST || 'http://localhost:3000';
 const URL = `${HOST}/results/${ANALYSIS_ID}`;
-const OUT_PATH = __dirname + '/results_screenshot.png';
+const defaultOutPath = path.resolve(__dirname, '../tests/artifacts/manual-results-screenshot.png');
+const OUT_PATH = process.env.OUT_PATH || defaultOutPath;
 
 (async () => {
   console.log(`Opening ${URL}`);
+  fs.mkdirSync(path.dirname(OUT_PATH), { recursive: true });
   const browser = await chromium.launch({ args: ['--no-sandbox'] });
   const page = await browser.newPage();
   try {

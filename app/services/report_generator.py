@@ -113,33 +113,28 @@ class ReportGenerator:
             top_genes
         )
         
-        # Generate reports in requested formats
+        # Generate reports per format so one failing renderer does not discard all output.
         output_files = {}
-        
+        generators = []
+
         if "pdf" in output_formats:
-            output_files["pdf"] = self._generate_pdf(
-                analysis_id,
-                report_data
-            )
-        
+            generators.append(("pdf", lambda: self._generate_pdf(analysis_id, report_data)))
+
         if "markdown" in output_formats:
-            output_files["markdown"] = self._generate_markdown(
-                analysis_id,
-                report_data
-            )
-        
+            generators.append(("markdown", lambda: self._generate_markdown(analysis_id, report_data)))
+
         if "html" in output_formats:
-            output_files["html"] = self._generate_html(
-                analysis_id,
-                report_data
-            )
-        
+            generators.append(("html", lambda: self._generate_html(analysis_id, report_data)))
+
         if "json" in output_formats:
-            output_files["json"] = self._generate_json(
-                analysis_id,
-                report_data
-            )
-        
+            generators.append(("json", lambda: self._generate_json(analysis_id, report_data)))
+
+        for fmt, generate in generators:
+            try:
+                output_files[fmt] = generate()
+            except Exception as exc:
+                logger.warning(f"{fmt.upper()} report generation failed: {exc}")
+
         logger.info(f"Report generation complete: {list(output_files.keys())}")
         
         return output_files

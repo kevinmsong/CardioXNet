@@ -88,7 +88,7 @@ export default function ProgressPage() {
         }
       };
 
-      ws.onerror = (error) => {
+      ws.onerror = () => {
         startPolling();
       };
 

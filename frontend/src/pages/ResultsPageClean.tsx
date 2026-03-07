@@ -27,7 +27,7 @@ import { getDruggabilityInfo } from '../utils/druggabilityUtils';
 export default function ResultsPage() {
   const { analysisId } = useParams<{ analysisId: string }>();
 
-  const { data: results, isLoading, error } = useQuery({
+  const { data: results, isLoading } = useQuery({
     queryKey: ['analysis-results', analysisId],
     queryFn: async () => {
       try {
@@ -142,9 +142,6 @@ export default function ResultsPage() {
     document.body.removeChild(a);
     window.URL.revokeObjectURL(url);
   };
-
-  // Calculate total pathways for display
-  const totalPathways = results?.hypotheses?.total_count || 0;
 
   return (
     <Box sx={{ py: 3 }}>

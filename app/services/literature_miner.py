@@ -28,6 +28,14 @@ class LiteratureMiner:
         self.cardiac_context = CardiacContext()
         
         logger.info("LiteratureMiner initialized")
+
+    @staticmethod
+    def _console_safe(text: str, limit: Optional[int] = None) -> str:
+        """Normalize external text for Windows console output."""
+        safe_text = (text or "").replace("\r", " ").replace("\n", " ")
+        if limit is not None and len(safe_text) > limit:
+            safe_text = safe_text[:limit]
+        return safe_text.encode("ascii", errors="replace").decode("ascii")
     
     def validate_hypotheses(
         self,
@@ -443,7 +451,8 @@ class LiteratureMiner:
         for i, paper in enumerate(papers, 1):
             # Show progress for citation creation
             if i <= 3 or i % 10 == 0 or i == len(papers):
-                print(f"[HYPOTHESIS CITATIONS] Hypothesis {hypothesis_id} paper {i}/{len(papers)}: {paper.get('title', 'No title')[:50]}...", flush=True)
+                title_preview = self._console_safe(paper.get("title", "No title"), limit=50)
+                print(f"[HYPOTHESIS CITATIONS] Hypothesis {hypothesis_id} paper {i}/{len(papers)}: {title_preview}...", flush=True)
             
             # Calculate hypothesis-specific relevance score
             relevance_score = self._calculate_hypothesis_relevance(
@@ -467,7 +476,8 @@ class LiteratureMiner:
             # Show high relevance papers with hypothesis context
             if relevance_score > 0.7:
                 contributing_genes_str = ", ".join([g.symbol for g in contributing_seed_genes])
-                print(f"[HIGH HYPOTHESIS RELEVANCE] {hypothesis_id}: Score {relevance_score:.3f} (genes: {contributing_genes_str}) - {paper.get('title', '')[:60]}...", flush=True)
+                title_preview = self._console_safe(paper.get("title", ""), limit=60)
+                print(f"[HIGH HYPOTHESIS RELEVANCE] {hypothesis_id}: Score {relevance_score:.3f} (genes: {contributing_genes_str}) - {title_preview}...", flush=True)
         
         print(f"[HYPOTHESIS CITATIONS] Hypothesis {hypothesis_id}: Created {len(citations)} citations", flush=True)
         return citations
@@ -650,7 +660,8 @@ class LiteratureMiner:
         for i, paper in enumerate(papers, 1):
             # Show progress for citation creation
             if i <= 5 or i % 10 == 0 or i == len(papers):
-                print(f"[CITATION CREATION] Processing paper {i}/{len(papers)}: {paper.get('title', 'No title')[:60]}...", flush=True)
+                title_preview = self._console_safe(paper.get("title", "No title"), limit=60)
+                print(f"[CITATION CREATION] Processing paper {i}/{len(papers)}: {title_preview}...", flush=True)
             
             # Calculate relevance score
             relevance_score = self._calculate_relevance(
@@ -672,7 +683,8 @@ class LiteratureMiner:
             
             # Show high relevance papers
             if relevance_score > 0.7:
-                print(f"[HIGH RELEVANCE] Paper {i}: Score {relevance_score:.3f} - {paper.get('title', '')[:80]}...", flush=True)
+                title_preview = self._console_safe(paper.get("title", ""), limit=80)
+                print(f"[HIGH RELEVANCE] Paper {i}: Score {relevance_score:.3f} - {title_preview}...", flush=True)
         
         print(f"[CITATION CREATION] Created {len(citations)} citations", flush=True)
         return citations

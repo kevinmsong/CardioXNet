@@ -69,7 +69,7 @@ app.add_middleware(
 
 # Include API routes
 app.include_router(router)
-# app.include_router(ws_router)  # Temporarily disabled
+app.include_router(ws_router)
 
 
 @app.get("/")

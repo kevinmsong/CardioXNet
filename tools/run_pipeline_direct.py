@@ -1,4 +1,4 @@
-"""Run FastPipeline directly (no API) with specified seed genes and save results.
+r"""Run Pipeline directly (no API) with specified seed genes and save results.
 
 Usage:
     .\venv\Scripts\python.exe tools\run_pipeline_direct.py
@@ -15,10 +15,18 @@ import json
 import os
 import sys
 import time
-from typing import Any
 
-SEEDS = ["TTN", "MYH7", "MYBPC3", "TNNT2", "LMNA"]
+SEEDS = ["PIK3R1", "ITGB1", "SRC"]
 OUT_DIR = "outputs"
+CONFIG_OVERRIDES = {
+    "disease_context": "diabetic_cardiomyopathy",
+    "string_neighbor_count": 12,
+    "top_hypotheses_count": 5,
+    "semantic_max_hypotheses_for_literature": 3,
+    "pubmed_max_results": 10,
+    "permutation_test_enabled": False,
+    "output_formats": ["json"],
+}
 
 
 def print_progress(stage: str, progress: float, message: str):
@@ -27,15 +35,10 @@ def print_progress(stage: str, progress: float, message: str):
 
 def main():
     try:
-        # Initialize services eagerly
-        print("Initializing services (fast) via fast_service_init...", flush=True)
-        from app.services.fast_service_init import initialize_services_fast, get_service_fast
-        services = initialize_services_fast()
-        print(f"Initialized {len(services)} services", flush=True)
-
         # Create pipeline
-        from app.services.fast_pipeline import FastPipeline
-        pipeline = FastPipeline()
+        from app.services.pipeline import Pipeline
+
+        pipeline = Pipeline(config_overrides=CONFIG_OVERRIDES)
         analysis_id = pipeline.analysis_id
         print(f"Created pipeline with id: {analysis_id}", flush=True)
 
@@ -48,7 +51,7 @@ def main():
             await asyncio.sleep(0.01)
 
         start = time.time()
-        result = loop.run_until_complete(pipeline.run(SEEDS, progress_callback=progress_cb, disease_context="cardiac"))
+        result = loop.run_until_complete(pipeline.run(SEEDS, progress_callback=progress_cb))
         loop.close()
         duration = time.time() - start
 
@@ -56,7 +59,7 @@ def main():
         os.makedirs(OUT_DIR, exist_ok=True)
         out_path = os.path.join(OUT_DIR, f"{analysis_id}_report_direct.json")
         with open(out_path, "w", encoding="utf8") as fh:
-            json.dump(result, fh, indent=2)
+            json.dump(result, fh, indent=2, default=str)
 
         print(f"Pipeline completed in {duration:.1f}s. Results written to {out_path}", flush=True)
         return 0

@@ -4,14 +4,16 @@
   "private": true,
   "type": "module",
   "scripts": {
-  "dev": "vite",
+    "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0"
-  ,"test:e2e": "playwright test --project=chromium frontend/tests/api",
-  "test:e2e:headed": "playwright test --project=chromium --headed frontend/tests/api",
-  "test:ui": "playwright test --project=chromium frontend/tests/ui",
-  "test:ui:headed": "playwright test --project=chromium --headed frontend/tests/ui"
+    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "test:e2e": "playwright test --project=chromium tests/api",
+    "test:e2e:headed": "playwright test --project=chromium --headed tests/api",
+    "test:ui": "playwright test --project=chromium tests/ui",
+    "test:ui:smoke": "playwright test --project=chromium tests/ui/live-analysis.spec.ts",
+    "test:ui:headed": "playwright test --project=chromium --headed tests/ui",
+    "test:ui:live": "playwright test --project=chromium --headed tests/ui/live-analysis.spec.ts"
   },
   "dependencies": {
     "@emotion/react": "^11.11.1",

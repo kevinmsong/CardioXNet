@@ -1,4 +1,3 @@
-import React from 'react';
 import { Box, Paper, Typography, Chip, Stack, Tooltip } from '@mui/material';
 import { ArrowForward, Science, Hub, Flag, AccountTree } from '@mui/icons-material';
 

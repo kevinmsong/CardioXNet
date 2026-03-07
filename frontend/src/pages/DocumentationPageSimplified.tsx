@@ -14,7 +14,6 @@ import {
   Chip,
 } from '@mui/material';
 import {
-  Science,
   TrendingUp,
   AccountTree,
   Timeline,

@@ -1,8 +1,8 @@
 """Configuration management using Pydantic settings."""
 
-from typing import Dict, List, Optional
+from typing import Any, Dict, List, Optional
 from functools import lru_cache
-from pydantic import Field
+from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -138,6 +138,20 @@ class NETSConfig(BaseSettings):
         description="Maximum pathways to return after semantic filtering (100 for comprehensive discovery, validated range: 15-1000)"
     )
 
+    semantic_max_hypotheses_for_literature: int = Field(
+        default=20,
+        ge=1,
+        le=200,
+        description="Maximum hypotheses to validate during literature mining"
+    )
+
+    semantic_disease_boost: float = Field(
+        default=1.8,
+        ge=1.0,
+        le=5.0,
+        description="Relative boost for disease-context pathway matches during semantic scoring"
+    )
+
     # Progressive thresholds (disease-context aware filtering)
     semantic_progressive_thresholds: Dict[str, float] = Field(
         default={
@@ -152,6 +166,11 @@ class NETSConfig(BaseSettings):
     seed_overlap_threshold: float = Field(
         default=0.5,
         description="Maximum seed gene overlap ratio for novelty filtering (0.5 = 50%)"
+    )
+
+    filter_generic_pathways: bool = Field(
+        default=True,
+        description="Skip literature expansion for overly generic pathways"
     )
     
     # Tissue Expression Validation Configuration
@@ -176,6 +195,21 @@ class NETSConfig(BaseSettings):
         ge=25,
         le=1000,
         description="Number of permutations for empirical p-value (100 for robust validation, validated range: 25-1000)"
+    )
+
+    enable_redundancy_detection: bool = Field(
+        default=True,
+        description="Remove highly redundant pathways after semantic scoring"
+    )
+    redundancy_jaccard_threshold: float = Field(
+        default=0.7,
+        ge=0.1,
+        le=1.0,
+        description="Jaccard similarity threshold for pathway redundancy removal"
+    )
+    enforce_final_name_filter: bool = Field(
+        default=True,
+        description="Require final pathway names to contain explicit cardiac terminology"
     )
     
     # Druggability Analysis Configuration
@@ -251,6 +285,18 @@ class Settings(BaseSettings):
     
     # NETS Pipeline Configuration
     nets: NETSConfig = Field(default_factory=NETSConfig)
+
+    @field_validator("debug", mode="before")
+    @classmethod
+    def parse_debug_value(cls, value: Any) -> Any:
+        """Accept common deployment strings such as DEBUG=release."""
+        if isinstance(value, str):
+            normalized = value.strip().lower()
+            if normalized in {"release", "prod", "production", "false", "0", "off", "no"}:
+                return False
+            if normalized in {"debug", "dev", "development", "true", "1", "on", "yes"}:
+                return True
+        return value
     
     model_config = SettingsConfigDict(
         env_file=".env",

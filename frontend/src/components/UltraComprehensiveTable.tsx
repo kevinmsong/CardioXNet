@@ -20,7 +20,6 @@ import {
   Paper,
   Rating,
   Badge,
-  CircularProgress,
 } from '@mui/material';
 import { 
   Download, 
@@ -36,22 +35,12 @@ import {
 import type { PathwayHypothesis } from '../api/types';
 import {
   normalizeHypothesis,
-  getPathwayName,
-  getPathwayId,
-  getSourceDb,
-  getPAdj,
-  getEvidenceGenes,
   getEvidenceCount,
-  getSeedGenes,
   getLiteratureCitations,
   calculateCardiacRelevance,
   calculateClinicalSignificance,
   calculateTissueSpecificity,
   calculatePathwayComplexity,
-  formatPValue,
-  getSignificanceLabel,
-  getCardiacRelevanceColor,
-  getDatabaseColor,
 } from '../utils/hypothesisUtils';
 
 interface UltraComprehensiveTableProps {
@@ -337,7 +326,7 @@ export default function UltraComprehensiveTable({ hypotheses, analysisId }: Ultr
                     }}
                   >
                     <Box>
-                      {headCell.id !== 'pathway_name' && headCell.id !== 'database_source' && headCell.id !== 'actions' ? (
+                      {headCell.id !== 'pathway_name' && headCell.id !== 'actions' ? (
                         <TableSortLabel
                           active={orderBy === headCell.id}
                           direction={orderBy === headCell.id ? order : 'asc'}
@@ -373,10 +362,8 @@ export default function UltraComprehensiveTable({ hypotheses, analysisId }: Ultr
           <TableBody>
             {paginatedHypotheses.map((hypothesis, index) => {
               const normalized = normalizeHypothesis(hypothesis);
-              const cardiacRelevance = calculateCardiacRelevance(hypothesis);
               const clinicalSignificance = calculateClinicalSignificance(hypothesis);
               const tissueSpecificity = calculateTissueSpecificity(hypothesis);
-              const pathwayComplexity = calculatePathwayComplexity(hypothesis);
 
               return (
                 <TableRow 
