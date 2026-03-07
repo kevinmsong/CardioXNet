@@ -138,6 +138,82 @@ export default function ResultsPage() {
     };
   }, [results?.hypotheses?.hypotheses]);
 
+  const geneTherapeuticEvidence = useMemo(() => {
+    const evidenceMap = new Map<string, any>();
+
+    const mergeEvidence = (geneSymbol: string, incoming: any) => {
+      if (!geneSymbol) {
+        return;
+      }
+
+      const key = geneSymbol.toUpperCase();
+      const existing = evidenceMap.get(key) || {
+        geneSymbol: key,
+        source: incoming?.source || 'Open Targets',
+        approvedName: incoming?.approved_name || '',
+        knownDrugCount: 0,
+        maxClinicalPhase: 0,
+        hasApprovedDrug: false,
+        hasClinicalDrug: false,
+        hasCardiovascularEvidence: false,
+        cardiovascularExampleCount: 0,
+        tractabilityLabels: [] as string[],
+        topDrugs: [] as any[],
+      };
+
+      existing.source = incoming?.source || existing.source;
+      existing.approvedName = incoming?.approved_name || existing.approvedName;
+      existing.knownDrugCount = Math.max(existing.knownDrugCount, incoming?.known_drug_count || 0);
+      existing.maxClinicalPhase = Math.max(existing.maxClinicalPhase, incoming?.max_clinical_phase || 0);
+      existing.hasApprovedDrug = existing.hasApprovedDrug || Boolean(incoming?.has_approved_drug);
+      existing.hasClinicalDrug = existing.hasClinicalDrug || Boolean(incoming?.has_clinical_drug);
+      existing.hasCardiovascularEvidence =
+        existing.hasCardiovascularEvidence || Boolean(incoming?.has_cardiovascular_evidence);
+      existing.cardiovascularExampleCount = Math.max(
+        existing.cardiovascularExampleCount,
+        incoming?.cardiovascular_example_count || 0
+      );
+
+      const tractabilityLabels = incoming?.tractability_labels || [];
+      tractabilityLabels.forEach((label: string) => {
+        if (label && !existing.tractabilityLabels.includes(label)) {
+          existing.tractabilityLabels.push(label);
+        }
+      });
+
+      (incoming?.top_drugs || []).forEach((drug: any) => {
+        if (existing.topDrugs.length >= 3) {
+          return;
+        }
+        const duplicate = existing.topDrugs.some(
+          (entry: any) => entry.name === drug.name && entry.disease === drug.disease
+        );
+        if (!duplicate) {
+          existing.topDrugs.push(drug);
+        }
+      });
+
+      evidenceMap.set(key, existing);
+    };
+
+    (results?.top_genes || []).forEach((gene: any) => {
+      if (gene?.gene && gene?.external_drug_evidence) {
+        mergeEvidence(gene.gene, gene.external_drug_evidence);
+      }
+    });
+
+    (results?.hypotheses?.hypotheses || []).forEach((hypothesis: any) => {
+      const targetEvidence = hypothesis?.score_components?.target_evidence || [];
+      targetEvidence.forEach((entry: any) => {
+        if (entry?.gene_symbol) {
+          mergeEvidence(entry.gene_symbol, entry);
+        }
+      });
+    });
+
+    return evidenceMap;
+  }, [results?.top_genes, results?.hypotheses?.hypotheses]);
+
   const summaryMetrics = useMemo(() => {
     const hypotheses = results?.hypotheses?.hypotheses || [];
     const nesValues = hypotheses.map((hypothesis: any) => hypothesis.nes_score || 0).sort((a: number, b: number) => a - b);
@@ -477,10 +553,23 @@ export default function ResultsPage() {
               <Typography variant="body2" color="text.secondary">
                 <strong>Scoring:</strong> Weighted score = (Frequency × 0.4) + (Avg NES × 0.4) + (Rank Quality × 0.2). Higher scores indicate genes central to multiple high-quality pathways.
               </Typography>
+              <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                Open Targets evidence is shown when available to highlight known drugs, clinical maturity, cardiovascular evidence, and tractability.
+              </Typography>
             </Box>
 
             <Grid container spacing={2}>
-              {keyGenes.map((keyGene, index) => (
+              {keyGenes.map((keyGene, index) => {
+                const therapeuticEvidence = geneTherapeuticEvidence.get(keyGene.gene.toUpperCase());
+                const therapeuticLabel = therapeuticEvidence?.hasApprovedDrug
+                  ? 'Approved target'
+                  : therapeuticEvidence?.hasClinicalDrug
+                    ? 'Clinical target'
+                    : therapeuticEvidence?.knownDrugCount > 0 || therapeuticEvidence?.tractabilityLabels?.length
+                      ? 'Open Targets evidence'
+                      : null;
+
+                return (
                 <Grid item xs={12} sm={6} md={4} key={keyGene.gene}>
                   <Card 
                     elevation={2}
@@ -517,6 +606,29 @@ export default function ResultsPage() {
                             }} 
                           />
                         </Stack>
+
+                        {therapeuticLabel && (
+                          <Stack spacing={0.5}>
+                            <Chip
+                              label={therapeuticLabel}
+                              size="small"
+                              sx={{
+                                alignSelf: 'flex-start',
+                                bgcolor: therapeuticEvidence?.hasApprovedDrug
+                                  ? '#1E6B52'
+                                  : therapeuticEvidence?.hasClinicalDrug
+                                    ? '#FFB81C'
+                                    : '#4A9B7F',
+                                color: 'white',
+                                fontWeight: 600,
+                              }}
+                            />
+                            <Typography variant="caption" color="text.secondary">
+                              {therapeuticEvidence?.source || 'Open Targets'}
+                              {therapeuticEvidence?.approvedName ? ` · ${therapeuticEvidence.approvedName}` : ''}
+                            </Typography>
+                          </Stack>
+                        )}
                         
                         <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
                           <Chip 
@@ -540,6 +652,55 @@ export default function ResultsPage() {
                           />
                         </Stack>
 
+                        {therapeuticEvidence && (
+                          <Stack spacing={0.75}>
+                            <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+                              <Chip
+                                label={`${therapeuticEvidence.knownDrugCount || 0} known drugs`}
+                                size="small"
+                                variant="outlined"
+                                sx={{ fontSize: '0.68rem' }}
+                              />
+                              <Chip
+                                label={`Max phase ${therapeuticEvidence.maxClinicalPhase || 0}`}
+                                size="small"
+                                variant="outlined"
+                                sx={{ fontSize: '0.68rem' }}
+                              />
+                              {therapeuticEvidence.hasCardiovascularEvidence && (
+                                <Chip
+                                  label={`Cardiovascular evidence (${therapeuticEvidence.cardiovascularExampleCount || 0})`}
+                                  size="small"
+                                  color="success"
+                                  variant="outlined"
+                                  sx={{ fontSize: '0.68rem' }}
+                                />
+                              )}
+                            </Stack>
+                            {!!therapeuticEvidence.tractabilityLabels?.length && (
+                              <Stack direction="row" spacing={0.5} flexWrap="wrap" useFlexGap>
+                                {therapeuticEvidence.tractabilityLabels.slice(0, 2).map((label: string) => (
+                                  <Chip
+                                    key={`${keyGene.gene}-${label}`}
+                                    label={label}
+                                    size="small"
+                                    variant="outlined"
+                                    sx={{ fontSize: '0.68rem' }}
+                                  />
+                                ))}
+                              </Stack>
+                            )}
+                            {!!therapeuticEvidence.topDrugs?.length && (
+                              <Typography variant="caption" color="text.secondary">
+                                Top drugs: {therapeuticEvidence.topDrugs
+                                  .slice(0, 2)
+                                  .map((drug: any) => drug.name || 'Unknown')
+                                  .join(', ')}
+                              </Typography>
+                            )}
+                          </Stack>
+                        )}
+
                         <Typography variant="caption" color="text.secondary" sx={{ mt: 1 }}>
                           Found in: {keyGene.pathways.slice(0, 2).join(', ')}
                           {keyGene.pathways.length > 2 && ` +${keyGene.pathways.length - 2} more`}
@@ -548,7 +709,7 @@ export default function ResultsPage() {
                     </CardContent>
                   </Card>
                 </Grid>
-              ))}
+              )})}
             </Grid>
           </Paper>
         );
