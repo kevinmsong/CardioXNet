@@ -1,7 +1,7 @@
 """Gene-related data models."""
 
 from typing import Optional
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class GeneInfo(BaseModel):
@@ -13,8 +13,8 @@ class GeneInfo(BaseModel):
     symbol: str = Field(..., description="Official gene symbol")
     species: str = Field(default="Homo sapiens", description="Species name")
     
-    class Config:
-        json_schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "input_id": "TP53",
                 "entrez_id": "7157",
@@ -23,3 +23,4 @@ class GeneInfo(BaseModel):
                 "species": "Homo sapiens"
             }
         }
+    )

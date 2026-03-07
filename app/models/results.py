@@ -1,7 +1,7 @@
 """Result data models for pipeline stages."""
 
 from typing import List, Dict, Optional, Set
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 from .gene import GeneInfo
 from .pathway import PathwayEntry, ScoredPathwayEntry, AggregatedPathway, ScoredPathway
 
@@ -13,8 +13,8 @@ class ValidationResult(BaseModel):
     invalid_genes: List[str] = Field(default_factory=list, description="Failed validation")
     warnings: List[str] = Field(default_factory=list, description="Validation warnings")
     
-    class Config:
-        json_schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "valid_genes": [
                     {
@@ -29,6 +29,7 @@ class ValidationResult(BaseModel):
                 "warnings": ["Gene XYZ has multiple mappings"]
             }
         }
+    )
 
 
 class FunctionalNeighborhood(BaseModel):
@@ -47,8 +48,8 @@ class FunctionalNeighborhood(BaseModel):
         description="Source databases per gene"
     )
     
-    class Config:
-        json_schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "seed_genes": [{"input_id": "TP53", "entrez_id": "7157", "symbol": "TP53"}],
                 "neighbors": [{"input_id": "MDM2", "entrez_id": "4193", "symbol": "MDM2"}],
@@ -57,6 +58,7 @@ class FunctionalNeighborhood(BaseModel):
                 "sources": {"7157": ["GeneMANIA", "STRING"]}
             }
         }
+    )
 
 
 class EnrichmentResult(BaseModel):
@@ -66,8 +68,8 @@ class EnrichmentResult(BaseModel):
     total_count: int = Field(..., description="Total number of pathways")
     databases_queried: List[str] = Field(default_factory=list, description="Databases queried")
     
-    class Config:
-        json_schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "pathways": [
                     {
@@ -84,6 +86,7 @@ class EnrichmentResult(BaseModel):
                 "databases_queried": ["REAC", "KEGG", "WP", "GO:BP"]
             }
         }
+    )
 
 
 class PrimaryTriageResult(BaseModel):
@@ -103,8 +106,8 @@ class PrimaryTriageResult(BaseModel):
         description="Filtering contribution per seed gene"
     )
     
-    class Config:
-        json_schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "primary_pathways": [
                     {
@@ -123,6 +126,7 @@ class PrimaryTriageResult(BaseModel):
                 "filtering_contributions": {"7157": 3, "4193": 2}
             }
         }
+    )
 
 
 class LiteratureExpansion(BaseModel):
@@ -139,8 +143,8 @@ class LiteratureExpansion(BaseModel):
         description="Relevance score per gene"
     )
     
-    class Config:
-        json_schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "original_genes": ["TP53", "MDM2"],
                 "expanded_genes": ["CDKN1A", "BAX"],
@@ -153,6 +157,7 @@ class LiteratureExpansion(BaseModel):
                 }
             }
         }
+    )
 
 
 class SecondaryPathwaySet(BaseModel):
@@ -170,8 +175,8 @@ class SecondaryPathwaySet(BaseModel):
         description="Genes added via literature"
     )
     
-    class Config:
-        json_schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "primary_pathway_id": "REAC:R-HSA-5663202",
                 "primary_pathway_name": "Signal transduction",
@@ -180,6 +185,7 @@ class SecondaryPathwaySet(BaseModel):
                 "literature_expanded_genes": ["CDKN1A"]
             }
         }
+    )
 
 
 class GeneTriageResult(BaseModel):
@@ -201,8 +207,8 @@ class GeneTriageResult(BaseModel):
     )
     pmid_count: int = Field(default=0, description="Number of literature citations")
     
-    class Config:
-        json_schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "gene_id": "TP53",
                 "gene_symbol": "TP53",
@@ -212,6 +218,7 @@ class GeneTriageResult(BaseModel):
                 "pmid_count": 2
             }
         }
+    )
 
 
 class SecondaryTriageResult(BaseModel):
@@ -243,8 +250,8 @@ class SecondaryTriageResult(BaseModel):
         description="Statistics on literature expansion"
     )
     
-    class Config:
-        json_schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "union_genes": ["TP53", "NKX2-5", "GATA4"],
                 "gene_triage_results": [],
@@ -259,6 +266,7 @@ class SecondaryTriageResult(BaseModel):
                 }
             }
         }
+    )
 
 
 class FinalPathwayResult(BaseModel):
@@ -272,8 +280,8 @@ class FinalPathwayResult(BaseModel):
     total_count: int = Field(..., description="Total final pathways")
     min_support_threshold: int = Field(..., description="Minimum support threshold used")
     
-    class Config:
-        json_schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "final_pathways": [],
                 "aggregation_strategy": "intersection",
@@ -281,6 +289,7 @@ class FinalPathwayResult(BaseModel):
                 "min_support_threshold": 2
             }
         }
+    )
 
 
 class ScoredHypotheses(BaseModel):
@@ -289,13 +298,14 @@ class ScoredHypotheses(BaseModel):
     hypotheses: List[ScoredPathway] = Field(default_factory=list, description="Ranked hypotheses")
     total_count: int = Field(..., description="Total number of hypotheses")
     
-    class Config:
-        json_schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "hypotheses": [],
                 "total_count": 0
             }
         }
+    )
 
 
 class Citation(BaseModel):
@@ -307,8 +317,8 @@ class Citation(BaseModel):
     year: int = Field(..., description="Publication year")
     relevance_score: float = Field(..., description="Relevance score")
     
-    class Config:
-        json_schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "pmid": "12345678",
                 "title": "Cardiovascular disease mechanisms",
@@ -317,6 +327,7 @@ class Citation(BaseModel):
                 "relevance_score": 0.85
             }
         }
+    )
 
 
 class LiteratureEvidence(BaseModel):
@@ -327,8 +338,8 @@ class LiteratureEvidence(BaseModel):
         description="Citations per pathway ID"
     )
     
-    class Config:
-        json_schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "hypothesis_citations": {
                     "REAC:R-HSA-5663202": [
@@ -343,6 +354,7 @@ class LiteratureEvidence(BaseModel):
                 }
             }
         }
+    )
 
 
 class KeyNode(BaseModel):
@@ -355,8 +367,8 @@ class KeyNode(BaseModel):
     connects_to_pathway: List[str] = Field(default_factory=list, description="Connected pathway genes")
     role: str = Field(..., description="Node role: mediator, hub, or bridge")
     
-    class Config:
-        json_schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "gene_id": "4193",
                 "gene_symbol": "MDM2",
@@ -366,6 +378,7 @@ class KeyNode(BaseModel):
                 "role": "mediator"
             }
         }
+    )
 
 
 class PathwayLineage(BaseModel):
@@ -377,8 +390,8 @@ class PathwayLineage(BaseModel):
     primary_pathway_genes: List[str] = Field(default_factory=list, description="Primary pathway genes")
     final_pathway_genes: List[str] = Field(default_factory=list, description="Final pathway genes")
     
-    class Config:
-        json_schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "seed_genes": ["TP53"],
                 "fn_genes": ["MDM2", "CDKN1A"],
@@ -387,6 +400,7 @@ class PathwayLineage(BaseModel):
                 "final_pathway_genes": ["CDKN1A", "BAX"]
             }
         }
+    )
 
 
 class NetworkAnalysis(BaseModel):
@@ -401,8 +415,8 @@ class NetworkAnalysis(BaseModel):
     shared_connections: List[str] = Field(default_factory=list, description="Shared connections")
     network_data: Dict = Field(default_factory=dict, description="Network visualization data")
     
-    class Config:
-        json_schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "lineage": {
                     "seed_genes": ["TP53"],
@@ -417,6 +431,7 @@ class NetworkAnalysis(BaseModel):
                 "network_data": {}
             }
         }
+    )
 
 
 class TopologyResult(BaseModel):
@@ -427,8 +442,8 @@ class TopologyResult(BaseModel):
         description="Network analysis per pathway ID"
     )
     
-    class Config:
-        json_schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "hypothesis_networks": {
                     "REAC:R-HSA-5663202": {
@@ -447,3 +462,4 @@ class TopologyResult(BaseModel):
                 }
             }
         }
+    )

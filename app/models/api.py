@@ -1,7 +1,7 @@
 """API request and response models."""
 
 from typing import List, Optional, Dict
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 from .gene import GeneInfo
 from .results import ValidationResult, ScoredHypotheses
 
@@ -11,12 +11,13 @@ class GeneValidationRequest(BaseModel):
     
     gene_ids: List[str] = Field(..., description="List of gene identifiers to validate")
     
-    class Config:
-        json_schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "gene_ids": ["NKX2-5", "GATA4", "MEF2C"]
             }
         }
+    )
 
 
 class GeneValidationResponse(BaseModel):
@@ -24,8 +25,8 @@ class GeneValidationResponse(BaseModel):
     
     result: ValidationResult = Field(..., description="Validation result")
     
-    class Config:
-        json_schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "result": {
                     "valid_genes": [
@@ -41,6 +42,7 @@ class GeneValidationResponse(BaseModel):
                 }
             }
         }
+    )
 
 
 class AnalysisRequest(BaseModel):
@@ -50,8 +52,8 @@ class AnalysisRequest(BaseModel):
     disease_context: Optional[str] = Field(None, description="Optional disease context for analysis")
     config_overrides: Optional[Dict] = Field(None, description="Configuration overrides")
     
-    class Config:
-        json_schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "seed_genes": ["TP53", "EGFR"],
                 "disease_context": "hypertensive_remodeling",
@@ -62,6 +64,7 @@ class AnalysisRequest(BaseModel):
                 }
             }
         }
+    )
 
 
 class AnalysisResponse(BaseModel):
@@ -71,14 +74,15 @@ class AnalysisResponse(BaseModel):
     status: str = Field(..., description="Analysis status")
     message: str = Field(..., description="Status message")
     
-    class Config:
-        json_schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "analysis_id": "abc123",
                 "status": "started",
                 "message": "Analysis started successfully"
             }
         }
+    )
 
 
 class AnalysisStatusResponse(BaseModel):
@@ -91,8 +95,8 @@ class AnalysisStatusResponse(BaseModel):
     message: Optional[str] = Field(None, description="Status message")
     error: Optional[str] = Field(None, description="Error message if failed")
     
-    class Config:
-        json_schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "analysis_id": "abc123",
                 "status": "running",
@@ -101,6 +105,7 @@ class AnalysisStatusResponse(BaseModel):
                 "message": "Performing pathway enrichment"
             }
         }
+    )
 
 
 class AnalysisResultsResponse(BaseModel):
@@ -114,8 +119,8 @@ class AnalysisResultsResponse(BaseModel):
     top_genes: Optional[List[Dict]] = Field(None, description="Top genes aggregated across pathways")
     report_urls: Optional[Dict[str, str]] = Field(None, description="URLs to download reports")
     
-    class Config:
-        json_schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "analysis_id": "abc123",
                 "status": "completed",
@@ -138,6 +143,7 @@ class AnalysisResultsResponse(BaseModel):
                 }
             }
         }
+    )
 
 
 class StageResultResponse(BaseModel):
@@ -149,8 +155,8 @@ class StageResultResponse(BaseModel):
     status: str = Field(..., description="Stage status")
     data: Dict = Field(default_factory=dict, description="Stage-specific data")
     
-    class Config:
-        json_schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "analysis_id": "abc123",
                 "stage_id": "stage_1",
@@ -162,6 +168,7 @@ class StageResultResponse(BaseModel):
                 }
             }
         }
+    )
 
 
 class ConfigDefaultsResponse(BaseModel):
@@ -169,8 +176,8 @@ class ConfigDefaultsResponse(BaseModel):
     
     config: Dict = Field(..., description="Default configuration parameters")
     
-    class Config:
-        json_schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "config": {
                     "string_score_threshold": 0.7,
@@ -178,6 +185,7 @@ class ConfigDefaultsResponse(BaseModel):
                 }
             }
         }
+    )
 
 
 class ProgressMessage(BaseModel):
@@ -189,8 +197,8 @@ class ProgressMessage(BaseModel):
     message: str = Field(..., description="Progress message")
     timestamp: str = Field(..., description="ISO timestamp")
     
-    class Config:
-        json_schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "analysis_id": "abc123",
                 "stage": "Stage 1",
@@ -199,6 +207,7 @@ class ProgressMessage(BaseModel):
                 "timestamp": "2024-10-02T10:30:00Z"
             }
         }
+    )
 
 
 class ErrorResponse(BaseModel):
@@ -208,8 +217,8 @@ class ErrorResponse(BaseModel):
     message: str = Field(..., description="Error message")
     details: Optional[Dict] = Field(None, description="Additional error details")
     
-    class Config:
-        json_schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "error": "ValidationError",
                 "message": "Invalid gene identifier",
@@ -218,3 +227,4 @@ class ErrorResponse(BaseModel):
                 }
             }
         }
+    )

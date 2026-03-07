@@ -1,7 +1,7 @@
 """Cardiovascular disease and phenotype-aware context configuration."""
 
 from typing import List, Dict
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class CardiacContext(BaseModel):
@@ -400,8 +400,8 @@ class CardiacContext(BaseModel):
         description="Weight multipliers for keyword categories"
     )
     
-    class Config:
-        json_schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "species": "Homo sapiens",
                 "high_priority_keywords": [
@@ -423,3 +423,4 @@ class CardiacContext(BaseModel):
                 }
             }
         }
+    )

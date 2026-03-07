@@ -1,7 +1,7 @@
 """Pathway-related data models."""
 
 from typing import List, Optional, Dict, Any
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class PathwayEntry(BaseModel):
@@ -15,8 +15,8 @@ class PathwayEntry(BaseModel):
     evidence_count: int = Field(..., description="Number of genes from input in pathway")
     evidence_genes: List[str] = Field(default_factory=list, description="Gene IDs in pathway")
     
-    class Config:
-        json_schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "pathway_id": "REAC:R-HSA-5663202",
                 "pathway_name": "Cardiac muscle contraction",
@@ -27,6 +27,7 @@ class PathwayEntry(BaseModel):
                 "evidence_genes": ["NKX2-5", "GATA4", "MEF2C"]
             }
         }
+    )
 
 
 class ScoredPathwayEntry(PathwayEntry):
@@ -72,8 +73,8 @@ class AggregatedPathway(BaseModel):
         description="Seed genes that contributed to this aggregated pathway"
     )
     
-    class Config:
-        json_schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "pathway": {
                     "pathway_id": "REAC:R-HSA-5663202",
@@ -89,6 +90,7 @@ class AggregatedPathway(BaseModel):
                 "aggregation_score": 0.85
             }
         }
+    )
 
 
 class ScoredPathway(BaseModel):
@@ -116,8 +118,8 @@ class ScoredPathway(BaseModel):
         description="Cardiac disease association score (0-1) based on evidence genes from curated database"
     )
     
-    class Config:
-        json_schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "aggregated_pathway": {
                     "pathway": {
@@ -143,3 +145,4 @@ class ScoredPathway(BaseModel):
                 }
             }
         }
+    )
