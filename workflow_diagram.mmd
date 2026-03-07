@@ -1,116 +1,88 @@
-graph TB
-    %% ============================================================================
-    %% CardioXNet NETS Algorithm - Sequential Workflow
-    %% Updated with logical sequential stage numbering (1-12)
-    %% November 2025
-    %% ============================================================================
-    
-    START([👤 User Input:<br/>Seed Genes +<br/>Disease Context])
-    
-    %% STAGE 1: INPUT VALIDATION
-    START --> STAGE1[Stage 1: Input Validation<br/>✓ Validate gene symbols<br/>✓ Map to Entrez IDs<br/>✓ Check gene validity<br/>Progress: 5%]
-    
-    %% STAGE 2: FUNCTIONAL NEIGHBORHOOD
-    STAGE1 --> STAGE2[Stage 2: Functional Neighborhood<br/>✓ STRING PPI Database<br/>✓ Confidence > 0.4<br/>✓ Build interaction network<br/>Progress: 15%]
-    
-    %% STAGE 3: PRIMARY PATHWAY ENRICHMENT
-    STAGE2 --> STAGE3[Stage 3: Primary Pathway Enrichment<br/>✓ g:Profiler API<br/>✓ GO:BP, KEGG, Reactome, WikiPathways<br/>✓ GSEA Analysis<br/>Progress: 25%]
-    
-    %% STAGE 4: SECONDARY PATHWAY DISCOVERY
-    STAGE3 --> STAGE4[Stage 4: Secondary Pathway Discovery<br/>✓ Network-based expansion<br/>✓ Neighbor gene enrichment<br/>✓ Novel pathway identification<br/>Progress: 40%]
-    
-    %% STAGE 5: PATHWAY AGGREGATION
-    STAGE4 --> STAGE5[Stage 5: Pathway Aggregation<br/>✓ Merge primary + secondary<br/>✓ Remove redundancy<br/>✓ Deduplicate pathways<br/>Progress: 55%]
-    
-    %% STAGE 6: NES SCORING
-    STAGE5 --> STAGE6[Stage 6: NES Scoring<br/>✓ Normalized Enrichment Score<br/>✓ Statistical significance<br/>✓ Network centrality<br/>Progress: 65%]
-    
-    %% STAGE 7: SEMANTIC FILTERING
-    STAGE6 --> STAGE7[Stage 7: Semantic Filtering<br/>✓ 700+ Cardiac Terms<br/>✓ 6 Disease Categories<br/>✓ Cardiac relevance scoring<br/>Progress: 72%]
-    
-    %% STAGE 8: ENHANCED VALIDATION
-    STAGE7 --> STAGE8[Stage 8: Enhanced Validation<br/>✓ GTEx tissue expression<br/>✓ Permutation testing 1000x<br/>✓ Druggability annotation<br/>Progress: 78%]
-    
-    %% STAGE 9: LITERATURE MINING
-    STAGE8 --> STAGE9[Stage 9: Literature Mining<br/>✓ PubMed API queries<br/>✓ Gene-pathway citations<br/>✓ Evidence count<br/>Progress: 82%]
-    
-    %% STAGE 10: NETWORK TOPOLOGY
-    STAGE9 --> STAGE10[Stage 10: Network Topology<br/>✓ PageRank centrality<br/>✓ Betweenness centrality<br/>✓ Hub gene identification<br/>Progress: 88%]
-    
-    %% STAGE 11: THERAPEUTIC TARGETS
-    STAGE10 --> STAGE11[Stage 11: Therapeutic Targets<br/>✓ Top genes generation<br/>✓ Cardiac disease scoring<br/>✓ Curated database 150+ genes<br/>Progress: 93%]
-    
-    %% STAGE 12: REPORT GENERATION
-    STAGE11 --> STAGE12[Stage 12: Report Generation<br/>✓ JSON report<br/>✓ PDF report<br/>✓ CSV export<br/>Progress: 97%]
-    
-    %% COMPLETE
-    STAGE12 --> COMPLETE([✅ Complete<br/>Results Ready<br/>100%])
-    
-    %% ============================================================================
-    %% DATA SOURCES (External APIs and Databases)
-    %% ============================================================================
-    
-    DB_STRING[(STRING PPI<br/>v12.0<br/>Protein Interactions)]
-    DB_GPROFILER[(g:Profiler API<br/>GO:BP, KEGG<br/>Reactome, WikiPathways)]
-    DB_GTEX[(GTEx Database<br/>v8<br/>Tissue Expression)]
-    DB_PUBMED[(PubMed API<br/>NCBI<br/>Literature Citations)]
-    DB_CARDIAC[(Curated Cardiac DB<br/>150+ genes<br/>ClinVar + OMIM)]
-    
-    %% Data source connections
-    DB_STRING -.->|PPI data<br/>confidence > 0.4| STAGE2
-    DB_GPROFILER -.->|Pathway<br/>enrichment| STAGE3
-    DB_GTEX -.->|Tissue<br/>expression| STAGE8
-    DB_PUBMED -.->|Literature<br/>evidence| STAGE9
-    DB_CARDIAC -.->|Cardiac<br/>scores| STAGE11
-    
-    %% ============================================================================
-    %% KEY OUTPUTS AT EACH STAGE
-    %% ============================================================================
-    
-    STAGE2 -.->|Output| OUT2[Functional<br/>neighborhood<br/>network]
-    STAGE3 -.->|Output| OUT3[Primary<br/>pathways]
-    STAGE5 -.->|Output| OUT5[Aggregated<br/>pathway list]
-    STAGE6 -.->|Output| OUT6[NES-scored<br/>pathways]
-    STAGE7 -.->|Output| OUT7[Cardiac-relevant<br/>pathways]
-    STAGE9 -.->|Output| OUT9[Literature<br/>citations]
-    STAGE10 -.->|Output| OUT10[Hub genes<br/>identified]
-    STAGE11 -.->|Output| OUT11[Top 5<br/>therapeutic<br/>targets]
-    
-    %% ============================================================================
-    %% STYLING
-    %% ============================================================================
-    
-    classDef inputStyle fill:#4CAF50,stroke:#2E7D32,stroke-width:3px,color:#fff,font-weight:bold
-    classDef stage1Style fill:#2196F3,stroke:#1565C0,stroke-width:2px,color:#fff
-    classDef stage2Style fill:#03A9F4,stroke:#0277BD,stroke-width:2px,color:#fff
-    classDef stage3Style fill:#00BCD4,stroke:#00838F,stroke-width:2px,color:#fff
-    classDef stage4Style fill:#009688,stroke:#00695C,stroke-width:2px,color:#fff
-    classDef stage5Style fill:#4CAF50,stroke:#2E7D32,stroke-width:2px,color:#fff
-    classDef stage6Style fill:#8BC34A,stroke:#558B2F,stroke-width:2px,color:#fff
-    classDef stage7Style fill:#CDDC39,stroke:#9E9D24,stroke-width:2px,color:#333
-    classDef stage8Style fill:#FFEB3B,stroke:#F57F17,stroke-width:2px,color:#333
-    classDef stage9Style fill:#FFC107,stroke:#FF6F00,stroke-width:2px,color:#333
-    classDef stage10Style fill:#FF9800,stroke:#E65100,stroke-width:2px,color:#fff
-    classDef stage11Style fill:#FF5722,stroke:#BF360C,stroke-width:2px,color:#fff
-    classDef stage12Style fill:#9C27B0,stroke:#6A1B9A,stroke-width:2px,color:#fff
-    classDef completeStyle fill:#673AB7,stroke:#4527A0,stroke-width:3px,color:#fff,font-weight:bold
-    classDef dbStyle fill:#607D8B,stroke:#37474F,stroke-width:2px,color:#fff
-    classDef outputStyle fill:#FFF9C4,stroke:#F57F17,stroke-width:1px,color:#333,font-size:10px
-    
-    class START inputStyle
-    class STAGE1 stage1Style
-    class STAGE2 stage2Style
-    class STAGE3 stage3Style
-    class STAGE4 stage4Style
-    class STAGE5 stage5Style
-    class STAGE6 stage6Style
-    class STAGE7 stage7Style
-    class STAGE8 stage8Style
-    class STAGE9 stage9Style
-    class STAGE10 stage10Style
-    class STAGE11 stage11Style
-    class STAGE12 stage12Style
-    class COMPLETE completeStyle
-    class DB_STRING,DB_GPROFILER,DB_GTEX,DB_PUBMED,DB_CARDIAC dbStyle
-    class OUT2,OUT3,OUT5,OUT6,OUT7,OUT9,OUT10,OUT11 outputStyle
+graph LR
+    %% CardioXNet live pipeline workflow
+    %% Updated to match app/services/pipeline.py
 
+    START([User Input<br/>Seed Genes + Disease Context])
+
+    S1[Stage 1<br/>Input Validation<br/>Validate and normalize gene symbols<br/>Progress: 5%]
+    S2[Stage 2<br/>Functional Neighborhood<br/>STRING-based interaction expansion<br/>Progress: 15%]
+    S3[Stage 3<br/>Primary Pathway Enrichment<br/>g:Profiler across REAC, KEGG, WP, GO:BP<br/>Progress: 25%]
+    S4[Stage 4<br/>Secondary Pathway Discovery<br/>Per-primary expansion with bounded literature expansion<br/>Progress: 40%]
+    S5[Stage 5<br/>Pathway Aggregation<br/>Replication-aware aggregation and deduplication<br/>Progress: 55-60%]
+    S6[Stage 6<br/>NES Scoring<br/>Rank aggregated pathways by enrichment-based score<br/>Progress: 65-70%]
+    S7[Stage 7<br/>Semantic Cardiac Filtering<br/>Cardiac relevance scoring and redundancy reduction<br/>Progress: 72-76%]
+    S8[Stage 8<br/>Enhanced Validation<br/>GTEx support, degree-preserving permutations when enabled,<br/>curated plus bounded live Open Targets evidence<br/>Progress: 78-81%]
+    S9[Stage 9<br/>Literature Mining and Seed Tracing<br/>PubMed screening plus seed-to-pathway traceability<br/>Progress: 82-84%]
+    S10[Stage 10<br/>Final Strict Cardiac Name Filter<br/>Enforce cardiac-name filter and refresh literature on retained pathways<br/>Progress: 77-84%]
+    S11[Stage 11<br/>Important Genes<br/>Rank recurrent genes from top pathways with DisGeNET and therapeutic evidence<br/>Progress: 93%]
+    S12[Stage 12<br/>Report Generation<br/>JSON, HTML, PDF, CSV-linked outputs<br/>Progress: 97%]
+    DONE([Results Ready<br/>Complete: 100%])
+
+    START --> S1 --> S2 --> S3 --> S4 --> S5 --> S6 --> S7 --> S8 --> S9 --> S10 --> S11 --> S12 --> DONE
+
+    DB1[(STRING<br/>protein interactions)]
+    DB2[(g:Profiler<br/>REAC, KEGG, WP, GO:BP)]
+    DB3[(GTEx<br/>cardiac tissue expression)]
+    DB4[(PubMed<br/>query-based literature screening)]
+    DB5[(Open Targets<br/>live therapeutic target evidence)]
+    DB6[(Curated cardiac and drug target sets<br/>plus DisGeNET scoring)]
+
+    DB1 -.-> S2
+    DB2 -.-> S3
+    DB2 -.-> S4
+    DB3 -.-> S8
+    DB4 -.-> S9
+    DB4 -.-> S10
+    DB5 -.-> S8
+    DB6 -.-> S8
+    DB6 -.-> S11
+
+    O2[Functional neighborhood]
+    O3[Primary pathways]
+    O4[Secondary pathways]
+    O5[Aggregated pathway set]
+    O7[Semantically prioritized pathways]
+    O10[Final cardiac-filtered pathways]
+    O11[Important genes]
+
+    S2 -.-> O2
+    S3 -.-> O3
+    S4 -.-> O4
+    S5 -.-> O5
+    S7 -.-> O7
+    S10 -.-> O10
+    S11 -.-> O11
+
+    classDef inputStyle fill:#1E6B52,stroke:#0F3D2F,stroke-width:3px,color:#fff,font-weight:bold
+    classDef stage1Style fill:#2F80ED,stroke:#1456B8,stroke-width:2px,color:#fff
+    classDef stage2Style fill:#1EA7E1,stroke:#0B6E96,stroke-width:2px,color:#fff
+    classDef stage3Style fill:#11B5AE,stroke:#0A6C68,stroke-width:2px,color:#fff
+    classDef stage4Style fill:#14966D,stroke:#0E5F46,stroke-width:2px,color:#fff
+    classDef stage5Style fill:#5AA647,stroke:#336B28,stroke-width:2px,color:#fff
+    classDef stage6Style fill:#8EBA3F,stroke:#5D7D25,stroke-width:2px,color:#fff
+    classDef stage7Style fill:#D6D93B,stroke:#9B9F18,stroke-width:2px,color:#333
+    classDef stage8Style fill:#FFD54A,stroke:#D69B00,stroke-width:2px,color:#333
+    classDef stage9Style fill:#FFB81C,stroke:#B87400,stroke-width:2px,color:#333
+    classDef stage10Style fill:#F28C28,stroke:#B35F08,stroke-width:2px,color:#fff
+    classDef stage11Style fill:#F26430,stroke:#A53A14,stroke-width:2px,color:#fff
+    classDef stage12Style fill:#8E44AD,stroke:#5E2C73,stroke-width:2px,color:#fff
+    classDef completeStyle fill:#5B2C9D,stroke:#3B1C69,stroke-width:3px,color:#fff,font-weight:bold
+    classDef dbStyle fill:#607D8B,stroke:#37474F,stroke-width:2px,color:#fff
+    classDef outputStyle fill:#FFF3CD,stroke:#C98A00,stroke-width:1px,color:#333
+
+    class START inputStyle
+    class S1 stage1Style
+    class S2 stage2Style
+    class S3 stage3Style
+    class S4 stage4Style
+    class S5 stage5Style
+    class S6 stage6Style
+    class S7 stage7Style
+    class S8 stage8Style
+    class S9 stage9Style
+    class S10 stage10Style
+    class S11 stage11Style
+    class S12 stage12Style
+    class DONE completeStyle
+    class DB1,DB2,DB3,DB4,DB5,DB6 dbStyle
+    class O2,O3,O4,O5,O7,O10,O11 outputStyle

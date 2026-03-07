@@ -19,29 +19,39 @@ const pipelineSteps = [
       'Seed genes are validated, normalized, and interpreted in the selected cardiovascular disease context before downstream enrichment begins.',
   },
   {
-    title: '2. Primary expansion',
+    title: '2. Functional neighborhood',
     body:
-      'STRING neighborhood expansion and first-pass enrichment build a broad candidate space so early discovery is permissive rather than overly restrictive.',
+      'STRING interaction expansion builds the local functional neighborhood that seeds the first enrichment pass.',
   },
   {
-    title: '3. Secondary pathway discovery',
+    title: '3. Primary pathway enrichment',
     body:
-      'Genes from leading primary pathways are re-enriched to recover replicated or related pathways that are not obvious from direct seed overlap alone.',
+      'g:Profiler enrichment across Reactome, KEGG, WikiPathways, and GO:BP creates the first broad candidate set.',
   },
   {
-    title: '4. Aggregation and ranking',
+    title: '4. Secondary pathway discovery',
     body:
-      'Pathways are aggregated across supporting primaries, ranked by NES-based scoring, and annotated with support count, database provenance, and semantic cardiac relevance.',
+      'Genes from leading primary pathways are re-enriched, with bounded literature expansion, to recover replicated or less obvious downstream pathways.',
   },
   {
-    title: '5. Stage 8 validation',
+    title: '5. Aggregation and NES scoring',
     body:
-      'Final candidates are evaluated with GTEx cardiac expression, degree-preserving permutation testing when enabled, and therapeutic target evidence from curated annotations plus bounded live Open Targets lookups.',
+      'Pathways are aggregated across supporting primaries, deduplicated, and ranked with NES-based scoring before later filters are applied.',
   },
   {
-    title: '6. Literature review',
+    title: '6. Semantic filtering and validation',
     body:
-      'PubMed pathway-level queries are refreshed after final filtering so the literature evidence shown to the user matches the final displayed pathways.',
+      'Semantic cardiac relevance, redundancy reduction, GTEx support, degree-preserving permutation testing when enabled, and curated plus bounded live Open Targets evidence refine the ranked set.',
+  },
+  {
+    title: '7. Literature and final filter',
+    body:
+      'PubMed pathway-level review and seed tracing annotate the ranked candidates, then a final strict cardiac-name filter retains the displayed final pathways and refreshes literature evidence on that set.',
+  },
+  {
+    title: '8. Important genes and reports',
+    body:
+      'Important genes are generated from top ranked pathways with DisGeNET and therapeutic evidence, and the analysis is exported through the results page and downloadable reports.',
   },
 ];
 
@@ -69,7 +79,7 @@ const interpretationItems = [
   {
     label: 'Therapeutic target evidence',
     value:
-      'Stage 8 target-evidence layer summarizing approved, clinical, or tractable pathway genes and representative drug examples when available.',
+      'Target-evidence layer summarizing approved, clinical, or tractable pathway genes and representative drug examples when available.',
   },
   {
     label: 'Important genes',

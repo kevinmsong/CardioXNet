@@ -15,14 +15,23 @@ CardioXNet follows a staged discovery funnel:
 2. STRING expands the local functional neighborhood.
 3. Primary pathway enrichment creates the first candidate set.
 4. Secondary pathway enrichment broadens discovery beyond the original seed list.
-5. Aggregation, semantic filtering, scoring, and PubMed screening produce the final ranked pathways.
+5. Pathway aggregation produces a replicated candidate set.
+6. NES scoring ranks aggregated pathways.
+7. Semantic cardiac filtering and redundancy reduction narrow the shortlist.
+8. Enhanced validation adds GTEx, permutation testing when enabled, and therapeutic target evidence.
+9. Literature mining and seed-gene tracing annotate the shortlist.
+10. A final strict cardiac-name filter produces the retained final pathways.
+11. Important genes are generated from top pathways.
+12. Reports and exports are generated.
+
+The exact current implementation workflow is captured in [workflow_diagram.mmd](../workflow_diagram.mmd).
 
 ## Interpreting Results
 
 - Final pathways are prioritized candidates, not confirmed novel findings.
 - Lower seed-overlap pathways are useful leads, but they still require literature review.
 - PubMed query hits are a fast screening layer, not a definitive novelty adjudication step.
-- Important genes highlight recurrence across highly ranked pathways.
+- Important genes highlight recurrence across highly ranked pathways and may include therapeutic evidence from curated annotations and Open Targets.
 
 ## Where To Look In The App
 

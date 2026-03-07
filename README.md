@@ -32,17 +32,22 @@ Do not use it to:
 
 ## Discovery Workflow
 
-The pipeline follows a funnel-and-filter workflow:
+The live implementation in [workflow_diagram.mmd](/c:/Users/kevin/Documents/Research/CardioXNet/CardioXNet/workflow_diagram.mmd) follows this order:
 
 1. Seed genes are validated and normalized.
 2. A functional neighborhood is built from STRING interactions.
 3. Primary pathway enrichment creates the first broad candidate space.
 4. Leading primary pathways seed secondary pathway expansion.
-5. Pathways are aggregated across branches and ranked using support, enrichment, and pathway-level weighting.
-6. Semantic cardiac filtering and literature review narrow the final output to a smaller review set.
-7. Additional validation layers can add tissue-expression support, empirical permutation testing, and therapeutic target evidence.
+5. Pathways are aggregated across branches and deduplicated into a replicated candidate set.
+6. Aggregated pathways are ranked with NES scoring.
+7. Semantic cardiac filtering and redundancy reduction prioritize the biologically relevant set.
+8. Enhanced validation adds GTEx support, degree-preserving permutation testing when enabled, and curated plus bounded live Open Targets evidence.
+9. Literature mining and seed-gene tracing annotate the prioritized pathways.
+10. A final strict cardiac-name filter is applied, and literature evidence is refreshed on the retained final pathways.
+11. Important genes are generated from the top ranked pathways with DisGeNET and therapeutic evidence.
+12. Reports and downloadable outputs are generated.
 
-This broader early funnel is intentional. CardioXNet now keeps more primary and secondary candidates in play before the later prioritization filters are applied.
+This broader early funnel is intentional. CardioXNet keeps more primary and secondary candidates in play before the later prioritization filters are applied.
 
 ## Data Sources and Evidence Layers
 
@@ -217,7 +222,6 @@ A completed analysis can produce:
 
 - ranked final pathways
 - pathway detail views with lineage and evidence summaries
-- important-gene summaries
 - important-gene summaries with curated and Open Targets-derived therapeutic evidence when available
 - CSV export
 - downloadable reports in supported formats
