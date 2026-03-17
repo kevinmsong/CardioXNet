@@ -76,13 +76,13 @@ def main():
         <html><body style="margin:0;background:#1E6B52;display:flex;flex-direction:column;
             align-items:center;justify-content:center;height:100vh;font-family:sans-serif;color:white;">
           <div style="font-size:2.2rem;font-weight:800;letter-spacing:-1px;">CardioXNet</div>
-          <div style="font-size:1rem;margin-top:8px;opacity:.75;">Cardiac Repair Pathway Discovery Platform</div>
+          <div style="font-size:1rem;margin-top:8px;opacity:.75;">Cardiovascular Disease Pathway Discovery</div>
           <div style="margin-top:32px;font-size:.9rem;opacity:.6;">Starting server…</div>
         </body></html>
         """,
         width=520,
         height=320,
-        resizable=False,
+        resizable=True,
     )
 
     def _on_shown():
@@ -90,7 +90,7 @@ def main():
         if ready:
             splash.load_url(url)
             splash.set_title("CardioXNet")
-            splash.resize(1400, 900)
+            splash.resize(1820, 1170)
         else:
             splash.load_html(
                 "<body style='font-family:sans-serif;padding:40px;color:#c0392b;'>"
