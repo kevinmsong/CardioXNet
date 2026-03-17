@@ -326,7 +326,6 @@ export default function UltraDetailPageFixed() {
                 </Grid>
                 <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
                   Genes from the functional neighborhood (seed + STRING neighbors) that overlap with this pathway.
-                  {' '}<strong>Gold chips</strong> = seed genes · <strong>outlined chips</strong> = pathway database members · scores = betweenness centrality.
                 </Typography>
                 {allGenes.length > 50 && (
                   <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
