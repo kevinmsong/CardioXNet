@@ -79,8 +79,34 @@ export default function LiteratureEvidenceDisplay({
   } else if (allResults?.literature?.hypothesis_citations?.[pathway?.pathway_id]) {
     hypothesisCitations = allResults.literature.hypothesis_citations[pathway.pathway_id];
   } else if (hypothesis?.literature_evidence?.citations) {
-    // Mock data structure
     hypothesisCitations = hypothesis.literature_evidence.citations;
+  } else if (hypothesis?.literature_associations?.associations?.length > 0) {
+    // Build citation objects from per-gene PMID lists in literature_associations
+    const built: Citation[] = [];
+    for (const assoc of hypothesis.literature_associations.associations) {
+      for (const pmid of (assoc.pmids || [])) {
+        built.push({
+          pmid: String(pmid),
+          title: assoc.title || `PubMed article PMID ${pmid}`,
+          authors: assoc.authors || '',
+          year: assoc.year || 0,
+          relevance_score: assoc.relevance_score || 0.3,
+          journal: assoc.journal || '',
+        });
+      }
+      // Also handle citations array format
+      for (const cit of (assoc.citations || [])) {
+        built.push({
+          pmid: String(cit.pmid || ''),
+          title: cit.title || `PubMed article PMID ${cit.pmid}`,
+          authors: cit.authors || '',
+          year: cit.year || 0,
+          relevance_score: cit.relevance_score || cit.relevance || 0.3,
+          journal: cit.journal || '',
+        });
+      }
+    }
+    if (built.length > 0) hypothesisCitations = built;
   }
 
   // Debug logging
@@ -422,16 +448,38 @@ export default function LiteratureEvidenceDisplay({
               </Accordion>
             ))}
           </Box>
+        ) : hasLiteratureSupport && hypothesis?.literature_associations?.associations?.length > 0 ? (
+          // Render raw PMID links when structured citations couldn't be built
+          <Box sx={{ mt: 2 }}>
+            {hypothesis.literature_associations.associations.map((assoc: any, idx: number) => (
+              assoc.pmids?.length > 0 && (
+                <Box key={idx} sx={{ mb: 2 }}>
+                  <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 0.5, color: 'primary.main' }}>
+                    {assoc.seed_gene} — {assoc.citation_count ?? assoc.pmids.length} citation{assoc.pmids.length !== 1 ? 's' : ''}
+                  </Typography>
+                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                    {assoc.pmids.map((pmid: string, pidx: number) => (
+                      <Chip
+                        key={pidx}
+                        label={`PMID: ${pmid}`}
+                        size="small"
+                        clickable
+                        icon={<OpenInNew fontSize="small" />}
+                        onClick={() => window.open(`https://pubmed.ncbi.nlm.nih.gov/${pmid}`, '_blank')}
+                        sx={{ fontFamily: 'monospace', cursor: 'pointer' }}
+                      />
+                    ))}
+                  </Box>
+                </Box>
+              )
+            ))}
+          </Box>
         ) : (
-          <Alert 
-            severity={hasLiteratureSupport ? "info" : "warning"}
-            sx={{ mt: 2 }}
-          >
+          <Alert severity={hasLiteratureSupport ? "info" : "warning"} sx={{ mt: 2 }}>
             <Typography variant="body2">
-              {hasLiteratureSupport 
-                ? "Literature evidence was found but detailed citations are not available in this view."
-                : "This pathway-seed gene association has no prior literature evidence, suggesting it may be a novel finding worthy of further investigation."
-              }
+              {hasLiteratureSupport
+                ? "Literature support was recorded but citation details were not retrieved. Re-run analysis with higher PubMed results setting."
+                : "No prior literature evidence found for this pathway-gene set association. This may indicate a novel finding."}
             </Typography>
           </Alert>
         )}

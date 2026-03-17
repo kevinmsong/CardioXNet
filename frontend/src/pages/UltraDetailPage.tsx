@@ -24,7 +24,6 @@ import {
   Science,
   TrendingUp,
   Favorite,
-  Assessment,
   MenuBook,
 } from '@mui/icons-material';
 import api from '../api/endpoints';
@@ -286,45 +285,63 @@ export default function UltraDetailPageFixed() {
       </Paper>
 
       {/* Evidence Genes Section */}
-      <Paper elevation={2} sx={{ p: 3, mb: 3 }}>
-        <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <Science color="primary" />
-          Evidence Genes ({normalized.key_nodes.length})
-        </Typography>
-        <Divider sx={{ my: 2 }} />
-        
-        <Typography variant="body2" color="text.secondary" paragraph>
-          These genes were identified through network expansion and show significant association with this pathway.
-        </Typography>
+      {(() => {
+        // Collect evidence genes from all available sources
+        const keyNodeGenes = normalized.key_nodes.map((n: any) => ({ gene: n.gene, centrality: n.centrality, role: n.role, source: 'topology' }));
+        const pathwayGenes: any[] = (hypothesisData.aggregated_pathway?.pathway?.evidence_genes || [])
+          .map((g: string) => ({ gene: g, centrality: null, role: 'pathway', source: 'pathway' }));
+        const seedGenes: any[] = (normalized.seed_genes || [])
+          .map((g: string) => ({ gene: g, centrality: null, role: 'seed', source: 'seed' }));
 
-        {normalized.key_nodes.length > 0 ? (
-          <>
-            <Grid container spacing={1}>
-              {normalized.key_nodes.slice(0, 30).map((node, idx) => (
-                <Grid item key={idx}>
-                  <Chip
-                    label={`${node.gene} (${node.centrality?.toFixed(3) || 'N/A'})`}
-                    size="small"
-                    color={node.role === 'seed' ? 'secondary' : 'default'}
-                    sx={{ fontFamily: 'monospace' }}
-                  />
+        // Merge: prefer topology nodes, then pathway genes, then seed genes; deduplicate
+        const seen = new Set<string>();
+        const allGenes: any[] = [];
+        for (const g of [...keyNodeGenes, ...pathwayGenes, ...seedGenes]) {
+          if (!seen.has(g.gene)) { seen.add(g.gene); allGenes.push(g); }
+        }
+
+        return (
+          <Paper elevation={2} sx={{ p: 3, mb: 3 }}>
+            <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <Science color="primary" />
+              Evidence Genes ({allGenes.length})
+            </Typography>
+            <Divider sx={{ my: 2 }} />
+            {allGenes.length > 0 ? (
+              <>
+                <Grid container spacing={1}>
+                  {allGenes.slice(0, 50).map((node, idx) => (
+                    <Grid item key={idx}>
+                      <Chip
+                        label={node.centrality != null
+                          ? `${node.gene} (${node.centrality.toFixed(3)})`
+                          : node.gene}
+                        size="small"
+                        color={node.role === 'seed' ? 'secondary' : 'default'}
+                        variant={node.role === 'pathway' ? 'outlined' : 'filled'}
+                        sx={{ fontFamily: 'monospace' }}
+                      />
+                    </Grid>
+                  ))}
                 </Grid>
-              ))}
-            </Grid>
-
-            {normalized.key_nodes.length > 30 && (
-              <Typography variant="caption" color="text.secondary" sx={{ mt: 2, display: 'block' }}>
-                Showing 30 of {normalized.key_nodes.length} genes. Download CSV for complete list.
+                <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
+                  Genes from the functional neighborhood (seed + STRING neighbors) that overlap with this pathway.
+                  {' '}<strong>Gold chips</strong> = seed genes · <strong>outlined chips</strong> = pathway database members · scores = betweenness centrality.
+                </Typography>
+                {allGenes.length > 50 && (
+                  <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
+                    Showing 50 of {allGenes.length} genes. Download CSV for complete list.
+                  </Typography>
+                )}
+              </>
+            ) : (
+              <Typography variant="body2" color="text.secondary">
+                No evidence gene data available for this pathway.
               </Typography>
             )}
-          </>
-        ) : (
-          <Alert severity="info" sx={{ mt: 2 }}>
-            Evidence genes are being calculated. This pathway contains {normalized.evidence_count || 'multiple'} genes from the database.
-            The seed genes below are the primary contributors to this pathway discovery.
-          </Alert>
-        )}
-      </Paper>
+          </Paper>
+        );
+      })()}
 
       {/* Seed Genes Section */}
       <Paper elevation={2} sx={{ p: 3, mb: 3 }}>
@@ -351,33 +368,6 @@ export default function UltraDetailPageFixed() {
       </Paper>
 
       {/* Pathway Genes Section */}
-      {hypothesisData.aggregated_pathway?.pathway?.evidence_genes && (
-        <Paper elevation={2} sx={{ p: 3, mb: 3 }}>
-          <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <Assessment color="primary" />
-            Pathway Genes ({hypothesisData.aggregated_pathway.pathway.evidence_genes.length})
-          </Typography>
-          <Divider sx={{ my: 2 }} />
-          
-          <Typography variant="body2" color="text.secondary" paragraph>
-            All genes contained in this pathway according to the {normalized.source_db} database (Pathway ID: {normalized.pathway_id}).
-          </Typography>
-
-          <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
-            {hypothesisData.aggregated_pathway.pathway.evidence_genes.map((gene: string, idx: number) => (
-              <Chip
-                key={idx}
-                label={gene}
-                size="small"
-                variant="outlined"
-                color="primary"
-                sx={{ fontFamily: 'monospace' }}
-              />
-            ))}
-          </Stack>
-        </Paper>
-      )}
-
       {targetEvidence.length > 0 && (
         <Paper elevation={2} sx={{ p: 3, mb: 3 }}>
           <Typography variant="h6" gutterBottom>
