@@ -11,20 +11,13 @@ import {
   IconButton,
   Tooltip,
   Divider,
-  Badge,
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
   Alert,
   Button,
 } from '@mui/material';
 import {
   MenuBook,
   OpenInNew,
-  Star,
-  StarBorder,
   Science,
-  ExpandMore,
   Article,
   VerifiedUser,
   Warning,
@@ -48,490 +41,361 @@ interface LiteratureEvidenceProps {
   citations?: Citation[];
 }
 
-export default function LiteratureEvidenceDisplay({ 
-  hypothesis, 
+const PUBMED_URL = (pmid: string) => `https://pubmed.ncbi.nlm.nih.gov/${pmid}`;
+
+function formatAuthors(authors: string) {
+  if (!authors) return '';
+  const list = authors.split(',').map(a => a.trim());
+  return list.length <= 2 ? authors : `${list[0]} et al.`;
+}
+
+export default function LiteratureEvidenceDisplay({
+  hypothesis,
   allResults = {},
-  citations = []
+  citations = [],
 }: LiteratureEvidenceProps) {
-  const [expandedCitation, setExpandedCitation] = useState<string | null>(null);
+  const [expandedPmid, setExpandedPmid] = useState<string | null>(null);
 
-  const literatureAssociations = hypothesis?.literature_associations || {};
-  const tracedSeedGenes = hypothesis?.traced_seed_genes || [];
   const pathway = hypothesis?.aggregated_pathway?.pathway;
+  const pathwayId = pathway?.pathway_id;
+  const tracedSeedGenes = hypothesis?.traced_seed_genes || [];
+  const literatureAssociations = hypothesis?.literature_associations || {};
 
-  // Extract literature data from results
-  const literatureResults = allResults?.stage_4_literature || {};
-  let hypothesisCitations: Citation[] = citations; // Start with prop citations
-  
-  // Try multiple locations for citations
-  // First try: allResults.stage_4_literature[pathway_id].top_citations (CORRECT LOCATION)
-  if (allResults?.stage_4_literature?.[pathway?.pathway_id]?.top_citations) {
-    // Map 'relevance' field to 'relevance_score' for compatibility
-    hypothesisCitations = allResults.stage_4_literature[pathway.pathway_id].top_citations.map((cit: any) => ({
-      ...cit,
-      relevance_score: cit.relevance_score || cit.relevance || 0,
-      authors: cit.authors || 'Unknown'
-    }));
+  // ── Step 1: collect all citations from every possible source ──────────────
+  const citationMap = new Map<string, Citation>();
+
+  // Priority 1: structured top_citations with full metadata (stage_4_literature)
+  const topCitations: any[] =
+    allResults?.stage_4_literature?.[pathwayId]?.top_citations ||
+    allResults?.stage_4_literature?.hypothesis_citations?.[pathwayId] ||
+    allResults?.literature?.hypothesis_citations?.[pathwayId] ||
+    hypothesis?.literature_evidence?.citations ||
+    citations;
+
+  for (const c of topCitations) {
+    const pmid = String(c.pmid || '');
+    if (!pmid) continue;
+    citationMap.set(pmid, {
+      pmid,
+      title: c.title || '',
+      authors: c.authors || '',
+      year: c.year || 0,
+      relevance_score: c.relevance_score ?? c.relevance ?? 0,
+      journal: c.journal || '',
+      abstract: c.abstract || '',
+      mesh_terms: c.mesh_terms || [],
+    });
   }
-  // Fallback: old structure for backwards compatibility
-  else if (allResults?.stage_4_literature?.hypothesis_citations?.[pathway?.pathway_id]) {
-    hypothesisCitations = allResults.stage_4_literature.hypothesis_citations[pathway.pathway_id];
-  } else if (allResults?.literature?.hypothesis_citations?.[pathway?.pathway_id]) {
-    hypothesisCitations = allResults.literature.hypothesis_citations[pathway.pathway_id];
-  } else if (hypothesis?.literature_evidence?.citations) {
-    hypothesisCitations = hypothesis.literature_evidence.citations;
-  } else if (hypothesis?.literature_associations?.associations?.length > 0) {
-    // Build citation objects from per-gene PMID lists in literature_associations
-    const built: Citation[] = [];
-    for (const assoc of hypothesis.literature_associations.associations) {
-      for (const pmid of (assoc.pmids || [])) {
-        built.push({
-          pmid: String(pmid),
-          title: assoc.title || `PubMed article PMID ${pmid}`,
+
+  // Priority 2: per-gene association arrays — add any PMIDs not yet seen
+  const associations: any[] = literatureAssociations?.associations || [];
+  for (const assoc of associations) {
+    // flat pmids array
+    for (const pmid of (assoc.pmids || [])) {
+      const key = String(pmid);
+      if (!citationMap.has(key)) {
+        citationMap.set(key, {
+          pmid: key,
+          title: assoc.title || '',       // assoc-level title if present
           authors: assoc.authors || '',
           year: assoc.year || 0,
-          relevance_score: assoc.relevance_score || 0.3,
+          relevance_score: assoc.relevance_score || 0,
           journal: assoc.journal || '',
         });
       }
-      // Also handle citations array format
-      for (const cit of (assoc.citations || [])) {
-        built.push({
-          pmid: String(cit.pmid || ''),
-          title: cit.title || `PubMed article PMID ${cit.pmid}`,
+    }
+    // nested citations array
+    for (const cit of (assoc.citations || [])) {
+      const key = String(cit.pmid || '');
+      if (!key) continue;
+      if (!citationMap.has(key)) {
+        citationMap.set(key, {
+          pmid: key,
+          title: cit.title || '',
           authors: cit.authors || '',
           year: cit.year || 0,
-          relevance_score: cit.relevance_score || cit.relevance || 0.3,
+          relevance_score: cit.relevance_score ?? cit.relevance ?? 0,
           journal: cit.journal || '',
+          abstract: cit.abstract || '',
         });
       }
     }
-    if (built.length > 0) hypothesisCitations = built;
   }
 
-  // Debug logging
-  console.log('LiteratureEvidenceDisplay Debug:', {
-    pathway_id: pathway?.pathway_id,
-    citations_prop_count: citations.length,
-    hypothesisCitations_count: hypothesisCitations.length,
-    hypothesisCitations_data: hypothesisCitations,
-    allResults_stage4_lit: allResults?.stage_4_literature ? Object.keys(allResults.stage_4_literature).slice(0, 3) : 'no stage_4_literature'
+  // Sort: by relevance_score desc, then by year desc
+  const allCitations = [...citationMap.values()].sort((a, b) => {
+    const rDiff = (b.relevance_score || 0) - (a.relevance_score || 0);
+    if (Math.abs(rDiff) > 0.001) return rDiff;
+    return (b.year || 0) - (a.year || 0);
   });
 
-  // Sort citations by relevance score
-  const sortedCitations = [...hypothesisCitations].sort((a, b) => (b.relevance_score || 0) - (a.relevance_score || 0));
+  const hasSupport =
+    literatureAssociations?.has_literature_support ||
+    (hypothesis?.literature_evidence?.total_citations ?? 0) > 0 ||
+    allCitations.length > 0;
 
-  // Group citations by relevance tiers
-  const highRelevance = sortedCitations.filter(c => (c.relevance_score || 0) >= 0.7);
-  const mediumRelevance = sortedCitations.filter(c => (c.relevance_score || 0) >= 0.4 && (c.relevance_score || 0) < 0.7);
-  const lowRelevance = sortedCitations.filter(c => (c.relevance_score || 0) < 0.4);
-
-  // Handle literature support from multiple sources
-  const hasLiteratureSupport = literatureAssociations?.has_literature_support || 
-                              (hypothesis?.literature_evidence?.total_citations > 0) || 
-                              (sortedCitations.length > 0);
-  const totalCitations = literatureAssociations?.total_citations || 
-                        hypothesis?.literature_evidence?.total_citations || 
-                        sortedCitations.length || 0;
-
-  const getRelevanceColor = (score: number) => {
-    if (score >= 0.7) return 'success';
-    if (score >= 0.4) return 'warning';
-    return 'default';
-  };
-
-  const getRelevanceLabel = (score: number) => {
-    if (score >= 0.7) return 'High';
-    if (score >= 0.4) return 'Medium';
-    return 'Low';
-  };
-
-  const formatAuthors = (authors: string) => {
-    const authorList = authors.split(',').map(a => a.trim());
-    if (authorList.length <= 2) return authors;
-    return `${authorList[0]} et al.`;
-  };
+  const totalCount =
+    literatureAssociations?.total_citations ||
+    hypothesis?.literature_evidence?.total_citations ||
+    allCitations.length ||
+    0;
 
   return (
     <Card elevation={2} sx={{ mb: 3 }}>
       <CardContent sx={{ p: 3 }}>
+        {/* Header */}
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 3 }}>
           <MenuBook color="primary" />
           <Typography variant="h6" fontWeight={600}>
-            Literature Evidence & Citations
+            Literature Evidence &amp; Citations
           </Typography>
+          {allCitations.length > 0 && (
+            <Chip
+              label={`${allCitations.length} citation${allCitations.length !== 1 ? 's' : ''}`}
+              size="small"
+              color="primary"
+              sx={{ ml: 1, fontWeight: 700 }}
+            />
+          )}
         </Box>
 
-        {/* Literature Support Status */}
-        <Card 
-          variant="outlined" 
-          sx={{ 
-            mb: 3, 
-            borderColor: hasLiteratureSupport ? 'success.main' : 'warning.main',
-            bgcolor: hasLiteratureSupport ? 'success.50' : 'warning.50'
+        {/* Support status banner */}
+        <Card
+          variant="outlined"
+          sx={{
+            mb: 3,
+            borderColor: hasSupport ? 'success.main' : 'warning.main',
+            bgcolor: hasSupport ? '#F1F8E9' : '#FFF8E1',
           }}
         >
           <CardContent sx={{ py: 2 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-              <Avatar 
-                sx={{ 
-                  bgcolor: hasLiteratureSupport ? 'success.main' : 'warning.main',
-                  width: 40,
-                  height: 40
-                }}
-              >
-                {hasLiteratureSupport ? <VerifiedUser /> : <Warning />}
+              <Avatar sx={{ bgcolor: hasSupport ? 'success.main' : 'warning.main', width: 40, height: 40 }}>
+                {hasSupport ? <VerifiedUser /> : <Warning />}
               </Avatar>
               <Box sx={{ flexGrow: 1 }}>
                 <Typography variant="h6" fontWeight={600}>
-                  {hasLiteratureSupport ? 'Literature Support Found' : 'Novel Finding - No Prior Literature'}
+                  {hasSupport ? 'Literature Support Found' : 'Novel Finding — No Prior Literature'}
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
-                  {hasLiteratureSupport 
-                    ? `Found ${totalCitations} publications linking this pathway to ${tracedSeedGenes.length} seed gene(s)`
-                    : 'No existing literature evidence found for this pathway-seed gene association. This may represent a novel discovery.'
-                  }
+                  {hasSupport
+                    ? `${totalCount} publication${totalCount !== 1 ? 's' : ''} link this pathway to ${tracedSeedGenes.length} seed gene${tracedSeedGenes.length !== 1 ? 's' : ''}`
+                    : 'No existing literature evidence found. This may represent a novel discovery.'}
                 </Typography>
               </Box>
-              <Chip 
-                label={hasLiteratureSupport ? 'Reported' : 'Not Reported'}
-                color={hasLiteratureSupport ? 'success' : 'warning'}
+              <Chip
+                label={hasSupport ? 'Reported' : 'Not Reported'}
+                color={hasSupport ? 'success' : 'warning'}
                 sx={{ fontWeight: 600 }}
               />
             </Box>
           </CardContent>
         </Card>
 
-        {/* Contributing Seed Genes for Literature Search */}
-        {tracedSeedGenes && tracedSeedGenes.length > 0 && (
+        {/* Contributing genes */}
+        {tracedSeedGenes.length > 0 && (
           <Card variant="outlined" sx={{ mb: 3 }}>
             <CardContent sx={{ py: 2 }}>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
                 <Science color="primary" fontSize="small" />
                 <Typography variant="subtitle1" fontWeight={600}>
-                  Contributing Seed Genes for Literature Search
+                  Contributing Seed Genes ({tracedSeedGenes.length})
                 </Typography>
               </Box>
-              <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                Literature search focused on the {tracedSeedGenes.length} seed gene(s) that specifically contributed to discovering this pathway:
-              </Typography>
               <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-                {tracedSeedGenes.map((gene: string, index: number) => (
-                  <Chip
-                    key={index}
-                    label={gene}
-                    size="small"
-                    color="primary"
-                    variant="outlined"
-                    icon={<Science />}
-                    sx={{ fontWeight: 600 }}
-                  />
+                {tracedSeedGenes.map((gene: string, i: number) => (
+                  <Chip key={i} label={gene} size="small" color="primary" variant="outlined" sx={{ fontWeight: 600 }} />
                 ))}
               </Box>
-              <Alert severity="info" sx={{ mt: 2 }}>
-                <Typography variant="body2">
-                  <strong>Targeted Literature Mining:</strong> Citations below were found by searching for publications 
-                  that discuss "{hypothesis?.aggregated_pathway?.pathway?.pathway_name}" in combination with these specific 
-                  contributing seed genes, providing more relevant evidence than generic pathway literature.
-                </Typography>
-              </Alert>
             </CardContent>
           </Card>
         )}
 
-        {/* Citation Statistics */}
-        {totalCitations > 0 && (
+        {/* Citation stats */}
+        {allCitations.length > 0 && (
           <Grid container spacing={2} sx={{ mb: 3 }}>
-            <Grid item xs={12} sm={3}>
-              <Card variant="outlined" sx={{ textAlign: 'center' }}>
-                <CardContent sx={{ py: 2 }}>
-                  <Typography variant="h4" color="primary" fontWeight={600}>
-                    {totalCitations}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    Total Citations
-                  </Typography>
-                </CardContent>
-              </Card>
-            </Grid>
-            <Grid item xs={12} sm={3}>
-              <Card variant="outlined" sx={{ textAlign: 'center' }}>
-                <CardContent sx={{ py: 2 }}>
-                  <Typography variant="h4" color="success.main" fontWeight={600}>
-                    {highRelevance.length}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    High Relevance
-                  </Typography>
-                </CardContent>
-              </Card>
-            </Grid>
-            <Grid item xs={12} sm={3}>
-              <Card variant="outlined" sx={{ textAlign: 'center' }}>
-                <CardContent sx={{ py: 2 }}>
-                  <Typography variant="h4" color="warning.main" fontWeight={600}>
-                    {mediumRelevance.length}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    Medium Relevance
-                  </Typography>
-                </CardContent>
-              </Card>
-            </Grid>
-            <Grid item xs={12} sm={3}>
-              <Card variant="outlined" sx={{ textAlign: 'center' }}>
-                <CardContent sx={{ py: 2 }}>
-                  <Typography variant="h4" color="text.secondary" fontWeight={600}>
-                    {lowRelevance.length}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    Lower Relevance
-                  </Typography>
-                </CardContent>
-              </Card>
-            </Grid>
+            {[
+              { label: 'Total Citations', value: allCitations.length, color: 'primary.main' },
+              { label: 'High Relevance (≥70%)', value: allCitations.filter(c => c.relevance_score >= 0.7).length, color: 'success.main' },
+              { label: 'With Title', value: allCitations.filter(c => c.title).length, color: 'info.main' },
+              { label: 'Recent (≥2020)', value: allCitations.filter(c => c.year >= 2020).length, color: 'warning.main' },
+            ].map(({ label, value, color }) => (
+              <Grid item xs={6} sm={3} key={label}>
+                <Card variant="outlined" sx={{ textAlign: 'center' }}>
+                  <CardContent sx={{ py: 2 }}>
+                    <Typography variant="h4" sx={{ color }} fontWeight={600}>{value}</Typography>
+                    <Typography variant="body2" color="text.secondary">{label}</Typography>
+                  </CardContent>
+                </Card>
+              </Grid>
+            ))}
           </Grid>
         )}
 
-        {/* Citations List */}
-        {sortedCitations.length > 0 ? (
+        {/* ── All citations flat list ────────────────────────────────────── */}
+        {allCitations.length > 0 ? (
           <Box>
-            <Typography variant="h6" fontWeight={600} gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.5 }}>
               <Article color="primary" />
-              Supporting Publications
-            </Typography>
-            <Typography variant="body2" color="text.secondary" paragraph>
-              Publications ranked by relevance to the pathway-seed gene association
+              <Typography variant="h6" fontWeight={600}>
+                Supporting Publications — All {allCitations.length}
+              </Typography>
+            </Box>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+              Sorted by relevance score. Click the title or PMID chip to open in PubMed.
             </Typography>
 
-            {[
-              { citations: highRelevance, title: 'High Relevance (≥0.7)', color: 'success' },
-              { citations: mediumRelevance, title: 'Medium Relevance (0.4-0.7)', color: 'warning' },
-              { citations: lowRelevance, title: 'Lower Relevance (<0.4)', color: 'default' }
-            ].filter(group => group.citations.length > 0).map((group, groupIdx) => (
-              <Accordion key={groupIdx} sx={{ mb: 1 }}>
-                <AccordionSummary expandIcon={<ExpandMore />}>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <Chip 
-                      label={group.citations.length} 
-                      size="small" 
-                      color={group.color as any}
-                    />
-                    <Typography variant="subtitle1" fontWeight={600}>
-                      {group.title}
-                    </Typography>
-                  </Box>
-                </AccordionSummary>
-                <AccordionDetails>
-                  <List>
-                    {group.citations.map((citation, _idx) => (
-                      <ListItem 
-                        key={citation.pmid} 
-                        sx={{ 
-                          border: '1px solid #E0E0E0',
-                          borderRadius: 1,
-                          mb: 1,
-                          bgcolor: 'grey.50'
-                        }}
-                      >
-                        <Box sx={{ width: '100%' }}>
-                          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
-                            <Box sx={{ flexGrow: 1, pr: 2 }}>
-                              <Typography
-                                variant="subtitle2"
-                                fontWeight={600}
-                                sx={{
-                                  mb: 0.5,
-                                  cursor: 'pointer',
-                                  color: 'primary.main',
-                                  '&:hover': { textDecoration: 'underline' },
-                                }}
-                                onClick={() => window.open(`https://pubmed.ncbi.nlm.nih.gov/${citation.pmid}`, '_blank')}
-                              >
-                                {citation.title}
-                              </Typography>
-                              <Typography variant="body2" color="text.secondary">
-                                {formatAuthors(citation.authors)} • {citation.year} • {citation.journal || 'Unknown Journal'}
-                              </Typography>
-                            </Box>
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                              <Chip 
-                                label={`${(citation.relevance_score * 100).toFixed(0)}%`}
-                                size="small"
-                                color={getRelevanceColor(citation.relevance_score) as any}
-                              />
-                              <Badge 
-                                badgeContent={getRelevanceLabel(citation.relevance_score)}
-                                color={getRelevanceColor(citation.relevance_score) as any}
-                                sx={{ '& .MuiBadge-badge': { fontSize: '0.7rem' } }}
-                              >
-                                <Box sx={{ display: 'flex' }}>
-                                  {[...Array(5)].map((_, starIdx) => (
-                                    starIdx < Math.round(citation.relevance_score * 5) 
-                                      ? <Star key={starIdx} sx={{ fontSize: 16, color: 'gold' }} />
-                                      : <StarBorder key={starIdx} sx={{ fontSize: 16, color: 'grey.400' }} />
-                                  ))}
-                                </Box>
-                              </Badge>
-                            </Box>
-                          </Box>
-                          
-                          {citation.abstract && (
-                            <Box sx={{ mb: 1 }}>
-                              <Typography 
-                                variant="body2" 
-                                sx={{ 
-                                  fontSize: '0.875rem',
-                                  lineHeight: 1.4,
-                                  color: 'text.secondary',
-                                  display: expandedCitation === citation.pmid ? 'block' : '-webkit-box',
-                                  WebkitLineClamp: expandedCitation === citation.pmid ? 'none' : 2,
-                                  WebkitBoxOrient: 'vertical',
-                                  overflow: 'hidden'
-                                }}
-                              >
-                                {citation.abstract}
-                              </Typography>
-                              <Button
-                                size="small"
-                                onClick={() => setExpandedCitation(
-                                  expandedCitation === citation.pmid ? null : citation.pmid
-                                )}
-                                sx={{ mt: 0.5, p: 0, minWidth: 'auto', textTransform: 'none' }}
-                              >
-                                {expandedCitation === citation.pmid ? 'Show less' : 'Show more'}
-                              </Button>
-                            </Box>
-                          )}
+            <List disablePadding>
+              {allCitations.map((citation, idx) => {
+                const relevancePct = Math.round((citation.relevance_score || 0) * 100);
+                const relevanceColor =
+                  relevancePct >= 70 ? '#2E7D32' : relevancePct >= 40 ? '#E65100' : '#757575';
 
-                          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <Box sx={{ display: 'flex', gap: 0.5 }}>
-                              <Chip
-                                label={`PMID: ${citation.pmid}`}
-                                size="small"
-                                variant="outlined"
-                                clickable
-                                onClick={() => window.open(`https://pubmed.ncbi.nlm.nih.gov/${citation.pmid}`, '_blank')}
-                                sx={{ fontSize: '0.75rem', fontFamily: 'monospace', cursor: 'pointer', '&:hover': { bgcolor: '#E3F2FD' } }}
-                              />
-                              {citation.mesh_terms && citation.mesh_terms.slice(0, 2).map((term: any, termIdx: number) => (
-                                <Chip 
-                                  key={termIdx}
-                                  label={term} 
-                                  size="small" 
-                                  variant="outlined"
-                                  sx={{ fontSize: '0.75rem' }}
-                                />
-                              ))}
-                            </Box>
-                            <Box>
-                              <Tooltip title="View on PubMed" arrow>
-                                <IconButton
-                                  size="small"
-                                  onClick={() => window.open(`https://pubmed.ncbi.nlm.nih.gov/${citation.pmid}`, '_blank')}
-                                  sx={{
-                                    bgcolor: 'primary.main',
-                                    color: 'white',
-                                    '&:hover': { bgcolor: 'primary.dark' }
-                                  }}
-                                >
-                                  <OpenInNew fontSize="small" />
-                                </IconButton>
-                              </Tooltip>
-                            </Box>
-                          </Box>
-                        </Box>
-                      </ListItem>
-                    ))}
-                  </List>
-                </AccordionDetails>
-              </Accordion>
-            ))}
-          </Box>
-        ) : hasLiteratureSupport && hypothesis?.literature_associations?.associations?.length > 0 ? (
-          // Render raw PMID links when structured citations couldn't be built
-          <Box sx={{ mt: 2 }}>
-            {hypothesis.literature_associations.associations.map((assoc: any, idx: number) => (
-              assoc.pmids?.length > 0 && (
-                <Box key={idx} sx={{ mb: 2 }}>
-                  <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 0.5, color: 'primary.main' }}>
-                    {assoc.seed_gene} — {assoc.citation_count ?? assoc.pmids.length} citation{assoc.pmids.length !== 1 ? 's' : ''}
-                  </Typography>
-                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-                    {assoc.pmids.map((pmid: string, pidx: number) => (
+                return (
+                  <ListItem
+                    key={citation.pmid}
+                    disablePadding
+                    sx={{
+                      mb: 1.5,
+                      border: '1px solid #E0E0E0',
+                      borderLeft: `4px solid ${relevanceColor}`,
+                      borderRadius: 1,
+                      bgcolor: idx % 2 === 0 ? '#FAFAFA' : 'white',
+                      p: 2,
+                      flexDirection: 'column',
+                      alignItems: 'flex-start',
+                    }}
+                  >
+                    {/* Top row: title + score */}
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', width: '100%', mb: 0.5 }}>
+                      <Box sx={{ flex: 1, pr: 2 }}>
+                        {citation.title ? (
+                          <Typography
+                            variant="subtitle2"
+                            fontWeight={600}
+                            sx={{
+                              cursor: 'pointer',
+                              color: 'primary.main',
+                              '&:hover': { textDecoration: 'underline' },
+                              lineHeight: 1.4,
+                            }}
+                            onClick={() => window.open(PUBMED_URL(citation.pmid), '_blank')}
+                          >
+                            {citation.title}
+                          </Typography>
+                        ) : (
+                          <Typography
+                            variant="subtitle2"
+                            fontWeight={600}
+                            sx={{ cursor: 'pointer', color: 'primary.main', '&:hover': { textDecoration: 'underline' }, fontFamily: 'monospace' }}
+                            onClick={() => window.open(PUBMED_URL(citation.pmid), '_blank')}
+                          >
+                            PMID {citation.pmid}
+                          </Typography>
+                        )}
+                      </Box>
                       <Chip
-                        key={pidx}
-                        label={`PMID: ${pmid}`}
+                        label={`${relevancePct}%`}
                         size="small"
-                        clickable
-                        icon={<OpenInNew fontSize="small" />}
-                        onClick={() => window.open(`https://pubmed.ncbi.nlm.nih.gov/${pmid}`, '_blank')}
-                        sx={{ fontFamily: 'monospace', cursor: 'pointer' }}
+                        sx={{ bgcolor: relevanceColor, color: 'white', fontWeight: 700, flexShrink: 0 }}
                       />
-                    ))}
-                  </Box>
-                </Box>
-              )
-            ))}
+                    </Box>
+
+                    {/* Authors / year / journal */}
+                    {(citation.authors || citation.year || citation.journal) && (
+                      <Typography variant="caption" color="text.secondary" sx={{ mb: 0.5 }}>
+                        {[
+                          citation.authors ? formatAuthors(citation.authors) : null,
+                          citation.year || null,
+                          citation.journal || null,
+                        ].filter(Boolean).join(' • ')}
+                      </Typography>
+                    )}
+
+                    {/* Abstract (collapsible) */}
+                    {citation.abstract && (
+                      <Box sx={{ width: '100%', mt: 0.5 }}>
+                        <Typography
+                          variant="body2"
+                          color="text.secondary"
+                          sx={{
+                            fontSize: '0.82rem',
+                            lineHeight: 1.5,
+                            display: expandedPmid === citation.pmid ? 'block' : '-webkit-box',
+                            WebkitLineClamp: expandedPmid === citation.pmid ? undefined : 2,
+                            WebkitBoxOrient: 'vertical',
+                            overflow: 'hidden',
+                          }}
+                        >
+                          {citation.abstract}
+                        </Typography>
+                        <Button
+                          size="small"
+                          onClick={() => setExpandedPmid(expandedPmid === citation.pmid ? null : citation.pmid)}
+                          sx={{ mt: 0.25, p: 0, minWidth: 'auto', textTransform: 'none', fontSize: '0.75rem' }}
+                        >
+                          {expandedPmid === citation.pmid ? 'Collapse' : 'Expand abstract'}
+                        </Button>
+                      </Box>
+                    )}
+
+                    {/* Footer: PMID chip + open button */}
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 1 }}>
+                      <Chip
+                        label={`PMID: ${citation.pmid}`}
+                        size="small"
+                        variant="outlined"
+                        clickable
+                        onClick={() => window.open(PUBMED_URL(citation.pmid), '_blank')}
+                        sx={{ fontFamily: 'monospace', fontSize: '0.72rem', cursor: 'pointer', '&:hover': { bgcolor: '#E3F2FD' } }}
+                      />
+                      {citation.mesh_terms?.slice(0, 2).map((term, i) => (
+                        <Chip key={i} label={term} size="small" variant="outlined" sx={{ fontSize: '0.7rem' }} />
+                      ))}
+                      <Tooltip title="Open in PubMed" arrow>
+                        <IconButton
+                          size="small"
+                          onClick={() => window.open(PUBMED_URL(citation.pmid), '_blank')}
+                          sx={{ ml: 'auto', bgcolor: 'primary.main', color: 'white', '&:hover': { bgcolor: 'primary.dark' } }}
+                        >
+                          <OpenInNew sx={{ fontSize: 14 }} />
+                        </IconButton>
+                      </Tooltip>
+                    </Box>
+                  </ListItem>
+                );
+              })}
+            </List>
           </Box>
         ) : (
-          <Alert severity={hasLiteratureSupport ? "info" : "warning"} sx={{ mt: 2 }}>
+          <Alert severity={hasSupport ? 'info' : 'warning'} sx={{ mt: 2 }}>
             <Typography variant="body2">
-              {hasLiteratureSupport
-                ? "Literature support was recorded but citation details were not retrieved. Re-run analysis with higher PubMed results setting."
-                : "No prior literature evidence found for this pathway-gene set association. This may indicate a novel finding."}
+              {hasSupport
+                ? 'Literature support recorded but citation details not retrieved. Re-run with higher PubMed results setting.'
+                : 'No prior literature evidence found. This may indicate a novel finding.'}
             </Typography>
           </Alert>
         )}
 
-        {/* Literature Mining Stats */}
-        {literatureResults && Object.keys(literatureResults).length > 0 && (
+        {/* Literature mining stats */}
+        {allResults?.stage_4_literature && Object.keys(allResults.stage_4_literature).length > 0 && (
           <Box sx={{ mt: 3 }}>
             <Divider sx={{ mb: 2 }} />
-            <Typography variant="subtitle2" color="text.secondary" gutterBottom>
-              Literature Mining Statistics
-            </Typography>
+            <Typography variant="subtitle2" color="text.secondary" gutterBottom>Literature Mining Statistics</Typography>
             <Grid container spacing={2}>
-              <Grid item xs={12} sm={6} md={3}>
-                <Box sx={{ textAlign: 'center' }}>
-                  <Typography variant="h6" color="primary">
-                    {literatureResults.hypotheses_with_literature || 0}
-                  </Typography>
-                  <Typography variant="caption" color="text.secondary">
-                    Pathways with Literature
-                  </Typography>
-                </Box>
-              </Grid>
-              <Grid item xs={12} sm={6} md={3}>
-                <Box sx={{ textAlign: 'center' }}>
-                  <Typography variant="h6" color="success.main">
-                    {literatureResults.total_citations || 0}
-                  </Typography>
-                  <Typography variant="caption" color="text.secondary">
-                    Total Citations Found
-                  </Typography>
-                </Box>
-              </Grid>
-              <Grid item xs={12} sm={6} md={3}>
-                <Box sx={{ textAlign: 'center' }}>
-                  <Typography variant="h6" color="warning.main">
-                    {literatureResults.avg_relevance_score?.toFixed(2) || 'N/A'}
-                  </Typography>
-                  <Typography variant="caption" color="text.secondary">
-                    Avg Relevance Score
-                  </Typography>
-                </Box>
-              </Grid>
-              <Grid item xs={12} sm={6} md={3}>
-                <Box sx={{ textAlign: 'center' }}>
-                  <Typography variant="h6" color="text.secondary">
-                    {literatureResults.unique_journals || 0}
-                  </Typography>
-                  <Typography variant="caption" color="text.secondary">
-                    Unique Journals
-                  </Typography>
-                </Box>
-              </Grid>
+              {[
+                { label: 'Pathways with Literature', value: allResults.stage_4_literature.hypotheses_with_literature ?? 0, color: 'primary' },
+                { label: 'Total Citations Found', value: allResults.stage_4_literature.total_citations ?? 0, color: 'success.main' },
+                { label: 'Avg Relevance Score', value: allResults.stage_4_literature.avg_relevance_score?.toFixed(2) ?? 'N/A', color: 'warning.main' },
+                { label: 'Unique Journals', value: allResults.stage_4_literature.unique_journals ?? 0, color: 'text.secondary' },
+              ].map(({ label, value, color }) => (
+                <Grid item xs={6} sm={3} key={label}>
+                  <Box sx={{ textAlign: 'center' }}>
+                    <Typography variant="h6" sx={{ color }}>{value}</Typography>
+                    <Typography variant="caption" color="text.secondary">{label}</Typography>
+                  </Box>
+                </Grid>
+              ))}
             </Grid>
           </Box>
         )}
