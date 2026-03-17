@@ -614,8 +614,7 @@ class LiteratureMiner:
             List of paper dictionaries
         """
         try:
-            # Further reduced limit for speed optimization (from 50 to 25)
-            max_results = 25
+            max_results = 50
             print(f"[PUBMED SEARCH] Searching for up to {max_results} papers...", flush=True)
             
             papers = self.pubmed_client._search_pubmed(query, max_results=max_results)

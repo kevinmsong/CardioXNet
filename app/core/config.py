@@ -138,7 +138,7 @@ class NETSConfig(BaseSettings):
 
     # Max hypotheses sent to literature mining
     semantic_max_hypotheses_for_literature: int = Field(
-        default=15, ge=1, le=100,
+        default=30, ge=1, le=100,
         description="Maximum hypotheses passed to literature mining stage"
     )
 

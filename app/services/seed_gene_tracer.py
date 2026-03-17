@@ -1,6 +1,7 @@
 """Seed gene traceability and literature association service."""
 
 import logging
+import re
 from typing import List, Dict, Set, Any
 from collections import defaultdict
 
@@ -145,23 +146,55 @@ class SeedGeneTracer:
         
         return True
     
+    @staticmethod
+    def _build_pubmed_query(pathway_name: str, seed_gene: str) -> str:
+        """
+        Build a PubMed query that balances specificity and recall.
+
+        Instead of requiring the exact Reactome/GO pathway name as a phrase
+        (almost never found verbatim in abstracts), we extract the 2-3 most
+        informative content words from the name and OR them with the seed gene
+        plus a cardiovascular context filter.
+        """
+        _STOP = {
+            'pathway', 'signaling', 'signal', 'by', 'in', 'of', 'via', 'the',
+            'a', 'an', 'and', 'or', 'with', 'for', 'from', 'to', 'at', 'into',
+            'regulation', 'regulated', 'process', 'processing', 'response',
+            'activity', 'activation', 'complex', 'system', 'biosynthesis',
+            'metabolism', 'metabolic', 'disease', 'diseases', 'type', 'class',
+        }
+        tokens = re.split(r'[\s\-_/,;:()\[\]]+', pathway_name)
+        key_terms = [
+            t for t in tokens
+            if len(t) >= 3 and t.lower() not in _STOP and re.search(r'[A-Za-z]', t)
+        ][:3]
+
+        if key_terms:
+            term_clause = ' AND '.join(f'{t}[Title/Abstract]' for t in key_terms)
+            return (
+                f'({term_clause}) AND "{seed_gene}"[Title/Abstract] AND '
+                f'(cardiac[Title/Abstract] OR heart[Title/Abstract] OR cardiovascular[Title/Abstract])'
+            )
+        # Fallback: gene + cardiovascular context only
+        return (
+            f'"{seed_gene}"[Title/Abstract] AND '
+            f'(cardiac[Title/Abstract] OR heart[Title/Abstract] OR cardiovascular[Title/Abstract])'
+        )
+
     def check_literature_associations(
         self,
         scored_hypotheses: List[ScoredPathway],
-        max_hypotheses: int = 10  # OPTIMIZED: Reduced from 50 to 10
+        max_hypotheses: int = 30
     ) -> List[ScoredPathway]:
         """
         Check PubMed for literature associations between pathways and seed genes.
         
-        OPTIMIZED: Only checks top 10 specific pathways (reduced from 50) and
-        filters out generic pathway names to avoid wasted PubMed queries.
-        
-        For each pathway-seed gene pair, searches PubMed for co-mentions
-        to determine if the association is already reported in literature.
-        
+        Checks PubMed for literature associations between pathways and seed genes.
+        Uses keyword-based queries (not exact pathway-name phrases) for better recall.
+
         Args:
             scored_hypotheses: Scored pathways with traced_seed_genes
-            max_hypotheses: Maximum number of hypotheses to check (default: 10)
+            max_hypotheses: Maximum number of hypotheses to check (default: 30)
             
         Returns:
             Updated scored_hypotheses with literature_associations populated
@@ -215,13 +248,10 @@ class SeedGeneTracer:
             for j, seed_gene in enumerate(seed_genes, 1):
                 print(f"[LITERATURE SEARCH] Hypothesis {i}/{len(hypotheses_to_check)}, Gene {j}/{len(seed_genes)}: Searching for '{seed_gene}' + '{pathway_name}'", flush=True)
                 try:
-                    # OPTIMIZATION 3: More targeted query with cardiac context
-                    # Use exact phrase matching for better results
-                    query = f'"{pathway_name}"[Title/Abstract] AND "{seed_gene}"[Title/Abstract] AND (cardiac[Title/Abstract] OR heart[Title/Abstract])'
+                    query = self._build_pubmed_query(pathway_name, seed_gene)
                     print(f"[PUBMED QUERY] Hypothesis {i}/{len(hypotheses_to_check)}, Gene {j}/{len(seed_genes)}: {query}", flush=True)
-                    
-                    # Use the enhanced PubMed client with reduced max results for speed
-                    max_results = 10  # OPTIMIZED: Reduced from default (usually 15-25) to 10
+
+                    max_results = 25
                     print(f"[PUBMED SEARCH] Querying PubMed with max {max_results} results...", flush=True)
                     results = self.pubmed_client.search(
                         query,
