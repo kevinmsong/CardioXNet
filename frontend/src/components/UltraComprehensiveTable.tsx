@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Table,
   TableBody,
@@ -83,6 +84,8 @@ const headCells = [
 // No need for frontend transformation
 
 export default function UltraComprehensiveTable({ hypotheses, analysisId }: UltraComprehensiveTableProps) {
+  const navigate = useNavigate();
+
   // Pagination state - default to 20 rows per page
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(20);
@@ -369,13 +372,17 @@ export default function UltraComprehensiveTable({ hypotheses, analysisId }: Ultr
               const clinicalSignificance = calculateClinicalSignificance(hypothesis);
               const tissueSpecificity = calculateTissueSpecificity(hypothesis);
 
+              const pathwayId = normalized.pathway_id || String(index);
+
               return (
-                <TableRow 
-                  key={`${normalized.pathway_id || index}`}
+                <TableRow
+                  key={`${pathwayId}`}
                   hover
-                  sx={{ 
-                    '&:hover': { 
-                      bgcolor: 'rgba(30, 107, 82, 0.05)',
+                  onClick={() => analysisId && navigate(`/results/${analysisId}/pathway/${encodeURIComponent(pathwayId)}`)}
+                  sx={{
+                    cursor: 'pointer',
+                    '&:hover': {
+                      bgcolor: 'rgba(30, 107, 82, 0.08)',
                       transform: 'scale(1.001)',
                       transition: 'all 0.2s ease-in-out',
                     },

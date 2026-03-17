@@ -40,17 +40,23 @@ logger = logging.getLogger(__name__)
 
 class ReportGenerator:
     """Generates analysis reports in multiple formats."""
-    
+
     def __init__(self):
         """Initialize report generator."""
         self.settings = get_settings()
-        
+
         # Setup Jinja2 environment
         template_dir = Path(__file__).parent.parent / "templates"
         template_dir.mkdir(exist_ok=True)
-        
         self.env = Environment(loader=FileSystemLoader(str(template_dir)))
-        
+
+        # AI narrative generator (gracefully disabled if Groq unavailable)
+        try:
+            from app.services.groq_report_enhancer import GroqReportEnhancer
+            self.groq = GroqReportEnhancer()
+        except Exception:
+            self.groq = None
+
         logger.info("ReportGenerator initialized")
     
     def generate_report(
@@ -182,7 +188,32 @@ class ReportGenerator:
         # Add top genes if available
         if top_genes is not None:
             report_dict["top_genes"] = top_genes
-        
+
+        # Build Groq-compatible pathway list
+        report_dict["top_pathways"] = [
+            {
+                "name": h.get("pathway_name", ""),
+                "nes_score": h.get("nes_score", 0),
+                "p_value": h.get("p_adj", 1.0),
+                "evidence_genes": h.get("seed_genes", []),
+                "database": h.get("source_db", ""),
+                "cardiac_disease_score": h.get("cardiac_relevance", 0),
+                "citation_count": h.get("citation_count", 0),
+                "citations": h.get("citations", []),
+                "key_nodes": h.get("key_nodes", []),
+            }
+            for h in report_dict.get("ranked_hypotheses", [])[:15]
+        ]
+        report_dict["seed_genes"] = report_dict.get("input_summary", {}).get("gene_list", [])
+        report_dict["disease_context"] = "cardiovascular disease"
+
+        # AI-enhanced narrative sections (falls back to rule-based if Groq unavailable)
+        if self.groq:
+            try:
+                report_dict = self.groq.enhance_report_data(report_dict)
+            except Exception as e:
+                logger.warning(f"Groq enhancement failed: {e}")
+
         return report_dict
     
     def _build_input_summary(
@@ -405,64 +436,105 @@ class ReportGenerator:
         )
     
     def _generate_markdown(self, analysis_id: str, report_data: Dict) -> str:
-        """Generate Markdown report."""
-        template_str = """# CardioXNet Analysis Report
+        """Generate Markdown report focused on analysis findings."""
+        template_str = """# CardioXNet Cardiovascular Pathway Analysis Report
 
-**Analysis ID:** {{ analysis_id }}  
+**Analysis ID:** {{ analysis_id }}
 **Generated:** {{ timestamp }}
+**Gene Set:** {{ input_summary.gene_list | join(', ') }}
+**Pathways Identified:** {{ stage_3.total_hypotheses }}
 
-## Input Summary
+---
 
-- **Seed Genes:** {{ input_summary.total_seed_genes }}
-- **Valid Genes:** {{ input_summary.valid_genes }}
-- **Gene List:** {{ input_summary.gene_list | join(', ') }}
+## Executive Summary
 
-## Pipeline Results
+{{ ai_executive_summary if ai_executive_summary else conclusion }}
 
-### Stage 1: Functional Neighborhood Assembly
-- **F_N Size:** {{ stage_1.fn_size }} genes
-- **Neighbors Added:** {{ stage_1.neighbor_count }}
+---
 
-### Stage 2a: Primary Pathway Enrichment
-- **Primary Pathways:** {{ stage_2a.primary_pathways_count }}
-- **Known Pathways Filtered:** {{ stage_2a.known_pathways_filtered }}
+## Top Pathway Discoveries
 
-### Stage 2b: Secondary Pathway Discovery
-- **Secondary Pathways:** {{ stage_2b.total_secondary_pathways }}
-- **Genes Added via Literature:** {{ stage_2b.literature_stats.total_genes_added }}
-
-### Stage 2c: Pathway Aggregation
-- **Final Pathways:** {{ stage_2c.final_pathways_count }}
-- **Strategy:** {{ stage_2c.aggregation_strategy }}
-
-### Stage 3a: Final NES Scoring
-- **Total Hypotheses:** {{ stage_3.total_hypotheses }}
-
-## Ranked Hypotheses
-
-| Rank | Pathway | NES Score | P-adj | Evidence | Seed Genes | Literature Support | Citations | Key Nodes |
-|------|---------|-----------|-------|----------|------------|-------------------|-----------|-----------|
-{% for h in ranked_hypotheses[:10] -%}
-| {{ h.rank }} | {{ h.pathway_name }} | {{ "%.2f"|format(h.nes_score) }} | {{ "%.2e"|format(h.p_adj) }} | {{ h.evidence_count }} | {{ h.seed_genes | join(', ') if h.seed_genes else 'N/A' }} | {{ 'Yes' if h.literature_support else 'No' }} | {{ h.citation_count }} | {{ h.key_nodes | length if h.key_nodes else 0 }} |
+| Rank | Pathway | Source | NES Score | Adj. P-value | Evidence Genes | Literature Citations |
+|------|---------|--------|-----------|--------------|----------------|---------------------|
+{% for h in ranked_hypotheses[:20] -%}
+| {{ h.rank }} | {{ h.pathway_name }} | {{ h.source_db }} | {{ "%.2f"|format(h.nes_score) }} | {{ "%.2e"|format(h.p_adj) }} | {{ h.evidence_count }} | {{ h.citation_count }} |
 {% endfor %}
+
+---
+
+## Pathway Details
+
+{% for item in ai_pathway_interpretations[:5] %}
+### {{ loop.index }}. {{ item.pathway.name }}
+
+**NES Score:** {{ "%.2f"|format(item.pathway.nes_score) }} | **P-value:** {{ "%.2e"|format(item.pathway.p_value) }} | **Database:** {{ item.pathway.database }}
+
+{{ item.interpretation }}
+
+{% if item.pathway.evidence_genes %}
+**Key Evidence Genes:** {{ item.pathway.evidence_genes | join(', ') }}
+{% endif %}
+{% if item.pathway.citations %}
+**Supporting Literature:**
+{% for c in item.pathway.citations[:3] %}
+- {{ c.title }} (PMID: {{ c.pmid }}, {{ c.year }})
+{% endfor %}
+{% endif %}
+
+---
+{% endfor %}
+
+## Therapeutic Targets
+
+{{ ai_therapeutic_discussion if ai_therapeutic_discussion else '' }}
+
+{% if top_genes %}
+### Druggable Gene Summary
+
+| Gene | Druggability Tier | Pathways |
+|------|------------------|---------|
+{% for g in top_genes[:15] -%}
+| {{ g.gene_symbol if g.gene_symbol else g.symbol }} | {{ g.druggability_tier | default('unknown') }} | {{ g.pathway_count | default(1) }} |
+{% endfor %}
+{% endif %}
+
+---
+
+## Literature Evidence
+
+- **Total citations analyzed:** {{ ranked_hypotheses | sum(attribute='citation_count') }}
+- **Pathways with literature support:** {{ ranked_hypotheses | selectattr('literature_support') | list | length }} / {{ ranked_hypotheses | length }}
+
+{% for h in ranked_hypotheses[:10] if h.citations %}
+### {{ h.pathway_name }}
+{% for c in h.citations[:3] %}
+- **{{ c.title }}** — PMID: {{ c.pmid }} ({{ c.year }})
+{% endfor %}
+{% endfor %}
+
+---
 
 ## Conclusion
 
 {{ conclusion }}
+
+---
+
+*Generated by CardioXNet NETS Pipeline · University of Alabama at Birmingham*
 """
-        
         template = Template(template_str)
+        # Ensure ai fields have defaults
+        report_data.setdefault("ai_executive_summary", "")
+        report_data.setdefault("ai_pathway_interpretations", [])
+        report_data.setdefault("ai_therapeutic_discussion", "")
+        report_data.setdefault("top_genes", [])
         markdown = template.render(**report_data)
-        
-        # Save to file
+
         output_dir = Path(self.settings.output_dir)
         output_dir.mkdir(exist_ok=True)
-        
         output_file = output_dir / f"{analysis_id}_report.md"
-        output_file.write_text(markdown)
-        
+        output_file.write_text(markdown, encoding="utf-8")
         logger.info(f"Markdown report saved to {output_file}")
-        
         return str(output_file)
     
     def _generate_html(self, analysis_id: str, report_data: Dict) -> str:
@@ -557,672 +629,219 @@ class ReportGenerator:
         return str(output_file)
     
     def _generate_pdf(self, analysis_id: str, report_data: Dict) -> str:
-        """Generate professional scientific PDF report."""
+        """Generate professional results-focused PDF report."""
         if not REPORTLAB_AVAILABLE:
-            logger.error("ReportLab not available - cannot generate PDF")
-            raise ImportError("ReportLab is required for PDF generation. Install with: pip install reportlab")
-        
+            raise ImportError("ReportLab is required for PDF generation.")
+
         output_dir = Path(self.settings.output_dir)
         output_dir.mkdir(exist_ok=True)
-        
         output_file = output_dir / f"{analysis_id}_report.pdf"
-        
-        # Create PDF document
+
         doc = SimpleDocTemplate(
-            str(output_file),
-            pagesize=letter,
-            rightMargin=72,
-            leftMargin=72,
-            topMargin=72,
-            bottomMargin=18,
+            str(output_file), pagesize=A4,
+            rightMargin=56, leftMargin=56, topMargin=56, bottomMargin=40,
         )
-        
-        # Container for the 'Flowable' objects
-        elements = []
-        
-        # Define styles
+
         styles = getSampleStyleSheet()
-        title_style = ParagraphStyle(
-            'CustomTitle',
-            parent=styles['Heading1'],
-            fontSize=24,
-            textColor=colors.HexColor('#1976d2'),
-            spaceAfter=30,
-            alignment=TA_CENTER
-        )
-        heading_style = ParagraphStyle(
-            'CustomHeading',
-            parent=styles['Heading2'],
-            fontSize=16,
-            textColor=colors.HexColor('#1976d2'),
-            spaceAfter=12,
-            spaceBefore=12
-        )
-        subheading_style = ParagraphStyle(
-            'CustomSubHeading',
-            parent=styles['Heading3'],
-            fontSize=14,
-            textColor=colors.HexColor('#424242'),
-            spaceAfter=10
-        )
-        
-        # Title Page
-        elements.append(Spacer(1, 2*inch))
-        elements.append(Paragraph("CardioXNet Analysis Report", title_style))
-        elements.append(Paragraph("NETS Pipeline for Cardiovascular Disease and Phenotype-Aware Pathway Discovery", styles['Normal']))
-        elements.append(Spacer(1, 0.5*inch))
-        elements.append(Paragraph(f"Analysis ID: {analysis_id}", styles['Normal']))
-        elements.append(Paragraph(f"Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}", styles['Normal']))
-        elements.append(PageBreak())
-        
-        # Executive Summary
-        elements.append(Paragraph("AI-Powered Cardiovascular Discovery Report", heading_style))
-        elements.append(HRFlowable(width="100%", thickness=2, color=colors.HexColor('#1976d2')))
-        elements.append(Spacer(1, 12))
-        
-        input_summary = report_data.get('input_summary', {})
-        stage_3 = report_data.get('stage_3', {})
-        
-        # Add AI-powered discovery summary
-        ai_summary_text = """
-        <b>7-Stage AI Pipeline Overview:</b><br/>
-        This report presents results from CardioXNet's AI-powered multi-dimensional pathway discovery system, 
-        integrating 6 AI/ML techniques: (1) Semantic NLP filtering, (2) Graph ML topology analysis, 
-        (3) Multi-modal clinical fusion, (4) Composite scoring, (5) Literature NLP mining, and 
-        (6) Intelligent pathway aggregation. Clinical evidence from HPA and druggability databases 
-        provides up to 2× scoring boost for validated pathways.
-        """
-        elements.append(Paragraph(ai_summary_text, styles['Normal']))
-        elements.append(Spacer(1, 15))
-        
-        summary_data = [
-            ['Metric', 'Value'],
-            ['Seed Genes', str(input_summary.get('total_seed_genes', input_summary.get('seed_gene_count', 0)))],
-            ['Functional Neighborhood Size', str(report_data.get('stage_1', {}).get('fn_size', 0))],
-            ['Primary Pathways (Stage 2)', str(report_data.get('stage_2a', {}).get('primary_pathways_count', report_data.get('stage_2a', {}).get('primary_count', 0)))],
-            ['Clinical Evidence Validated (Stage 3)', str(stage_3.get('clinically_validated_count', 'N/A'))],
-            ['Final Hypotheses (NES Scored)', str(stage_3.get('total_hypotheses', 0))],
-            ['High Confidence (NES > 50)', str(stage_3.get('high_confidence_count', 0))],
+        UAB_GREEN   = colors.HexColor("#1E6B52")
+        UAB_GOLD    = colors.HexColor("#FFB81C")
+        LIGHT_GREEN = colors.HexColor("#E8F5E9")
+
+        title_style = ParagraphStyle("Title", parent=styles["Title"],
+            fontSize=20, textColor=UAB_GREEN, spaceAfter=6, alignment=TA_CENTER)
+        h1_style = ParagraphStyle("H1", parent=styles["Heading1"],
+            fontSize=14, textColor=UAB_GREEN, spaceBefore=14, spaceAfter=6, leading=18)
+        h2_style = ParagraphStyle("H2", parent=styles["Heading2"],
+            fontSize=11, textColor=colors.HexColor("#145A43"), spaceBefore=10, spaceAfter=4)
+        body_style = ParagraphStyle("Body", parent=styles["Normal"],
+            fontSize=9, leading=14, spaceAfter=6)
+        small_style = ParagraphStyle("Small", parent=styles["Normal"],
+            fontSize=8, leading=12, textColor=colors.HexColor("#444444"))
+        caption_style = ParagraphStyle("Caption", parent=styles["Normal"],
+            fontSize=7.5, leading=11, textColor=colors.HexColor("#666666"))
+
+        def hr():
+            return HRFlowable(width="100%", thickness=1, color=UAB_GOLD, spaceAfter=8)
+        def sp(h=8):
+            return Spacer(1, h)
+
+        def base_tbl_style():
+            return TableStyle([
+                ("BACKGROUND", (0, 0), (-1, 0), UAB_GREEN),
+                ("TEXTCOLOR",  (0, 0), (-1, 0), colors.white),
+                ("FONTNAME",   (0, 0), (-1, 0), "Helvetica-Bold"),
+                ("FONTSIZE",   (0, 0), (-1, 0), 8),
+                ("FONTSIZE",   (0, 1), (-1, -1), 7.5),
+                ("ROWBACKGROUNDS", (0, 1), (-1, -1), [colors.white, LIGHT_GREEN]),
+                ("GRID", (0, 0), (-1, -1), 0.4, colors.HexColor("#B0BEC5")),
+                ("VALIGN", (0, 0), (-1, -1), "TOP"),
+                ("TOPPADDING", (0, 0), (-1, -1), 4),
+                ("BOTTOMPADDING", (0, 0), (-1, -1), 4),
+                ("LEFTPADDING", (0, 0), (-1, -1), 5),
+            ])
+
+        els = []
+
+        # ── Title page ──────────────────────────────────────────────────
+        els.append(sp(40))
+        els.append(Paragraph("CardioXNet Cardiovascular Pathway Analysis", title_style))
+        els.append(Paragraph("NETS Pipeline Report",
+            ParagraphStyle("Sub", parent=styles["Normal"],
+                fontSize=12, textColor=colors.HexColor("#4A9B7F"),
+                alignment=TA_CENTER, spaceAfter=20)))
+        els.append(hr())
+        seed_genes = report_data.get("seed_genes", [])
+        gene_display = ", ".join(seed_genes[:12])
+        if len(seed_genes) > 12:
+            gene_display += f" (+{len(seed_genes)-12} more)"
+        meta_rows = [
+            ["Analysis ID", analysis_id],
+            ["Generated",   datetime.now().strftime("%Y-%m-%d %H:%M")],
+            ["Gene Set",    gene_display],
+            ["Pathways Identified", str(report_data.get("stage_3", {}).get("total_hypotheses", 0))],
         ]
-        
-        summary_table = Table(summary_data, colWidths=[3*inch, 2*inch])
-        summary_table.setStyle(TableStyle([
-            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#1976d2')),
-            ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
-            ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
-            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-            ('FONTSIZE', (0, 0), (-1, 0), 12),
-            ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
-            ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
-            ('GRID', (0, 0), (-1, -1), 1, colors.black)
+        meta_tbl = Table(
+            [[Paragraph(f"<b>{k}</b>", small_style), Paragraph(v, small_style)]
+             for k, v in meta_rows],
+            colWidths=[1.6*inch, 4.5*inch])
+        meta_tbl.setStyle(TableStyle([
+            ("BACKGROUND", (0, 0), (0, -1), LIGHT_GREEN),
+            ("GRID", (0, 0), (-1, -1), 0.3, colors.HexColor("#C8E6C9")),
+            ("TOPPADDING",    (0, 0), (-1, -1), 5),
+            ("BOTTOMPADDING", (0, 0), (-1, -1), 5),
+            ("LEFTPADDING",   (0, 0), (-1, -1), 6),
         ]))
-        elements.append(summary_table)
-        elements.append(Spacer(1, 20))
-        
-        # Top Hypotheses (Extended to show more pathways)
-        elements.append(PageBreak())
-        elements.append(Paragraph("Pathway Hypotheses", heading_style))
-        elements.append(HRFlowable(width="100%", thickness=1, color=colors.HexColor('#1976d2')))
-        elements.append(Spacer(1, 12))
-        
-        elements.append(Paragraph(
-            "The following table presents the top cardiovascular pathway hypotheses ranked by NES (Novelty and Evidence Score), "
-            "which integrates statistical significance, evidence strength, and cardiac relevance.",
-            styles['Normal']
-        ))
-        elements.append(Spacer(1, 12))
-        
-        hypotheses = report_data.get('ranked_hypotheses', [])[:50]  # Top 50 for comprehensive report
-        
+        els.append(meta_tbl)
+        els.append(PageBreak())
+
+        # ── Executive Summary ────────────────────────────────────────────
+        els.append(Paragraph("Executive Summary", h1_style))
+        els.append(hr())
+        summary = (report_data.get("ai_executive_summary") or
+                   report_data.get("conclusion") or "No summary available.")
+        for para in summary.split("\n\n"):
+            if para.strip():
+                els.append(Paragraph(para.strip(), body_style))
+        els.append(sp())
+
+        # ── Ranked Pathways Table ────────────────────────────────────────
+        els.append(PageBreak())
+        els.append(Paragraph("Ranked Pathway Discoveries", h1_style))
+        els.append(hr())
+        hypotheses = report_data.get("ranked_hypotheses", [])
         if hypotheses:
-            hyp_data = [['Pathway Name', 'NES', 'P-adj', 'Clinical', 'Cardiac', 'Evidence', 'Lit', 'Citations', 'Database']]
-            for hyp in hypotheses:
-                seed_genes_str = ', '.join(hyp.get('seed_genes', [])) if hyp.get('seed_genes') else 'N/A'
-                lit_support = 'Yes' if hyp.get('literature_support') else 'No'
-                citations = str(hyp.get('citation_count', 0))
-                cardiac_rel = f"{(hyp.get('cardiac_relevance', 0) * 100):.0f}%"
-                database = hyp.get('source_db', hyp.get('database', 'Unknown'))
-                
-                # Get clinical evidence if available (Stage 3)
-                clinical_score = 'N/A'
-                if hyp.get('stage_3_clinical_evidence'):
-                    clinical_score = f"{(hyp['stage_3_clinical_evidence'].get('clinical_score', 0) * 100):.0f}%"
-                elif hyp.get('score_components', {}).get('clinical_score') is not None:
-                    clinical_score = f"{(hyp['score_components']['clinical_score'] * 100):.0f}%"
-                
-                hyp_data.append([
-                    hyp.get('pathway_name', '')[:45],  # Truncate long names
-                    f"{hyp.get('nes_score', 0):.2f}",
-                    f"{hyp.get('p_adj', 0):.2e}",
-                    clinical_score,
-                    cardiac_rel,
-                    str(hyp.get('evidence_count', 0)),
-                    lit_support,
-                    citations,
-                    database[:12]  # Truncate database name
+            tbl_data = [["Rank", "Pathway Name", "DB", "NES", "Adj. P", "Genes", "Lit."]]
+            for h in hypotheses[:30]:
+                tbl_data.append([
+                    str(h.get("rank", "")),
+                    Paragraph(str(h.get("pathway_name", ""))[:65], small_style),
+                    str(h.get("source_db", ""))[:8],
+                    f"{h.get('nes_score', 0):.2f}",
+                    f"{h.get('p_adj', 1):.1e}",
+                    str(h.get("evidence_count", 0)),
+                    str(h.get("citation_count", 0)),
                 ])
-            
-            hyp_table = Table(hyp_data, colWidths=[2.2*inch, 0.6*inch, 0.7*inch, 0.6*inch, 0.6*inch, 0.6*inch, 0.4*inch, 0.5*inch, 0.7*inch])
-            hyp_table.setStyle(TableStyle([
-                ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#1976d2')),
-                ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
-                ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
-                ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-                ('FONTSIZE', (0, 0), (-1, 0), 8),
-                ('FONTSIZE', (0, 1), (-1, -1), 6.5),
-                ('BOTTOMPADDING', (0, 0), (-1, 0), 10),
-                ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
-                ('GRID', (0, 0), (-1, -1), 1, colors.black),
-                ('VALIGN', (0, 0), (-1, -1), 'TOP')
-            ]))
-            elements.append(hyp_table)
+            t = Table(tbl_data,
+                      colWidths=[0.4*inch, 2.9*inch, 0.55*inch, 0.5*inch,
+                                 0.65*inch, 0.45*inch, 0.4*inch])
+            t.setStyle(base_tbl_style())
+            els.append(t)
         else:
-            elements.append(Paragraph("No pathway hypotheses generated.", styles['Normal']))
-        
-        # Add Key Genes Section
-        elements.append(PageBreak())
-        elements.append(Paragraph("Key Genes and Evidence", heading_style))
-        elements.append(HRFlowable(width="100%", thickness=1, color=colors.HexColor('#1976d2')))
-        elements.append(Spacer(1, 12))
-        
+            els.append(Paragraph("No pathway hypotheses available.", body_style))
+
+        # ── Per-Pathway Interpretations ──────────────────────────────────
+        ai_interps = report_data.get("ai_pathway_interpretations", [])
+        if ai_interps:
+            els.append(PageBreak())
+            els.append(Paragraph("Pathway Interpretations", h1_style))
+            els.append(hr())
+            for i, item in enumerate(ai_interps[:5], 1):
+                pw    = item.get("pathway", {})
+                interp = item.get("interpretation", "")
+                els.append(Paragraph(f"{i}. {pw.get('name', 'Unknown')}", h2_style))
+                stats = (f"NES = {pw.get('nes_score', 0):.2f}  |  "
+                         f"p = {pw.get('p_value', 1):.2e}  |  "
+                         f"DB: {pw.get('database', '')}  |  "
+                         f"Citations: {pw.get('citation_count', 0)}")
+                els.append(Paragraph(stats, caption_style))
+                if interp:
+                    els.append(Paragraph(interp, body_style))
+                genes = pw.get("evidence_genes", [])
+                if genes:
+                    els.append(Paragraph(
+                        "<b>Evidence genes:</b> " + ", ".join(genes[:12]),
+                        small_style))
+                for c in pw.get("citations", [])[:3]:
+                    els.append(Paragraph(
+                        f"• {c.get('title','')[:90]} — PMID {c.get('pmid','')} ({c.get('year','')})",
+                        caption_style))
+                els.append(sp(6))
+
+        # ── Therapeutic Targets ──────────────────────────────────────────
+        top_genes = report_data.get("top_genes", [])
+        if top_genes:
+            els.append(PageBreak())
+            els.append(Paragraph("Therapeutic Target Genes", h1_style))
+            els.append(hr())
+            ai_ther = report_data.get("ai_therapeutic_discussion", "")
+            if ai_ther:
+                for para in ai_ther.split("\n\n"):
+                    if para.strip():
+                        els.append(Paragraph(para.strip(), body_style))
+                els.append(sp())
+            gene_data = [["Gene", "Druggability", "NES", "Pathways"]]
+            for g in top_genes[:20]:
+                gene_data.append([
+                    str(g.get("gene_symbol", g.get("symbol", ""))),
+                    str(g.get("druggability_tier", "unknown")).capitalize(),
+                    f"{g.get('nes_score', 0):.2f}" if g.get("nes_score") else "—",
+                    str(g.get("pathway_count", "—")),
+                ])
+            gt = Table(gene_data,
+                       colWidths=[1.5*inch, 1.4*inch, 1.2*inch, 1.2*inch])
+            gt.setStyle(base_tbl_style())
+            els.append(gt)
+
+        # ── Literature Summary ───────────────────────────────────────────
         if hypotheses:
-            elements.append(Paragraph(
-                "The following genes appear most frequently across top-ranked pathways and represent key nodes in the cardiovascular network:",
-                styles['Normal']
-            ))
-            elements.append(Spacer(1, 12))
-            
-            # Collect gene frequencies across top pathways
-            gene_freq = {}
-            for hyp in hypotheses[:20]:  # Top 20 for gene analysis
-                evidence_genes = hyp.get('evidence_genes', [])
-                for gene in evidence_genes:
-                    gene_freq[gene] = gene_freq.get(gene, 0) + 1
-            
-            # Sort by frequency and take top 30
-            top_genes = sorted(gene_freq.items(), key=lambda x: x[1], reverse=True)[:30]
-            
-            if top_genes:
-                gene_data = [['Gene Symbol', 'Pathway Frequency', 'Evidence Strength']]
-                for gene, freq in top_genes:
-                    strength = 'High' if freq >= 5 else 'Medium' if freq >= 3 else 'Moderate'
-                    gene_data.append([gene, str(freq), strength])
-                
-                gene_table = Table(gene_data, colWidths=[2*inch, 2*inch, 2*inch])
-                gene_table.setStyle(TableStyle([
-                    ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#1976d2')),
-                    ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
-                    ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-                    ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-                    ('FONTSIZE', (0, 0), (-1, 0), 10),
-                    ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
-                    ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
-                    ('GRID', (0, 0), (-1, -1), 1, colors.black)
-                ]))
-                elements.append(gene_table)
-        
-        # Add Literature Evidence Section
-        elements.append(PageBreak())
-        elements.append(Paragraph("Literature Support and Citations", heading_style))
-        elements.append(HRFlowable(width="100%", thickness=1, color=colors.HexColor('#1976d2')))
-        elements.append(Spacer(1, 12))
-        
-        total_citations = sum(hyp.get('citation_count', 0) for hyp in hypotheses)
-        pathways_with_lit = sum(1 for hyp in hypotheses if hyp.get('literature_support'))
-        
-        lit_summary_text = f"""
-        <b>Literature Mining Summary:</b><br/>
-        • Total PubMed citations analyzed: {total_citations}<br/>
-        • Pathways with literature support: {pathways_with_lit} / {len(hypotheses)} ({(pathways_with_lit/len(hypotheses)*100):.1f}%)<br/>
-        • Average citations per pathway: {(total_citations/len(hypotheses)):.1f}<br/><br/>
-        
-        Literature evidence was systematically mined from PubMed to validate pathway-disease associations. 
-        Pathways with direct literature support demonstrate established connections to cardiovascular biology.
-        """
-        elements.append(Paragraph(lit_summary_text, styles['Normal']))
-        elements.append(Spacer(1, 12))
-        
-        # Add Stage 4c Network Topology Section (Enhanced)
-        topology_summary = report_data.get('topology_summary', {})
-        if topology_summary:
-            elements.append(PageBreak())
-            elements.append(Paragraph("Stage 4c: Comprehensive Network Topology Analysis", heading_style))
-            elements.append(HRFlowable(width="100%", thickness=1, color=colors.HexColor('#1976d2')))
-            elements.append(Spacer(1, 12))
-            
-            elements.append(Paragraph("Network Overview", subheading_style))
-            topology_text = f"""
-            <b>STRING Protein-Protein Interaction Network Characteristics:</b><br/>
-            • Total nodes (proteins): {topology_summary.get('total_genes', 'N/A')} genes<br/>
-            • Total edges (interactions): {topology_summary.get('total_interactions', 'N/A')} interactions<br/>
-            • Network density: {topology_summary.get('density', 0):.4f}<br/>
-            • Average clustering coefficient: {topology_summary.get('avg_clustering', 0):.4f}<br/>
-            • Network diameter: {topology_summary.get('diameter', 'N/A')}<br/>
-            • Hub genes identified (top 1% by centrality): {topology_summary.get('hub_count', 0)}<br/><br/>
-            
-            Network topology analysis reveals the structural organization of protein-protein interactions 
-            underlying the discovered pathways. Hub genes represent critical nodes with high connectivity 
-            and betweenness centrality, often serving as key regulators or therapeutic targets.
-            """
-            elements.append(Paragraph(topology_text, styles['Normal']))
-            elements.append(Spacer(1, 15))
-            
-            # Hub Genes Table
-            hub_genes = topology_summary.get('hub_genes', [])
-            if hub_genes:
-                elements.append(Paragraph("Top Hub Genes", subheading_style))
-                elements.append(Spacer(1, 8))
-                
-                hub_data = [['Gene', 'Hub Score', 'Betweenness', 'PageRank', 'Degree', 'Pathways', 'Druggable']]
-                for hub in hub_genes[:25]:  # Top 25 hub genes
-                    centrality = hub.get('centrality_scores', {})
-                    hub_data.append([
-                        hub.get('gene_symbol', '')[:15],
-                        f"{hub.get('hub_score', 0):.3f}",
-                        f"{centrality.get('betweenness', 0):.4f}",
-                        f"{centrality.get('pagerank', 0):.4f}",
-                        str(centrality.get('degree', 0)),
-                        str(hub.get('pathway_count', 0)),
-                        'Yes' if hub.get('is_druggable', False) else 'No'
-                    ])
-                
-                hub_table = Table(hub_data, colWidths=[1.2*inch, 0.8*inch, 1*inch, 0.8*inch, 0.7*inch, 0.8*inch, 0.8*inch])
-                hub_table.setStyle(TableStyle([
-                    ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#1976d2')),
-                    ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
-                    ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-                    ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-                    ('FONTSIZE', (0, 0), (-1, 0), 9),
-                    ('FONTSIZE', (0, 1), (-1, -1), 7),
-                    ('BOTTOMPADDING', (0, 0), (-1, 0), 10),
-                    ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
-                    ('GRID', (0, 0), (-1, -1), 1, colors.black),
-                    ('VALIGN', (0, 0), (-1, -1), 'MIDDLE')
-                ]))
-                elements.append(hub_table)
-                elements.append(Spacer(1, 10))
-                
-                # Hub gene explanation
-                hub_explanation = """
-                <b>Hub Score Calculation:</b> Composite metric combining multiple centrality measures weighted by 
-                importance: Betweenness (35%), PageRank (25%), Degree (20%), Closeness (15%), Eigenvector (5%). 
-                Hub genes with high scores are critical network nodes that may serve as key regulators or 
-                therapeutic intervention points.
-                """
-                elements.append(Paragraph(hub_explanation, styles['Normal']))
-            
-            elements.append(Spacer(1, 15))
-            
-            # Therapeutic Targets Table
-            therapeutic_targets = topology_summary.get('therapeutic_targets', [])
-            if therapeutic_targets:
-                elements.append(Paragraph("Top Therapeutic Target Candidates", subheading_style))
-                elements.append(Spacer(1, 8))
-                
-                target_data = [['Gene', 'Therapeutic Score', 'Centrality', 'Druggability', 'Evidence', 'Pathway Diversity']]
-                for target in therapeutic_targets[:20]:  # Top 20 targets
-                    scores = target.get('scores', {})
-                    target_data.append([
-                        target.get('gene_symbol', '')[:15],
-                        f"{target.get('therapeutic_score', 0):.3f}",
-                        f"{scores.get('centrality_component', 0):.2f}",
-                        f"{scores.get('druggability_component', 0):.2f}",
-                        f"{scores.get('evidence_component', 0):.2f}",
-                        f"{scores.get('pathway_diversity_component', 0):.2f}"
-                    ])
-                
-                target_table = Table(target_data, colWidths=[1.1*inch, 1.2*inch, 1*inch, 1*inch, 0.9*inch, 1.2*inch])
-                target_table.setStyle(TableStyle([
-                    ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#4CAF50')),
-                    ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
-                    ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-                    ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-                    ('FONTSIZE', (0, 0), (-1, 0), 9),
-                    ('FONTSIZE', (0, 1), (-1, -1), 7),
-                    ('BOTTOMPADDING', (0, 0), (-1, 0), 10),
-                    ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
-                    ('GRID', (0, 0), (-1, -1), 1, colors.black),
-                    ('VALIGN', (0, 0), (-1, -1), 'MIDDLE')
-                ]))
-                elements.append(target_table)
-                elements.append(Spacer(1, 10))
-                
-                # Therapeutic scoring explanation
-                therapeutic_explanation = """
-                <b>Therapeutic Score Formula:</b> Prioritizes genes for therapeutic targeting using weighted 
-                components: Centrality (40%), Druggability (30%), Evidence Strength (20%), Pathway Diversity (10%). 
-                This integrative score identifies hub genes that are both biologically critical and pharmacologically 
-                actionable, with strong supporting evidence across multiple pathways.
-                """
-                elements.append(Paragraph(therapeutic_explanation, styles['Normal']))
-        
-        # Add Stage 3 Clinical Evidence Section (NEW)
-        elements.append(PageBreak())
-        elements.append(Paragraph("🆕 Stage 3: Multi-Modal Clinical Evidence Validation", heading_style))
-        elements.append(HRFlowable(width="100%", thickness=2, color=colors.HexColor('#FF5722')))
-        elements.append(Spacer(1, 12))
-        
-        # Count pathways with clinical evidence
-        clinically_validated = sum(1 for hyp in hypotheses if hyp.get('stage_3_clinical_evidence', {}).get('clinical_score', 0) > 0.3)
-        strong_clinical = sum(1 for hyp in hypotheses if hyp.get('stage_3_clinical_evidence', {}).get('clinical_score', 0) > 0.5)
-        
-        clinical_intro_text = f"""
-        <b>Novel Clinical Validation Framework:</b><br/>
-        Stage 3 validates pathway genes using <b>three independent clinical evidence sources</b> queried in parallel:<br/><br/>
-        
-        • <b>Human Protein Atlas (HPA):</b> Tissue-specific RNA expression in cardiac tissues<br/>
-        • <b>DrugBank:</b> FDA-approved and investigational drugs<br/>
-        • <b>Epigenomics Roadmap:</b> H3K27ac enhancer marks indicating regulatory activity<br/><br/>
-        
-        <b>Clinical Validation Statistics:</b><br/>
-        • Pathways with clinical evidence (&gt;30%): {clinically_validated} / {len(hypotheses)} ({(clinically_validated/len(hypotheses)*100):.1f}%)<br/>
-        • Strong clinical support (&gt;50%): {strong_clinical} / {len(hypotheses)} ({(strong_clinical/len(hypotheses)*100):.1f}%)<br/>
-        • Clinical weight multiplier range: 1.0× - 2.0× (applied to NES score)<br/><br/>
-        
-        <b>Impact on Discovery:</b><br/>
-        Clinical evidence integration ensures discovered pathways are not just statistically significant but also 
-        biologically validated in cardiac tissues. The multi-modal approach (combining expression + genetics + regulation) 
-        provides orthogonal validation that pathways are mechanistically relevant to cardiovascular disease.
-        """
-        elements.append(Paragraph(clinical_intro_text, styles['Normal']))
-        elements.append(Spacer(1, 15))
-        
-        # Clinical Evidence Distribution Table
-        if any(hyp.get('stage_3_clinical_evidence') for hyp in hypotheses):
-            elements.append(Paragraph("Clinical Evidence Score Distribution", subheading_style))
-            elements.append(Spacer(1, 8))
-            
-            clinical_data = [['Pathway Name', 'HPA Score', 'Druggability', 'Combined', 'Weight']]
-            for hyp in hypotheses[:20]:  # Top 20 pathways
-                clinical_ev = hyp.get('stage_3_clinical_evidence', {})
-                if clinical_ev:
-                    clinical_data.append([
-                        hyp.get('pathway_name', '')[:40],
-                        f"{(clinical_ev.get('hpa_score', 0) * 100):.0f}%",
-                        f"{(clinical_ev.get('gwas_score', 0) * 100):.0f}%",
-                        f"{(clinical_ev.get('epigenomic_score', 0) * 100):.0f}%",
-                        f"{(clinical_ev.get('clinical_score', 0) * 100):.0f}%",
-                        f"{clinical_ev.get('clinical_weight', 1.0):.2f}×"
-                    ])
-            
-            if len(clinical_data) > 1:
-                clinical_table = Table(clinical_data, colWidths=[2.5*inch, 0.9*inch, 0.9*inch, 0.9*inch, 0.9*inch, 0.7*inch])
-                clinical_table.setStyle(TableStyle([
-                    ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#FF5722')),
-                    ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
-                    ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-                    ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-                    ('FONTSIZE', (0, 0), (-1, 0), 9),
-                    ('FONTSIZE', (0, 1), (-1, -1), 7),
-                    ('BOTTOMPADDING', (0, 0), (-1, 0), 10),
-                    ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
-                    ('GRID', (0, 0), (-1, -1), 1, colors.black),
-                    ('VALIGN', (0, 0), (-1, -1), 'MIDDLE')
-                ]))
-                elements.append(clinical_table)
-                elements.append(Spacer(1, 12))
-                
-                clinical_explanation = """
-                <b>Clinical Score Calculation:</b> Combined Score = (HPA + Druggability) / 2.
-                The clinical weight multiplier (1.0-2.0×) is then applied to the pathway's NES score.
-                Pathways with strong clinical validation (score &gt; 0.5) receive significant boost,
-                prioritizing clinically relevant mechanisms over purely statistical associations.
-                """
-                elements.append(Paragraph(clinical_explanation, styles['Normal']))
-        
-        elements.append(Spacer(1, 15))
-        
-        # Add GTEx Validation Section (Legacy but complementary)
-        elements.append(Paragraph("Tissue Expression Validation (GTEx - Complementary)", subheading_style))
-        elements.append(Spacer(1, 8))
-        
-        cardiac_validated = sum(1 for hyp in hypotheses if hyp.get('score_components', {}).get('cardiac_specificity_ratio', 0) > 0.5)
-        
-        gtex_text = f"""
-        <b>GTEx Expression Validation (Legacy System):</b><br/>
-        • Pathways with cardiac expression evidence: {cardiac_validated} / {len(hypotheses)} ({(cardiac_validated/len(hypotheses)*100):.1f}%)<br/>
-        • Threshold for cardiac specificity: &gt;0.50 (heart/median tissue ratio)<br/><br/>
-        
-        GTEx (Genotype-Tissue Expression) data provides complementary validation to Stage 3 HPA evidence, 
-        confirming that genes in identified pathways show preferential expression in cardiac tissues. 
-        Both HPA (Stage 3) and GTEx use different methodologies and sample sets, providing robust orthogonal validation.
-        """
-        elements.append(Paragraph(gtex_text, styles['Normal']))
-        elements.append(Spacer(1, 12))
-        
-        # Add Druggability Section
-        elements.append(Paragraph("Druggability Assessment", subheading_style))
-        elements.append(Spacer(1, 8))
-        
-        druggable_count = sum(1 for hyp in hypotheses if hyp.get('druggability', {}).get('has_druggable_targets', False))
-        
-        drug_text = f"""
-        <b>Therapeutic Potential Analysis:</b><br/>
-        • Pathways with druggable targets: {druggable_count} / {len(hypotheses)} ({(druggable_count/len(hypotheses)*100):.1f}%)<br/>
-        • Sources: DrugBank, Therapeutic Target Database (TTD)<br/><br/>
-        
-        Druggability annotation identifies pathways containing genes that are known drug targets or have 
-        drug-like properties. These represent potential therapeutic intervention points for cardiovascular diseases.
-        Note: Druggability is added post-discovery to avoid biasing pathway identification.
-        """
-        elements.append(Paragraph(drug_text, styles['Normal']))
-        
-        # Methodology
-        elements.append(PageBreak())
-        elements.append(Paragraph("Methodology", heading_style))
-        elements.append(HRFlowable(width="100%", thickness=1, color=colors.HexColor('#1976d2')))
-        elements.append(Spacer(1, 12))
-        
-        methodology_text = """
-        <b>🤖 AI-Powered NETS Pipeline (7-Stage Multi-Dimensional Discovery):</b><br/><br/>
-        
-        <b>Stage 0: Input Validation</b><br/>
-        Validates seed genes against HGNC (HUGO Gene Nomenclature Committee) to ensure standardized gene symbols. 
-        Invalid or ambiguous gene symbols are flagged for manual review.<br/><br/>
-        
-        <b>Stage 1: Functional Neighborhood Assembly (Graph ML)</b><br/>
-        Expands seed genes using STRING protein-protein interaction network (v12.0) to identify functionally 
-        related genes. Network expansion uses combined confidence scores (&gt;0.60) incorporating experimental, database, 
-        text-mining, and co-expression evidence. Typical expansion: 100 high-confidence interactors per seed gene.<br/><br/>
-        
-        <b>Stage 2: Pathway Enrichment & Intelligent Aggregation</b><br/>
-        Performs multi-database pathway enrichment using g:Profiler (integrating Reactome, KEGG, WikiPathways, GO:BP) 
-        with FDR correction (Benjamini-Hochberg, threshold ≤ 0.05). Primary pathways are discovered from functional 
-        neighborhood, then literature mining (PubMed) expands gene sets to discover secondary pathways. Fisher's method 
-        combines evidence across databases with consistency scoring requiring ≥2 primary pathway support.<br/><br/>
-        
-        <b>Stage 3: Clinical Evidence Integration (Multi-Modal Fusion) 🆕</b><br/>
-        <b>Novel multi-modal validation</b> using three independent clinical evidence sources queried in parallel:<br/>
-        • <b>HPA (Human Protein Atlas):</b> Validates tissue-specific RNA expression in cardiac tissues (heart muscle, atrium, ventricle)<br/>
-        • <b>DrugBank:</b> Identifies FDA-approved and investigational drugs<br/>
-        • <b>Epigenomics Roadmap:</b> Detects H3K27ac enhancer marks indicating regulatory activity in cardiac tissues<br/>
-        Combined clinical score (0-1) provides <b>clinical weight multiplier (1.0-2.0×)</b> applied to NES score. 
-        This ensures pathways are not just statistically significant but also biologically validated in cardiac tissues.<br/><br/>
-        
-        <b>Stage 5: NES Composite Scoring (6-Dimensional Optimization)</b><br/>
-        Calculates Novelty and Evidence Score (NES) integrating 6 dimensions:<br/>
-        1. <b>Statistical Significance:</b> -log₁₀(P_adj) from FDR correction<br/>
-        2. <b>Evidence Count:</b> Number of pathway genes from functional neighborhood<br/>
-        3. <b>Database Quality:</b> Weighting by curation level (Reactome/KEGG 1.5×, WikiPathways 1.2×, GO:BP 1.0×)<br/>
-        4. <b>Cardiac Relevance:</b> Semantic NLP matching (700+ terms, +30% disease-context boost)<br/>
-        5. <b>Literature Score:</b> PubMed co-citation network analysis (0.8-1.2×)<br/>
-        6. <b>Clinical Weight:</b> Multi-modal validation multiplier (1.0-2.0×) from Stage 3<br/>
-        Formula: NES = Base_Score × DB_Weight × Cardiac_Relevance × Lit_Score × Clinical_Weight × Network_Weight<br/><br/>
-        
-        <b>Stage 4: Semantic Filtering (NLP with 700+ Cardiovascular Terms)</b><br/>
-        AI-powered semantic matching using 700+ cardiovascular terms across 8 categories: anatomical (heart, ventricle, atrium), 
-        physiological (contraction, conduction), disease (cardiomyopathy, arrhythmia, infarction), molecular (calcium, ion channel), 
-        cellular (cardiomyocyte, endothelial), metabolic (energy, oxidative), inflammatory (cytokine, immune), and pharmacological 
-        (drug, therapy). Pathways matching selected disease context receive <b>+30% relevance boost</b> with 75% semantic weight. 
-        Minimum cardiac relevance threshold (0.01) ensures cardiovascular specificity.<br/><br/>
-        
-        <b>Stage 6: Literature Mining & Validation (NLP)</b><br/>
-        PubMed literature mining with cardiovascular keyword matching and co-citation network analysis. Discovers literature-supported 
-        pathways (100 secondary pathways) and validates primary findings with publication evidence. Citation networks reveal 
-        mechanistic connections not evident from gene-level analysis.<br/><br/>
-        
-        <b>Stage 7: Network Topology Analysis (Graph ML)</b><br/>
-        Advanced graph machine learning using <b>PageRank, betweenness centrality, and community detection</b> algorithms 
-        to identify:<br/>
-        • <b>Hub genes:</b> Critical network nodes with high connectivity and centrality<br/>
-        • <b>Therapeutic targets:</b> Druggable hub genes prioritized by centrality (40%), druggability (30%), evidence (20%), pathway diversity (10%)<br/>
-        • <b>Functional modules:</b> Community detection reveals pathway crosstalk and mechanistic relationships<br/>
-        Top 20 genes ranked by multi-factor importance score: Importance = (Frequency^1.2) × (Avg NES) × (1 + Cardiac Relevance)<br/><br/>
-        
-        <b>Report Generation and Druggability Annotation</b><br/>
-        Generates comprehensive reports with druggability annotations from DrugBank and TTD (4-tier classification: FDA Approved, 
-        Clinical Trial, Druggable protein family, Research-stage). Druggability annotation occurs post-discovery to avoid 
-        selection bias while providing translational context for therapeutic target identification.
-        """
-        elements.append(Paragraph(methodology_text, styles['Normal']))
-        
-        # Statistical Parameters
-        elements.append(Spacer(1, 20))
-        elements.append(Paragraph("Statistical Parameters", subheading_style))
-        
-        params_data = [
-            ['Parameter', 'Value'],
-            ['FDR Threshold', str(self.settings.nets.fdr_threshold)],
-            ['STRING Score Threshold', str(self.settings.nets.string_score_threshold)],
-            ['Minimum Support Count', str(self.settings.nets.min_support_threshold)],
-            ['Semantic Relevance Threshold', str(self.settings.nets.semantic_relevance_threshold)],
-        ]
-        
-        params_table = Table(params_data, colWidths=[3*inch, 2*inch])
-        params_table.setStyle(TableStyle([
-            ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
-            ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
-            ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
-            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-            ('FONTSIZE', (0, 0), (-1, 0), 10),
-            ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
-            ('GRID', (0, 0), (-1, -1), 1, colors.black)
-        ]))
-        elements.append(params_table)
-        
-        # Statistical Summary
-        elements.append(PageBreak())
-        elements.append(Paragraph("Statistical Summary", heading_style))
-        elements.append(HRFlowable(width="100%", thickness=1, color=colors.HexColor('#1976d2')))
-        elements.append(Spacer(1, 12))
-        
-        if hypotheses:
-            avg_nes = sum(hyp.get('nes_score', 0) for hyp in hypotheses) / len(hypotheses)
-            avg_padj = sum(hyp.get('p_adj', 1.0) for hyp in hypotheses) / len(hypotheses)
-            avg_cardiac = sum(hyp.get('cardiac_relevance', 0) for hyp in hypotheses) / len(hypotheses)
-            avg_evidence = sum(hyp.get('evidence_count', 0) for hyp in hypotheses) / len(hypotheses)
-            
-            stats_text = f"""
-            <b>Aggregate Statistics Across Top Pathways:</b><br/><br/>
-            
-            • <b>Mean NES Score:</b> {avg_nes:.3f} (higher indicates stronger novelty and evidence)<br/>
-            • <b>Mean Adjusted P-value:</b> {avg_padj:.2e} (FDR-corrected statistical significance)<br/>
-            • <b>Mean Cardiac Relevance:</b> {(avg_cardiac*100):.1f}% (semantic cardiac specificity)<br/>
-            • <b>Mean Evidence Genes:</b> {avg_evidence:.1f} genes per pathway<br/><br/>
-            
-            <b>Distribution Characteristics:</b><br/>
-            • NES Range: {min(hyp.get('nes_score', 0) for hyp in hypotheses):.3f} - {max(hyp.get('nes_score', 0) for hyp in hypotheses):.3f}<br/>
-            • P-value Range: {min(hyp.get('p_adj', 1.0) for hyp in hypotheses):.2e} - {max(hyp.get('p_adj', 1.0) for hyp in hypotheses):.2e}<br/>
-            • Evidence Count Range: {min(hyp.get('evidence_count', 0) for hyp in hypotheses)} - {max(hyp.get('evidence_count', 0) for hyp in hypotheses)} genes<br/><br/>
-            
-            All statistics are calculated from enrichment analysis with FDR correction (Benjamini-Hochberg method) 
-            and validated through multiple independent evidence sources.
-            """
-            elements.append(Paragraph(stats_text, styles['Normal']))
-        
-        # Conclusion
-        elements.append(PageBreak())
-        elements.append(Paragraph("Conclusion", heading_style))
-        elements.append(HRFlowable(width="100%", thickness=1, color=colors.HexColor('#1976d2')))
-        elements.append(Spacer(1, 12))
-        
-        conclusion = report_data.get('conclusion', 'Analysis completed successfully.')
-        if isinstance(conclusion, dict):
-            conclusion_text = conclusion.get('summary', 'Analysis completed successfully.')
-        else:
-            conclusion_text = str(conclusion) if conclusion else 'Analysis completed successfully.'
-        
-        elements.append(Paragraph(conclusion_text, styles['Normal']))
-        elements.append(Spacer(1, 20))
-        
-        # Add interpretation guidance
-        interpretation_text = """
-        <b>Interpreting Results:</b><br/><br/>
-        
-        The NETS pipeline systematically expands beyond seed genes to discover novel cardiovascular pathways through 
-        multi-database integration and statistical aggregation. High-ranking pathways represent robust hypotheses 
-        supported by multiple lines of evidence including enrichment statistics, literature validation, tissue expression, 
-        and network topology.<br/><br/>
-        
-        <b>Quality Indicators:</b><br/>
-        • <b>High NES scores</b> (>2.0): Strong novelty and evidence support<br/>
-        • <b>Low adjusted p-values</b> (<0.01): High statistical significance<br/>
-        • <b>High cardiac relevance</b> (>50%): Strong cardiovascular specificity<br/>
-        • <b>Literature support</b>: Direct validation from published research<br/>
-        • <b>GTEx validation</b>: Preferential cardiac expression patterns<br/><br/>
-        
-        Pathways should be evaluated holistically considering all evidence dimensions rather than single metrics.
-        """
-        elements.append(Paragraph(interpretation_text, styles['Normal']))
-        
-        # Data Sources and References
-        elements.append(PageBreak())
-        elements.append(Paragraph("Data Sources and References", heading_style))
-        elements.append(HRFlowable(width="100%", thickness=1, color=colors.HexColor('#1976d2')))
-        elements.append(Spacer(1, 12))
-        
-        references_text = """
-        <b>Primary Data Sources (9 Databases):</b><br/><br/>
-        
-        • <b>STRING v12.0</b> - Protein-protein interaction networks (Stage 1)<br/>
-          Szklarczyk D, et al. (2023) Nucleic Acids Res. 51(D1):D638-D646<br/><br/>
-        
-        • <b>g:Profiler</b> - Functional enrichment analysis (Stage 2)<br/>
-          Raudvere U, et al. (2019) Nucleic Acids Res. 47(W1):W191-W198<br/><br/>
-        
-        • <b>Reactome</b> - Pathway database (Stage 2)<br/>
-          Gillespie M, et al. (2022) Nucleic Acids Res. 50(D1):D687-D692<br/><br/>
-        
-        • <b>KEGG</b> - Kyoto Encyclopedia of Genes and Genomes (Stage 2)<br/>
-          Kanehisa M, et al. (2023) Nucleic Acids Res. 51(D1):D587-D592<br/><br/>
-        
-        • <b>🆕 Human Protein Atlas (HPA)</b> - Tissue expression validation (Stage 3)<br/>
-          Uhlén M, et al. (2015) Science. 347(6220):1260419<br/><br/>
-        
-        • <b>🆕 DrugBank</b> - Therapeutic target database (Stage 3)<br/>
-          Sollis E, et al. (2023) Nucleic Acids Res. 51(D1):D1019-D1028<br/><br/>
-        
-        • <b>🆕 Epigenomics Roadmap</b> - Regulatory element maps (Stage 3)<br/>
-          Roadmap Epigenomics Consortium (2015) Nature. 518(7539):317-330<br/><br/>
-        
-        • <b>GTEx v8</b> - Genotype-Tissue Expression Project (Complementary)<br/>
-          GTEx Consortium (2020) Science. 369(6509):1318-1330<br/><br/>
-        
-        • <b>DrugBank 5.1</b> - Drug and drug target database (Post-discovery annotation)<br/>
-          Wishart DS, et al. (2018) Nucleic Acids Res. 46(D1):D1074-D1082<br/><br/>
-        
-        • <b>PubMed/NCBI</b> - Biomedical literature database (Stage 2 & 6)<br/>
-          National Center for Biotechnology Information<br/><br/>
-        
-        <b>Statistical Methods:</b><br/><br/>
-        
-        • <b>Fisher's Method</b> - Meta-analysis of p-values<br/>
-          Fisher RA (1932) Statistical Methods for Research Workers<br/><br/>
-        
-        • <b>Benjamini-Hochberg FDR</b> - Multiple testing correction<br/>
-          Benjamini Y, Hochberg Y (1995) J R Stat Soc Series B. 57(1):289-300<br/><br/>
-        
-        <b>Analysis Framework:</b><br/><br/>
-        
-        CardioXNet implements the NETS (Neighborhood Enrichment Triage and Scoring) pipeline, a systematic 
-        approach to cardiovascular pathway discovery through functional neighborhood expansion, 
-        multi-database integration, and rigorous statistical validation.
-        """
-        elements.append(Paragraph(references_text, styles['Normal']))
-        
-        # Build PDF
-        doc.build(elements)
-        
+            els.append(PageBreak())
+            els.append(Paragraph("Literature Evidence", h1_style))
+            els.append(hr())
+            total_cit = sum(h.get("citation_count", 0) for h in hypotheses)
+            lit_n = sum(1 for h in hypotheses if h.get("literature_support"))
+            pct = lit_n / max(len(hypotheses), 1) * 100
+            els.append(Paragraph(
+                f"<b>{total_cit}</b> PubMed citations analyzed across "
+                f"<b>{len(hypotheses)}</b> pathways. "
+                f"<b>{lit_n}</b> pathways ({pct:.0f}%) have direct literature support.",
+                body_style))
+            els.append(sp())
+            for h in hypotheses[:10]:
+                cits = h.get("citations", [])
+                if not cits:
+                    continue
+                els.append(Paragraph(f"<b>{h.get('pathway_name','')}</b>", small_style))
+                for c in cits[:3]:
+                    els.append(Paragraph(
+                        f"• {c.get('title','')}. PMID: {c.get('pmid','')} ({c.get('year','')})",
+                        caption_style))
+                els.append(sp(4))
+
+        # ── Conclusion ───────────────────────────────────────────────────
+        els.append(PageBreak())
+        els.append(Paragraph("Conclusion", h1_style))
+        els.append(hr())
+        conclusion = report_data.get("conclusion", "")
+        if conclusion:
+            els.append(Paragraph(conclusion, body_style))
+        els.append(sp(20))
+        els.append(Paragraph(
+            "Generated by CardioXNet NETS Pipeline \u00b7 "
+            "University of Alabama at Birmingham \u00b7 "
+            f"{datetime.now().strftime('%Y-%m-%d')}",
+            caption_style))
+
+        doc.build(els)
         logger.info(f"PDF report saved to {output_file}")
-        
         return str(output_file)
+

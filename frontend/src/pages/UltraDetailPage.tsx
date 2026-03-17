@@ -29,6 +29,7 @@ import {
 } from '@mui/icons-material';
 import api from '../api/endpoints';
 import PathwayLineage from '../components/PathwayLineage';
+import LiteratureEvidenceDisplay from '../components/LiteratureEvidenceDisplay';
 import {
   normalizeHypothesis,
   calculateClinicalSignificance,
@@ -37,7 +38,8 @@ import {
 } from '../utils/hypothesisUtils';
 
 export default function UltraDetailPageFixed() {
-  const { analysisId, pathwayId } = useParams();
+  const { analysisId, pathwayId: pathwayIdRaw } = useParams();
+  const pathwayId = pathwayIdRaw ? decodeURIComponent(pathwayIdRaw) : undefined;
   const navigate = useNavigate();
 
   const { data: results, isLoading, error } = useQuery({
@@ -493,44 +495,53 @@ export default function UltraDetailPageFixed() {
         </Grid>
       </Paper>
 
-      {/* Literature Citations */}
-      {normalized.literature_citations > 0 && hypothesisData.literature_associations?.associations && (
-        <Paper elevation={2} sx={{ p: 3, mb: 3 }}>
-          <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <MenuBook color="primary" />
-            Literature Evidence ({normalized.literature_citations} citations)
-          </Typography>
-          <Divider sx={{ my: 2 }} />
-          
-          <Typography variant="body2" color="text.secondary" paragraph>
-            PubMed citations linking seed genes to this pathway. Click to view full articles.
-          </Typography>
-
-          {hypothesisData.literature_associations.associations.map((assoc: any, idx: number) => (
-            <Box key={idx} sx={{ mb: 3 }}>
-              <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 1, color: 'primary.main' }}>
-                {assoc.seed_gene} ({assoc.citation_count} {assoc.citation_count === 1 ? 'citation' : 'citations'})
-              </Typography>
-              <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
-                {assoc.pmids?.map((pmid: string, pidx: number) => (
-                  <Button
-                    key={pidx}
-                    size="small"
-                    variant="outlined"
-                    href={`https://pubmed.ncbi.nlm.nih.gov/${pmid}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    startIcon={<MenuBook />}
-                    sx={{ textTransform: 'none' }}
-                  >
-                    PMID: {pmid}
-                  </Button>
-                ))}
-              </Stack>
-            </Box>
-          ))}
-        </Paper>
-      )}
+      {/* Literature Citations — uses LiteratureEvidenceDisplay which handles all data locations */}
+      <Paper elevation={2} sx={{ p: 3, mb: 3 }}>
+        <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <MenuBook color="primary" />
+          Literature Evidence
+          {normalized.literature_citations > 0 && (
+            <Chip
+              label={`${normalized.literature_citations} citations`}
+              size="small"
+              sx={{ ml: 1, bgcolor: '#2E7D32', color: 'white', fontWeight: 700 }}
+            />
+          )}
+        </Typography>
+        <Divider sx={{ my: 2 }} />
+        <LiteratureEvidenceDisplay
+          hypothesis={hypothesisData}
+          allResults={results}
+        />
+        {/* Fallback: render PMID buttons from associations if LiteratureEvidenceDisplay finds nothing */}
+        {normalized.literature_citations === 0 && hypothesisData.literature_associations?.associations && (
+          <Box sx={{ mt: 2 }}>
+            {hypothesisData.literature_associations.associations.map((assoc: any, idx: number) => (
+              <Box key={idx} sx={{ mb: 2 }}>
+                <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 0.5, color: 'primary.main' }}>
+                  {assoc.seed_gene} — {assoc.citation_count} citation{assoc.citation_count !== 1 ? 's' : ''}
+                </Typography>
+                <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+                  {assoc.pmids?.map((pmid: string, pidx: number) => (
+                    <Button
+                      key={pidx}
+                      size="small"
+                      variant="outlined"
+                      href={`https://pubmed.ncbi.nlm.nih.gov/${pmid}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      startIcon={<MenuBook />}
+                      sx={{ textTransform: 'none' }}
+                    >
+                      PMID: {pmid}
+                    </Button>
+                  ))}
+                </Stack>
+              </Box>
+            ))}
+          </Box>
+        )}
+      </Paper>
 
       {/* Interpretation Guide */}
       <Paper elevation={2} sx={{ p: 3, bgcolor: '#f5f5f5' }}>

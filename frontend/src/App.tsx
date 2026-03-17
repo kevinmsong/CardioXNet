@@ -6,6 +6,7 @@ import Layout from './components/Layout';
 import HomePage from './pages/HomePage';
 import ProgressPage from './pages/ProgressPage';
 import ResultsPage from './pages/ResultsPageClean';
+import PathwayDetailPage from './pages/UltraDetailPage';
 import DocumentationPage from './pages/DocumentationPageSimplified';
 import APIReferencePage from './pages/APIReferencePage';
 
@@ -227,6 +228,7 @@ function App() {
               <Route path="/api-reference" element={<APIReferencePage />} />
               <Route path="/progress/:analysisId" element={<ProgressPage />} />
               <Route path="/results/:analysisId" element={<ResultsPage />} />
+              <Route path="/results/:analysisId/pathway/:pathwayId" element={<PathwayDetailPage />} />
             </Routes>
           </Layout>
         </Router>
