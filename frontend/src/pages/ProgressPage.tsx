@@ -27,342 +27,269 @@ export default function ProgressPage() {
 
   useEffect(() => {
     if (!analysisId) {
-      // No analysis ID provided, redirect to home
       navigate('/');
       return;
     }
 
     let ws: WebSocket | null = null;
     let mounted = true;
-    let pollInterval: NodeJS.Timeout | null = null;
+    let pollInterval: ReturnType<typeof setInterval> | null = null;
 
-    // Fallback polling in case WebSocket fails
     const startPolling = () => {
       pollInterval = setInterval(async () => {
         try {
-          const status = await api.getAnalysisStatus(analysisId);
-          
-          if (status.progress_percentage !== undefined) setProgress(status.progress_percentage);
-          if (status.current_stage) setCurrentStage(status.current_stage);
-          if (status.message) setMessage(status.message);
-          if (status.status) setStatus(status.status);
-          
-          if (status.status === 'completed') {
+          const statusData = await api.getAnalysisStatus(analysisId);
+          if (statusData.progress_percentage !== undefined) setProgress(statusData.progress_percentage);
+          if (statusData.current_stage) setCurrentStage(statusData.current_stage);
+          if (statusData.message) setMessage(statusData.message);
+          if (statusData.status) setStatus(statusData.status);
+
+          if (statusData.status === 'completed') {
             if (pollInterval) clearInterval(pollInterval);
             setTimeout(() => navigate(`/results/${analysisId}`), 2000);
-          } else if (status.status === 'failed') {
+          } else if (statusData.status === 'failed') {
             if (pollInterval) clearInterval(pollInterval);
           }
-        } catch (error: any) {
-          // Only redirect if we're still on the progress page
-          // Don't interfere with navigation to other pages
+        } catch {
           if (pollInterval) clearInterval(pollInterval);
           if (mounted && window.location.pathname.includes('/progress/')) {
             navigate('/');
           }
         }
-      }, 2000); // Poll every 2 seconds
+      }, 2000);
     };
 
-    // Small delay to ensure analysis is created
     const connectWebSocket = () => {
       if (!mounted) return;
 
       ws = api.connectWebSocket(analysisId);
 
-      ws.onopen = () => {};
-
       ws.onmessage = (event) => {
         if (!mounted) return;
-        
         const data: ProgressMessage = JSON.parse(event.data);
         setProgress(data.progress || 0);
         setCurrentStage(data.current_stage || '');
         setMessage(data.message || '');
         setStatus(data.status);
 
-        if (data.type === 'complete') {
-          if (data.status === 'completed') {
-            setTimeout(() => navigate(`/results/${analysisId}`), 2000);
-          }
+        if (data.type === 'complete' && data.status === 'completed') {
+          setTimeout(() => navigate(`/results/${analysisId}`), 2000);
         }
       };
 
-      ws.onerror = () => {
-        startPolling();
-      };
+      ws.onerror = () => startPolling();
 
       ws.onclose = () => {
-        // Start polling as fallback if WebSocket closes unexpectedly
         if (status !== 'completed' && status !== 'failed') {
           startPolling();
         }
       };
     };
 
-    // Connect after a small delay
     const timer = setTimeout(connectWebSocket, 100);
 
     return () => {
       mounted = false;
       clearTimeout(timer);
-      if (pollInterval) {
-        clearInterval(pollInterval);
-        pollInterval = null;
-      }
-      if (ws) {
-        if (ws.readyState === WebSocket.OPEN || ws.readyState === WebSocket.CONNECTING) {
-          ws.close();
-        }
-        ws = null;
+      if (pollInterval) clearInterval(pollInterval);
+      if (ws && (ws.readyState === WebSocket.OPEN || ws.readyState === WebSocket.CONNECTING)) {
+        ws.close();
       }
     };
   }, [analysisId, navigate, status]);
 
   const stages = [
-    'Stage 1: Seed Gene Validation',
+    'Stage 1: Input Validation',
     'Stage 2: Functional Neighborhood',
     'Stage 3: Primary Pathway Enrichment',
     'Stage 4: Secondary Pathway Discovery',
     'Stage 5: Pathway Aggregation',
-    'Stage 6: Semantic Filtering',
-    'Stage 7: NES Scoring',
+    'Stage 6: NES Scoring',
+    'Stage 7: Semantic Filtering',
     'Stage 8: Enhanced Validation',
     'Stage 9: Literature Mining',
+    'Stage 10: Network Topology Analysis',
+    'Stage 11: Therapeutic Targets',
+    'Stage 12: Report Generation',
   ];
 
   const stageDescriptions: { [key: string]: string } = {
-    'Stage 1': 'Validating input genes and checking API connectivity',
-    'Stage 2': 'Building protein interaction networks (STRING database)',
-    'Stage 3': 'Primary pathway enrichment (g:Profiler: GO, KEGG, Reactome, WikiPathways)',
-    'Stage 4': 'Secondary pathway discovery through network expansion',
-    'Stage 5': 'Aggregating pathways and tracking complete lineage',
-    'Stage 6': 'Filtering pathways by strict cardiac term matching',
-    'Stage 7': 'Computing NETS (Neighborhood Enrichment Triage and Scoring) scores',
-    'Stage 8': 'Enhanced validation (GTEx cardiac expression, live therapeutic target evidence, druggability)',
-    'Stage 9': 'Mining PubMed for cardiovascular disease literature evidence',
+    'Stage 1': 'Validating input genes and normalizing identifiers',
+    'Stage 2': 'Building protein interaction networks via STRING (75 neighbors, confidence ≥ 0.60)',
+    'Stage 3': 'Primary pathway enrichment using g:Profiler (GO:BP, KEGG, Reactome, WikiPathways)',
+    'Stage 4': 'Secondary pathway discovery through network expansion and aggregation',
+    'Stage 5': 'Aggregating pathways and removing redundant entries (Jaccard ≥ 0.85)',
+    'Stage 6': 'Computing NES scores with √(gene_count) normalization and database quality weighting',
+    'Stage 7': 'Cardiac disease context filtering (3-tier thresholds, 700+ cardiovascular terms)',
+    'Stage 8': 'Biological validation: GTEx tissue expression, permutation testing, druggability',
+    'Stage 9': 'Mining PubMed abstracts for pathway-gene literature evidence (20/gene)',
+    'Stage 10': 'Network topology analysis: PageRank, betweenness, closeness centrality',
+    'Stage 11': 'Identifying druggable therapeutic targets (FDA approved, clinical trials, research)',
+    'Stage 12': 'Generating analysis reports (JSON, PDF)',
   };
 
-  // Get the index of the current stage
   const getCurrentStageIndex = (stage: string) => {
     const stageMap: { [key: string]: number } = {
-      // Backend sends "Stage 1", "Stage 2", etc.
-      'Stage 1': 0,
-      'Stage 2': 1,
-      'Stage 3': 2,
-      'Stage 4': 3,
-      'Stage 5': 4,
-      'Stage 6': 5,
-      'Stage 7': 6,
-      'Stage 8': 7,
-      'Stage 9': 8,
-      'Stage 10': 8,  // Old stage 10 maps to stage 9
-      'Stage 11': 8,  // Old stage 11 maps to stage 9
-      'Stage 12': 8,  // Old stage 12 maps to stage 9
-      'Complete': 9,
-      'complete': 9,
-      'Error': -1,
-      'error': -1,
+      'input_validation': 0,
+      'functional_neighborhood': 1,
+      'primary_pathway': 2,
+      'secondary_pathway': 3,
+      'pathway_aggregation': 4,
+      'nes_scoring': 5,
+      'semantic_filtering': 6,
+      'enhanced_validation': 7,
+      'literature_mining': 8,
+      'topology_analysis': 9,
+      'therapeutic_targets': 10,
+      'report_generation': 11,
+      'complete': 12,
     };
     return stageMap[stage] ?? -1;
   };
 
   const currentStageIndex = getCurrentStageIndex(currentStage);
 
-  const stageEstimateFloor: { [key: string]: number } = {
-    'Stage 1': 12,
-    'Stage 2': 11,
-    'Stage 3': 9,
-    'Stage 4': 7,
-    'Stage 5': 6,
-    'Stage 6': 5,
-    'Stage 7': 4,
-    'Stage 8': 4,
-    'Stage 9': 2,
-    'Complete': 0,
+  const getEstimatedTimeRemaining = () => {
+    if (progress >= 100) return 0;
+    const stageDurations: { [key: number]: number } = {
+      0: 0.2, 1: 1.2, 2: 2.0, 3: 2.5, 4: 0.5,
+      5: 0.4, 6: 1.0, 7: 2.5, 8: 1.5, 9: 1.0, 10: 0.4, 11: 0.3,
+    };
+    let remaining = 0;
+    for (let i = currentStageIndex + 1; i < 12; i++) {
+      remaining += stageDurations[i] || 0.5;
+    }
+    remaining += (stageDurations[currentStageIndex] || 1) * 0.5;
+    return Math.max(0.5, Math.round(remaining));
   };
 
-  // Use a conservative total-duration estimate and keep stage-specific floors
-  // so the UI stops promising unrealistically short runtimes.
-  const progressBasedEstimate = Math.ceil(((100 - progress) / 100) * 14);
-  const stageBasedFloor = stageEstimateFloor[currentStage.split(':')[0]] ?? 6;
-  const estimatedTimeRemaining =
-    status === 'completed'
-      ? 0
-      : Math.max(stageBasedFloor, progressBasedEstimate);
+  const estimatedTimeRemaining = getEstimatedTimeRemaining();
 
   return (
     <Box>
-      {/* Enhanced Header */}
+      {/* Header */}
       <Paper
         elevation={3}
         sx={{
-          p: 3,
+          p: 4,
           mb: 3,
           background: 'linear-gradient(135deg, #1E6B52 0%, #145A43 100%)',
           borderRadius: 3,
-          border: '2px solid #FFB81C',
           position: 'relative',
           overflow: 'hidden',
         }}
       >
-        <Stack direction="row" justifyContent="space-between" alignItems="flex-start" sx={{ position: 'relative' }} spacing={3}>
+        <Stack direction="row" justifyContent="space-between" alignItems="center" spacing={3}>
           <Box sx={{ flex: 1 }}>
             <Typography variant="h4" sx={{ color: 'white', fontWeight: 700, mb: 1 }}>
               Analysis in Progress
             </Typography>
-            <Typography variant="h6" sx={{ color: '#FFB81C', fontWeight: 600, mb: 1 }}>
-              {currentStage || 'Initializing pipeline...'}
+            <Typography variant="body1" sx={{ color: 'rgba(255,255,255,0.9)', mb: 2 }}>
+              ID: <Box component="span" sx={{ fontFamily: 'monospace', color: '#FFB81C' }}>{analysisId}</Box>
             </Typography>
-            <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.85)', lineHeight: 1.6, mb: 1 }}>
-              {stageDescriptions[currentStage.split(':')[0]] || 'Running analysis...'}
+            <Typography variant="h6" sx={{ color: '#FFB81C', fontWeight: 600 }}>
+              {currentStage || 'Initializing...'}
             </Typography>
-            {currentStage.includes('Stage 2') && (
-              <Typography variant="caption" sx={{ color: '#FFB81C', fontStyle: 'italic', display: 'block', mt: 0.5 }}>
-                ⚠️ g:Profiler may be slow or temporarily unavailable. Retrying automatically...
-              </Typography>
-            )}
           </Box>
-          <Box sx={{ textAlign: 'right', whiteSpace: 'nowrap' }}>
-            <Typography variant="h3" sx={{ color: '#FFB81C', fontWeight: 700 }}>
+          <Box sx={{ textAlign: 'right' }}>
+            <Typography variant="h2" sx={{ color: '#FFB81C', fontWeight: 700, mb: 0.5 }}>
               {progress}%
             </Typography>
-            <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.8)', display: 'block' }}>
-              Est. {estimatedTimeRemaining} min remaining
+            <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.9)' }}>
+              ~{estimatedTimeRemaining} min remaining
             </Typography>
           </Box>
         </Stack>
+
+        <LinearProgress
+          variant="determinate"
+          value={progress}
+          sx={{
+            mt: 3,
+            height: 10,
+            borderRadius: 5,
+            bgcolor: 'rgba(255,255,255,0.2)',
+            '& .MuiLinearProgress-bar': {
+              bgcolor: '#FFB81C',
+              borderRadius: 5,
+              transition: 'transform 0.4s ease-in-out',
+            },
+          }}
+        />
       </Paper>
 
-      {/* Progress Visualization */}
-      <Paper 
-        elevation={2}
-        sx={{ 
-          p: 3, 
-          mb: 3,
-          borderRadius: 3,
-          border: '2px solid #E8F5E9',
-        }}
-      >
-        <LinearProgress 
-          variant="determinate" 
-          value={progress} 
-          sx={{ 
-            mb: 2,
-            height: 12,
-            borderRadius: 6,
-            bgcolor: '#E0E0E0',
-            '& .MuiLinearProgress-bar': {
-              bgcolor: '#1E6B52',
-              borderRadius: 6,
-              transition: 'transform 0.4s ease-in-out',
-            }
-          }} 
-        />
-        <Stack spacing={1}>
-          <Typography 
-            variant="body2" 
-            color="text.secondary"
-            sx={{ 
-              textAlign: 'center',
-              fontStyle: 'italic',
-              minHeight: '20px',
-            }}
-          >
-            {message || 'Processing your analysis...'}
-          </Typography>
-          {currentStage.includes('Stage 2') && (
-            <Box sx={{ 
-              p: 1.5, 
-              bgcolor: '#FFF3E0', 
-              borderRadius: 2, 
-              border: '1px solid #FFB74D',
-              textAlign: 'center'
-            }}>
-              <Typography variant="caption" sx={{ color: '#E65100', fontWeight: 600 }}>
-                ℹ️ Pathway enrichment may take 1-2 minutes. If g:Profiler is unavailable, the system will retry automatically.
-              </Typography>
-            </Box>
-          )}
-        </Stack>
+      {/* Current Status */}
+      <Paper elevation={2} sx={{ p: 3, mb: 3, borderRadius: 2, border: '1px solid #E0E0E0' }}>
+        <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, color: '#1E6B52', mb: 2 }}>
+          Current Status
+        </Typography>
+        <Typography variant="body1" sx={{ color: 'text.primary', mb: 2, minHeight: '24px' }}>
+          {message || 'Processing your analysis...'}
+        </Typography>
+        <Typography variant="body2" color="text.secondary">
+          {stageDescriptions[currentStage.split(':')[0]] || 'Running CardioXNet pathway discovery pipeline...'}
+        </Typography>
       </Paper>
 
       {/* Pipeline Stages */}
-      <Paper 
-        elevation={2}
-        sx={{ 
-          p: 3, 
-          mb: 3,
-          borderRadius: 3,
-          border: '2px solid #E3F2FD',
-        }}
-      >
-        <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, color: '#1E6B52', mb: 3 }}>
+      <Paper elevation={2} sx={{ p: 3, borderRadius: 2, border: '1px solid #E0E0E0' }}>
+        <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, color: '#1E6B52', mb: 2 }}>
           Pipeline Stages
         </Typography>
         <List sx={{ p: 0 }}>
           {stages.map((stage, index) => {
             const isCompleted = index < currentStageIndex;
             const isCurrent = index === currentStageIndex;
-            
+
             let icon;
             if (isCompleted) {
-              icon = <CheckCircle sx={{ fontSize: 28, color: '#4CAF50' }} />;
+              icon = <CheckCircle sx={{ fontSize: 24, color: '#4CAF50' }} />;
             } else if (isCurrent) {
               icon = (
                 <Box sx={{ position: 'relative', display: 'inline-flex' }}>
-                  <CircularProgress size={28} thickness={4} sx={{ color: '#1E6B52' }} />
+                  <CircularProgress size={24} thickness={5} sx={{ color: '#1E6B52' }} />
                 </Box>
               );
             } else {
-              icon = <RadioButtonUnchecked sx={{ fontSize: 28, color: '#BDBDBD' }} />;
+              icon = <RadioButtonUnchecked sx={{ fontSize: 24, color: '#BDBDBD' }} />;
             }
-            
+
             return (
-              <ListItem 
+              <ListItem
                 key={index}
                 sx={{
                   py: 1.5,
                   px: 2,
-                  mb: 1,
-                  borderRadius: 2,
-                  bgcolor: isCurrent ? 'rgba(30, 107, 82, 0.05)' : 'transparent',
-                  border: isCurrent ? '2px solid #E8F5E9' : '2px solid transparent',
-                  transition: 'all 0.3s ease-in-out',
-                  transform: isCurrent ? 'scale(1.02)' : 'scale(1)',
+                  mb: 0.5,
+                  borderRadius: 1,
+                  bgcolor: isCurrent ? 'rgba(30, 107, 82, 0.04)' : 'transparent',
+                  borderLeft: isCurrent ? '3px solid #1E6B52' : '3px solid transparent',
+                  transition: 'all 0.2s ease',
                 }}
               >
-                <Box sx={{ mr: 2 }}>{icon}</Box>
-                <ListItemText 
+                <Box sx={{ mr: 2, display: 'flex', alignItems: 'center' }}>{icon}</Box>
+                <ListItemText
                   primary={stage}
                   sx={{
                     '& .MuiListItemText-primary': {
-                      fontWeight: isCurrent ? 600 : isCompleted ? 500 : 'normal',
-                      color: isCurrent ? '#1E6B52' : isCompleted ? '#4CAF50' : '#9E9E9E',
-                      fontSize: isCurrent ? '1.05rem' : '1rem',
-                    }
+                      fontWeight: isCurrent ? 600 : isCompleted ? 500 : 400,
+                      color: isCurrent ? '#1E6B52' : isCompleted ? '#4CAF50' : '#757575',
+                      fontSize: '0.95rem',
+                    },
                   }}
                 />
                 {isCompleted && (
-                  <Chip 
-                    label="Completed" 
-                    size="small" 
-                    sx={{ 
-                      bgcolor: '#E8F5E9', 
-                      color: '#4CAF50',
-                      fontWeight: 600,
-                    }} 
+                  <Chip
+                    label="✓"
+                    size="small"
+                    sx={{ bgcolor: '#E8F5E9', color: '#4CAF50', fontWeight: 600, fontSize: '0.75rem', height: '24px', minWidth: '32px' }}
                   />
                 )}
                 {isCurrent && (
-                  <Chip 
-                    label="In Progress" 
-                    size="small" 
-                    sx={{ 
-                      bgcolor: '#E8F5E9', 
-                      color: '#1E6B52',
-                      fontWeight: 600,
-                    }} 
+                  <Chip
+                    label="Running"
+                    size="small"
+                    sx={{ bgcolor: '#E8F5E9', color: '#1E6B52', fontWeight: 600, fontSize: '0.75rem', height: '24px' }}
                   />
                 )}
               </ListItem>
@@ -374,8 +301,15 @@ export default function ProgressPage() {
       {status === 'completed' && (
         <Button
           variant="contained"
+          size="large"
           fullWidth
-          sx={{ mt: 2 }}
+          sx={{
+            mt: 3, py: 1.5,
+            bgcolor: '#1E6B52',
+            '&:hover': { bgcolor: '#145A43' },
+            fontSize: '1.1rem',
+            fontWeight: 600,
+          }}
           onClick={() => navigate(`/results/${analysisId}`)}
         >
           View Results

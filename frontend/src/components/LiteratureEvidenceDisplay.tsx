@@ -83,7 +83,14 @@ export default function LiteratureEvidenceDisplay({
     hypothesisCitations = hypothesis.literature_evidence.citations;
   }
 
-
+  // Debug logging
+  console.log('LiteratureEvidenceDisplay Debug:', {
+    pathway_id: pathway?.pathway_id,
+    citations_prop_count: citations.length,
+    hypothesisCitations_count: hypothesisCitations.length,
+    hypothesisCitations_data: hypothesisCitations,
+    allResults_stage4_lit: allResults?.stage_4_literature ? Object.keys(allResults.stage_4_literature).slice(0, 3) : 'no stage_4_literature'
+  });
 
   // Sort citations by relevance score
   const sortedCitations = [...hypothesisCitations].sort((a, b) => (b.relevance_score || 0) - (a.relevance_score || 0));
@@ -151,17 +158,17 @@ export default function LiteratureEvidenceDisplay({
               </Avatar>
               <Box sx={{ flexGrow: 1 }}>
                 <Typography variant="h6" fontWeight={600}>
-                  {hasLiteratureSupport ? 'PubMed Query Support Found' : 'No PubMed Query Hits Retrieved'}
+                  {hasLiteratureSupport ? 'Literature Support Found' : 'Novel Finding - No Prior Literature'}
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
                   {hasLiteratureSupport 
-                    ? `Retrieved ${totalCitations} PubMed hits for this pathway-focused query across ${tracedSeedGenes.length} contributing seed gene(s)`
-                    : 'The automated PubMed query did not retrieve supporting hits. This is a query-level gap, not proof that the pathway is absent from the literature.'
+                    ? `Found ${totalCitations} publications linking this pathway to ${tracedSeedGenes.length} seed gene(s)`
+                    : 'No existing literature evidence found for this pathway-seed gene association. This may represent a novel discovery.'
                   }
                 </Typography>
               </Box>
               <Chip 
-                label={hasLiteratureSupport ? 'Query Hits' : 'No Query Hits'}
+                label={hasLiteratureSupport ? 'Reported' : 'Not Reported'}
                 color={hasLiteratureSupport ? 'success' : 'warning'}
                 sx={{ fontWeight: 600 }}
               />
@@ -199,7 +206,7 @@ export default function LiteratureEvidenceDisplay({
                 <Typography variant="body2">
                   <strong>Targeted Literature Mining:</strong> Citations below were found by searching for publications 
                   that discuss "{hypothesis?.aggregated_pathway?.pathway?.pathway_name}" in combination with these specific 
-                  contributing seed genes, providing a narrow automated co-mention screen rather than a comprehensive proof of prior reporting.
+                  contributing seed genes, providing more relevant evidence than generic pathway literature.
                 </Typography>
               </Alert>
             </CardContent>
@@ -304,7 +311,17 @@ export default function LiteratureEvidenceDisplay({
                         <Box sx={{ width: '100%' }}>
                           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
                             <Box sx={{ flexGrow: 1, pr: 2 }}>
-                              <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 0.5 }}>
+                              <Typography
+                                variant="subtitle2"
+                                fontWeight={600}
+                                sx={{
+                                  mb: 0.5,
+                                  cursor: 'pointer',
+                                  color: 'primary.main',
+                                  '&:hover': { textDecoration: 'underline' },
+                                }}
+                                onClick={() => window.open(`https://pubmed.ncbi.nlm.nih.gov/${citation.pmid}`, '_blank')}
+                              >
                                 {citation.title}
                               </Typography>
                               <Typography variant="body2" color="text.secondary">
@@ -363,11 +380,13 @@ export default function LiteratureEvidenceDisplay({
 
                           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                             <Box sx={{ display: 'flex', gap: 0.5 }}>
-                              <Chip 
-                                label={`PMID: ${citation.pmid}`} 
-                                size="small" 
+                              <Chip
+                                label={`PMID: ${citation.pmid}`}
+                                size="small"
                                 variant="outlined"
-                                sx={{ fontSize: '0.75rem', fontFamily: 'monospace' }}
+                                clickable
+                                onClick={() => window.open(`https://pubmed.ncbi.nlm.nih.gov/${citation.pmid}`, '_blank')}
+                                sx={{ fontSize: '0.75rem', fontFamily: 'monospace', cursor: 'pointer', '&:hover': { bgcolor: '#E3F2FD' } }}
                               />
                               {citation.mesh_terms && citation.mesh_terms.slice(0, 2).map((term: any, termIdx: number) => (
                                 <Chip 

@@ -6,7 +6,6 @@ import Layout from './components/Layout';
 import HomePage from './pages/HomePage';
 import ProgressPage from './pages/ProgressPage';
 import ResultsPage from './pages/ResultsPageClean';
-import UltraDetailPage from './pages/UltraDetailPage';
 import DocumentationPage from './pages/DocumentationPageSimplified';
 import APIReferencePage from './pages/APIReferencePage';
 
@@ -19,6 +18,7 @@ const queryClient = new QueryClient({
   },
 });
 
+// UAB Green branded theme with professional scientific look
 const theme = createTheme({
   palette: {
     mode: 'light',
@@ -35,8 +35,8 @@ const theme = createTheme({
       contrastText: '#000000',
     },
     background: {
-      default: '#F4F8F6',
-      paper: '#FFFFFF',
+      default: '#FFFFFF', // Pure white background
+      paper: '#FAFAFA', // Subtle off-white for cards
     },
     text: {
       primary: '#1A1A1A',
@@ -62,70 +62,67 @@ const theme = createTheme({
     },
   },
   typography: {
-    htmlFontSize: 17,
-    fontFamily: '"IBM Plex Sans", "Segoe UI", sans-serif',
+    fontFamily: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif',
     h1: {
-      fontSize: '2.4rem',
-      fontWeight: 500,
-      letterSpacing: '-0.012em',
+      fontSize: '2.25rem',
+      fontWeight: 600,
+      letterSpacing: '-0.01562em',
       color: '#1A1A1A',
     },
     h2: {
-      fontSize: '1.95rem',
-      fontWeight: 500,
-      letterSpacing: '-0.006em',
+      fontSize: '1.8rem',
+      fontWeight: 600,
+      letterSpacing: '-0.00833em',
       color: '#1A1A1A',
     },
     h3: {
-      fontSize: '1.7rem',
-      fontWeight: 500,
+      fontSize: '1.575rem',
+      fontWeight: 600,
       letterSpacing: '0em',
       color: '#1A1A1A',
     },
     h4: {
-      fontSize: '1.45rem',
-      fontWeight: 500,
-      letterSpacing: '0.004em',
+      fontSize: '1.35rem',
+      fontWeight: 600,
+      letterSpacing: '0.00735em',
       color: '#1A1A1A',
     },
     h5: {
-      fontSize: '1.2rem',
-      fontWeight: 500,
+      fontSize: '1.125rem',
+      fontWeight: 600,
       letterSpacing: '0em',
       color: '#1A1A1A',
     },
     h6: {
-      fontSize: '1.05rem',
-      fontWeight: 500,
-      letterSpacing: '0.004em',
+      fontSize: '1.0rem',
+      fontWeight: 600,
+      letterSpacing: '0.0075em',
       color: '#1A1A1A',
     },
     subtitle1: {
-      fontSize: '1rem',
-      fontWeight: 400,
-      letterSpacing: '0.004em',
+      fontSize: '0.9rem',
+      fontWeight: 500,
+      letterSpacing: '0.00938em',
       color: '#4A4A4A',
     },
     body1: {
-      fontSize: '1rem',
-      fontWeight: 400,
-      letterSpacing: '0.003em',
-      lineHeight: 1.65,
+      fontSize: '0.9rem',
+      letterSpacing: '0.00938em',
+      lineHeight: 1.6,
     },
     body2: {
-      fontSize: '0.92rem',
-      fontWeight: 400,
-      letterSpacing: '0.003em',
-      lineHeight: 1.55,
+      fontSize: '0.8rem',
+      letterSpacing: '0.01071em',
+      lineHeight: 1.5,
     },
     button: {
       textTransform: 'none', // More professional, less shouty
-      fontWeight: 400,
-      fontSize: '0.95rem',
+      fontWeight: 500,
+      fontSize: '0.875rem',
     },
   },
   shape: {
-    borderRadius: 10,
+    borderRadius: 7, // Slightly rounded for modern look
   },
   shadows: [
     'none',
@@ -158,8 +155,7 @@ const theme = createTheme({
     MuiCssBaseline: {
       styleOverrides: {
         body: {
-          backgroundColor: '#F4F8F6',
-          fontSize: '1rem',
+          backgroundColor: '#FFFFFF',
           scrollbarColor: '#BDBDBD #F5F5F5',
           '&::-webkit-scrollbar, & *::-webkit-scrollbar': {
             width: 8,
@@ -187,9 +183,9 @@ const theme = createTheme({
       styleOverrides: {
         root: {
           borderRadius: 5,
-          padding: '8px 18px',
-          fontSize: '0.95rem',
-          fontWeight: 400,
+          padding: '7px 18px',
+          fontSize: '0.875rem',
+          fontWeight: 500,
         },
         contained: {
           boxShadow: 'none',
@@ -213,6 +209,7 @@ const theme = createTheme({
 function App() {
   // Clear any previous analysis data on app startup
   useEffect(() => {
+    console.log('[APP] Clearing previous analysis data on startup');
     localStorage.removeItem('currentAnalysisId');
     localStorage.removeItem('analysisResults');
     sessionStorage.removeItem('currentAnalysisId');
@@ -230,7 +227,6 @@ function App() {
               <Route path="/api-reference" element={<APIReferencePage />} />
               <Route path="/progress/:analysisId" element={<ProgressPage />} />
               <Route path="/results/:analysisId" element={<ResultsPage />} />
-              <Route path="/detail/:analysisId/:pathwayId" element={<UltraDetailPage />} />
             </Routes>
           </Layout>
         </Router>

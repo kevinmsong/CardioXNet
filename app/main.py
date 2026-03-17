@@ -1,5 +1,14 @@
 """FastAPI application entry point for CardioXNet."""
 
+import sys
+import io
+
+# Ensure UTF-8 output on Windows to avoid charmap encoding errors with Unicode characters
+if hasattr(sys.stdout, 'buffer'):
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
+if hasattr(sys.stderr, 'buffer'):
+    sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8', errors='replace')
+
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -51,7 +60,7 @@ async def lifespan(app: FastAPI):
 # Create FastAPI application
 app = FastAPI(
     title="CardioXNet API",
-    description="Cardiac Repair Pathway Discovery Platform - NETS (Neighborhood Enrichment Triage and Scoring) Pipeline",
+    description="Cardiac Repair Pathway Discovery Platform - NETS Pipeline",
     version="0.1.0",
     docs_url="/docs",
     redoc_url="/redoc",
@@ -69,7 +78,7 @@ app.add_middleware(
 
 # Include API routes
 app.include_router(router)
-app.include_router(ws_router)
+app.include_router(ws_router)  # WebSocket for real-time progress
 
 
 @app.get("/")

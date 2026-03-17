@@ -150,7 +150,7 @@ class ModularCardioXNetPipeline:
             f"Starting modular NETS pipeline analysis (ID: {self.analysis_id}) "
             f"with {len(seed_genes)} seed genes"
         )
-        print(f"\n🚀 [TIMING] Modular Pipeline START at {datetime.now().strftime('%H:%M:%S')}")
+        logger.info(f"[TIMING] Modular Pipeline START at {datetime.now().strftime('%H:%M:%S')}")
         
         try:
             # Initialize context with input
@@ -189,7 +189,7 @@ class ModularCardioXNetPipeline:
                 if result.status == "failed":
                     raise PipelineError(f"Required stage {stage_name} failed: {result.error}")
                 
-                print(f"⏱️  [TIMING] {stage_name} completed in {elapsed:.2f}s")
+                logger.info("  [TIMING] {stage_name} completed in {elapsed:.2f}s")
             
             # Collect final results
             final_results = {

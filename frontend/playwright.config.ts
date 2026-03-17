@@ -1,17 +1,14 @@
 import { defineConfig, devices } from '@playwright/test';
 import path from 'path';
 
-const isCI = !!process.env.CI;
-
 export default defineConfig({
   testDir: './tests',
-  timeout: 900_000,
+  timeout: 60_000,
   expect: { timeout: 5000 },
-  fullyParallel: false,
-  workers: 1,
+  fullyParallel: true,
   reporter: [['list'], ['html', { open: 'never' }]],
   use: {
-    baseURL: process.env.VITE_APP_URL || 'http://127.0.0.1:3000',
+    baseURL: process.env.VITE_APP_URL || 'http://localhost:3000',
     headless: true,
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
@@ -23,18 +20,12 @@ export default defineConfig({
       use: { ...devices['Desktop Chrome'] },
     },
   ],
-  webServer: [
-    {
-      command: 'python -m uvicorn app.main:app --host 127.0.0.1 --port 8000',
-      cwd: path.resolve(process.cwd(), '..'),
-      url: 'http://127.0.0.1:8000/health',
-      reuseExistingServer: !isCI,
-    },
-    {
-      command: 'npm run dev -- --host 127.0.0.1 --port 3000',
-      cwd: process.cwd(),
-      url: 'http://127.0.0.1:3000',
-      reuseExistingServer: !isCI,
-    },
-  ],
+  webServer: process.env.CI
+    ? undefined
+    : {
+        command: 'npm run dev',
+        cwd: process.cwd(),
+        url: 'http://localhost:3000',
+        reuseExistingServer: true,
+      },
 });

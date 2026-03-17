@@ -24,6 +24,7 @@ from app.services import (
     PrimaryPathwayAnalyzer,
     SecondaryPathwayAnalyzer,
     NESScorer,
+    TopologyAnalyzer,
     LiteratureMiner,
     ReportGenerator,
     TissueExpressionValidator,
@@ -58,21 +59,12 @@ class Pipeline:
         # Create a copy of settings to avoid modifying the global instance
         import copy
         self.settings = copy.deepcopy(get_settings())
-
-        # Disease context is pipeline-owned state and must survive config override handling.
-        self.disease_context = None
-        self.disease_synonyms = []
         
         # Apply config overrides if provided
         if config_overrides:
             logger.info(f"Applying {len(config_overrides)} configuration overrides: {config_overrides}")
             for key, value in config_overrides.items():
                 if hasattr(self.settings.nets, key):
-                    nets_attr = getattr(type(self.settings.nets), key, None)
-                    if isinstance(nets_attr, property) and nets_attr.fset is None:
-                        logger.warning(f"Skipping read-only configuration parameter: {key}")
-                        continue
-
                     old_value = getattr(self.settings.nets, key)
                     setattr(self.settings.nets, key, value)
                     logger.info(f"Override: {key} = {old_value} -> {value}")
@@ -105,25 +97,29 @@ class Pipeline:
         self.redundancy_detector = PathwayRedundancyDetector(similarity_threshold=redundancy_threshold)
         self.permutation_tester = PermutationTester()
         self.druggability_analyzer = DruggabilityAnalyzer()
-        # topology_analyzer removed for speed optimization
+        self.topology_analyzer = TopologyAnalyzer()
         
         # Stage 3: Clinical Evidence Integrator (REMOVED - GWAS API deprecated)
         # disease_context = getattr(self, 'disease_context', 'cardiovascular')
         # self.clinical_evidence_integrator = ClinicalEvidenceIntegrator(disease_context=disease_context)
         
-        # Comprehensive topology analyzer removed for speed optimization
+        # Stage 7: Comprehensive Network Topology Analyzer
+        from app.services.comprehensive_topology import ComprehensiveTopologyAnalyzer
+        self.comprehensive_topology = ComprehensiveTopologyAnalyzer()
         
         self.literature_miner = LiteratureMiner()
         self.hypothesis_validator = HypothesisValidator()
         self.seed_gene_tracer = SeedGeneTracer()
         self.report_generator = ReportGenerator()
-
-        self._sync_service_settings()
         
         # Pipeline state
         self.results = {}
         self.warnings = []
         self.progress_callback = None
+        
+        # Disease context for semantic filtering and literature search
+        self.disease_context = None
+        self.disease_synonyms = []
         
         logger.info(f"CardioXNetPipeline initialized (ID: {self.analysis_id})")
     
@@ -161,70 +157,70 @@ class Pipeline:
         
         try:
             # Stage 0: Input Validation
-            await self._update_progress("Stage 1", 5, "Validating input")
+            await self._update_progress("input_validation", 5, "Validating input")
             stage_start_time = time.time()
             validation_result = await self._run_stage_0(seed_genes)
             elapsed = time.time() - stage_start_time
-            print(f"[TIMING] Stage 0 completed in {elapsed:.2f}s (Total: {time.time() - pipeline_start_time:.2f}s)")
+            logger.info(f"[TIMING] Stage 0 completed in {elapsed:.2f}s (Total: {time.time() - pipeline_start_time:.2f}s)")
             
             # Stage 1: Functional Neighborhood Assembly
-            await self._update_progress("Stage 2", 15, "Building functional neighborhood")
+            await self._update_progress("functional_neighborhood", 15, "Building functional neighborhood")
             stage_start_time = time.time()
             fn_result = await self._run_stage_1(validation_result.valid_genes)
             elapsed = time.time() - stage_start_time
-            print(f"[TIMING] Stage 1 completed in {elapsed:.2f}s (Total: {time.time() - pipeline_start_time:.2f}s)")
+            logger.info(f"[TIMING] Stage 1 completed in {elapsed:.2f}s (Total: {time.time() - pipeline_start_time:.2f}s)")
             
             # Stage 2a: Primary Pathway Enrichment
-            await self._update_progress("Stage 3", 25, "Primary pathway enrichment")
+            await self._update_progress("primary_pathway", 25, "Primary pathway enrichment")
             stage_start_time = time.time()
             primary_result = await self._run_stage_2a(fn_result)
             elapsed = time.time() - stage_start_time
-            print(f"[TIMING] Stage 2a completed in {elapsed:.2f}s (Total: {time.time() - pipeline_start_time:.2f}s)")
+            logger.info(f"[TIMING] Stage 2a completed in {elapsed:.2f}s (Total: {time.time() - pipeline_start_time:.2f}s)")
             
             # Stage 2b: Secondary Pathway Discovery
-            await self._update_progress("Stage 4", 40, "Secondary pathway discovery")
+            await self._update_progress("secondary_pathway", 40, "Secondary pathway discovery")
             stage_start_time = time.time()
             secondary_result = await self._run_stage_2b(
                 primary_result,
                 validation_result.valid_genes
             )
             elapsed = time.time() - stage_start_time
-            print(f"[TIMING] Stage 2b completed in {elapsed:.2f}s (Total: {time.time() - pipeline_start_time:.2f}s)")
+            logger.info(f"[TIMING] Stage 2b completed in {elapsed:.2f}s (Total: {time.time() - pipeline_start_time:.2f}s)")
             
             # Stage 2c: Pathway Aggregation
-            await self._update_progress("Stage 5", 55, "Aggregating pathways")
+            await self._update_progress("pathway_aggregation", 55, "Aggregating pathways")
             stage_start_time = time.time()
             final_result = await self._run_stage_2c(secondary_result, primary_result)
             elapsed = time.time() - stage_start_time
             logger.info(f"Stage 2c complete: {final_result.total_count} final pathways")
-            print(f"[TIMING] Stage 2c completed in {elapsed:.2f}s (Total: {time.time() - pipeline_start_time:.2f}s)")
-            await self._update_progress("Stage 5", 60, f"Stage 5 complete: {final_result.total_count} pathways")
+            logger.info(f"[TIMING] Stage 2c completed in {elapsed:.2f}s (Total: {time.time() - pipeline_start_time:.2f}s)")
+            await self._update_progress("pathway_aggregation", 60, f"Pathway aggregation complete: {final_result.total_count} pathways")
             
             # Stage 5a: Final NES Scoring
-            await self._update_progress("Stage 6", 65, "Calculating NES scores")
+            await self._update_progress("nes_scoring", 65, "Calculating NES scores")
             stage_start_time = time.time()
-            print(f"[PIPELINE DEBUG] Calling Stage 5a with {final_result.total_count} pathways")
+            logger.info(f"[PIPELINE] Calling Stage 5a with {final_result.total_count} pathways")
             scored_hypotheses = await self._run_stage_5_scoring(final_result, None)
             elapsed = time.time() - stage_start_time
             print(f"[PIPELINE DEBUG] Stage 5a returned {scored_hypotheses.total_count} hypotheses")
             logger.info(f"Stage 5a complete: {scored_hypotheses.total_count} scored hypotheses")
-            print(f"[TIMING] Stage 5a completed in {elapsed:.2f}s (Total: {time.time() - pipeline_start_time:.2f}s)")
-            await self._update_progress("Stage 6", 70, f"Stage 6 complete: {scored_hypotheses.total_count} hypotheses")
+            logger.info(f"[TIMING] Stage 5a completed in {elapsed:.2f}s (Total: {time.time() - pipeline_start_time:.2f}s)")
+            await self._update_progress("nes_scoring", 70, f"NES scoring complete: {scored_hypotheses.total_count} hypotheses")
             
             # Stage 4a: Semantic Filtering (Cardiac Relevance Boost)
-            await self._update_progress("Stage 7", 72, "Applying semantic cardiac relevance filtering")
+            await self._update_progress("semantic_filtering", 72, "Applying semantic cardiac relevance filtering")
             stage_start_time = time.time()
             scored_hypotheses = await self._run_stage_4_semantic(scored_hypotheses)
             elapsed = time.time() - stage_start_time
             logger.info(f"Stage 4a complete: {scored_hypotheses.total_count} hypotheses after semantic filtering")
-            print(f"[TIMING] Stage 4a completed in {elapsed:.2f}s (Total: {time.time() - pipeline_start_time:.2f}s)")
-            await self._update_progress("Stage 7", 76, f"Semantic filtering complete: {scored_hypotheses.total_count} hypotheses")
+            logger.info(f"[TIMING] Stage 4a completed in {elapsed:.2f}s (Total: {time.time() - pipeline_start_time:.2f}s)")
+            await self._update_progress("semantic_filtering", 76, f"Semantic filtering complete: {scored_hypotheses.total_count} hypotheses")
             
             # Stage 4b: Enhanced Biological Validation (Tissue Expression, Permutation, Druggability)
-            await self._update_progress("Stage 8", 78, "Applying enhanced biological validation")
+            await self._update_progress("enhanced_validation", 78, "Applying enhanced biological validation")
             stage_start_time = time.time()
-            print(f"[PIPELINE DEBUG] Starting Stage 4b with {scored_hypotheses.total_count} hypotheses")
-            logger.info(f"Starting Stage 4b enhanced validation with {scored_hypotheses.total_count} hypotheses")
+            print(f"[PIPELINE DEBUG] Starting Stage 8 with {scored_hypotheses.total_count} hypotheses")
+            logger.info(f"Starting Stage 8 enhanced validation with {scored_hypotheses.total_count} hypotheses")
             
             try:
                 scored_hypotheses = await self._run_stage_4_enhanced_validation(
@@ -233,48 +229,42 @@ class Pipeline:
                     validation_result.valid_genes
                 )
                 elapsed = time.time() - stage_start_time
-                print(f"[PIPELINE DEBUG] Stage 4b completed successfully")
-                logger.info(f"Stage 4b complete: Enhanced validation applied to {scored_hypotheses.total_count} hypotheses")
-                print(f"[TIMING] Stage 4b completed in {elapsed:.2f}s (Total: {time.time() - pipeline_start_time:.2f}s)")
-                await self._update_progress("Stage 8", 81, f"Enhanced validation complete")
+                print(f"[PIPELINE DEBUG] Stage 8 completed successfully")
+                logger.info(f"Stage 8 complete: Enhanced validation applied to {scored_hypotheses.total_count} hypotheses")
+                logger.info(f"[TIMING] Stage 8 completed in {elapsed:.2f}s (Total: {time.time() - pipeline_start_time:.2f}s)")
+                await self._update_progress("enhanced_validation", 84, f"Enhanced validation complete")
             except Exception as e:
                 elapsed = time.time() - stage_start_time
-                print(f"[PIPELINE DEBUG] Stage 4b failed: {str(e)}")
-                logger.error(f"Stage 4b failed but continuing pipeline: {str(e)}")
-                print(f"[TIMING] Stage 4b failed after {elapsed:.2f}s (Total: {time.time() - pipeline_start_time:.2f}s)")
+                logger.info(f"[PIPELINE] Stage 8 failed: {str(e)}")
+                logger.error(f"Stage 8 failed but continuing pipeline: {str(e)}")
+                logger.info(f"[TIMING] Stage 8 failed after {elapsed:.2f}s (Total: {time.time() - pipeline_start_time:.2f}s)")
                 import traceback
                 traceback.print_exc()
-                self.warnings.append(f"Stage 4b enhanced validation failed: {str(e)}")
-                await self._update_progress("Stage 8", 81, f"Stage 8 failed, continuing pipeline")
+                self.warnings.append(f"Stage 8 enhanced validation failed: {str(e)}")
+                await self._update_progress("enhanced_validation", 84, f"Enhanced validation failed, continuing")
             
             # Stage 6: Literature Mining & Seed Gene Traceability
-            await self._update_progress("Stage 9", 82, "Mining literature and tracing seed genes")
+            await self._update_progress("literature_mining", 85, "Mining literature and tracing seed genes")
             stage_6_start = time.time()
-            print(f"[PIPELINE DEBUG] Starting Stage 6 with {scored_hypotheses.total_count} hypotheses")
+            print(f"[PIPELINE DEBUG] Starting Stage 9 with {scored_hypotheses.total_count} hypotheses")
             
             # Stage 6a: Literature Mining (detailed citations)
             try:
                 stage_start_time = time.time()
-                literature_limit = getattr(
-                    self.settings.nets,
-                    "semantic_max_hypotheses_for_literature",
-                    self.settings.nets.top_hypotheses_count
-                )
                 literature_evidence = await self._run_stage_6_literature(
                     scored_hypotheses,
-                    validation_result.valid_genes,
-                    top_n=literature_limit
+                    validation_result.valid_genes
                 )
                 elapsed = time.time() - stage_start_time
                 print(f"[PIPELINE DEBUG] Stage 6a literature mining completed successfully")
                 logger.info(f"Stage 6a complete: Literature mining found citations for {len(literature_evidence.hypothesis_citations)} hypotheses")
-                print(f"[TIMING] Stage 6a completed in {elapsed:.2f}s (Total: {time.time() - pipeline_start_time:.2f}s)")
+                logger.info(f"[TIMING] Stage 6a completed in {elapsed:.2f}s (Total: {time.time() - pipeline_start_time:.2f}s)")
             except Exception as e:
                 elapsed = time.time() - stage_start_time
                 literature_error_msg = f"[PIPELINE DEBUG] Stage 6a literature mining failed: {str(e)}"
                 print(literature_error_msg, flush=True)
                 logger.error(f"Stage 6a literature mining failed but continuing: {str(e)}")
-                print(f"[TIMING] Stage 6a failed after {elapsed:.2f}s (Total: {time.time() - pipeline_start_time:.2f}s)")
+                logger.info(f"[TIMING] Stage 6a failed after {elapsed:.2f}s (Total: {time.time() - pipeline_start_time:.2f}s)")
                 import traceback
                 traceback.print_exc()
                 self.warnings.append(f"Stage 6a literature mining failed: {str(e)}")
@@ -293,13 +283,13 @@ class Pipeline:
                 stage6_complete_msg = f"[PIPELINE DEBUG] Stage 6b completed successfully"
                 print(stage6_complete_msg, flush=True)
                 logger.info(f"Stage 6b complete: Seed gene tracing and literature associations added")
-                print(f"[TIMING] Stage 6b completed in {elapsed:.2f}s (Total: {time.time() - pipeline_start_time:.2f}s)")
+                logger.info(f"[TIMING] Stage 6b completed in {elapsed:.2f}s (Total: {time.time() - pipeline_start_time:.2f}s)")
             except Exception as e:
                 elapsed = time.time() - stage_start_time
                 stage6_error_msg = f"[PIPELINE DEBUG] Stage 6b failed: {str(e)}"
                 print(stage6_error_msg, flush=True)
                 logger.error(f"Stage 6b failed but continuing: {str(e)}")
-                print(f"[TIMING] Stage 6b failed after {elapsed:.2f}s (Total: {time.time() - pipeline_start_time:.2f}s)")
+                logger.info(f"[TIMING] Stage 6b failed after {elapsed:.2f}s (Total: {time.time() - pipeline_start_time:.2f}s)")
                 import traceback
                 traceback.print_exc()
                 self.warnings.append(f"Stage 6b seed tracing failed: {str(e)}")
@@ -307,7 +297,7 @@ class Pipeline:
             # Stage 6c: FINAL STRICT FILTER - configurable enforcement
             # Pathway names are required to contain cardiac/disease terms by default,
             # but this can be disabled via settings.nets.enforce_final_name_filter = False
-            await self._update_progress("Stage 7", 77, "Applying strict cardiac name filter")
+            # NOTE: This is part of literature_mining stage (already at 85%), no need to update progress
             stage_start_time = time.time()
             pre_final_filter_count = scored_hypotheses.total_count
             
@@ -344,83 +334,91 @@ class Pipeline:
                     f"[PIPELINE] Stage 4b MANDATORY name filter complete: {scored_hypotheses.total_count}/{pre_final_filter_count} "
                     f"pathways retained ({retention_rate:.1f}%) - 100% contain cardiac/disease terms in pathway name"
                 )
-                print(f"[PIPELINE DEBUG] [SUCCESS] Stage 4b: {scored_hypotheses.total_count}/{pre_final_filter_count} pathways retained (100% cardiac-named)")
-                print(f"[TIMING] Stage 6c (Final Filter) completed in {elapsed:.2f}s (Total: {time.time() - pipeline_start_time:.2f}s)")
-                
-                # CRITICAL: Update stage_3 with FILTERED results (100% cardiac-relevant pathways)
-                self.results["stage_3"] = scored_hypotheses.model_dump()
-                logger.info(f"Updated stage_3 with {scored_hypotheses.total_count} cardiac-filtered pathways")
+                logger.info(f"[PIPELINE DEBUG] [SUCCESS] Stage 4b: {scored_hypotheses.total_count}/{pre_final_filter_count} pathways retained (100% cardiac-named)")
+                logger.info(f"[TIMING] Stage 6c (Final Filter) completed in {elapsed:.2f}s (Total: {time.time() - pipeline_start_time:.2f}s)")
                 
                 if scored_hypotheses.total_count == 0:
-                    warning_msg = "Stage 4b filter removed all pathways. No cardiac-named pathways were found."
+                    warning_msg = "⚠️ Stage 4b filter removed ALL pathways - no cardiac-named pathways found. Consider adjusting disease context or input genes."
                     logger.warning(warning_msg)
                     print(warning_msg)
                     self.warnings.append(warning_msg)
-
-                # Align literature evidence with the final ranked pathway set.
-                # Pre-filter literature mining can miss pathways retained by the
-                # strict cardiac name filter, which leads to misleading zero-hit
-                # displays on the results page.
-                if scored_hypotheses.total_count > 0:
-                    await self._update_progress("Stage 9", 84, "Refreshing literature evidence for final pathways")
-                    literature_limit = getattr(
-                        self.settings.nets,
-                        "semantic_max_hypotheses_for_literature",
-                        self.settings.nets.top_hypotheses_count
-                    )
-                    final_literature_top_n = min(literature_limit, scored_hypotheses.total_count)
-                    literature_evidence = await self._run_stage_6_literature(
-                        scored_hypotheses,
-                        validation_result.valid_genes,
-                        top_n=final_literature_top_n
-                    )
-                    logger.info(
-                        "Refreshed literature evidence for %s final pathways after the strict cardiac filter",
-                        final_literature_top_n,
-                    )
-                
+                    
             except Exception as e:
                 elapsed = time.time() - stage_start_time
                 error_msg = f"Stage 4b MANDATORY filter failed: {str(e)}"
                 logger.error(error_msg)
-                print(f"[TIMING] Stage 6c (Final Filter) failed after {elapsed:.2f}s (Total: {time.time() - pipeline_start_time:.2f}s)")
+                logger.info(f"[TIMING] Stage 6c (Final Filter) failed after {elapsed:.2f}s (Total: {time.time() - pipeline_start_time:.2f}s)")
                 import traceback
                 traceback.print_exc()
                 self.warnings.append(error_msg)
                 raise PipelineError(f"CRITICAL: Mandatory cardiac name filter failed - {str(e)}")
             
-            # Stage 11: Generate Important Genes (Top 20 from Top 50 Pathways by NES)
-            await self._update_progress("Stage 11", 93, "Identifying important genes")
+            # Stage 7: Comprehensive Network Topology Analysis
+            await self._update_progress("topology_analysis", 91, "Analyzing network topology")
             stage_start_time = time.time()
-            print(f"[PIPELINE DEBUG] Generating important genes from top pathways")
+            print(f"[PIPELINE DEBUG] Starting Stage 10: Comprehensive Topology Analysis")
             
+            comprehensive_topology_result = None
             try:
-                top_genes = self._generate_important_genes(
-                    scored_hypotheses.hypotheses,
-                    self.druggability_analyzer,
-                    top_n_pathways=50,
-                    top_n_genes=20
+                # Prepare druggability data for topology analysis
+                druggability_data = {
+                    'druggable_genes': self.druggability_analyzer.druggable_genes,
+                    'approved_drug_targets': self.druggability_analyzer.approved_drug_targets,
+                    'clinical_trial_targets': self.druggability_analyzer.clinical_trial_targets,
+                    'gene_to_drugs': {}  # Could be populated from druggability analyzer if available
+                }
+                
+                # Run comprehensive topology analysis on top 50 pathways
+                comprehensive_topology_result = self.comprehensive_topology.analyze(
+                    top_pathways=scored_hypotheses.hypotheses,
+                    string_network=self.results.get('stage_1_fn', {}),
+                    druggability_data=druggability_data,
+                    top_n=50
                 )
-                self.results['top_genes'] = top_genes
+                
+                # Store results
+                self.results['stage_7_topology'] = comprehensive_topology_result.to_dict()
                 elapsed = time.time() - stage_start_time
-                logger.info(f"[SUCCESS] Generated {len(top_genes)} important genes from top pathways")
-                print(f"[PIPELINE DEBUG] Generated {len(top_genes)} important genes")
-                print(f"[TIMING] Important genes generation completed in {elapsed:.2f}s (Total: {time.time() - pipeline_start_time:.2f}s)")
+                
+                logger.info(f"[SUCCESS] Stage 7 complete: {len(comprehensive_topology_result.hub_genes)} hubs, "
+                           f"{len(comprehensive_topology_result.therapeutic_targets)} therapeutic targets identified")
+                logger.info(f"[PIPELINE DEBUG] [SUCCESS] Stage 7: Identified {len(comprehensive_topology_result.hub_genes)} hub genes, "
+                      f"{len(comprehensive_topology_result.therapeutic_targets)} therapeutic targets")
+                logger.info(f"[TIMING] Stage 7 completed in {elapsed:.2f}s (Total: {time.time() - pipeline_start_time:.2f}s)")
+                
+                # Stage 11: Therapeutic Targets Generation
+                await self._update_progress("therapeutic_targets", 95, "Identifying therapeutic target candidates")
+                try:
+                    top_genes = self._generate_top_genes(
+                        scored_hypotheses.hypotheses,
+                        self.druggability_analyzer,
+                        comprehensive_topology_result,
+                        fn_result,
+                        top_n=20  # Top 20 genes by count across ALL final pathways
+                    )
+                    self.results['top_genes'] = top_genes
+                    logger.info(f"[SUCCESS] Generated {len(top_genes)} top therapeutic target candidates")
+                    logger.info(f"[PIPELINE DEBUG] Generated {len(top_genes)} top genes")
+                except Exception as top_genes_error:
+                    logger.warning(f"Top genes generation failed (non-critical): {str(top_genes_error)}")
+                    self.results['top_genes'] = []
+                
             except Exception as e:
                 elapsed = time.time() - stage_start_time
-                logger.warning(f"Important genes generation failed (non-critical): {str(e)}")
-                print(f"[PIPELINE DEBUG] Important genes generation failed: {str(e)}")
-                print(f"[TIMING] Important genes generation failed after {elapsed:.2f}s (Total: {time.time() - pipeline_start_time:.2f}s)")
-                self.warnings.append(f"Important genes generation failed: {str(e)}")
-                self.results['top_genes'] = []
+                logger.warning(f"Stage 7 topology analysis failed (non-critical): {str(e)}")
+                logger.info(f"[PIPELINE DEBUG] Stage 7 failed: {str(e)}")
+                logger.info(f"[TIMING] Stage 7 failed after {elapsed:.2f}s (Total: {time.time() - pipeline_start_time:.2f}s)")
+                self.warnings.append(f"Stage 7 topology analysis failed: {str(e)}")
+                # Non-critical failure - continue pipeline
             
             # Generate Reports
-            await self._update_progress("Stage 12", 97, "Generating reports")
+            await self._update_progress("report_generation", 97, "Generating reports")
             stage_start_time = time.time()
             print(f"[PIPELINE DEBUG] Starting report generation with {scored_hypotheses.total_count} final hypotheses")
             
             try:
-                # Get top genes from results
+                # Get comprehensive topology and top genes from results
+                comprehensive_topology_data = self.results.get('stage_7_topology')
                 top_genes_data = self.results.get('top_genes', [])
                 
                 report_files = await self._generate_reports(
@@ -433,25 +431,25 @@ class Pipeline:
                     scored_hypotheses,
                     None,  # topology_result removed
                     literature_evidence,  # detailed literature citations
-                    None,  # comprehensive_topology removed
-                    top_genes_data  # Important genes
+                    comprehensive_topology_data,  # Stage 7 comprehensive topology
+                    top_genes_data  # Top therapeutic target candidates
                 )
                 elapsed = time.time() - stage_start_time
                 print(f"[PIPELINE DEBUG] Report generation completed successfully")
-                print(f"[PIPELINE DEBUG] Generated report files: {list(report_files.keys()) if report_files else 'None'}")
-                print(f"[TIMING] Report generation completed in {elapsed:.2f}s (Total: {time.time() - pipeline_start_time:.2f}s)")
+                logger.info(f"[PIPELINE DEBUG] Generated report files: {list(report_files.keys()) if report_files else 'None'}")
+                logger.info("  [TIMING] Report generation completed in {elapsed:.2f}s (Total: {time.time() - pipeline_start_time:.2f}s)")
             except Exception as e:
                 elapsed = time.time() - stage_start_time
-                print(f"[PIPELINE DEBUG] Report generation failed: {str(e)}")
+                logger.info(f"[PIPELINE DEBUG] Report generation failed: {str(e)}")
                 logger.error(f"Report generation failed: {str(e)}")
-                print(f"[TIMING] Report generation failed after {elapsed:.2f}s (Total: {time.time() - pipeline_start_time:.2f}s)")
+                logger.info("  [TIMING] Report generation failed after {elapsed:.2f}s (Total: {time.time() - pipeline_start_time:.2f}s)")
                 import traceback
                 traceback.print_exc()
                 self.warnings.append(f"Report generation failed: {str(e)}")
                 report_files = {}
             
             # Save final results
-            await self._update_progress("Complete", 100, "Analysis complete")
+            await self._update_progress("complete", 100, "Analysis complete")
             stage_start_time = time.time()
             print(f"[PIPELINE DEBUG] Saving final results...")
             
@@ -459,17 +457,17 @@ class Pipeline:
                 await self._save_results()
                 elapsed = time.time() - stage_start_time
                 print(f"[PIPELINE DEBUG] Final results saved successfully")
-                print(f"[TIMING] Save results completed in {elapsed:.2f}s (Total: {time.time() - pipeline_start_time:.2f}s)")
+                logger.info("  [TIMING] Save results completed in {elapsed:.2f}s (Total: {time.time() - pipeline_start_time:.2f}s)")
             except Exception as e:
                 elapsed = time.time() - stage_start_time
-                print(f"[PIPELINE DEBUG] Error saving results: {str(e)}")
+                logger.info(f"[PIPELINE DEBUG] Error saving results: {str(e)}")
                 logger.error(f"Error saving results: {str(e)}")
-                print(f"[TIMING] Save results failed after {elapsed:.2f}s (Total: {time.time() - pipeline_start_time:.2f}s)")
+                logger.info("  [TIMING] Save results failed after {elapsed:.2f}s (Total: {time.time() - pipeline_start_time:.2f}s)")
             
             # Final timing summary
             total_elapsed = time.time() - pipeline_start_time
             print(f"\n{'='*80}")
-            print(f"[TIMING] PIPELINE COMPLETED SUCCESSFULLY")
+            logger.info("[TIMING] PIPELINE COMPLETED SUCCESSFULLY")
             print(f"{'='*80}")
             print(f"   Analysis ID: {self.analysis_id}")
             print(f"   Final hypotheses: {scored_hypotheses.total_count}")
@@ -489,7 +487,7 @@ class Pipeline:
             
         except Exception as e:
             print(f"[PIPELINE DEBUG] *** PIPELINE FAILED ***")
-            print(f"[PIPELINE DEBUG] Error: {str(e)}")
+            logger.info(f"[PIPELINE DEBUG] Error: {str(e)}")
             print(f"[PIPELINE DEBUG] Analysis ID: {self.analysis_id}")
             logger.error(f"Pipeline execution failed: {str(e)}")
             import traceback
@@ -815,7 +813,7 @@ class Pipeline:
                     }
                     
                     logger.info(
-                        f"Redundancy detection complete: {pre_redundancy_count} -> {scored_hypotheses.total_count} "
+                        f"Redundancy detection complete: {pre_redundancy_count} → {scored_hypotheses.total_count} "
                         f"({removed_count} redundant pathways removed)"
                     )
                     
@@ -859,7 +857,7 @@ class Pipeline:
         """
         Run Stage 4b: Enhanced Biological Validation.
         
-        Applies three critical validation layers to the top configured hypotheses:
+        Applies three critical validation layers to the TOP 50 hypotheses:
         1. Cardiac Tissue Expression - Validates genes are expressed in heart tissue
         2. Permutation Testing - Calculates empirical p-values to control for network bias
         3. Druggability Analysis - Identifies therapeutic intervention opportunities
@@ -870,14 +868,7 @@ class Pipeline:
         
         try:
             print(f"[STAGE 3C DEBUG] Starting enhanced validation...")
-            validation_limit = min(
-                max(1, self.settings.nets.top_hypotheses_count),
-                scored_hypotheses.total_count
-            )
-            logger.info(
-                f"Stage 3c: Processing top {validation_limit} of "
-                f"{scored_hypotheses.total_count} hypotheses for enhanced validation"
-            )
+            logger.info(f"Stage 3c: Processing top 25 of {scored_hypotheses.total_count} hypotheses for enhanced validation")
             
             # Get all genes for permutation testing
             # Extract all unique genes from seed genes and neighbors
@@ -905,228 +896,105 @@ class Pipeline:
                 logger.warning("No interaction data available, using uniform degrees")
                 print(f"[STAGE 3C DEBUG] Using uniform degrees for {len(all_genes)} genes")
             
+            # Track statistics
+            tissue_filtered = 0
+            high_druggability = 0
+            
             print(f"[STAGE 3C DEBUG] Starting hypothesis processing...")
             
-            # Respect the configured validation count so UI and backend stay aligned.
-            top_hypotheses = scored_hypotheses.hypotheses[:validation_limit]
+            # Limit enhanced validation to top 50 hypotheses for speed optimization
+            top_hypotheses = scored_hypotheses.hypotheses[:50]
             print(f"[STAGE 3C DEBUG] Limiting enhanced validation to top {len(top_hypotheses)} hypotheses")
-
-            validation_workers = min(
-                len(top_hypotheses),
-                max(1, getattr(self.settings, "max_workers_validation", getattr(self.settings, "max_workers_literature", 4)))
-            ) if top_hypotheses else 1
-            gtex_top_n = min(
-                len(top_hypotheses),
-                max(0, getattr(self.settings.nets, "gtex_top_pathways", len(top_hypotheses)))
-            ) if top_hypotheses and getattr(self.settings.nets, "tissue_expression_validation", True) else 0
-            live_target_top_n = min(
-                len(top_hypotheses),
-                max(0, getattr(self.settings.nets, "external_druggability_top_pathways", 8))
-            ) if top_hypotheses and getattr(self.settings.nets, "external_druggability_enabled", True) else 0
-            permutation_top_n = min(
-                len(top_hypotheses),
-                max(0, getattr(self.settings.nets, "permutation_top_pathways", len(top_hypotheses)))
-            ) if top_hypotheses and self.settings.nets.permutation_test_enabled else 0
-            logger.info(f"Stage 3c: running enhanced validation with up to {validation_workers} workers")
-
-            if gtex_top_n > 0:
-                gtex_prefetch_genes = sorted(
-                    {
-                        gene.upper()
-                        for hypothesis in top_hypotheses[:gtex_top_n]
-                        for gene in hypothesis.aggregated_pathway.pathway.evidence_genes
-                        if gene
-                    }
-                )
-                await self.tissue_validator.warm_gene_cache(
-                    gtex_prefetch_genes,
-                    max_concurrent=max(4, validation_workers * 2),
-                )
-
-            if live_target_top_n > 0:
-                live_target_prefetch_genes = []
-                for hypothesis in top_hypotheses[:live_target_top_n]:
+            
+            # Process each hypothesis
+            for i, hypothesis in enumerate(top_hypotheses):
+                if i % 10 == 0:  # Progress every 10 hypotheses
+                    print(f"[STAGE 3C DEBUG] Processing hypothesis {i+1}/{len(top_hypotheses)}")
+                    
+                try:
                     pathway_genes = hypothesis.aggregated_pathway.pathway.evidence_genes
-                    live_target_prefetch_genes.extend(
-                        self.druggability_analyzer.select_external_lookup_genes(pathway_genes)
-                    )
-                await asyncio.to_thread(
-                    self.druggability_analyzer.prefetch_gene_evidence,
-                    live_target_prefetch_genes,
-                    max(2, validation_workers),
-                )
-
-            async def _validate_hypothesis(i: int, hypothesis) -> Dict[str, int]:
-                pathway_genes = hypothesis.aggregated_pathway.pathway.evidence_genes
-                if not hypothesis.score_components:
-                    hypothesis.score_components = {}
-
-                tissue_failed = 0
-                high_druggability_hit = 0
-                use_tissue_validation = (
-                    i < gtex_top_n
-                    and getattr(self.settings.nets, "tissue_expression_validation", True)
-                )
-                use_live_lookup = i < live_target_top_n
-                use_permutation = (
-                    i < permutation_top_n
-                    and all_genes
-                    and fn_genes
-                    and gene_degrees
-                    and self.settings.nets.permutation_test_enabled
-                )
-
-                async_tasks = {
-                    "druggability": asyncio.create_task(
-                        asyncio.to_thread(
-                            self.druggability_analyzer.calculate_druggability_score,
-                            pathway_genes,
-                            use_live_lookup
-                        )
-                    ),
-                }
-                if use_tissue_validation:
-                    async_tasks["tissue"] = asyncio.create_task(
-                        self.tissue_validator.calculate_expression_score(pathway_genes)
-                    )
-                if use_permutation:
-                    min_perm = max(5, min(10, max(1, self.settings.nets.n_permutations // 2)))
-                    if getattr(self.settings.nets, "adaptive_permutation_enabled", True):
-                        async_tasks["permutation"] = asyncio.create_task(
-                            asyncio.to_thread(
-                                self.permutation_tester.calculate_degree_preserving_pvalue_adaptive,
-                                pathway_genes,
-                                fn_genes,
-                                gene_degrees,
-                                all_genes,
-                                min_perm,
-                                self.settings.nets.n_permutations
-                            )
-                        )
-                    else:
-                        async_tasks["permutation"] = asyncio.create_task(
-                            asyncio.to_thread(
-                                self.permutation_tester.calculate_degree_preserving_pvalue,
-                                pathway_genes,
-                                fn_genes,
-                                gene_degrees,
-                                all_genes,
-                                self.settings.nets.n_permutations
-                            )
-                        )
-
-                task_results = dict(
-                    zip(
-                        async_tasks.keys(),
-                        await asyncio.gather(*async_tasks.values(), return_exceptions=True)
-                    )
-                )
-
-                tissue_result = task_results.get("tissue")
-                if isinstance(tissue_result, Exception):
-                    logger.warning(f"GTEx tissue validation failed for hypothesis {i}: {str(tissue_result)}")
-                    hypothesis.score_components['tissue_validation_passed'] = False
-                    tissue_failed = 1
-                elif tissue_result is not None:
-                    hypothesis.score_components['cardiac_expression_ratio'] = tissue_result.cardiac_expression_ratio
-                    hypothesis.score_components['cardiac_expressed_genes'] = tissue_result.expressed_genes
-                    hypothesis.score_components['tissue_validation_passed'] = tissue_result.validation_passed
-                    hypothesis.score_components['mean_cardiac_tpm'] = tissue_result.mean_cardiac_tpm
-                    hypothesis.score_components['cardiac_specificity_ratio'] = tissue_result.mean_cardiac_specificity_ratio
-                    if not tissue_result.validation_passed:
-                        tissue_failed = 1
-
-                permutation_result = task_results.get("permutation")
-                if isinstance(permutation_result, Exception):
-                    logger.warning(f"Permutation testing failed for hypothesis {i}: {str(permutation_result)}")
-                    hypothesis.score_components['empirical_pvalue'] = None
-                    hypothesis.score_components['permutation_z_score'] = None
-                elif permutation_result is not None:
-                    empirical_p, perm_stats = permutation_result
-                    hypothesis.score_components['empirical_pvalue'] = empirical_p
-                    hypothesis.score_components['permutation_z_score'] = perm_stats.get('z_score', 0)
-                    hypothesis.score_components['observed_overlap'] = perm_stats.get('observed_overlap', 0)
-                    hypothesis.score_components['expected_overlap'] = perm_stats.get('mean_null_overlap', 0)
-                    hypothesis.score_components['n_permutations_used'] = perm_stats.get('n_permutations', 100)
-                    hypothesis.score_components['degree_preserved'] = perm_stats.get('degree_preserved', True)
-                else:
-                    hypothesis.score_components['empirical_pvalue'] = None
-                    hypothesis.score_components['permutation_z_score'] = None
-                    hypothesis.score_components['permutation_skipped'] = not use_permutation
-
-                if not use_tissue_validation:
-                    hypothesis.score_components['tissue_validation_passed'] = None
-                    hypothesis.score_components['tissue_validation_skipped'] = True
-                else:
-                    hypothesis.score_components['tissue_validation_skipped'] = False
-
-                druggability_result = task_results.get("druggability")
-                if isinstance(druggability_result, Exception):
-                    logger.warning(f"Druggability analysis failed for hypothesis {i}: {str(druggability_result)}")
-                    hypothesis.score_components['druggability_tier'] = 'unknown'
-                    hypothesis.score_components['druggability_source'] = 'unavailable'
-                elif druggability_result is not None:
-                    hypothesis.score_components['druggable_genes'] = druggability_result.druggable_genes
-                    hypothesis.score_components['druggable_ratio'] = druggability_result.druggable_ratio
-                    hypothesis.score_components['approved_drug_count'] = druggability_result.approved_drug_count
-                    hypothesis.score_components['clinical_trial_count'] = druggability_result.clinical_trial_count
-                    hypothesis.score_components['druggability_tier'] = druggability_result.druggability_tier
-                    hypothesis.score_components['druggability_source'] = druggability_result.druggability_source
-                    hypothesis.score_components['external_target_count'] = druggability_result.external_target_count
-                    hypothesis.score_components['external_approved_target_count'] = druggability_result.external_approved_target_count
-                    hypothesis.score_components['external_clinical_target_count'] = druggability_result.external_clinical_target_count
-                    hypothesis.score_components['cardiovascular_target_count'] = druggability_result.cardiovascular_target_count
-                    hypothesis.score_components['target_evidence'] = druggability_result.target_evidence
-                    hypothesis.score_components['used_live_target_lookup'] = use_live_lookup
-                    if druggability_result.druggability_tier == 'high':
-                        high_druggability_hit = 1
-
-                return {
-                    "tissue_failed": tissue_failed,
-                    "high_druggability": high_druggability_hit
-                }
-
-            semaphore = asyncio.Semaphore(validation_workers)
-
-            async def _validate_with_semaphore(i: int, hypothesis) -> Dict[str, int]:
-                async with semaphore:
-                    if i % 10 == 0:
-                        print(f"[STAGE 3C DEBUG] Processing hypothesis {i+1}/{len(top_hypotheses)}")
+                    
+                    # Initialize score_components if needed
+                    if not hypothesis.score_components:
+                        hypothesis.score_components = {}
+                    
+                    # 1. Cardiac Tissue Expression Validation with GTEx
                     try:
-                        return await _validate_hypothesis(i, hypothesis)
+                        tissue_score = await self.tissue_validator.calculate_expression_score(pathway_genes)
+                        hypothesis.score_components['cardiac_expression_ratio'] = tissue_score.cardiac_expression_ratio
+                        hypothesis.score_components['cardiac_expressed_genes'] = tissue_score.expressed_genes
+                        hypothesis.score_components['tissue_validation_passed'] = tissue_score.validation_passed
+                        hypothesis.score_components['mean_cardiac_tpm'] = tissue_score.mean_cardiac_tpm
+                        hypothesis.score_components['cardiac_specificity_ratio'] = tissue_score.mean_cardiac_specificity_ratio
+                        
+                        if not tissue_score.validation_passed:
+                            tissue_filtered += 1
                     except Exception as e:
-                        logger.error(f"Failed to process hypothesis {i}: {str(e)}")
-                        return {"tissue_failed": 0, "high_druggability": 0}
-
-            validation_results = await asyncio.gather(
-                *[_validate_with_semaphore(i, hypothesis) for i, hypothesis in enumerate(top_hypotheses)]
-            )
-
-            tissue_filtered = sum(result["tissue_failed"] for result in validation_results)
-            high_druggability = sum(result["high_druggability"] for result in validation_results)
+                        logger.warning(f"GTEx tissue validation failed for hypothesis {i}: {str(e)}")
+                        hypothesis.score_components['tissue_validation_passed'] = False
+                        tissue_filtered += 1
+                
+                    # 2. Permutation Testing (Optional for performance - degree-preserving empirical p-value)
+                    # SCIENTIFIC RIGOR: Use degree-preserving permutation to control for network topology
+                    # Reduced from 1000 to 100 permutations for performance while maintaining statistical validity
+                    try:
+                        if all_genes and fn_genes and gene_degrees and self.settings.nets.permutation_test_enabled:
+                            empirical_p, perm_stats = self.permutation_tester.calculate_degree_preserving_pvalue(
+                                pathway_genes,
+                                fn_genes,
+                                gene_degrees,
+                                all_genes,
+                                n_permutations=None  # Use config default (1000 for rigorous testing)
+                            )
+                            hypothesis.score_components['empirical_pvalue'] = empirical_p
+                            hypothesis.score_components['permutation_z_score'] = perm_stats.get('z_score', 0)
+                            hypothesis.score_components['observed_overlap'] = perm_stats.get('observed_overlap', 0)
+                            hypothesis.score_components['expected_overlap'] = perm_stats.get('mean_null_overlap', 0)
+                            hypothesis.score_components['n_permutations_used'] = perm_stats.get('n_permutations', 100)
+                            hypothesis.score_components['degree_preserved'] = perm_stats.get('degree_preserved', True)
+                        else:
+                            hypothesis.score_components['empirical_pvalue'] = None
+                            hypothesis.score_components['permutation_z_score'] = None
+                    except Exception as e:
+                        logger.warning(f"Permutation testing failed for hypothesis {i}: {str(e)}")
+                        hypothesis.score_components['empirical_pvalue'] = None
+                        hypothesis.score_components['permutation_z_score'] = None
+                    
+                    # 3. Druggability Analysis
+                    try:
+                        drug_score = self.druggability_analyzer.calculate_druggability_score(pathway_genes)
+                        hypothesis.score_components['druggable_genes'] = drug_score.druggable_genes
+                        hypothesis.score_components['druggable_ratio'] = drug_score.druggable_ratio
+                        hypothesis.score_components['approved_drug_count'] = drug_score.approved_drug_count
+                        hypothesis.score_components['clinical_trial_count'] = drug_score.clinical_trial_count
+                        hypothesis.score_components['druggability_tier'] = drug_score.druggability_tier
+                        
+                        if drug_score.druggability_tier == 'high':
+                            high_druggability += 1
+                    except Exception as e:
+                        logger.warning(f"Druggability analysis failed for hypothesis {i}: {str(e)}")
+                        hypothesis.score_components['druggability_tier'] = 'unknown'
+                        
+                except Exception as e:
+                    logger.error(f"Failed to process hypothesis {i}: {str(e)}")
+                    continue  # Skip this hypothesis and continue with the next
             
             # Store validation results
             self.results["stage_3_6_enhanced_validation"] = {
                 "hypotheses_validated": len(top_hypotheses),
                 "total_hypotheses": scored_hypotheses.total_count,
-                "validation_scope": f"top_{len(top_hypotheses)}_only",
+                "validation_scope": "top_50_only",
                 "tissue_expression": {
-                    "applied": bool(gtex_top_n > 0),
-                    "top_pathways_tested": gtex_top_n,
-                    "skipped_count": max(0, len(top_hypotheses) - gtex_top_n),
                     "low_expression_count": tissue_filtered,
-                    "passed_count": max(0, gtex_top_n - tissue_filtered)
+                    "passed_count": len(top_hypotheses) - tissue_filtered
                 },
                 "permutation_testing": {
-                    "applied": bool(all_genes and fn_genes and self.settings.nets.permutation_test_enabled),
-                    "n_permutations": self.settings.nets.n_permutations,
-                    "top_pathways_tested": permutation_top_n,
-                    "adaptive": bool(getattr(self.settings.nets, "adaptive_permutation_enabled", True))
+                    "applied": all_genes and fn_genes,
+                    "n_permutations": 100
                 },
                 "druggability": {
                     "high_tier_count": high_druggability,
-                    "analyzed_count": len(top_hypotheses),
-                    "live_target_lookup_top_n": live_target_top_n
+                    "analyzed_count": len(top_hypotheses)
                 }
             }
             
@@ -1182,8 +1050,7 @@ class Pipeline:
     async def _run_stage_6_literature(
         self,
         scored_hypotheses: ScoredHypotheses,
-        seed_genes: List[GeneInfo],
-        top_n: Optional[int] = None
+        seed_genes: List[GeneInfo]
     ) -> LiteratureEvidence:
         """Run Stage 6a: Literature Validation."""
         lit_msg = "Running Stage 6a: Literature Validation"
@@ -1194,7 +1061,7 @@ class Pipeline:
             literature_evidence = await self.literature_miner.validate_hypotheses_async(
                 scored_hypotheses.hypotheses,
                 seed_genes,
-                top_n=top_n,
+                top_n=None,  # Mine literature for ALL pathways (will default to config or all hypotheses)
                 disease_context=self.disease_context,
                 disease_synonyms=self.disease_synonyms,
                 max_concurrent=3  # Allow 3 concurrent literature searches
@@ -1202,7 +1069,7 @@ class Pipeline:
             
             self.results["stage_4_literature"] = {
                 "hypotheses_validated": len(literature_evidence.hypothesis_citations),
-                "hypothesis_citations": literature_evidence.model_dump()["hypothesis_citations"]
+                "hypothesis_citations": literature_evidence.hypothesis_citations
             }
             
             return literature_evidence
@@ -1343,12 +1210,7 @@ class Pipeline:
             # Check literature associations with enhanced visibility
             step2_msg = f"[STAGE 4 DEBUG] Step 2: Checking literature associations..."
             print(step2_msg, flush=True)
-            literature_limit = getattr(
-                self.settings.nets,
-                "semantic_max_hypotheses_for_literature",
-                self.settings.nets.top_hypotheses_count
-            )
-            max_lit_check = min(literature_limit, scored_hypotheses.total_count)
+            max_lit_check = min(50, scored_hypotheses.total_count)
             lit_msg = f"[STAGE 4 DEBUG] Will check literature for top {max_lit_check} hypotheses"
             print(lit_msg, flush=True)
             logger.info(f"Checking literature associations for top {max_lit_check} hypotheses")
@@ -1413,7 +1275,7 @@ class Pipeline:
         """Generate analysis reports."""
         print(f"[PIPELINE DEBUG] Starting report generation phase")
         logger.info("Generating reports")
-        print(f"[PIPELINE DEBUG] Report generation arguments received: {len(args)} items")
+        logger.info(f"[PIPELINE DEBUG] Report generation arguments received: {len(args)} items")
         
         try:
             report_files = self.report_generator.generate_report(
@@ -1462,30 +1324,35 @@ class Pipeline:
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         return f"analysis_{timestamp}"
     
-    def _generate_important_genes(
+    def _generate_top_genes(
         self,
         hypotheses: List,
         druggability_analyzer,
-        top_n_pathways: int = 50,
-        top_n_genes: int = 20
+        topology_result,
+        fn_result,
+        top_n: int = 20
     ) -> List[Dict[str, Any]]:
         """
-        Generate important genes from top pathways by NES score.
+        Generate top therapeutic target candidates based on gene frequency across ALL final pathways.
+        
+        This identifies the top N genes by their occurrence count across all final pathways,
+        then enriches them with druggability, topology, and cardiac disease scores.
         
         Args:
-            hypotheses: List of scored hypotheses
+            hypotheses: List of scored hypotheses (all final pathways)
             druggability_analyzer: Druggability analyzer instance
-            top_n_pathways: Number of top pathways to consider
-            top_n_genes: Number of top genes to return
+            topology_result: Topology analysis result
+            fn_result: Functional neighborhood result
+            top_n: Number of top genes to return (default: 20)
             
         Returns:
-            List of top gene dictionaries with pathway counts and druggability metrics
+            List of top gene dictionaries with druggability and topology metrics
         """
-        # Collect all genes with their metrics
+        # Collect all genes with their metrics across ALL pathways
         gene_scores = {}
         
-        # Extract genes from top pathways by NES score
-        for i, hyp in enumerate(hypotheses[:top_n_pathways]):
+        # Extract genes from ALL final pathways (not just top 50)
+        for i, hyp in enumerate(hypotheses):  # ALL pathways
             pathway_genes = []
             if hasattr(hyp, 'aggregated_pathway') and hyp.aggregated_pathway:
                 if hasattr(hyp.aggregated_pathway, 'pathway') and hyp.aggregated_pathway.pathway:
@@ -1533,42 +1400,40 @@ class Pipeline:
                     gene_scores[gene_symbol]['is_clinical_trial'] = True
                     if gene_scores[gene_symbol]['druggability_tier'] == 'unknown':
                         gene_scores[gene_symbol]['druggability_tier'] = 'medium'
-
-                live_target_evidence = druggability_analyzer.get_cached_gene_evidence(gene_symbol)
-                if live_target_evidence:
-                    gene_scores[gene_symbol]['external_drug_evidence'] = live_target_evidence
-                    gene_scores[gene_symbol]['druggability_source'] = live_target_evidence.get('source', 'Open Targets')
-                    if live_target_evidence.get('known_drug_count', 0) > 0 or live_target_evidence.get('tractability_labels'):
-                        gene_scores[gene_symbol]['is_druggable'] = True
-                    if live_target_evidence.get('has_approved_drug'):
-                        gene_scores[gene_symbol]['is_fda_approved'] = True
-                        gene_scores[gene_symbol]['druggability_tier'] = 'high'
-                    elif live_target_evidence.get('has_clinical_drug'):
-                        gene_scores[gene_symbol]['is_clinical_trial'] = True
-                        if gene_scores[gene_symbol]['druggability_tier'] == 'unknown':
-                            gene_scores[gene_symbol]['druggability_tier'] = 'medium'
         
-        # Centrality not used - removed topology analysis for speed
+        # Add topology/centrality information
+        if topology_result and hasattr(topology_result, 'hypothesis_networks'):
+            for pathway_id, network_data in topology_result.hypothesis_networks.items():
+                if hasattr(network_data, 'hub_genes'):
+                    for hub_gene in network_data.hub_genes:
+                        gene_symbol = hub_gene.gene if hasattr(hub_gene, 'gene') else str(hub_gene)
+                        if gene_symbol in gene_scores:
+                            centrality = hub_gene.centrality if hasattr(hub_gene, 'centrality') else 0.5
+                            gene_scores[gene_symbol]['centrality'] = max(
+                                gene_scores[gene_symbol]['centrality'],
+                                centrality
+                            )
         
-        # Add DisGeNET cardiac disease association scores
+        # Add gene-disease association scores using curated cardiovascular gene database
         try:
-            from app.services.disgenet_client import DisGeNETClient
-            disgenet = DisGeNETClient()
+            from app.services.gene_disease_scorer import GeneDiseaseScorer
+            gene_disease_scorer = GeneDiseaseScorer()
             
-            logger.info(f"Querying DisGeNET for {len(gene_scores)} genes...")
-            disgenet_scores = disgenet.get_batch_scores(list(gene_scores.keys()))
+            logger.info(f"Querying gene-disease scorer for {len(gene_scores)} genes...")
+            disease_scores = gene_disease_scorer.get_batch_scores(list(gene_scores.keys()))
             
             for gene_symbol in gene_scores:
-                gene_scores[gene_symbol]['disgenet_cardiac_score'] = disgenet_scores.get(gene_symbol, 0.0)
+                gene_scores[gene_symbol]['gene_disease_score'] = disease_scores.get(gene_symbol, 0.0)
             
-            logger.info(f"DisGeNET scores obtained for {len(disgenet_scores)} genes")
+            scored_genes = sum(1 for s in disease_scores.values() if s > 0)
+            logger.info(f"Gene-disease scores obtained: {scored_genes}/{len(disease_scores)} genes have cardiac disease associations")
         except Exception as e:
-            logger.warning(f"DisGeNET scoring failed (non-critical): {str(e)}")
-            # Set default scores if DisGeNET fails
+            logger.warning(f"Gene-disease scoring failed (non-critical): {str(e)}")
+            # Set default scores if gene-disease scoring fails
             for gene_symbol in gene_scores:
-                gene_scores[gene_symbol]['disgenet_cardiac_score'] = 0.0
+                gene_scores[gene_symbol]['gene_disease_score'] = 0.0
         
-        # Calculate final score: importance * (1 + druggability_bonus + centrality_bonus + disgenet_bonus)
+        # Calculate final score: importance * (1 + druggability_bonus + centrality_bonus + disease_bonus)
         for gene_symbol in gene_scores:
             druggability_bonus = 0.0
             if gene_scores[gene_symbol]['is_fda_approved']:
@@ -1578,10 +1443,11 @@ class Pipeline:
             elif gene_scores[gene_symbol]['is_druggable']:
                 druggability_bonus = 0.25
             
-            disgenet_bonus = gene_scores[gene_symbol]['disgenet_cardiac_score'] * 0.75  # Weight DisGeNET score
+            centrality_bonus = gene_scores[gene_symbol]['centrality'] * 0.5
+            disease_bonus = gene_scores[gene_symbol]['gene_disease_score'] * 0.75  # Weight gene-disease score
             
             gene_scores[gene_symbol]['final_score'] = gene_scores[gene_symbol]['importance_score'] * (
-                1.0 + druggability_bonus + disgenet_bonus
+                1.0 + druggability_bonus + centrality_bonus + disease_bonus
             )
         
         # Sort by final score and return top N
@@ -1591,78 +1457,14 @@ class Pipeline:
             reverse=True
         )
         
-        return sorted_genes[:top_n_genes]
-
-    def _sync_service_settings(self):
-        """Propagate pipeline-local settings into service instances created from global defaults."""
-        visited = set()
-
-        def sync(obj: Any, depth: int = 0):
-            if obj is None or depth > 3:
-                return
-
-            obj_id = id(obj)
-            if obj_id in visited:
-                return
-            visited.add(obj_id)
-
-            if hasattr(obj, "settings"):
-                obj.settings = self.settings
-
-            if hasattr(obj, "max_results"):
-                try:
-                    obj.max_results = self.settings.nets.pubmed_max_results
-                except Exception:
-                    pass
-
-            if not hasattr(obj, "__dict__"):
-                return
-
-            for value in obj.__dict__.values():
-                if isinstance(value, dict):
-                    for item in value.values():
-                        if hasattr(item, "__dict__"):
-                            sync(item, depth + 1)
-                elif isinstance(value, (list, tuple, set)):
-                    for item in value:
-                        if hasattr(item, "__dict__"):
-                            sync(item, depth + 1)
-                elif hasattr(value, "__dict__"):
-                    sync(value, depth + 1)
-
-        services = [
-            self.input_validator,
-            self.fn_builder,
-            self.primary_analyzer,
-            self.secondary_analyzer,
-            self.nes_scorer,
-            self.semantic_filter,
-            self.tissue_validator,
-            self.permutation_tester,
-            self.druggability_analyzer,
-            self.literature_miner,
-            self.hypothesis_validator,
-            self.seed_gene_tracer,
-            self.report_generator,
-        ]
-
-        for service in services:
-            sync(service)
+        return sorted_genes[:top_n]
     
     def close(self):
         """Close all service connections."""
-        for attr_name in (
-            "input_validator",
-            "fn_builder",
-            "primary_analyzer",
-            "secondary_analyzer",
-        ):
-            service = getattr(self, attr_name, None)
-            close_method = getattr(service, "close", None)
-            if callable(close_method):
-                try:
-                    close_method()
-                except Exception as exc:
-                    logger.warning(f"Failed to close {attr_name}: {exc}")
-
+        self.input_validator.close()
+        self.fn_builder.close()
+        self.primary_analyzer.close()
+        self.secondary_analyzer.close()
+        self.topology_analyzer.close()
+        
         logger.info("Pipeline services closed")

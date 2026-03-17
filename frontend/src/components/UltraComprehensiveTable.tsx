@@ -1,5 +1,4 @@
 import { useState, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
 import {
   Table,
   TableBody,
@@ -10,7 +9,6 @@ import {
   TablePagination,
   TableSortLabel,
   Button,
-  IconButton,
   Box,
   Tooltip,
   Chip,
@@ -21,9 +19,8 @@ import {
   Rating,
   Badge,
 } from '@mui/material';
-import { 
-  Download, 
-  Visibility, 
+import {
+  Download,
   Science,
   MenuBook,
   TrendingUp,
@@ -35,12 +32,14 @@ import {
 import type { PathwayHypothesis } from '../api/types';
 import {
   normalizeHypothesis,
+  getPAdj,
   getEvidenceCount,
   getLiteratureCitations,
   calculateCardiacRelevance,
   calculateClinicalSignificance,
   calculateTissueSpecificity,
   calculatePathwayComplexity,
+  getCardiacRelevanceColor,
 } from '../utils/hypothesisUtils';
 
 interface UltraComprehensiveTableProps {
@@ -49,39 +48,41 @@ interface UltraComprehensiveTableProps {
 }
 
 type Order = 'asc' | 'desc';
-type OrderBy = 'nes_score' | 'evidence_count' | 'support_count' | 'cardiac_relevance' | 'literature_support' | 'clinical_significance' | 'pathway_complexity' | 'tissue_specificity';
+type OrderBy = 'nes_score' | 'p_adj' | 'evidence_count' | 'support_count' | 'cardiac_relevance' | 'literature_support' | 'clinical_significance' | 'pathway_complexity' | 'tissue_specificity' | 'actions';
 
 // Column tooltips with comprehensive explanations
 const columnTooltips: Record<string, string> = {
   pathway_name: 'Biological pathway or gene set name from curated databases (Reactome, KEGG, GO)',
-  nes_score: 'Normalized Enrichment Score: Combined metric of statistical significance, network centrality, evidence strength, and biological relevance. Higher values indicate stronger pathway associations. Incorporates permutation-based statistical validation, network topology, and cardiac relevance. Typical range: 2-5 for significant pathways.',
-  cardiac_relevance: 'Cardiac-specific relevance score (0-100%) based on: cardiovascular keywords, literature support, evidence genes, and NES score.',
-  clinical_significance: 'Clinical impact score (0-100%) combining: statistical significance (p-value), effect size (NES), and literature validation.',
-  evidence_count: 'Number of genes from the functional neighborhood (seed + neighbors) that overlap with this pathway.',
-  literature_support: 'Number of PubMed hits retrieved for the automated pathway-focused literature query. Higher counts indicate stronger query-level support; zero does not prove the pathway is unreported.',
-  tissue_specificity: 'GTEx cardiac tissue specificity score (0-100%): Ratio of cardiac vs. non-cardiac tissue expression for pathway genes. Higher = more cardiac-specific.',
-  pathway_complexity: 'Pathway size and complexity score (0-100%) based on number of evidence genes and seed gene contributors.',
-  cardiac_disease_score: 'Cardiac disease association score (0-1) based on curated database of cardiovascular disease genes. Weighted average of top cardiac genes in pathway.',
-  database_source: 'Original database source: Reactome (curated signaling), KEGG (metabolic/disease), GO (functional processes), or WikiPathways.',
+  nes_score: 'Normalized Enrichment Score = -log10(p_adj) × √(gene_count) × db_weight × agg_weight × centrality_weight. Combines statistical significance with sqrt gene set size normalization (GSEA standard), database quality weights, multi-source validation, and network centrality. Range: 2-5 for significant pathways, >3.5 for highly significant.',
+  p_adj: 'FDR-adjusted p-value from g:Profiler enrichment analysis. Controls false discovery rate across multiple pathway tests. Values < 0.05 indicate statistically significant enrichment (FDR < 5%). Computed using Benjamini-Hochberg correction.',
+  empirical_pvalue: 'Permutation-based empirical p-value from 1000 degree-preserving network permutations. More conservative than parametric tests. Values < 0.05 indicate pathway enrichment is unlikely by chance given network topology. Uses stratified sampling by degree quintiles.',
+  fdr_qvalue: 'False Discovery Rate q-value from Benjamini-Hochberg correction of empirical p-values. Controls expected proportion of false positives among all discoveries. q < 0.05 means < 5% of pathways at this threshold are expected to be false positives.',
+  fold_enrichment: 'Observed/Expected overlap ratio. Measures effect size beyond statistical significance. Value of 2.0 means pathway genes are 2× more enriched than expected by chance. Minimum threshold: 2.0 for biological meaningfulness.',
+  cardiac_relevance: 'Cardiac-specific relevance score (0-100%) based on: cardiovascular keywords (40%), NES score (30%), literature support (15%), evidence genes (15%). Semantic scoring using 700+ curated cardiac disease terms.',
+  clinical_significance: 'Clinical impact score (0-100%) combining: p-value significance threshold (40%), NES effect size (30%), literature validation (30%). Higher scores indicate greater translational potential.',
+  evidence_count: 'Number of genes from the functional neighborhood (seed + neighbors) that overlap with this pathway. Higher counts indicate stronger pathway-gene associations.',
+  literature_support: 'Number of PubMed citations reported in literature linking seed genes to pathway-related concepts. Based on PubMed abstract mining (30 abstracts per gene). Higher counts indicate well-studied pathway-gene associations.',
+  tissue_specificity: 'GTEx cardiac tissue specificity score (0-100%): Ratio of cardiac vs. non-cardiac tissue expression for pathway genes. Based on GTEx v8 median TPM values across 54 tissues. Higher = more cardiac-specific expression.',
+  pathway_complexity: 'Pathway size and complexity score (0-100%) based on number of evidence genes, seed gene contributors, and pathway interconnectedness. Larger pathways may represent broader biological processes.',
+  cardiac_disease_score: 'Gene-disease association score (0-100%) from curated cardiovascular disease gene database. Based on gold-standard cardiac disease genes (OMIM, ClinGen), cardiac pathway membership, and literature evidence. Higher scores indicate stronger cardiovascular disease relevance.',
 };
 
 // Ultra-comprehensive column definitions for cardiovascular analysis
 const headCells = [
-  { id: 'pathway_name' as const, label: 'Pathway Name', align: 'left' as const, width: 350, tooltip: columnTooltips.pathway_name },
+  { id: 'pathway_name' as const, label: 'Pathway Name', align: 'left' as const, width: 240, tooltip: columnTooltips.pathway_name },
   { id: 'nes_score' as OrderBy, label: 'NES Score', align: 'center' as const, width: 110, tooltip: columnTooltips.nes_score },
+  { id: 'p_adj' as OrderBy, label: 'P-value (adj)', align: 'center' as const, width: 100, tooltip: columnTooltips.p_adj },
+  { id: 'cardiac_relevance' as OrderBy, label: 'Cardiac Relevance', align: 'center' as const, width: 140, tooltip: columnTooltips.cardiac_relevance },
   { id: 'clinical_significance' as OrderBy, label: 'Clinical Impact', align: 'center' as const, width: 110, tooltip: columnTooltips.clinical_significance },
   { id: 'evidence_count' as OrderBy, label: 'Evidence Genes', align: 'center' as const, width: 100, tooltip: columnTooltips.evidence_count },
-  { id: 'literature_support' as OrderBy, label: 'PubMed Query Hits', align: 'center' as const, width: 120, tooltip: columnTooltips.literature_support },
+  { id: 'literature_support' as OrderBy, label: 'Literature Reported', align: 'center' as const, width: 120, tooltip: columnTooltips.literature_support },
   { id: 'tissue_specificity' as OrderBy, label: 'GTEx Cardiac Specificity', align: 'center' as const, width: 140, tooltip: columnTooltips.tissue_specificity },
-  { id: 'actions' as const, label: 'Details', align: 'center' as const, width: 70, tooltip: 'View comprehensive pathway details, gene lists, and evidence' },
 ];
 
 // NES scores include log10 transformation in the backend calculation for improved interpretability
 // No need for frontend transformation
 
 export default function UltraComprehensiveTable({ hypotheses, analysisId }: UltraComprehensiveTableProps) {
-  const navigate = useNavigate();
-  
   // Pagination state - default to 20 rows per page
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(20);
@@ -118,7 +119,11 @@ export default function UltraComprehensiveTable({ hypotheses, analysisId }: Ultr
           aValue = a.nes_score || 0;
           bValue = b.nes_score || 0;
           break;
-
+        case 'p_adj':
+          // Sort by p-value (lower is better)
+          aValue = getPAdj(a);
+          bValue = getPAdj(b);
+          break;
         case 'evidence_count':
           aValue = getEvidenceCount(a);
           bValue = getEvidenceCount(b);
@@ -167,13 +172,6 @@ export default function UltraComprehensiveTable({ hypotheses, analysisId }: Ultr
     page * rowsPerPage + rowsPerPage
   );
 
-  const handleViewDetails = (hypothesis: PathwayHypothesis) => {
-    const normalized = normalizeHypothesis(hypothesis);
-    if (analysisId && normalized.pathway_id) {
-      navigate(`/detail/${analysisId}/${normalized.pathway_id}`);
-    }
-  };
-
   const handleExportCSV = () => {
     // Export ALL hypotheses, not just the current page
     const csvData = hypotheses.map((hypothesis) => {
@@ -188,9 +186,13 @@ export default function UltraComprehensiveTable({ hypotheses, analysisId }: Ultr
         evidence_genes: normalized.evidence_count,
         literature_citations: normalized.literature_citations,
         tissue_specificity: (calculateTissueSpecificity(hypothesis) * 100).toFixed(1) + '%',
-        cardiac_disease_score: hypothesis.cardiac_disease_score?.toFixed(3) || '0.000',
-        pathway_complexity: (calculatePathwayComplexity(hypothesis) * 100).toFixed(1) + '%',
-        database: normalized.source_db,
+        p_adj: normalized.p_adj ? normalized.p_adj.toExponential(2) : '1.00e+00',
+        empirical_pvalue: (hypothesis as any).empirical_pvalue !== undefined 
+          ? ((hypothesis as any).empirical_pvalue as number).toExponential(2) 
+          : 'N/A',
+        fold_enrichment: (hypothesis as any).fold_enrichment !== undefined 
+          ? ((hypothesis as any).fold_enrichment as number).toFixed(2)
+          : 'N/A',
         // GTEx tissue expression data
         gtex_cardiac_specificity_ratio: (hypothesis.score_components as any)?.cardiac_specificity_ratio?.toFixed(2) || 'N/A',
         gtex_mean_cardiac_tpm: (hypothesis.score_components as any)?.mean_cardiac_tpm?.toFixed(1) || 'N/A',
@@ -313,15 +315,16 @@ export default function UltraComprehensiveTable({ hypotheses, analysisId }: Ultr
                     zIndex: 100,
                   }}
                 >
-                  <Tooltip 
-                    title={headCell.tooltip || ''} 
-                    arrow 
+                  <Tooltip
+                    title={headCell.tooltip}
+                    arrow
                     placement="top"
-                    sx={{
-                      '& .MuiTooltip-tooltip': {
-                        fontSize: '0.875rem',
-                        maxWidth: 350,
-                        bgcolor: 'rgba(0, 0, 0, 0.9)',
+                    enterDelay={300}
+                    slotProps={{
+                      tooltip: {
+                        sx: {
+                          bgcolor: 'rgba(0, 0, 0, 0.9)',
+                        }
                       }
                     }}
                   >
@@ -362,6 +365,7 @@ export default function UltraComprehensiveTable({ hypotheses, analysisId }: Ultr
           <TableBody>
             {paginatedHypotheses.map((hypothesis, index) => {
               const normalized = normalizeHypothesis(hypothesis);
+              const cardiacRelevance = calculateCardiacRelevance(hypothesis);
               const clinicalSignificance = calculateClinicalSignificance(hypothesis);
               const tissueSpecificity = calculateTissueSpecificity(hypothesis);
 
@@ -421,6 +425,39 @@ export default function UltraComprehensiveTable({ hypotheses, analysisId }: Ultr
                     </Stack>
                   </TableCell>
 
+                  {/* P-value (adjusted) */}
+                  <TableCell align="center">
+                    <Typography 
+                      variant="body2" 
+                      sx={{ 
+                        fontFamily: 'monospace',
+                        fontSize: '0.75rem',
+                        color: (normalized.p_adj || 0) < 0.05 ? '#2E7D32' : '#757575'
+                      }}
+                    >
+                      {normalized.p_adj ? normalized.p_adj.toExponential(2) : '1.00e+00'}
+                    </Typography>
+                  </TableCell>
+
+                  {/* Cardiac Relevance */}
+                  <TableCell align="center">
+                    <Stack spacing={0.5} alignItems="center">
+                      <Chip
+                        label={`${(cardiacRelevance * 100).toFixed(0)}%`}
+                        color={getCardiacRelevanceColor(cardiacRelevance)}
+                        size="small"
+                        icon={<Favorite />}
+                        sx={{ fontSize: '0.75rem', height: 24 }}
+                      />
+                      <LinearProgress
+                        variant="determinate"
+                        value={cardiacRelevance * 100}
+                        color={getCardiacRelevanceColor(cardiacRelevance)}
+                        sx={{ width: 50, height: 3 }}
+                      />
+                    </Stack>
+                  </TableCell>
+
                   {/* Clinical Impact */}
                   <TableCell align="center">
                     <Stack spacing={0.5} alignItems="center">
@@ -453,12 +490,18 @@ export default function UltraComprehensiveTable({ hypotheses, analysisId }: Ultr
                   {/* Literature Support */}
                   <TableCell align="center">
                     <Stack spacing={0.5} alignItems="center">
-                      <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          fontWeight: 700,
+                          color: normalized.literature_citations > 0 ? '#2E7D32' : '#C62828',
+                        }}
+                      >
                         {normalized.literature_citations}
                       </Typography>
-                      <MenuBook 
-                        fontSize="small" 
-                        color={normalized.literature_citations > 0 ? 'primary' : 'disabled'}
+                      <MenuBook
+                        fontSize="small"
+                        sx={{ color: normalized.literature_citations > 0 ? '#2E7D32' : '#C62828' }}
                       />
                     </Stack>
                   </TableCell>
@@ -502,22 +545,8 @@ export default function UltraComprehensiveTable({ hypotheses, analysisId }: Ultr
                     </Tooltip>
                   </TableCell>
 
-                  {/* Actions */}
-                  <TableCell align="center" onClick={(e) => e.stopPropagation()}>
-                    <Tooltip title="View detailed analysis">
-                      <IconButton
-                        size="small"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleViewDetails(hypothesis);
-                        }}
-                        disabled={!analysisId || !normalized.pathway_id}
-                        color="primary"
-                      >
-                        <Visibility />
-                      </IconButton>
-                    </Tooltip>
-                  </TableCell>
+                  {/* Cardiac Disease Score - REMOVED, now using cardiac_relevance */}
+
                 </TableRow>
               );
             })}

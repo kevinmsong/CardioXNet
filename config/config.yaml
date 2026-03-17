@@ -32,16 +32,12 @@ nets:
   reactome_version: "79"
   
   # Analysis Parameters for comprehensive cardiovascular pathway discovery
-  string_neighbor_count: 100          # Broad network expansion for discovery
+  string_neighbor_count: 75           # Reduced for faster network expansion
   string_score_threshold: 0.60        # Moderate confidence threshold for interactions
   fdr_threshold: 0.05                 # FDR threshold set to 0.05
-  top_hypotheses_count: 20            # Top 20 final hypotheses for detailed validation
-  primary_pathways_to_expand: 30      # Broader funnel from strong primaries into secondary discovery
-  semantic_max_hypotheses_for_literature: 15  # Mine literature for final candidate pathways
-  secondary_literature_expansion_top_n: 8     # Only top primaries get PubMed-based expansion in Stage 4
+  top_hypotheses_count: 15            # Top 15 hypotheses for faster validation
+  semantic_max_hypotheses_for_literature: 15  # Mine literature for top 15 pathways for speed
   n_permutations: 25                  # Permutations for statistical testing
-  adaptive_permutation_enabled: true  # Early-stop degree-preserving permutations in Stage 8
-  permutation_top_pathways: 8         # Only the top validated pathways run permutation tests
   
   # Database Weights
   db_weight_reactome: 1.5
@@ -61,16 +57,16 @@ nets:
   
   # Aggregation Configuration
   aggregation_strategy: "frequency"     # Options: intersection, frequency, weighted
-  min_support_threshold: 2            # Require replication across at least two primaries by default
+  min_support_threshold: 1            # Minimum pathway support count required
   
   # Literature Mining for cardiovascular disease focus
-  pubmed_max_results: 30              # Maximum literature context for comprehensive evidence
+  pubmed_max_results: 20              # Maximum literature context for comprehensive evidence
   literature_relevance_threshold: 0.3 # Relevance threshold for literature-derived genes
   
   # Enhanced Semantic Filtering for cardiovascular pathway discovery
   semantic_relevance_threshold: 0.01  # Cardiac relevance scoring threshold
   semantic_disease_boost: 1.8         # Boost multiplier for disease-specific pathways
-  semantic_max_results: 150           # Return top 150 most relevant pathways
+  semantic_max_results: 100           # Return top 100 most relevant pathways
   semantic_progressive_thresholds:    # Progressive thresholds for multi-tier discovery
     high_disease: 0.20                # High cardiovascular disease relevance (lowered for testing)
     medium_disease: 0.10              # Medium cardiovascular disease relevance (lowered for testing)
@@ -97,14 +93,7 @@ nets:
   
   # Cardiovascular Disease Context
   min_cardiac_expression_ratio: 0.5   # Minimum cardiac tissue expression requirement
-  gtex_top_pathways: 6                # Only top validated pathways run GTEx validation in Stage 8
   cardiovascular_disease_focus: true  # Enable cardiovascular disease filtering
-  external_druggability_enabled: true # Use live therapeutic target evidence in Stage 8
-  external_druggability_gene_limit: 8 # Query a bounded number of evidence genes per pathway
-  external_druggability_top_pathways: 4 # Only the top validated pathways use live target lookups
-  external_drug_examples_per_gene: 5  # Show a few representative drugs per target
-  external_druggability_timeout: 12   # Keep live therapeutic evidence bounded in Stage 8
-  opentargets_api_url: "https://api.platform.opentargets.org/api/v4/graphql"
   
   # Output Formats (Optimized for speed)
   output_formats:
@@ -121,5 +110,4 @@ performance:
   # Parallel Processing (Optimized)
   max_workers_semantic: 6             # Increased semantic filtering workers
   max_workers_literature: 4           # Increased literature mining workers
-  max_workers_validation: 4           # Parallel Stage 8 validation without overloading GTEx
   max_concurrent_pubmed: 6            # Increased concurrent PubMed requests

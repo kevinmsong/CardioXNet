@@ -51,9 +51,6 @@ class GTExClient:
         self.settings = get_settings()
         self.base_url = "https://gtexportal.org/api/v2"
         self.session = requests.Session()
-        self._gencode_cache: Dict[str, Optional[str]] = {}
-        self._expression_cache: Dict[tuple, List[GTExExpression]] = {}
-        self._cardiac_specificity_cache: Dict[str, Optional[CardiacExpressionProfile]] = {}
         
         # GTEx cardiac tissue identifiers - focused on heart-specific validation
         self.cardiac_tissues = {
@@ -70,6 +67,12 @@ class GTExClient:
             'Muscle_Skeletal', 'Adipose_Subcutaneous', 'Skin_Sun_Exposed_Lower_leg'
         ]
         
+        # Cache for dynamic lookups to avoid repeated API calls
+        self._gencode_cache: Dict[str, Optional[str]] = {}
+        
+        # Track genes we've already logged warnings for (avoid spam)
+        self._logged_warnings: set = set()
+        
         logger.info("GTEx client initialized for cardiac expression analysis")
     
     def _get_versioned_gencode_id(self, gene_symbol: str) -> Optional[str]:
@@ -78,10 +81,14 @@ class GTExClient:
         
         GTEx API v2 requires versioned GENCODE IDs (e.g., ENSG00000173020.15)
         """
-        normalized_symbol = gene_symbol.upper()
-        if normalized_symbol in self._gencode_cache:
-            return self._gencode_cache[normalized_symbol]
-
+        # Check cache first
+        cache_key = gene_symbol.upper()
+        if cache_key in self._gencode_cache:
+            cached_id = self._gencode_cache[cache_key]
+            if cached_id:
+                logger.debug(f"Using cached GENCODE ID for {gene_symbol}: {cached_id}")
+            return cached_id
+        
         # Comprehensive cardiovascular gene mappings with versions (GTEx v8 compatible)
         symbol_to_gencode = {
             # Natriuretic peptides and signaling (corrected from API lookup)
@@ -149,16 +156,19 @@ class GTExClient:
         }
         
         # Try static mapping first for performance
-        gencode_id = symbol_to_gencode.get(normalized_symbol)
+        gencode_id = symbol_to_gencode.get(gene_symbol.upper())
         
-        # If not in static mapping, always try dynamic lookup
+        # If not in static mapping, try dynamic lookup
         if not gencode_id:
             gencode_id = self._lookup_gene_id_dynamic(gene_symbol)
-            # Cache successful lookups for future use
+            # Cache the result (even if None to avoid repeated failed lookups)
+            self._gencode_cache[cache_key] = gencode_id
             if gencode_id:
-                logger.debug(f"Caching dynamic lookup: {gene_symbol} -> {gencode_id}")
-        
-        self._gencode_cache[normalized_symbol] = gencode_id
+                logger.info(f"[OK] Cached dynamic lookup: {gene_symbol} -> {gencode_id}")
+        else:
+            # Cache static mapping results too
+            self._gencode_cache[cache_key] = gencode_id
+            
         return gencode_id
     
     def _lookup_gene_id_dynamic(self, gene_symbol: str) -> Optional[str]:
@@ -172,7 +182,7 @@ class GTExClient:
             Versioned GENCODE ID if found, None otherwise
         """
         try:
-            # Use GTEx gene lookup endpoint
+            # Use GTEx gene lookup endpoint with increased timeout and retry logic
             url = f"{self.base_url}/reference/gene"
             params = {
                 'geneId': gene_symbol,  # Can search by symbol
@@ -180,34 +190,53 @@ class GTExClient:
                 'pageSize': 10
             }
             
-            response = self.session.get(url, params=params, timeout=10)
-            
-            if response.status_code == 200:
-                data = response.json()
-                if 'data' in data and data['data']:
-                    # Look for exact symbol match first
-                    for gene_info in data['data']:
-                        api_symbol = gene_info.get('geneSymbol', '').upper()
-                        if api_symbol == gene_symbol.upper():
-                            gencode_id = gene_info.get('gencodeId')
-                            if gencode_id:
-                                logger.debug(f"Dynamic lookup exact match: {gene_symbol} -> {gencode_id}")
-                                return gencode_id
+            # Try multiple times with increasing timeout
+            for attempt in range(3):
+                try:
+                    timeout = 15 + (attempt * 5)  # 15s, 20s, 25s
+                    response = self.session.get(url, params=params, timeout=timeout)
                     
-                    # If no exact match, try the first result (API usually returns most relevant first)
-                    if data['data']:
-                        first_result = data['data'][0]
-                        gencode_id = first_result.get('gencodeId')
-                        api_symbol = first_result.get('geneSymbol', '')
-                        if gencode_id:
-                            logger.debug(f"Dynamic lookup first result: {gene_symbol} -> {api_symbol} -> {gencode_id}")
-                            return gencode_id
+                    if response.status_code == 200:
+                        data = response.json()
+                        if 'data' in data and data['data']:
+                            # Look for exact symbol match first
+                            for gene_info in data['data']:
+                                api_symbol = gene_info.get('geneSymbol', '').upper()
+                                if api_symbol == gene_symbol.upper():
+                                    gencode_id = gene_info.get('gencodeId')
+                                    if gencode_id:
+                                        logger.info(f"[OK] Dynamic lookup exact match: {gene_symbol} -> {gencode_id}")
+                                        return gencode_id
+                            
+                            # If no exact match, try the first result (API usually returns most relevant first)
+                            if data['data']:
+                                first_result = data['data'][0]
+                                gencode_id = first_result.get('gencodeId')
+                                api_symbol = first_result.get('geneSymbol', '')
+                                if gencode_id:
+                                    logger.info(f"[OK] Dynamic lookup first result: {gene_symbol} -> {api_symbol} -> {gencode_id}")
+                                    return gencode_id
+                    
+                    # If we got here, no valid data found
+                    if attempt < 2:
+                        logger.debug(f"Retry {attempt + 1}/3 for {gene_symbol}")
+                        continue
+                    else:
+                        break
+                        
+                except requests.exceptions.Timeout:
+                    if attempt < 2:
+                        logger.warning(f"Timeout on attempt {attempt + 1}/3 for {gene_symbol}, retrying...")
+                        continue
+                    else:
+                        logger.warning(f"All timeout attempts failed for {gene_symbol}")
+                        return None
             
-            logger.debug(f"Dynamic lookup failed for gene symbol: {gene_symbol}")
+            logger.warning(f"[FAIL] Dynamic lookup failed for gene symbol: {gene_symbol} (no results after 3 attempts)")
             return None
             
         except Exception as e:
-            logger.warning(f"Dynamic gene lookup error for {gene_symbol}: {e}")
+            logger.warning(f"[FAIL] Dynamic gene lookup error for {gene_symbol}: {e}")
             return None
     
     async def get_gene_expression(
@@ -225,19 +254,13 @@ class GTExClient:
         Returns:
             List of GTExExpression objects for each tissue
         """
-        cache_key = (
-            gene_symbol.upper(),
-            tuple(sorted(tissues)) if tissues else ("__all__",),
-        )
-        cached_expressions = self._expression_cache.get(cache_key)
-        if cached_expressions is not None:
-            return cached_expressions
-
         # Convert gene symbol to Ensembl ID
         gencode_id = self._get_versioned_gencode_id(gene_symbol)
         if not gencode_id:
-            logger.warning(f"No versioned GENCODE mapping found for gene symbol: {gene_symbol}")
-            self._expression_cache[cache_key] = []
+            # Only log warning once per gene to avoid spam
+            if gene_symbol not in self._logged_warnings:
+                logger.warning(f"No versioned GENCODE mapping found for gene symbol: {gene_symbol}")
+                self._logged_warnings.add(gene_symbol)
             return []
         
         logger.debug(f"Using GENCODE ID {gencode_id} for gene {gene_symbol}")
@@ -285,7 +308,6 @@ class GTExClient:
                         # Calculate cardiac specificity metrics
                         cardiac_count = len([exp for exp in expressions if exp.tissue in self.cardiac_tissue_ids])
                         logger.info(f"Retrieved GTEx cardiac expression for {gene_symbol}: {cardiac_count}/{len(expressions)} cardiac tissues")
-                        self._expression_cache[cache_key] = expressions
                         return expressions
                 else:
                     logger.debug(f"No median expression data returned for {gene_symbol} (GENCODE: {gencode_id})")
@@ -294,12 +316,10 @@ class GTExClient:
             
             # If API call failed, log and return empty list for fallback handling
             logger.debug(f"GTEx API unavailable for {gene_symbol}, using cardiac gene classification fallback")
-            self._expression_cache[cache_key] = []
             return []
             
         except Exception as e:
             logger.debug(f"GTEx expression query error for {gene_symbol}: {e}")
-            self._expression_cache[cache_key] = []
             return []
     
     async def calculate_cardiac_specificity(
@@ -317,15 +337,10 @@ class GTExClient:
         Returns:
             CardiacExpressionProfile with specificity metrics
         """
-        normalized_symbol = gene_symbol.upper()
-        if normalized_symbol in self._cardiac_specificity_cache:
-            return self._cardiac_specificity_cache[normalized_symbol]
-
         try:
             expressions = await self.get_gene_expression(gene_symbol)
             
             if not expressions:
-                self._cardiac_specificity_cache[normalized_symbol] = None
                 return None
             
             # Separate cardiac and non-cardiac tissues
@@ -340,7 +355,6 @@ class GTExClient:
             
             if not cardiac_expressions:
                 logger.warning(f"No cardiac expression data found for {gene_symbol}")
-                self._cardiac_specificity_cache[normalized_symbol] = None
                 return None
             
             # Calculate cardiac metrics
@@ -365,7 +379,7 @@ class GTExClient:
                     cardiac_rank = i
                     break
             
-            profile = CardiacExpressionProfile(
+            return CardiacExpressionProfile(
                 gene_symbol=gene_symbol,
                 cardiac_median_tpm=cardiac_median_tpm,
                 cardiac_mean_tpm=cardiac_mean_tpm,
@@ -374,12 +388,9 @@ class GTExClient:
                 total_tissues=len(expressions),
                 cardiac_rank=cardiac_rank
             )
-            self._cardiac_specificity_cache[normalized_symbol] = profile
-            return profile
             
         except Exception as e:
             logger.error(f"Cardiac specificity calculation failed for {gene_symbol}: {e}")
-            self._cardiac_specificity_cache[normalized_symbol] = None
             return None
     
     async def batch_cardiac_specificity(
@@ -398,18 +409,6 @@ class GTExClient:
             Dictionary mapping gene symbols to expression profiles
         """
         semaphore = asyncio.Semaphore(max_concurrent)
-        profiles: Dict[str, CardiacExpressionProfile] = {}
-        uncached_genes: List[str] = []
-
-        for gene in gene_symbols:
-            normalized_gene = gene.upper()
-            if normalized_gene in self._cardiac_specificity_cache:
-                cached_profile = self._cardiac_specificity_cache[normalized_gene]
-                if cached_profile:
-                    profiles[gene] = cached_profile
-                continue
-            if gene not in uncached_genes:
-                uncached_genes.append(gene)
         
         async def _get_specificity_with_semaphore(gene: str):
             async with semaphore:
@@ -421,11 +420,12 @@ class GTExClient:
                     return gene, None
         
         # Execute concurrent requests
-        tasks = [_get_specificity_with_semaphore(gene) for gene in uncached_genes]
+        tasks = [_get_specificity_with_semaphore(gene) for gene in gene_symbols]
         results = await asyncio.gather(*tasks)
         
         # Process results
-        successful = sum(1 for profile in profiles.values() if profile)
+        profiles = {}
+        successful = 0
         failed = 0
         
         for gene, profile in results:

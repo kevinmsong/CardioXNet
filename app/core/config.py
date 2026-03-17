@@ -1,8 +1,8 @@
 """Configuration management using Pydantic settings."""
 
-from typing import Any, Dict, List, Optional
+from typing import Dict, List, Optional
 from functools import lru_cache
-from pydantic import Field, field_validator
+from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -41,41 +41,35 @@ class NETSConfig(BaseSettings):
     
     # Analysis Parameters (Optimized for comprehensive disease pathway discovery)
     string_neighbor_count: int = Field(
-        default=100,  # Increased for comprehensive neighborhood expansion
+        default=75,
         ge=10,
         le=200,
-        description="Number of neighbors from STRING for functional neighborhood assembly (100 for comprehensive coverage, validated range: 10-200)"
+        description="Number of neighbors from STRING for functional neighborhood assembly (validated range: 10-200)"
     )
     string_score_threshold: float = Field(
-        default=0.70,  # Balanced selectivity for more pathway coverage
+        default=0.60,
         ge=0.4,
         le=0.95,
-        description="STRING combined score threshold for protein-protein interactions (0.70 for balanced coverage, validated range: 0.4-0.95)"
+        description="STRING combined score threshold for protein-protein interactions (validated range: 0.4-0.95)"
     )
     fdr_threshold: float = Field(
-        default=0.05,  # More permissive for broader discovery
+        default=0.05,
         ge=0.001,
         le=0.2,
-        description="FDR significance threshold (0.05 for comprehensive discovery, validated range: 0.001-0.2)"
+        description="FDR significance threshold (validated range: 0.001-0.2)"
     )
     top_hypotheses_count: int = Field(
-        default=20,  # Increased for more comprehensive results
+        default=15,
         ge=5,
         le=100,
-        description="Number of top hypotheses to validate (20 for comprehensive coverage, validated range: 5-100)"
-    )
-    primary_pathways_to_expand: int = Field(
-        default=30,
-        ge=10,
-        le=100,
-        description="Number of primary pathways to expand into the secondary funnel before final filtering"
+        description="Number of top hypotheses to validate (validated range: 5-100)"
     )
     
-    # Database Weights (Comprehensive pathway coverage)
-    db_weight_reactome: float = Field(default=2.0, description="Reactome database weight (highest quality)")
-    db_weight_kegg: float = Field(default=1.8, description="KEGG database weight (comprehensive)")
-    db_weight_wikipathways: float = Field(default=1.5, description="WikiPathways weight (community curated)")
-    db_weight_gobp: float = Field(default=1.3, description="GO:BP weight (broad functional annotation)")
+    # Database Weights
+    db_weight_reactome: float = Field(default=1.5, description="Reactome database weight")
+    db_weight_kegg: float = Field(default=1.5, description="KEGG database weight")
+    db_weight_wikipathways: float = Field(default=1.2, description="WikiPathways weight")
+    db_weight_gobp: float = Field(default=1.0, description="GO:BP weight")
     
     # API Endpoints (Per official documentation)
     string_api_url: str = Field(
@@ -91,10 +85,10 @@ class NETSConfig(BaseSettings):
         description="Reactome Content Service API (https://reactome.org/ContentService/)"
     )
     
-    # Retry Configuration (Balanced for reliability and speed)
-    max_retries: int = Field(default=3, description="Maximum API retry attempts")
-    retry_backoff_factor: float = Field(default=2.0, description="Exponential backoff factor")
-    request_timeout: int = Field(default=20, description="API request timeout in seconds")
+    # Retry Configuration
+    max_retries: int = Field(default=2, description="Maximum API retry attempts")
+    retry_backoff_factor: float = Field(default=1.5, description="Exponential backoff factor")
+    request_timeout: int = Field(default=15, description="API request timeout in seconds")
     
     # Clinical Evidence API Timeouts (Stage 3: HPA, GWAS, Epigenomic)
     hpa_timeout: int = Field(default=30, description="Human Protein Atlas API timeout in seconds")
@@ -104,28 +98,28 @@ class NETSConfig(BaseSettings):
     
     # Aggregation Configuration
     aggregation_strategy: str = Field(
-        default="weighted",  # Changed to weighted for comprehensive coverage
-        description="Pathway aggregation strategy: intersection, frequency, or weighted (weighted for comprehensive discovery)"
+        default="frequency",
+        description="Pathway aggregation strategy: intersection, frequency, or weighted"
     )
     min_support_threshold: int = Field(
-        default=2,
+        default=1,  # Inclusive for comprehensive pathway coverage
         ge=1,
         le=10,
-        description="Minimum support count for pathway replication in final prioritization"
+        description="Minimum support count for pathway replication (1 for comprehensive coverage, validated range: 1-10)"
     )
     
-    # Literature Mining Configuration (Comprehensive cardiovascular disease focus)
+    # Literature Mining Configuration
     pubmed_max_results: int = Field(
-        default=50,  # Increased for comprehensive literature coverage
+        default=20,
         ge=10,
         le=500,
-        description="Max PubMed results per gene (50 for comprehensive coverage, validated range: 10-500)"
+        description="Max PubMed results per gene (validated range: 10-500)"
     )
     literature_relevance_threshold: float = Field(
-        default=0.40,  # More permissive for broader evidence inclusion
+        default=0.30,
         ge=0.05,
         le=0.7,
-        description="Minimum relevance score for literature-expanded genes (0.40 for comprehensive disease evidence, validated range: 0.05-0.7)"
+        description="Minimum relevance score for literature-expanded genes (validated range: 0.05-0.7)"
     )
     
     # Semantic Filtering Configuration (Disease-context aware, comprehensive)
@@ -144,27 +138,6 @@ class NETSConfig(BaseSettings):
         description="Maximum pathways to return after semantic filtering (100 for comprehensive discovery, validated range: 15-1000)"
     )
 
-    semantic_max_hypotheses_for_literature: int = Field(
-        default=15,
-        ge=1,
-        le=200,
-        description="Maximum hypotheses to validate during literature mining"
-    )
-
-    secondary_literature_expansion_top_n: int = Field(
-        default=8,
-        ge=0,
-        le=50,
-        description="Number of top primary pathways that receive literature expansion during secondary discovery"
-    )
-
-    semantic_disease_boost: float = Field(
-        default=1.8,
-        ge=1.0,
-        le=5.0,
-        description="Relative boost for disease-context pathway matches during semantic scoring"
-    )
-
     # Progressive thresholds (disease-context aware filtering)
     semantic_progressive_thresholds: Dict[str, float] = Field(
         default={
@@ -180,11 +153,6 @@ class NETSConfig(BaseSettings):
         default=0.5,
         description="Maximum seed gene overlap ratio for novelty filtering (0.5 = 50%)"
     )
-
-    filter_generic_pathways: bool = Field(
-        default=True,
-        description="Skip literature expansion for overly generic pathways"
-    )
     
     # Tissue Expression Validation Configuration
     tissue_expression_validation: bool = Field(
@@ -197,12 +165,6 @@ class NETSConfig(BaseSettings):
         le=0.8,
         description="Minimum ratio of pathway genes expressed in cardiac tissue (0.30 for comprehensive coverage, validated range: 0.1-0.8)"
     )
-    gtex_top_pathways: int = Field(
-        default=6,
-        ge=0,
-        le=100,
-        description="Only the top N validated pathways run GTEx tissue validation during Stage 8; lower-ranked pathways skip this step for speed"
-    )
     
     # Permutation Testing Configuration
     permutation_test_enabled: bool = Field(
@@ -210,73 +172,22 @@ class NETSConfig(BaseSettings):
         description="Enable permutation-based empirical p-value calculation"
     )
     n_permutations: int = Field(
-        default=100,  # Increased for more robust statistical testing
-        ge=25,
-        le=1000,
-        description="Number of permutations for empirical p-value (100 for robust validation, validated range: 25-1000)"
+        default=25,
+        ge=10,
+        le=10000,
+        description="Number of permutations for empirical p-value (validated range: 10-10000)"
     )
-    adaptive_permutation_enabled: bool = Field(
-        default=True,
-        description="Use adaptive early-stopping degree-preserving permutations during Stage 8 validation"
-    )
-    permutation_top_pathways: int = Field(
-        default=8,
-        ge=0,
-        le=100,
-        description="Only the top N validated pathways run degree-preserving permutation testing; lower-ranked pathways skip this step for speed"
-    )
-
-    enable_redundancy_detection: bool = Field(
-        default=True,
-        description="Remove highly redundant pathways after semantic scoring"
-    )
-    redundancy_jaccard_threshold: float = Field(
-        default=0.7,
-        ge=0.1,
-        le=1.0,
-        description="Jaccard similarity threshold for pathway redundancy removal"
-    )
-    enforce_final_name_filter: bool = Field(
-        default=True,
-        description="Apply a final cardiac prioritization filter with pathway-name matches and semantic rescue"
+    min_fold_enrichment: float = Field(
+        default=2.0,
+        ge=1.0,
+        le=10.0,
+        description="Minimum fold-enrichment (observed/expected overlap ratio) for pathway inclusion. Ensures biological effect size beyond statistical significance. Default 2.0 = 2× enrichment."
     )
     
     # Druggability Analysis Configuration
     druggability_analysis: bool = Field(
         default=True,
         description="Enable druggable target identification"
-    )
-    external_druggability_enabled: bool = Field(
-        default=True,
-        description="Enable live therapeutic target evidence lookup for Stage 8 validation"
-    )
-    external_druggability_gene_limit: int = Field(
-        default=8,
-        ge=1,
-        le=25,
-        description="Maximum evidence genes per pathway to query against live therapeutic target APIs"
-    )
-    external_druggability_top_pathways: int = Field(
-        default=4,
-        ge=0,
-        le=50,
-        description="Only the top N validated pathways use live therapeutic target lookups; lower-ranked pathways use curated fallback"
-    )
-    external_drug_examples_per_gene: int = Field(
-        default=5,
-        ge=1,
-        le=10,
-        description="Maximum example drugs to retain per target gene from external evidence"
-    )
-    external_druggability_timeout: int = Field(
-        default=12,
-        ge=5,
-        le=60,
-        description="Timeout in seconds for live therapeutic target evidence queries"
-    )
-    opentargets_api_url: str = Field(
-        default="https://api.platform.opentargets.org/api/v4/graphql",
-        description="Open Targets GraphQL endpoint for live therapeutic target evidence"
     )
     
     # Output Configuration
@@ -342,23 +253,10 @@ class Settings(BaseSettings):
     # Parallel Processing Configuration (Optimized for comprehensive analysis)
     max_workers_semantic: int = Field(default=8, description="Max workers for semantic filtering")
     max_workers_literature: int = Field(default=6, description="Max workers for literature mining")
-    max_workers_validation: int = Field(default=4, description="Max workers for enhanced biological validation")
     max_concurrent_pubmed: int = Field(default=10, description="Max concurrent PubMed requests")
     
     # NETS Pipeline Configuration
     nets: NETSConfig = Field(default_factory=NETSConfig)
-
-    @field_validator("debug", mode="before")
-    @classmethod
-    def parse_debug_value(cls, value: Any) -> Any:
-        """Accept common deployment strings such as DEBUG=release."""
-        if isinstance(value, str):
-            normalized = value.strip().lower()
-            if normalized in {"release", "prod", "production", "false", "0", "off", "no"}:
-                return False
-            if normalized in {"debug", "dev", "development", "true", "1", "on", "yes"}:
-                return True
-        return value
     
     model_config = SettingsConfigDict(
         env_file=".env",
