@@ -108,6 +108,12 @@ class NETSConfig(BaseSettings):
         description="Minimum support count for pathway replication (1 for comprehensive coverage, validated range: 1-10)"
     )
     
+    # Secondary enrichment expansion
+    primary_pathways_to_expand: int = Field(
+        default=20, ge=1, le=200,
+        description="Number of primary pathways expanded in secondary enrichment stage"
+    )
+
     # Literature Mining Configuration
     pubmed_max_results: int = Field(
         default=20,
@@ -128,6 +134,12 @@ class NETSConfig(BaseSettings):
         ge=0.001,
         le=0.7,
         description="Minimum semantic cardiovascular disease relevance score (0.15 for comprehensive discovery, validated range: 0.001-0.7)"
+    )
+
+    # Max hypotheses sent to literature mining
+    semantic_max_hypotheses_for_literature: int = Field(
+        default=15, ge=1, le=100,
+        description="Maximum hypotheses passed to literature mining stage"
     )
 
     # Semantic result limits (comprehensive pathway discovery)
