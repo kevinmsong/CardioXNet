@@ -402,6 +402,11 @@ async def get_analysis_results(analysis_id: str):
                     "edge_count": len(network.get("edges", []))
                 }
     
+    # Extract comprehensive network topology from stage_7_topology
+    network_topology = results.get("stage_7_topology")
+    if not network_topology:
+        network_topology = results.get("stage_4c_topology")
+
     # Extract top_genes from results if available
     top_genes = results.get("top_genes")
     if top_genes:
@@ -476,6 +481,7 @@ async def get_analysis_results(analysis_id: str):
         seed_genes=seed_genes,
         hypotheses=hypotheses,
         topology=topology,
+        network_topology=network_topology,
         top_genes=top_genes,
         report_urls=sanitized_report_urls or None
     )

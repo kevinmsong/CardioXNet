@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { ThemeProvider, createTheme, CssBaseline } from '@mui/material';
+import { ThemeProvider, createTheme, CssBaseline, Box } from '@mui/material';
 import Layout from './components/Layout';
 import HomePage from './pages/HomePage';
 import ProgressPage from './pages/ProgressPage';
@@ -223,12 +223,12 @@ function App() {
         <Router>
           <Layout>
             <Routes>
-              <Route path="/" element={<HomePage />} />
-              <Route path="/documentation" element={<DocumentationPage />} />
-              <Route path="/api-reference" element={<APIReferencePage />} />
-              <Route path="/progress/:analysisId" element={<ProgressPage />} />
-              <Route path="/results/:analysisId" element={<ResultsPage />} />
-              <Route path="/results/:analysisId/pathway/:pathwayId" element={<PathwayDetailPage />} />
+              <Route path="/" element={<Box sx={{ zoom: 0.85 }}><HomePage /></Box>} />
+              <Route path="/documentation" element={<Box sx={{ zoom: 0.90 }}><DocumentationPage /></Box>} />
+              <Route path="/api-reference" element={<Box sx={{ zoom: 0.90 }}><APIReferencePage /></Box>} />
+              <Route path="/progress/:analysisId" element={<Box sx={{ zoom: 0.90 }}><ProgressPage /></Box>} />
+              <Route path="/results/:analysisId" element={<Box sx={{ zoom: 0.90 }}><ResultsPage /></Box>} />
+              <Route path="/results/:analysisId/pathway/:pathwayId" element={<Box sx={{ zoom: 0.90 }}><PathwayDetailPage /></Box>} />
             </Routes>
           </Layout>
         </Router>

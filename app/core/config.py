@@ -116,7 +116,7 @@ class NETSConfig(BaseSettings):
 
     # Literature Mining Configuration
     pubmed_max_results: int = Field(
-        default=20,
+        default=50,
         ge=10,
         le=500,
         description="Max PubMed results per gene (validated range: 10-500)"

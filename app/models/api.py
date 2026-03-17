@@ -116,6 +116,7 @@ class AnalysisResultsResponse(BaseModel):
     seed_genes: List[GeneInfo] = Field(default_factory=list, description="Validated seed genes")
     hypotheses: Optional[Dict] = Field(None, description="Scored hypotheses (flexible format for frontend)")
     topology: Optional[Dict] = Field(None, description="Network topology analysis results")
+    network_topology: Optional[Dict] = Field(None, description="Comprehensive network topology (hub genes, centrality, network summary)")
     top_genes: Optional[List[Dict]] = Field(None, description="Top genes aggregated across pathways")
     report_urls: Optional[Dict[str, str]] = Field(None, description="URLs to download reports")
     

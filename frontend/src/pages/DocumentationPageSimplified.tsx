@@ -110,8 +110,8 @@ const PIPELINE_STAGES: PipelineStage[] = [
   {
     num: '09', title: 'Literature Mining', subtitle: 'PubMed evidence', pct: 88, phase: 'validation',
     icon: <Article sx={{ fontSize: 20 }} />,
-    desc: 'PubMed abstract screening — 20 results per seed gene. Traceability linking genes to discovered pathways.',
-    details: ['20 PubMed abstracts per seed gene', 'Gene-to-pathway citation traceability', 'Disease context-guided queries'],
+    desc: 'PubMed abstract screening — 50 results per seed gene. Traceability linking genes to discovered pathways.',
+    details: ['50 PubMed abstracts per seed gene', 'Gene-to-pathway citation traceability', 'Disease context-guided queries'],
   },
   {
     num: '10', title: 'Network Topology Analysis', subtitle: 'Hub gene identification', pct: 93, phase: 'validation',
@@ -461,7 +461,7 @@ export default function DocumentationPageSimplified() {
                     { src: 'STRING v11.5', use: 'PPI networks, 75 neighbors/gene' },
                     { src: 'g:Profiler', use: 'GO:BP, KEGG, Reactome, WikiPathways' },
                     { src: 'GTEx v8', use: 'Cardiac tissue expression (live API)' },
-                    { src: 'PubMed/NCBI', use: 'Literature mining, 20 abstracts/gene' },
+                    { src: 'PubMed/NCBI', use: 'Literature mining, 50 abstracts/gene' },
                     { src: 'DrugBank v5.1.10', use: 'Druggability curated gene lists (Nov 2023)' },
                     { src: 'ChEMBL REST API', use: 'Live drug phase & activity lookup (EBI)' },
                   ].map(({ src, use }) => (
@@ -494,7 +494,7 @@ export default function DocumentationPageSimplified() {
                     { param: 'FDR threshold', value: '≤ 0.05' },
                     { param: 'Permutations', value: '25' },
                     { param: 'Top hypotheses', value: '15' },
-                    { param: 'PubMed per gene', value: '20' },
+                    { param: 'PubMed per gene', value: '50' },
                     { param: 'Jaccard threshold', value: '≥ 0.85' },
                     { param: 'Min fold-enrichment', value: '2.0×' },
                   ].map(({ param, value }) => (

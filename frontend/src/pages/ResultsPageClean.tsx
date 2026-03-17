@@ -19,6 +19,7 @@ import {
 } from '@mui/icons-material';
 import api from '../api/endpoints';
 import UltraComprehensiveTable from '../components/UltraComprehensiveTable';
+import NetworkTopologyPanel from '../components/NetworkTopologyPanel';
 
 export default function ResultsPage() {
   const { analysisId } = useParams<{ analysisId: string }>();
@@ -85,18 +86,17 @@ export default function ResultsPage() {
       return;
     }
 
-    // Build hub gene lookup map from Stage 4c topology
+    // Build hub gene lookup map from network topology (stage_7_topology)
     const hubGeneMap = new Map();
-    if (results?.stage_4c_topology?.hub_genes) {
-      results.stage_4c_topology.hub_genes.forEach((hub: any) => {
-        hubGeneMap.set(hub.gene_symbol, {
-          hub_score: hub.hub_score.toFixed(3),
-          is_druggable: hub.is_druggable ? 'Yes' : 'No',
-          centrality_betweenness: hub.centrality_scores?.betweenness?.toFixed(4) || 'N/A',
-          centrality_pagerank: hub.centrality_scores?.pagerank?.toFixed(4) || 'N/A',
-        });
+    const hubGenes = (results as any)?.network_topology?.hub_genes || (results as any)?.stage_4c_topology?.hub_genes || [];
+    hubGenes.forEach((hub: any) => {
+      hubGeneMap.set(hub.gene_symbol || hub.gene, {
+        hub_score: (hub.hub_score ?? 0).toFixed(3),
+        is_druggable: hub.is_druggable ? 'Yes' : 'No',
+        centrality_betweenness: (hub.betweenness_centrality ?? hub.centrality_scores?.betweenness ?? 0).toFixed(4),
+        centrality_pagerank: (hub.pagerank ?? hub.centrality_scores?.pagerank ?? 0).toFixed(4),
       });
-    }
+    });
 
     // NES scores calculated in backend with log10 transformation
     const csvData = allHypotheses.map((hypothesis: any) => {
@@ -141,6 +141,7 @@ export default function ResultsPage() {
 
   // Calculate total pathways for display
   const totalPathways = results?.hypotheses?.total_count || 0;
+  const hubGeneCount = (results as any)?.network_topology?.hub_genes?.length || 0;
 
   return (
     <Box sx={{ py: 3 }}>
@@ -210,7 +211,21 @@ export default function ResultsPage() {
                   py: 2.5,
                 }} 
               />
-              <Chip 
+              {hubGeneCount > 0 && (
+                <Chip
+                  label={`${hubGeneCount} Hub Genes`}
+                  size="medium"
+                  sx={{
+                    bgcolor: 'rgba(255, 184, 28, 0.2)',
+                    color: 'white',
+                    fontWeight: 700,
+                    border: '1.5px solid rgba(255, 184, 28, 0.5)',
+                    fontSize: '0.85rem',
+                    py: 2.5,
+                  }}
+                />
+              )}
+              <Chip
                 label="12-Stage Pipeline"
                 icon={<BiotechOutlined sx={{ color: 'white !important' }} />}
                 size="medium"
@@ -329,6 +344,9 @@ export default function ResultsPage() {
           analysisId={analysisId}
         />
       </Paper>
+
+      {/* Network Topology Analysis */}
+      <NetworkTopologyPanel networkTopology={(results as any)?.network_topology} />
 
       {/* AI-Identified Therapeutic Target Candidates - PLACED BELOW TABLE FOR LOGICAL FLOW */}
       <Paper 

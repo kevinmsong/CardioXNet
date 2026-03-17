@@ -26,7 +26,7 @@ interface GeneInputPanelProps {
 
 const DISEASE_OPTIONS = [
   {
-    value: '',
+    value: 'general',
     label: 'General Cardiovascular Discovery',
     description: 'Broad cardiac pathway prioritization without narrowing to a single disease'
   },
