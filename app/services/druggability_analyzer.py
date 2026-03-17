@@ -1,8 +1,9 @@
-"""Druggability analysis using curated DrugBank data + live ChEMBL API."""
+"""Druggability analysis using curated DrugBank data + Open Targets Platform API."""
 
 import logging
+import requests
 from typing import List, Dict, Set, Any, Optional
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from app.core.config import get_settings
 
@@ -12,7 +13,7 @@ logger = logging.getLogger(__name__)
 @dataclass
 class DruggabilityScore:
     """Druggability analysis result."""
-    
+
     druggable_genes: List[str]
     druggable_ratio: float
     total_genes: int
@@ -20,6 +21,14 @@ class DruggabilityScore:
     approved_drug_count: int
     clinical_trial_count: int
     druggability_tier: str  # 'high', 'medium', 'low'
+
+    # Open Targets live evidence fields
+    druggability_source: str = "curated"          # "curated" | "Open Targets + curated"
+    external_target_count: int = 0                 # genes matched in Open Targets
+    external_approved_target_count: int = 0        # targets with FDA-approved drugs
+    external_clinical_target_count: int = 0        # targets in active clinical trials
+    cardiovascular_target_count: int = 0           # targets with CV disease indication
+    target_evidence: List[Dict[str, Any]] = field(default_factory=list)  # per-gene detail
 
 
 class DruggabilityAnalyzer:
@@ -42,8 +51,36 @@ class DruggabilityAnalyzer:
     in this class for performance. Data current as of November 2023.
     """
     
+    # Open Targets Platform GraphQL endpoint
+    _OT_GRAPHQL_URL = "https://api.platform.opentargets.org/api/v4/graphql"
+    _OT_QUERY = """
+    query SearchTarget($term: String!) {
+      search(queryString: $term, entityNames: ["target"], page: {index: 0, size: 5}) {
+        hits {
+          id
+          entity
+          object {
+            ... on Target {
+              approvedSymbol
+              tractability { label modality value }
+              knownDrugs(size: 10) {
+                count
+                rows {
+                  phase
+                  status
+                  disease { name }
+                  drug { id name maximumClinicalTrialPhase }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    """
+
     def __init__(self):
-        """Initialize druggability analyzer with curated lists + ChEMBL live API."""
+        """Initialize druggability analyzer with curated lists + Open Targets live API."""
         self.settings = get_settings()
 
         # Curated gene sets (DrugBank v5.1.10, TTD 2023, ChEMBL v31 — Nov 2023)
@@ -51,20 +88,32 @@ class DruggabilityAnalyzer:
         self.approved_drug_targets = self._load_approved_drug_targets()
         self.clinical_trial_targets = self._load_clinical_trial_targets()
 
-        # ChEMBL live API client for genes not in curated sets
-        try:
-            from app.services.chembl_client import ChEMBLClient
-            self.chembl_client: Optional[Any] = ChEMBLClient()
-        except Exception as e:
-            logger.warning(f"ChEMBL client unavailable: {e}")
-            self.chembl_client = None
-
         logger.info(
             f"DruggabilityAnalyzer initialized: "
             f"{len(self.druggable_genes)} curated druggable genes, "
-            f"{len(self.approved_drug_targets)} approved targets, "
-            f"ChEMBL live API: {'enabled' if self.chembl_client else 'disabled'}"
+            f"{len(self.approved_drug_targets)} approved targets"
         )
+
+    def _query_open_targets(self, gene_symbols: List[str]) -> List[Dict[str, Any]]:
+        """Query Open Targets Platform GraphQL API for drug target evidence per gene."""
+        matched: List[Dict[str, Any]] = []
+        for gene in gene_symbols:
+            try:
+                resp = requests.post(
+                    self._OT_GRAPHQL_URL,
+                    json={"query": self._OT_QUERY, "variables": {"term": gene}},
+                    timeout=10,
+                )
+                resp.raise_for_status()
+                hits = resp.json().get("data", {}).get("search", {}).get("hits", [])
+                for hit in hits:
+                    obj = hit.get("object", {})
+                    if obj.get("approvedSymbol", "").upper() == gene.upper():
+                        matched.append(obj)
+                        break  # exact symbol match — take first
+            except Exception:
+                pass
+        return matched
     
     def _load_druggable_genes(self) -> Set[str]:
         """
@@ -221,41 +270,72 @@ class DruggabilityAnalyzer:
                 drug_count=0,
                 approved_drug_count=0,
                 clinical_trial_count=0,
-                druggability_tier='low'
+                druggability_tier='low',
             )
-        
-        # Identify druggable genes from curated sets (primary source)
+
+        # ── Curated sets (primary source) ──────────────────────────────────
         pathway_set = set(g.upper() for g in pathway_genes)
         druggable = set(pathway_set & self.druggable_genes)
         approved = set(pathway_set & self.approved_drug_targets)
         clinical = set(pathway_set & self.clinical_trial_targets)
 
-        # Supplementary live ChEMBL lookup for genes NOT in curated sets
-        uncurated = pathway_set - self.druggable_genes
-        if self.chembl_client and uncurated:
-            for gene in list(uncurated)[:10]:  # Limit to 10 API calls per pathway
-                try:
-                    result = self.chembl_client.lookup_gene(gene, timeout=5)
-                    if result:
-                        tier_live = self.chembl_client.classify_tier(result)
-                        if tier_live in ('high', 'medium', 'low'):
-                            druggable.add(gene)
-                        if tier_live == 'high':
-                            approved.add(gene)
-                        elif tier_live == 'medium':
-                            clinical.add(gene)
-                except Exception:
-                    pass
+        # ── Open Targets live evidence (supplementary) ─────────────────────
+        ot_hits = self._query_open_targets(list(pathway_set))
+
+        ot_target_count = 0
+        ot_approved_count = 0
+        ot_clinical_count = 0
+        ot_cv_count = 0
+        target_evidence: List[Dict[str, Any]] = []
+        druggability_source = "curated"
+
+        if ot_hits:
+            druggability_source = "Open Targets + curated"
+            _cv_terms = {"cardiovascular", "heart", "cardiac", "coronary", "arrhythmia",
+                         "hypertension", "heart failure", "cardiomyopathy"}
+            for obj in ot_hits:
+                gene_sym = obj.get("approvedSymbol", "")
+                tractability = obj.get("tractability") or []
+                drugs_data = obj.get("knownDrugs") or {}
+                drug_rows = drugs_data.get("rows") or []
+
+                has_approved = any(
+                    t.get("label") == "Approved Drug" and t.get("value") for t in tractability
+                )
+                has_clinical = any(
+                    t.get("label") == "Advanced Clinical" and t.get("value") for t in tractability
+                )
+                has_cv = any(
+                    any(term in (r.get("disease") or {}).get("name", "").lower() for term in _cv_terms)
+                    for r in drug_rows
+                )
+
+                ot_target_count += 1
+                if has_approved:
+                    ot_approved_count += 1
+                    druggable.add(gene_sym.upper())
+                    approved.add(gene_sym.upper())
+                if has_clinical:
+                    ot_clinical_count += 1
+                    druggable.add(gene_sym.upper())
+                    clinical.add(gene_sym.upper())
+                if has_cv:
+                    ot_cv_count += 1
+
+                top_drugs = [
+                    {"name": r["drug"]["name"], "phase": r.get("phase", 0)}
+                    for r in drug_rows
+                    if r.get("drug", {}).get("name")
+                ][:5]
+                target_evidence.append({"gene_symbol": gene_sym, "top_drugs": top_drugs})
 
         druggable_list = list(druggable)
         approved_list = list(approved)
         clinical_list = list(clinical)
 
-        # Calculate metrics
         total_genes = len(pathway_genes)
         druggable_ratio = len(druggable_list) / total_genes if total_genes > 0 else 0.0
 
-        # Determine tier
         if druggable_ratio >= 0.3 and len(approved_list) >= 2:
             tier = 'high'
         elif druggable_ratio >= 0.2 or len(approved_list) >= 1:
@@ -264,9 +344,8 @@ class DruggabilityAnalyzer:
             tier = 'low'
 
         logger.debug(
-            f"Druggability: {len(druggable_list)}/{total_genes} druggable "
-            f"({len(approved_list)} approved, {len(clinical_list)} clinical, "
-            f"curated+ChEMBL), tier: {tier}"
+            f"Druggability: {len(druggable_list)}/{total_genes} ({len(approved_list)} approved, "
+            f"{len(clinical_list)} clinical, {ot_target_count} OT hits), tier: {tier}"
         )
 
         return DruggabilityScore(
@@ -276,7 +355,13 @@ class DruggabilityAnalyzer:
             drug_count=len(druggable_list),
             approved_drug_count=len(approved_list),
             clinical_trial_count=len(clinical_list),
-            druggability_tier=tier
+            druggability_tier=tier,
+            druggability_source=druggability_source,
+            external_target_count=ot_target_count,
+            external_approved_target_count=ot_approved_count,
+            external_clinical_target_count=ot_clinical_count,
+            cardiovascular_target_count=ot_cv_count,
+            target_evidence=target_evidence,
         )
     
     def annotate_pathways_with_druggability(

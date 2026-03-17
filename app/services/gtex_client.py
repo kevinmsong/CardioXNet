@@ -69,7 +69,10 @@ class GTExClient:
         
         # Cache for dynamic lookups to avoid repeated API calls
         self._gencode_cache: Dict[str, Optional[str]] = {}
-        
+
+        # Cache for cardiac specificity profiles — avoids redundant GTEx API calls
+        self._cardiac_specificity_cache: Dict[str, CardiacExpressionProfile] = {}
+
         # Track genes we've already logged warnings for (avoid spam)
         self._logged_warnings: set = set()
         
@@ -409,7 +412,19 @@ class GTExClient:
             Dictionary mapping gene symbols to expression profiles
         """
         semaphore = asyncio.Semaphore(max_concurrent)
-        
+
+        # Deduplicate while preserving order; serve cached profiles immediately
+        seen: set = set()
+        unique_genes = [g for g in gene_symbols if not (g in seen or seen.add(g))]
+
+        profiles: Dict[str, CardiacExpressionProfile] = {}
+        to_fetch = []
+        for gene in unique_genes:
+            if gene in self._cardiac_specificity_cache:
+                profiles[gene] = self._cardiac_specificity_cache[gene]
+            else:
+                to_fetch.append(gene)
+
         async def _get_specificity_with_semaphore(gene: str):
             async with semaphore:
                 try:
@@ -418,28 +433,27 @@ class GTExClient:
                 except Exception as e:
                     logger.warning(f"GTEx query failed for {gene}: {e}")
                     return gene, None
-        
-        # Execute concurrent requests
-        tasks = [_get_specificity_with_semaphore(gene) for gene in gene_symbols]
-        results = await asyncio.gather(*tasks)
-        
-        # Process results
-        profiles = {}
-        successful = 0
+
+        # Execute concurrent requests only for uncached genes
+        tasks = [_get_specificity_with_semaphore(gene) for gene in to_fetch]
+        fetch_results = await asyncio.gather(*tasks)
+
+        successful = len(profiles)
         failed = 0
-        
-        for gene, profile in results:
+
+        for gene, profile in fetch_results:
             if profile:
+                self._cardiac_specificity_cache[gene] = profile
                 profiles[gene] = profile
                 successful += 1
             else:
                 failed += 1
-        
+
         logger.info(
             f"GTEx batch cardiac specificity: {successful} successful, "
-            f"{failed} failed out of {len(gene_symbols)} genes"
+            f"{failed} failed out of {len(unique_genes)} unique genes"
         )
-        
+
         return profiles
     
     def get_fallback_cardiac_genes(self) -> set:

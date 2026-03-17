@@ -59,7 +59,12 @@ class Pipeline:
         # Create a copy of settings to avoid modifying the global instance
         import copy
         self.settings = copy.deepcopy(get_settings())
-        
+
+        # Disease context for semantic filtering and literature search
+        # (must be initialized before config_overrides so overrides can set them)
+        self.disease_context = None
+        self.disease_synonyms = []
+
         # Apply config overrides if provided
         if config_overrides:
             logger.info(f"Applying {len(config_overrides)} configuration overrides: {config_overrides}")
@@ -111,18 +116,31 @@ class Pipeline:
         self.hypothesis_validator = HypothesisValidator()
         self.seed_gene_tracer = SeedGeneTracer()
         self.report_generator = ReportGenerator()
-        
+
+        # Sync any config overrides into sub-services that hold their own settings copy
+        if config_overrides:
+            self._sync_settings_to_services()
+
         # Pipeline state
         self.results = {}
         self.warnings = []
         self.progress_callback = None
-        
-        # Disease context for semantic filtering and literature search
-        self.disease_context = None
-        self.disease_synonyms = []
-        
+
         logger.info(f"CardioXNetPipeline initialized (ID: {self.analysis_id})")
-    
+
+    def _sync_settings_to_services(self) -> None:
+        """Push pipeline-level settings overrides into sub-services."""
+        nets = self.settings.nets
+
+        # Literature miner and its PubMed client
+        self.literature_miner.settings = self.settings
+        if hasattr(self.literature_miner, 'pubmed_client'):
+            self.literature_miner.pubmed_client.max_results = nets.pubmed_max_results
+
+        # Seed gene tracer PubMed client
+        if hasattr(self.seed_gene_tracer, 'pubmed_client'):
+            self.seed_gene_tracer.pubmed_client.max_results = nets.pubmed_max_results
+
     async def run(
         self,
         seed_genes: List[str],

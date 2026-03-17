@@ -2,7 +2,7 @@
 
 from typing import Dict, List, Optional
 from functools import lru_cache
-from pydantic import Field
+from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -184,6 +184,26 @@ class NETSConfig(BaseSettings):
         description="Minimum fold-enrichment (observed/expected overlap ratio) for pathway inclusion. Ensures biological effect size beyond statistical significance. Default 2.0 = 2× enrichment."
     )
     
+    # Redundancy filtering
+    redundancy_jaccard_threshold: float = Field(
+        default=0.7, ge=0.0, le=1.0,
+        description="Jaccard similarity threshold for pathway redundancy filtering"
+    )
+
+    # Stage 8 limits — how many top pathways each validation step processes
+    gtex_top_pathways: int = Field(
+        default=20, ge=0, description="Pathways to validate with GTEx (0 = all)"
+    )
+    permutation_top_pathways: int = Field(
+        default=20, ge=0, description="Pathways to run permutation testing on (0 = all)"
+    )
+    external_druggability_top_pathways: int = Field(
+        default=20, ge=0, description="Pathways to query external druggability APIs (0 = all)"
+    )
+    external_druggability_enabled: bool = Field(
+        default=True, description="Enable external druggability lookup (Open Targets / ChEMBL)"
+    )
+
     # Druggability Analysis Configuration
     druggability_analysis: bool = Field(
         default=True,
@@ -216,11 +236,22 @@ class NETSConfig(BaseSettings):
 
 class Settings(BaseSettings):
     """Application settings."""
-    
+
     # Application
     app_name: str = Field(default="CardioXNet", description="Application name")
     environment: str = Field(default="development", description="Environment: development, staging, production")
     debug: bool = Field(default=True, description="Debug mode")
+
+    # External API Keys (optional)
+    groq_api_key: Optional[str] = Field(default=None, description="Groq API key for AI report generation")
+
+    @field_validator('debug', mode='before')
+    @classmethod
+    def parse_debug_string(cls, v):
+        """Accept non-standard boolean strings used in deployment environments."""
+        if isinstance(v, str):
+            return v.lower() not in ('false', 'release', 'production', '0', 'no', 'off')
+        return v
     
     # Server
     host: str = Field(default="0.0.0.0", description="Server host")

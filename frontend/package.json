@@ -11,7 +11,8 @@
   ,"test:e2e": "playwright test --project=chromium frontend/tests/api",
   "test:e2e:headed": "playwright test --project=chromium --headed frontend/tests/api",
   "test:ui": "playwright test --project=chromium frontend/tests/ui",
-  "test:ui:headed": "playwright test --project=chromium --headed frontend/tests/ui"
+  "test:ui:headed": "playwright test --project=chromium --headed frontend/tests/ui",
+  "test:ui:smoke": "playwright test --project=chromium tests/smoke"
   },
   "dependencies": {
     "@emotion/react": "^11.11.1",
