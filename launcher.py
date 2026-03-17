@@ -9,6 +9,7 @@ import threading
 import time
 import socket
 import logging
+import signal
 
 # Fix stdout encoding on Windows
 if hasattr(sys.stdout, 'buffer'):
@@ -44,19 +45,33 @@ def _wait_for_server(port: int, timeout: float = 30.0):
     return False
 
 
+_server: object = None  # uvicorn Server instance
+
+
 def _start_backend(port: int):
     """Run uvicorn in the current thread (called from a daemon thread)."""
+    global _server
     import uvicorn
-    # Suppress noisy startup logs in windowed mode
     logging.getLogger("uvicorn").setLevel(logging.WARNING)
     logging.getLogger("uvicorn.access").setLevel(logging.WARNING)
-    uvicorn.run(
+    config = uvicorn.Config(
         "app.main:app",
         host=HOST,
         port=port,
         log_level="warning",
         reload=False,
     )
+    _server = uvicorn.Server(config)
+    _server.run()
+
+
+def _shutdown():
+    """Stop the uvicorn server and force-exit the process."""
+    global _server
+    if _server is not None:
+        _server.should_exit = True
+    # Give it a moment then hard-kill so no ports remain occupied
+    threading.Timer(2.0, lambda: os.kill(os.getpid(), signal.SIGTERM)).start()
 
 
 def main():
@@ -102,6 +117,9 @@ def main():
     splash.events.shown += _on_shown
 
     webview.start(debug=False)
+
+    # Window closed — clean up
+    _shutdown()
 
 
 if __name__ == "__main__":
