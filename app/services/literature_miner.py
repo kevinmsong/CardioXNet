@@ -390,39 +390,22 @@ class LiteratureMiner:
         Returns:
             PubMed query string optimized for this specific hypothesis
         """
-        # Extract gene symbols from contributing genes only
+        # Extract gene symbols from contributing genes only (up to 8 for broader coverage)
         gene_symbols = [gene.symbol for gene in contributing_seed_genes]
-        
-        # Build more focused query with pathway name and contributing genes
-        if len(gene_symbols) > 0:
-            # If we have specific contributing genes, focus on them
-            gene_query = " OR ".join([f'"{gene}"[Title/Abstract]' for gene in gene_symbols[:5]])  # Limit to 5 genes max
+
+        if gene_symbols:
+            gene_query = " OR ".join([f'"{gene}"[Title/Abstract]' for gene in gene_symbols[:8]])
         else:
-            # Fallback if no contributing genes identified
             gene_query = "gene[Title/Abstract]"
-        
-        pathway_query = f'"{pathway_name}"[Title/Abstract]'
-        
-        # Add disease context if provided
-        disease_query = ""
-        if disease_context and disease_synonyms:
-            # Include disease synonyms in the search
-            disease_terms = [disease_context] + disease_synonyms[:3]  # Limit to 4 terms max
-            disease_query = " OR ".join([f'"{term}"[Title/Abstract]' for term in disease_terms])
-            disease_query = f" AND ({disease_query})"
-        
-        # Simplified query: genes + cardiac terms (no mandatory pathway requirement)
-        # This is more flexible and will return more results
-        cardiac_keywords = ["cardiovascular", "cardiac", "heart"]  # Simple cardiac terms
-        keyword_query = " OR ".join([f'"{kw}"[Title/Abstract]' for kw in cardiac_keywords])
-        
-        # Build flexible query: genes AND (cardiac terms OR pathway)
-        # This ensures we get papers about the genes in cardiac context
-        query = f"({gene_query}) AND ({keyword_query} OR {pathway_query})"
-        
-        # Add species filter (optional, commented out to increase results)
-        # query += f' AND "{self.cardiac_context.species}"[Organism]'
-        
+
+        # Broad cardiovascular context — OR'd so any cardiac term qualifies
+        cardiac_keywords = ["cardiovascular", "cardiac", "heart", "myocardial", "cardiomyopathy"]
+        keyword_query = " OR ".join([f'{kw}[Title/Abstract]' for kw in cardiac_keywords])
+
+        # Genes AND cardiovascular context — no exact pathway-name phrase required
+        # (Reactome/GO names almost never appear verbatim in abstract text)
+        query = f"({gene_query}) AND ({keyword_query})"
+
         return query
     
     def _create_hypothesis_citations(
@@ -576,31 +559,32 @@ class LiteratureMiner:
         Returns:
             PubMed query string
         """
-        # Extract gene symbols
-        gene_symbols = [gene.symbol for gene in seed_genes[:5]]  # Limit to 5 genes
-        
-        # Build query with pathway name and genes
-        gene_query = " OR ".join([f'"{gene}"[Title/Abstract]' for gene in gene_symbols])
-        pathway_query = f'"{pathway_name}"[Title/Abstract]'
-        
-        # Add cardiac keywords
-        cardiac_keywords = self.cardiac_context.high_priority_keywords[:3]
-        
-        # Add disease context to cardiac keywords if provided
-        if disease_context and disease_synonyms:
-            # Add disease-specific terms to cardiac keywords
-            disease_terms = [term.lower() for term in disease_synonyms[:2]]  # Limit to 2
-            cardiac_keywords.extend(disease_terms)
-            cardiac_keywords = list(set(cardiac_keywords))  # Remove duplicates
-        
-        keyword_query = " OR ".join([f'"{kw}"[Title/Abstract]' for kw in cardiac_keywords])
-        
-        # Combine with AND logic
-        query = f"({pathway_query}) AND ({gene_query}) AND ({keyword_query})"
-        
-        # Add species filter
-        query += f' AND "{self.cardiac_context.species}"[Organism]'
-        
+        import re as _re
+        _STOP = {
+            'pathway', 'signaling', 'signal', 'by', 'in', 'of', 'via', 'the',
+            'a', 'an', 'and', 'or', 'with', 'for', 'from', 'to', 'regulation',
+            'regulated', 'process', 'processing', 'response', 'activity',
+            'activation', 'complex', 'system', 'biosynthesis', 'metabolism',
+            'metabolic', 'disease', 'diseases', 'type', 'class',
+        }
+        tokens = _re.split(r'[\s\-_/,;:()\[\]]+', pathway_name)
+        key_terms = [
+            t for t in tokens
+            if len(t) >= 3 and t.lower() not in _STOP and _re.search(r'[A-Za-z]', t)
+        ][:3]
+
+        gene_symbols = [gene.symbol for gene in seed_genes[:8]]
+        gene_query = " OR ".join([f'"{g}"[Title/Abstract]' for g in gene_symbols])
+
+        cardiac_keywords = ["cardiovascular", "cardiac", "heart", "myocardial", "cardiomyopathy"]
+        keyword_query = " OR ".join([f'{kw}[Title/Abstract]' for kw in cardiac_keywords])
+
+        if key_terms:
+            term_clause = " OR ".join([f'{t}[Title/Abstract]' for t in key_terms])
+            query = f"({gene_query}) AND ({keyword_query} OR {term_clause})"
+        else:
+            query = f"({gene_query}) AND ({keyword_query})"
+
         return query
     
     def _search_pubmed(self, query: str) -> List[Dict]:

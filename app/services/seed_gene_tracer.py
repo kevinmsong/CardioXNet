@@ -171,15 +171,9 @@ class SeedGeneTracer:
 
         if key_terms:
             term_clause = ' AND '.join(f'{t}[Title/Abstract]' for t in key_terms)
-            return (
-                f'({term_clause}) AND "{seed_gene}"[Title/Abstract] AND '
-                f'(cardiac[Title/Abstract] OR heart[Title/Abstract] OR cardiovascular[Title/Abstract])'
-            )
-        # Fallback: gene + cardiovascular context only
-        return (
-            f'"{seed_gene}"[Title/Abstract] AND '
-            f'(cardiac[Title/Abstract] OR heart[Title/Abstract] OR cardiovascular[Title/Abstract])'
-        )
+            return f'({term_clause}) AND "{seed_gene}"[Title/Abstract]'
+        # Fallback: gene only — any paper mentioning this gene is relevant
+        return f'"{seed_gene}"[Title/Abstract]'
 
     def check_literature_associations(
         self,
