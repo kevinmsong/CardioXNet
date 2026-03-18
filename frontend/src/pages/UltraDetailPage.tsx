@@ -132,7 +132,7 @@ export default function UltraDetailPageFixed() {
         <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 2 }}>
           <Science sx={{ fontSize: 40, color: '#FFB81C' }} />
           <Box>
-            <Typography variant="h4" sx={{ fontWeight: 700, mb: 1 }}>
+            <Typography variant="h4" sx={{ fontWeight: 700, mb: 1, color: 'white' }}>
               {normalized.pathway_name}
             </Typography>
             <Stack direction="row" spacing={1} flexWrap="wrap">

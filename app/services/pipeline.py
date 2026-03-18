@@ -171,7 +171,7 @@ class Pipeline:
             f"Starting NETS pipeline analysis (ID: {self.analysis_id}) "
             f"with {len(seed_genes)} seed genes"
         )
-        print(f"\n[TIMING] Pipeline START at {datetime.now().strftime('%H:%M:%S')}")
+        pass
         
         try:
             # Stage 0: Input Validation
@@ -220,7 +220,7 @@ class Pipeline:
             logger.info(f"[PIPELINE] Calling Stage 5a with {final_result.total_count} pathways")
             scored_hypotheses = await self._run_stage_5_scoring(final_result, None)
             elapsed = time.time() - stage_start_time
-            print(f"[PIPELINE DEBUG] Stage 5a returned {scored_hypotheses.total_count} hypotheses")
+            pass
             logger.info(f"Stage 5a complete: {scored_hypotheses.total_count} scored hypotheses")
             logger.info(f"[TIMING] Stage 5a completed in {elapsed:.2f}s (Total: {time.time() - pipeline_start_time:.2f}s)")
             await self._update_progress("nes_scoring", 70, f"NES scoring complete: {scored_hypotheses.total_count} hypotheses")
@@ -237,7 +237,7 @@ class Pipeline:
             # Stage 4b: Enhanced Biological Validation (Tissue Expression, Permutation, Druggability)
             await self._update_progress("enhanced_validation", 78, "Applying enhanced biological validation")
             stage_start_time = time.time()
-            print(f"[PIPELINE DEBUG] Starting Stage 8 with {scored_hypotheses.total_count} hypotheses")
+            pass
             logger.info(f"Starting Stage 8 enhanced validation with {scored_hypotheses.total_count} hypotheses")
             
             try:
@@ -247,7 +247,7 @@ class Pipeline:
                     validation_result.valid_genes
                 )
                 elapsed = time.time() - stage_start_time
-                print(f"[PIPELINE DEBUG] Stage 8 completed successfully")
+                pass
                 logger.info(f"Stage 8 complete: Enhanced validation applied to {scored_hypotheses.total_count} hypotheses")
                 logger.info(f"[TIMING] Stage 8 completed in {elapsed:.2f}s (Total: {time.time() - pipeline_start_time:.2f}s)")
                 await self._update_progress("enhanced_validation", 84, f"Enhanced validation complete")
@@ -264,7 +264,7 @@ class Pipeline:
             # Stage 6: Literature Mining & Seed Gene Traceability
             await self._update_progress("literature_mining", 85, "Mining literature and tracing seed genes")
             stage_6_start = time.time()
-            print(f"[PIPELINE DEBUG] Starting Stage 9 with {scored_hypotheses.total_count} hypotheses")
+            pass
             
             # Stage 6a: Literature Mining (detailed citations)
             try:
@@ -274,13 +274,13 @@ class Pipeline:
                     validation_result.valid_genes
                 )
                 elapsed = time.time() - stage_start_time
-                print(f"[PIPELINE DEBUG] Stage 6a literature mining completed successfully")
+                pass
                 logger.info(f"Stage 6a complete: Literature mining found citations for {len(literature_evidence.hypothesis_citations)} hypotheses")
                 logger.info(f"[TIMING] Stage 6a completed in {elapsed:.2f}s (Total: {time.time() - pipeline_start_time:.2f}s)")
             except Exception as e:
                 elapsed = time.time() - stage_start_time
                 literature_error_msg = f"[PIPELINE DEBUG] Stage 6a literature mining failed: {str(e)}"
-                print(literature_error_msg, flush=True)
+                pass
                 logger.error(f"Stage 6a literature mining failed but continuing: {str(e)}")
                 logger.info(f"[TIMING] Stage 6a failed after {elapsed:.2f}s (Total: {time.time() - pipeline_start_time:.2f}s)")
                 import traceback
@@ -299,13 +299,13 @@ class Pipeline:
                 )
                 elapsed = time.time() - stage_start_time
                 stage6_complete_msg = f"[PIPELINE DEBUG] Stage 6b completed successfully"
-                print(stage6_complete_msg, flush=True)
+                pass
                 logger.info(f"Stage 6b complete: Seed gene tracing and literature associations added")
                 logger.info(f"[TIMING] Stage 6b completed in {elapsed:.2f}s (Total: {time.time() - pipeline_start_time:.2f}s)")
             except Exception as e:
                 elapsed = time.time() - stage_start_time
                 stage6_error_msg = f"[PIPELINE DEBUG] Stage 6b failed: {str(e)}"
-                print(stage6_error_msg, flush=True)
+                pass
                 logger.error(f"Stage 6b failed but continuing: {str(e)}")
                 logger.info(f"[TIMING] Stage 6b failed after {elapsed:.2f}s (Total: {time.time() - pipeline_start_time:.2f}s)")
                 import traceback
@@ -358,7 +358,7 @@ class Pipeline:
                 if scored_hypotheses.total_count == 0:
                     warning_msg = "⚠️ Stage 4b filter removed ALL pathways - no cardiac-named pathways found. Consider adjusting disease context or input genes."
                     logger.warning(warning_msg)
-                    print(warning_msg)
+                    pass
                     self.warnings.append(warning_msg)
                     
             except Exception as e:
@@ -374,7 +374,7 @@ class Pipeline:
             # Stage 7: Comprehensive Network Topology Analysis
             await self._update_progress("topology_analysis", 91, "Analyzing network topology")
             stage_start_time = time.time()
-            print(f"[PIPELINE DEBUG] Starting Stage 10: Comprehensive Topology Analysis")
+            pass
             
             comprehensive_topology_result = None
             try:
@@ -432,7 +432,7 @@ class Pipeline:
             # Generate Reports
             await self._update_progress("report_generation", 97, "Generating reports")
             stage_start_time = time.time()
-            print(f"[PIPELINE DEBUG] Starting report generation with {scored_hypotheses.total_count} final hypotheses")
+            pass
             
             try:
                 # Get comprehensive topology and top genes from results
@@ -453,7 +453,7 @@ class Pipeline:
                     top_genes_data  # Top therapeutic target candidates
                 )
                 elapsed = time.time() - stage_start_time
-                print(f"[PIPELINE DEBUG] Report generation completed successfully")
+                pass
                 logger.info(f"[PIPELINE DEBUG] Generated report files: {list(report_files.keys()) if report_files else 'None'}")
                 logger.info("  [TIMING] Report generation completed in {elapsed:.2f}s (Total: {time.time() - pipeline_start_time:.2f}s)")
             except Exception as e:
@@ -469,12 +469,12 @@ class Pipeline:
             # Save final results
             await self._update_progress("complete", 100, "Analysis complete")
             stage_start_time = time.time()
-            print(f"[PIPELINE DEBUG] Saving final results...")
+            pass
             
             try:
                 await self._save_results()
                 elapsed = time.time() - stage_start_time
-                print(f"[PIPELINE DEBUG] Final results saved successfully")
+                pass
                 logger.info("  [TIMING] Save results completed in {elapsed:.2f}s (Total: {time.time() - pipeline_start_time:.2f}s)")
             except Exception as e:
                 elapsed = time.time() - stage_start_time
@@ -484,15 +484,15 @@ class Pipeline:
             
             # Final timing summary
             total_elapsed = time.time() - pipeline_start_time
-            print(f"\n{'='*80}")
+            pass
             logger.info("[TIMING] PIPELINE COMPLETED SUCCESSFULLY")
-            print(f"{'='*80}")
-            print(f"   Analysis ID: {self.analysis_id}")
-            print(f"   Final hypotheses: {scored_hypotheses.total_count}")
-            print(f"   Total time: {total_elapsed:.2f}s ({total_elapsed/60:.2f} minutes)")
-            print(f"   Completed at: {datetime.now().strftime('%H:%M:%S')}")
-            print(f"   Warnings: {len(self.warnings)}")
-            print(f"{'='*80}\n")
+            pass
+            pass
+            pass
+            pass
+            pass
+            pass
+            pass
             logger.info(f"Pipeline analysis complete (ID: {self.analysis_id}) in {total_elapsed:.2f}s")
             
             return {
@@ -504,9 +504,9 @@ class Pipeline:
             }
             
         except Exception as e:
-            print(f"[PIPELINE DEBUG] *** PIPELINE FAILED ***")
+            pass
             logger.info(f"[PIPELINE DEBUG] Error: {str(e)}")
-            print(f"[PIPELINE DEBUG] Analysis ID: {self.analysis_id}")
+            pass
             logger.error(f"Pipeline execution failed: {str(e)}")
             import traceback
             traceback.print_exc()
@@ -514,7 +514,7 @@ class Pipeline:
             try:
                 await self._update_progress("Error", 0, f"Pipeline failed: {str(e)}")
             except Exception as progress_error:
-                print(f"[PIPELINE DEBUG] Error updating progress: {progress_error}")
+                pass
                 
             raise PipelineError(f"Pipeline execution failed: {str(e)}")
     
@@ -633,11 +633,11 @@ class Pipeline:
     ) -> FinalPathwayResult:
         """Run Stage 2c: Pathway Aggregation."""
         logger.info("Running Stage 2c: Pathway Aggregation")
-        print(f"[STAGE 2C DEBUG] Starting aggregation with {secondary_result.total_secondary_count} pathways")
+        pass
         
         try:
             final_result = self.aggregator.aggregate(secondary_result, primary_result=primary_result)
-            print(f"[STAGE 2C DEBUG] Aggregation returned {final_result.total_count} final pathways")
+            pass
             
             self.results["stage_2c"] = {
                 "final_pathways": final_result.total_count,
@@ -648,7 +648,7 @@ class Pipeline:
                 logger.warning("Stage 2c produced 0 final pathways")
                 self.warnings.append("No final pathways after aggregation")
             
-            print(f"[STAGE 2C DEBUG] Returning result")
+            pass
             return final_result
             
         except Exception as e:
@@ -672,12 +672,12 @@ class Pipeline:
     async def _run_stage_5_scoring(self, final_result: FinalPathwayResult, clinical_evidence_result: Optional['ClinicalEvidenceResult']) -> ScoredHypotheses:
         """Run Stage 5a: Final NES Scoring."""
         logger.info("Running Stage 5a: Final NES Scoring")
-        print(f"[STAGE 5a DEBUG] Starting NES scoring with {final_result.total_count} pathways")
+        pass
         
         try:
             # Pass None for clinical evidence (Stage 3 removed)
             scored_hypotheses = self.nes_scorer.score(final_result, None)
-            print(f"[STAGE 5a DEBUG] NES scoring returned {scored_hypotheses.total_count} hypotheses")
+            pass
             
             # Note: Stage 5a results will be stored AFTER Stage 4a semantic filtering
             # to include cardiac_relevance scores in the final output
@@ -885,7 +885,7 @@ class Pipeline:
         logger.info("Running Stage 4b: Enhanced Biological Validation")
         
         try:
-            print(f"[STAGE 3C DEBUG] Starting enhanced validation...")
+            pass
             logger.info(f"Stage 3c: Processing top 25 of {scored_hypotheses.total_count} hypotheses for enhanced validation")
             
             # Get all genes for permutation testing
@@ -894,7 +894,7 @@ class Pipeline:
             fn_genes = [g.symbol for g in fn.neighbors] if fn.neighbors else []
             all_genes = list(set(seed_gene_symbols + fn_genes))
             
-            print(f"[STAGE 3C DEBUG] Gene counts - seed: {len(seed_gene_symbols)}, neighbors: {len(fn_genes)}, total: {len(all_genes)}")
+            pass
             
             # Calculate gene degrees from functional neighborhood for degree-preserving permutation
             # Degree = number of connections each gene has in the network
@@ -906,28 +906,28 @@ class Pipeline:
                     gene_degrees[gene1] = gene_degrees.get(gene1, 0) + 1
                     gene_degrees[gene2] = gene_degrees.get(gene2, 0) + 1
                 logger.info(f"Calculated degrees for {len(gene_degrees)} genes from network")
-                print(f"[STAGE 3C DEBUG] Calculated degrees for {len(gene_degrees)} genes")
+                pass
             else:
                 # Fallback: assign uniform degree if no interaction data
                 for gene in all_genes:
                     gene_degrees[gene] = 1
                 logger.warning("No interaction data available, using uniform degrees")
-                print(f"[STAGE 3C DEBUG] Using uniform degrees for {len(all_genes)} genes")
+                pass
             
             # Track statistics
             tissue_filtered = 0
             high_druggability = 0
             
-            print(f"[STAGE 3C DEBUG] Starting hypothesis processing...")
+            pass
             
             # Limit enhanced validation to top 50 hypotheses for speed optimization
             top_hypotheses = scored_hypotheses.hypotheses[:50]
-            print(f"[STAGE 3C DEBUG] Limiting enhanced validation to top {len(top_hypotheses)} hypotheses")
+            pass
             
             # Process each hypothesis
             for i, hypothesis in enumerate(top_hypotheses):
                 if i % 10 == 0:  # Progress every 10 hypotheses
-                    print(f"[STAGE 3C DEBUG] Processing hypothesis {i+1}/{len(top_hypotheses)}")
+                    pass
                     
                 try:
                     pathway_genes = hypothesis.aggregated_pathway.pathway.evidence_genes
@@ -1016,7 +1016,7 @@ class Pipeline:
                 }
             }
             
-            print(f"[STAGE 3C DEBUG] Enhanced validation completed successfully")
+            pass
             logger.info(
                 f"Stage 3c complete: Enhanced validation applied to top {len(top_hypotheses)} hypotheses, "
                 f"{tissue_filtered} low cardiac expression, "
@@ -1045,7 +1045,7 @@ class Pipeline:
         """Run Stage 7: Topology Analysis."""
         topo_msg = "Running Stage 7: Topology Analysis"
         logger.info(topo_msg)
-        print(f"[STAGE 7 DEBUG] {topo_msg}", flush=True)
+        pass
         
         try:
             topology_result = self.topology_analyzer.analyze(
@@ -1073,7 +1073,7 @@ class Pipeline:
         """Run Stage 6a: Literature Validation."""
         lit_msg = "Running Stage 6a: Literature Validation"
         logger.info(lit_msg)
-        print(f"[STAGE 6A DEBUG] {lit_msg}", flush=True)
+        pass
         
         try:
             literature_evidence = await self.literature_miner.validate_hypotheses_async(
@@ -1119,7 +1119,7 @@ class Pipeline:
         """
         multi_msg = "Running Stage 4.5: Multi-Evidence Validation"
         logger.info(multi_msg)
-        print(f"[STAGE 4 DEBUG] {multi_msg}", flush=True)
+        pass
         
         try:
             validation_scores = {}
@@ -1203,16 +1203,16 @@ class Pipeline:
         """
         stage_msg = "Running Stage 6b: Seed Gene Traceability & Literature Association"
         logger.info(stage_msg)
-        print(f"[STAGE 6B DEBUG] {stage_msg}", flush=True)
-        print(f"[STAGE 6B DEBUG] Starting seed gene tracing and literature association", flush=True)
-        print(f"[STAGE 4 DEBUG] Input: {scored_hypotheses.total_count} hypotheses, {len(seed_genes)} seed genes", flush=True)
-        print(f"[STAGE 4 DEBUG] Seed genes: {[g.symbol for g in seed_genes][:10]}{'...' if len(seed_genes) > 10 else ''}", flush=True)
-        print(f"[STAGE 4 DEBUG] Primary pathways available: {len(primary_result.primary_pathways)}", flush=True)
+        pass
+        pass
+        pass
+        pass
+        pass
         
         try:
             # Trace seed genes to pathways
             trace_msg = f"[STAGE 4 DEBUG] Step 1: Tracing seed genes to pathways..."
-            print(trace_msg, flush=True)
+            pass
             logger.info(f"Tracing {len(seed_genes)} seed genes to {scored_hypotheses.total_count} hypotheses")
             
             traced_hypotheses = self.seed_gene_tracer.trace_seed_genes_to_pathways(
@@ -1223,14 +1223,14 @@ class Pipeline:
             )
             
             scored_hypotheses.hypotheses = traced_hypotheses
-            print(f"[STAGE 4 DEBUG] Step 1 complete: Seed gene tracing finished")
+            pass
             
             # Check literature associations with enhanced visibility
             step2_msg = f"[STAGE 4 DEBUG] Step 2: Checking literature associations..."
-            print(step2_msg, flush=True)
+            pass
             max_lit_check = min(50, scored_hypotheses.total_count)
             lit_msg = f"[STAGE 4 DEBUG] Will check literature for top {max_lit_check} hypotheses"
-            print(lit_msg, flush=True)
+            pass
             logger.info(f"Checking literature associations for top {max_lit_check} hypotheses")
             
             # This will trigger our enhanced debug output from seed_gene_tracer
@@ -1241,10 +1241,10 @@ class Pipeline:
             
             scored_hypotheses.hypotheses = literature_checked_hypotheses
             complete_msg = f"[STAGE 4 DEBUG] Step 2 complete: Literature association checking finished"
-            print(complete_msg, flush=True)
+            pass
             
             # Store results with detailed statistics
-            print(f"[STAGE 4 DEBUG] Calculating final statistics...")
+            pass
             
             try:
                 traced_count = sum(1 for h in scored_hypotheses.hypotheses if h.traced_seed_genes)
@@ -1253,14 +1253,14 @@ class Pipeline:
                     if h.literature_associations.get('has_literature_support', False)
                 )
             except AttributeError as e:
-                print(f"[STAGE 4 DEBUG] Error accessing hypothesis attributes: {e}")
+                pass
                 traced_count = 0
                 lit_support_count = 0
             
-            print(f"[STAGE 4 DEBUG] Final statistics:")
-            print(f"[STAGE 4 DEBUG]   - Total hypotheses: {scored_hypotheses.total_count}")
-            print(f"[STAGE 4 DEBUG]   - Traced hypotheses: {traced_count}")
-            print(f"[STAGE 4 DEBUG]   - Hypotheses with literature: {lit_support_count}")
+            pass
+            pass
+            pass
+            pass
             
             self.results["stage_4_6_seed_tracing"] = {
                 "hypotheses_traced": traced_count,
@@ -1268,7 +1268,7 @@ class Pipeline:
                 "total_hypotheses": scored_hypotheses.total_count
             }
             
-            print(f"[STAGE 4 DEBUG] Stage 4.6 completely finished")
+            pass
             logger.info(
                 f"Stage 4.6 complete: {traced_count} hypotheses traced, "
                 f"{lit_support_count} with literature support"
@@ -1281,17 +1281,17 @@ class Pipeline:
             return scored_hypotheses
             
         except Exception as e:
-            print(f"[STAGE 4 DEBUG] Stage 4.6 failed with error: {str(e)}")
+            pass
             logger.error(f"Stage 4.6 seed tracing failed: {str(e)}")
             import traceback
             traceback.print_exc()
             self.warnings.append(f"Seed gene tracing failed: {str(e)}")
-            print(f"[STAGE 4 DEBUG] Returning original hypotheses due to error")
+            pass
             return scored_hypotheses
     
     async def _generate_reports(self, *args) -> Dict[str, str]:
         """Generate analysis reports."""
-        print(f"[PIPELINE DEBUG] Starting report generation phase")
+        pass
         logger.info("Generating reports")
         logger.info(f"[PIPELINE DEBUG] Report generation arguments received: {len(args)} items")
         

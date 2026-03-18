@@ -64,9 +64,9 @@ export default function LiteratureEvidenceDisplay({
   // ── Step 1: collect all citations from every possible source ──────────────
   const citationMap = new Map<string, Citation>();
 
-  // Priority 1: structured top_citations with full metadata (stage_4_literature)
+  // Priority 1: full Citation objects embedded in each hypothesis by the backend
   const topCitations: any[] =
-    allResults?.stage_4_literature?.[pathwayId]?.top_citations ||
+    hypothesis?.citations ||
     allResults?.stage_4_literature?.hypothesis_citations?.[pathwayId] ||
     allResults?.literature?.hypothesis_citations?.[pathwayId] ||
     hypothesis?.literature_evidence?.citations ||
@@ -134,11 +134,7 @@ export default function LiteratureEvidenceDisplay({
     (hypothesis?.literature_evidence?.total_citations ?? 0) > 0 ||
     allCitations.length > 0;
 
-  const totalCount =
-    literatureAssociations?.total_citations ||
-    hypothesis?.literature_evidence?.total_citations ||
-    allCitations.length ||
-    0;
+  const totalCount = allCitations.length || 0;
 
   return (
     <Card elevation={2} sx={{ mb: 3 }}>

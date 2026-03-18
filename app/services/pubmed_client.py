@@ -73,7 +73,6 @@ class PubMedClient:
             List of PMIDs as strings
         """
         try:
-            print(f"[PUBMED HTTP FALLBACK] Searching for: {query[:100]}...", flush=True)
             
             params = {
                 'db': 'pubmed',
@@ -94,11 +93,9 @@ class PubMedClient:
                 if id_elem.text:
                     pmids.append(id_elem.text.strip())
             
-            print(f"[PUBMED HTTP FALLBACK] Found {len(pmids)} PMIDs", flush=True)
             return pmids
             
         except Exception as e:
-            print(f"[PUBMED HTTP FALLBACK ERROR] Failed: {str(e)}", flush=True)
             return []
     
     @retry(
@@ -120,7 +117,6 @@ class PubMedClient:
             return []
             
         try:
-            print(f"[PUBMED HTTP FALLBACK] Fetching {len(pmids)} papers", flush=True)
             
             params = {
                 'db': 'pubmed',
@@ -142,14 +138,11 @@ class PubMedClient:
                     if paper:
                         papers.append(paper)
                 except Exception as e:
-                    print(f"[PUBMED WARNING] Failed to parse article: {str(e)}", flush=True)
                     continue
             
-            print(f"[PUBMED HTTP FALLBACK] Parsed {len(papers)} papers", flush=True)
             return papers
             
         except Exception as e:
-            print(f"[PUBMED HTTP FALLBACK ERROR] Fetch failed: {str(e)}", flush=True)
             return []
     
     def _parse_xml_article(self, article_elem) -> Optional[Dict[str, Any]]:
@@ -205,7 +198,6 @@ class PubMedClient:
             }
             
         except Exception as e:
-            print(f"[PUBMED WARNING] Error parsing XML article: {str(e)}", flush=True)
             return None
     
     def search(
@@ -376,14 +368,10 @@ class PubMedClient:
             return pmids
             
         except HTTPError as e:
-            print(f"[PUBMED WARNING] Bio.Entrez HTTP error {e.code}: {e.reason}", flush=True)
             if e.code == 502:
-                print("[PUBMED DEBUG] 502 error detected, trying HTTP fallback...", flush=True)
                 return self._search_pubmed_with_http_fallback(query, max_results)
             raise
         except (URLError, socket.error) as e:
-            print(f"[PUBMED WARNING] Bio.Entrez connectivity error: {str(e)}", flush=True)
-            print("[PUBMED DEBUG] Trying HTTP fallback...", flush=True)
             return self._search_pubmed_with_http_fallback(query, max_results)
         except Exception as e:
             error_str = str(e).lower()
@@ -478,23 +466,27 @@ class PubMedClient:
             
             authors_str = ", ".join(authors) if authors else ""
             
-            # Extract publication year
-            pub_date = article.get("Journal", {}).get("JournalIssue", {}).get("PubDate", {})
+            # Extract publication year and journal
+            journal_info = article.get("Journal", {})
+            pub_date = journal_info.get("JournalIssue", {}).get("PubDate", {})
             year = pub_date.get("Year")
             if not year:
                 # Try MedlineDate
                 medline_date = pub_date.get("MedlineDate", "")
                 if medline_date:
                     year = medline_date.split()[0] if medline_date.split() else None
-            
+
             year = int(year) if year and year.isdigit() else None
-            
+
+            journal = journal_info.get("Title", "") or journal_info.get("ISOAbbreviation", "") or ""
+
             return {
                 "pmid": pmid,
                 "title": title,
                 "abstract": abstract,
                 "authors": authors_str,
-                "year": year
+                "year": year,
+                "journal": journal,
             }
             
         except Exception as e:
@@ -590,7 +582,8 @@ class PubMedClient:
                 db="pubmed",
                 id=batch_pmids,
                 rettype="medline",
-                retmode="xml"
+                retmode="xml",
+                retmax=len(batch_pmids)
             )
             
             records = Entrez.read(handle)

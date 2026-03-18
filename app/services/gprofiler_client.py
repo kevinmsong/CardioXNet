@@ -57,7 +57,7 @@ class GProfilerClient:
             f"Querying g:Profiler for {len(gene_symbols)} genes, "
             f"sources: {sources}, FDR threshold: {fdr_threshold}"
         )
-        print(f"[GPROFILER] Querying with genes: {gene_symbols[:10] if len(gene_symbols) > 10 else gene_symbols}")
+        pass
         
         # Retry logic for 503 errors
         max_retries = 3
@@ -66,7 +66,7 @@ class GProfilerClient:
         for attempt in range(max_retries):
             try:
                 if attempt > 0:
-                    print(f"[GPROFILER] Retry attempt {attempt + 1}/{max_retries}...")
+                    pass
                     logger.info(f"g:Profiler retry attempt {attempt + 1}/{max_retries}")
                 
                 # Query using official g:Profiler library
@@ -85,9 +85,9 @@ class GProfilerClient:
                 logger.info(
                     f"Retrieved {len(pathways)} significant pathways from g:Profiler"
                 )
-                print(f"[GPROFILER] Retrieved {len(pathways)} pathways")
+                pass
                 if pathways:
-                    print(f"[GPROFILER] First pathway genes: {pathways[0].evidence_genes[:5] if len(pathways[0].evidence_genes) > 5 else pathways[0].evidence_genes}")
+                    pass
                 
                 return pathways
                 
@@ -102,20 +102,20 @@ class GProfilerClient:
                             f"g:Profiler returned 503 (attempt {attempt + 1}/{max_retries}). "
                             f"Retrying in {wait_time}s..."
                         )
-                        print(f"\n[GPROFILER RETRY] Service unavailable (attempt {attempt + 1}/{max_retries})")
-                        print(f"[GPROFILER RETRY] Waiting {wait_time} seconds before retry...\n")
+                        pass
+                        pass
                         time.sleep(wait_time)
                         continue
                     else:
                         logger.error(f"g:Profiler unavailable after {max_retries} attempts")
-                        print(f"[GPROFILER ERROR] Service unavailable after {max_retries} attempts")
+                        pass
                         raise APIClientError(
                             f"g:Profiler service temporarily unavailable. Please try again in a few minutes."
                         )
                 else:
                     # Non-503 error, don't retry
                     logger.error(f"g:Profiler query failed: {error_msg}")
-                    print(f"[GPROFILER ERROR] {error_msg}")
+                    pass
                     raise APIClientError(f"g:Profiler query failed: {error_msg}")
 
     def close(self):

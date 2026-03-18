@@ -68,8 +68,8 @@ class LiteratureMiner:
             literature_msg = f"Validating top {top_n} hypotheses using seed gene-specific literature mining"
         
         logger.info(literature_msg)
-        print(f"[LITERATURE DEBUG] {literature_msg}", flush=True)
-        print(f"[LITERATURE DEBUG] Processing {len(hypotheses_to_process)} of {len(hypotheses)} total hypotheses", flush=True)
+        pass
+        pass
         
         hypothesis_citations = {}
         
@@ -83,9 +83,9 @@ class LiteratureMiner:
             if not contributing_seed_symbols:
                 # Fallback to all seed genes if tracing not available
                 contributing_seed_symbols = [gene.symbol for gene in seed_genes]
-                print(f"[LITERATURE DEBUG] No traced seed genes for hypothesis {i}, using all {len(contributing_seed_symbols)} seed genes", flush=True)
+                pass
             else:
-                print(f"[LITERATURE DEBUG] Hypothesis {i} contributed by {len(contributing_seed_symbols)} specific seed genes: {', '.join(contributing_seed_symbols)}", flush=True)
+                pass
             
             # Convert symbols back to GeneInfo objects for the contributing genes
             contributing_genes = [
@@ -96,8 +96,8 @@ class LiteratureMiner:
             # Detailed progress output
             progress_msg = f"Hypothesis {i} of {top_n}: Literature search for '{pathway_name}' + {len(contributing_genes)} contributing seed genes"
             logger.info(progress_msg)
-            print(f"[LITERATURE DEBUG] {progress_msg}", flush=True)
-            print(f"[LITERATURE DEBUG] Pathway ID: {pathway_id}", flush=True)
+            pass
+            pass
             
             try:
                 citations = self._mine_hypothesis_literature(
@@ -112,12 +112,12 @@ class LiteratureMiner:
                 
                 result_msg = f"Hypothesis {i}/{len(hypotheses_to_process)} complete: Found {len(citations)} citations for '{pathway_name}' + {len(contributing_genes)} seed genes"
                 logger.info(result_msg)
-                print(f"[LITERATURE SUCCESS] {result_msg}", flush=True)
+                pass
                 
             except Exception as e:
                 error_msg = f"Hypothesis {i}/{len(hypotheses_to_process)} failed: Literature mining failed for '{pathway_name}': {str(e)}"
                 logger.error(error_msg)
-                print(f"[LITERATURE ERROR] {error_msg}", flush=True)
+                pass
                 hypothesis_citations[pathway_id] = []
         
         result = LiteratureEvidence(
@@ -130,13 +130,13 @@ class LiteratureMiner:
         
         completion_msg = f"Literature validation complete for {len(hypothesis_citations)} hypotheses"
         logger.info(completion_msg)
-        print(f"[LITERATURE COMPLETE] {completion_msg}", flush=True)
-        print(f"[LITERATURE SUMMARY] Total citations found: {total_citations}", flush=True)
-        print(f"[LITERATURE SUMMARY] Hypotheses with citations: {hypotheses_with_citations}/{len(hypothesis_citations)}", flush=True)
+        pass
+        pass
+        pass
         
         if hypotheses_with_citations > 0:
             avg_citations = total_citations / hypotheses_with_citations
-            print(f"[LITERATURE SUMMARY] Average citations per supported hypothesis: {avg_citations:.1f}", flush=True)
+            pass
         
         return result
     
@@ -173,9 +173,9 @@ class LiteratureMiner:
             literature_msg = f"Validating top {top_n} hypotheses using parallel seed gene-specific literature mining"
         
         logger.info(literature_msg)
-        print(f"[LITERATURE DEBUG] {literature_msg}", flush=True)
-        print(f"[LITERATURE DEBUG] Processing {len(hypotheses_to_process)} of {len(hypotheses)} total hypotheses", flush=True)
-        print(f"[LITERATURE DEBUG] Using max_concurrent={max_concurrent} parallel searches", flush=True)
+        pass
+        pass
+        pass
         
         hypothesis_citations = {}
         
@@ -190,9 +190,9 @@ class LiteratureMiner:
             if not contributing_seed_symbols:
                 # Fallback to all seed genes if tracing not available
                 contributing_seed_symbols = [gene.symbol for gene in seed_genes]
-                print(f"[LITERATURE DEBUG] No traced seed genes for hypothesis {i}, using all {len(contributing_seed_symbols)} seed genes", flush=True)
+                pass
             else:
-                print(f"[LITERATURE DEBUG] Hypothesis {i} contributed by {len(contributing_seed_symbols)} specific seed genes: {', '.join(contributing_seed_symbols)}", flush=True)
+                pass
             
             # Convert symbols back to GeneInfo objects for the contributing genes
             contributing_genes = [
@@ -211,8 +211,8 @@ class LiteratureMiner:
             async with semaphore:
                 progress_msg = f"Hypothesis {i} of {len(hypotheses_to_process)}: Literature search for '{pathway_name}' + {len(contributing_genes)} contributing seed genes"
                 logger.info(progress_msg)
-                print(f"[LITERATURE DEBUG] {progress_msg}", flush=True)
-                print(f"[LITERATURE DEBUG] Pathway ID: {pathway_id}", flush=True)
+                pass
+                pass
                 
                 try:
                     # Run the synchronous literature mining in a thread pool
@@ -229,14 +229,14 @@ class LiteratureMiner:
                     
                     result_msg = f"Hypothesis {i}/{len(hypotheses_to_process)} complete: Found {len(citations)} citations for '{pathway_name}' + {len(contributing_genes)} seed genes"
                     logger.info(result_msg)
-                    print(f"[LITERATURE SUCCESS] {result_msg}", flush=True)
+                    pass
                     
                     return pathway_id, citations
                     
                 except Exception as e:
                     error_msg = f"Hypothesis {i}/{len(hypotheses_to_process)} failed: Literature mining failed for '{pathway_name}': {str(e)}"
                     logger.error(error_msg)
-                    print(f"[LITERATURE ERROR] {error_msg}", flush=True)
+                    pass
                     return pathway_id, []
         
         # Execute all tasks concurrently
@@ -256,13 +256,13 @@ class LiteratureMiner:
         
         completion_msg = f"Parallel literature validation complete for {len(hypothesis_citations)} hypotheses"
         logger.info(completion_msg)
-        print(f"[LITERATURE COMPLETE] {completion_msg}", flush=True)
-        print(f"[LITERATURE SUMMARY] Total citations found: {total_citations}", flush=True)
-        print(f"[LITERATURE SUMMARY] Hypotheses with citations: {hypotheses_with_citations}/{len(hypothesis_citations)}", flush=True)
+        pass
+        pass
+        pass
         
         if hypotheses_with_citations > 0:
             avg_citations = total_citations / hypotheses_with_citations
-            print(f"[LITERATURE SUMMARY] Average citations per supported hypothesis: {avg_citations:.1f}", flush=True)
+            pass
         
         return result
     
@@ -287,22 +287,22 @@ class LiteratureMiner:
         """
         # Show gene context for this pathway search
         gene_symbols = [gene.symbol for gene in seed_genes[:5]]  # Show up to 5 genes
-        print(f"[LITERATURE SEARCH] Searching with genes: {', '.join(gene_symbols)}", flush=True)
+        pass
         
         # Construct search query with seed genes + pathway terms
         query = self._construct_query(pathway_name, seed_genes, disease_context, disease_synonyms)
         
-        print(f"[LITERATURE SEARCH] PubMed query: {query[:100]}{'...' if len(query) > 100 else ''}", flush=True)
+        pass
         logger.debug(f"Literature query: {query}")
         
         # Search PubMed
-        print(f"[LITERATURE SEARCH] Querying PubMed...", flush=True)
+        pass
         papers = self._search_pubmed(query)
         
-        print(f"[LITERATURE SEARCH] Retrieved {len(papers)} papers from PubMed", flush=True)
+        pass
         
         # Calculate relevance scores and create citations
-        print(f"[LITERATURE SEARCH] Creating citations and calculating relevance scores...", flush=True)
+        pass
         citations = self._create_citations(papers, pathway_name, seed_genes)
         
         # Sort by relevance score
@@ -310,9 +310,9 @@ class LiteratureMiner:
         
         if citations:
             top_score = citations[0].relevance_score
-            print(f"[LITERATURE SEARCH] Citations created: {len(citations)}, top relevance score: {top_score:.3f}", flush=True)
+            pass
         else:
-            print(f"[LITERATURE SEARCH] No citations created from {len(papers)} papers", flush=True)
+            pass
         
         return citations
     
@@ -342,22 +342,22 @@ class LiteratureMiner:
         """
         # Show which seed genes are being used for this specific hypothesis
         gene_symbols = [gene.symbol for gene in contributing_seed_genes]
-        print(f"[HYPOTHESIS LITERATURE] Hypothesis {hypothesis_id}: Searching literature for '{pathway_name}' + {len(gene_symbols)} contributing genes: {', '.join(gene_symbols)}", flush=True)
+        pass
         
         # Construct targeted query with only contributing seed genes
         query = self._construct_hypothesis_query(pathway_name, contributing_seed_genes, disease_context, disease_synonyms)
         
-        print(f"[HYPOTHESIS LITERATURE] Targeted PubMed query: {query[:150]}{'...' if len(query) > 150 else ''}", flush=True)
+        pass
         logger.debug(f"Hypothesis literature query for {hypothesis_id}: {query}")
         
         # Search PubMed with hypothesis-specific query
-        print(f"[HYPOTHESIS LITERATURE] Querying PubMed for hypothesis {hypothesis_id}...", flush=True)
+        pass
         papers = self._search_pubmed(query)
         
-        print(f"[HYPOTHESIS LITERATURE] Retrieved {len(papers)} papers for hypothesis {hypothesis_id}", flush=True)
+        pass
         
         # Calculate relevance scores with hypothesis-specific context
-        print(f"[HYPOTHESIS LITERATURE] Creating citations with hypothesis-specific relevance scoring...", flush=True)
+        pass
         citations = self._create_hypothesis_citations(papers, pathway_name, contributing_seed_genes, hypothesis_id)
         
         # Sort by relevance score
@@ -365,9 +365,9 @@ class LiteratureMiner:
         
         if citations:
             top_score = citations[0].relevance_score
-            print(f"[HYPOTHESIS LITERATURE] Hypothesis {hypothesis_id}: {len(citations)} citations created, top relevance: {top_score:.3f}", flush=True)
+            pass
         else:
-            print(f"[HYPOTHESIS LITERATURE] Hypothesis {hypothesis_id}: No citations created from {len(papers)} papers", flush=True)
+            pass
         
         return citations
     
@@ -394,19 +394,14 @@ class LiteratureMiner:
         gene_symbols = [gene.symbol for gene in contributing_seed_genes]
 
         if gene_symbols:
-            gene_query = " OR ".join([f'"{gene}"[Title/Abstract]' for gene in gene_symbols[:8]])
+            gene_query = " OR ".join([f'{gene}[Title/Abstract]' for gene in gene_symbols[:8]])
         else:
             gene_query = "gene[Title/Abstract]"
 
-        # Broad cardiovascular context — OR'd so any cardiac term qualifies
-        cardiac_keywords = ["cardiovascular", "cardiac", "heart", "myocardial", "cardiomyopathy"]
-        keyword_query = " OR ".join([f'{kw}[Title/Abstract]' for kw in cardiac_keywords])
-
-        # Genes AND cardiovascular context — no exact pathway-name phrase required
-        # (Reactome/GO names almost never appear verbatim in abstract text)
-        query = f"({gene_query}) AND ({keyword_query})"
-
-        return query
+        # Search only by gene — cardiac relevance ranking handles prioritisation.
+        # Adding an AND cardiac-keyword clause is too restrictive for genes that
+        # are not primarily annotated as cardiac in the literature.
+        return gene_query
     
     def _create_hypothesis_citations(
         self,
@@ -429,13 +424,13 @@ class LiteratureMiner:
         """
         citations = []
         
-        print(f"[HYPOTHESIS CITATIONS] Processing {len(papers)} papers for hypothesis {hypothesis_id}...", flush=True)
+        pass
         
         for i, paper in enumerate(papers, 1):
             # Show progress for citation creation
             if i <= 3 or i % 10 == 0 or i == len(papers):
                 title_preview = self._console_safe(paper.get("title", "No title"), limit=50)
-                print(f"[HYPOTHESIS CITATIONS] Hypothesis {hypothesis_id} paper {i}/{len(papers)}: {title_preview}...", flush=True)
+                pass
             
             # Calculate hypothesis-specific relevance score
             relevance_score = self._calculate_hypothesis_relevance(
@@ -451,7 +446,9 @@ class LiteratureMiner:
                 title=paper.get("title", ""),
                 authors=paper.get("authors", ""),
                 year=paper.get("year", 0),
-                relevance_score=relevance_score
+                relevance_score=relevance_score,
+                journal=paper.get("journal", "") or None,
+                abstract=paper.get("abstract", "") or None,
             )
             
             citations.append(citation)
@@ -460,9 +457,9 @@ class LiteratureMiner:
             if relevance_score > 0.7:
                 contributing_genes_str = ", ".join([g.symbol for g in contributing_seed_genes])
                 title_preview = self._console_safe(paper.get("title", ""), limit=60)
-                print(f"[HIGH HYPOTHESIS RELEVANCE] {hypothesis_id}: Score {relevance_score:.3f} (genes: {contributing_genes_str}) - {title_preview}...", flush=True)
+                pass
         
-        print(f"[HYPOTHESIS CITATIONS] Hypothesis {hypothesis_id}: Created {len(citations)} citations", flush=True)
+        pass
         return citations
     
     def _calculate_hypothesis_relevance(
@@ -574,7 +571,7 @@ class LiteratureMiner:
         ][:3]
 
         gene_symbols = [gene.symbol for gene in seed_genes[:8]]
-        gene_query = " OR ".join([f'"{g}"[Title/Abstract]' for g in gene_symbols])
+        gene_query = " OR ".join([f'{g}[Title/Abstract]' for g in gene_symbols])
 
         cardiac_keywords = ["cardiovascular", "cardiac", "heart", "myocardial", "cardiomyopathy"]
         keyword_query = " OR ".join([f'{kw}[Title/Abstract]' for kw in cardiac_keywords])
@@ -598,25 +595,24 @@ class LiteratureMiner:
             List of paper dictionaries
         """
         try:
-            max_results = 50
-            print(f"[PUBMED SEARCH] Searching for up to {max_results} papers...", flush=True)
-            
+            max_results = 100
+
             papers = self.pubmed_client._search_pubmed(query, max_results=max_results)
             
             if papers:
-                print(f"[PUBMED SEARCH] Found {len(papers)} PMIDs, fetching paper details...", flush=True)
+                pass
                 # Fetch paper details
                 paper_details = self.pubmed_client._fetch_papers(papers)
-                print(f"[PUBMED SEARCH] Successfully fetched details for {len(paper_details)} papers", flush=True)
+                pass
                 return paper_details
             else:
-                print(f"[PUBMED SEARCH] No papers found for this query", flush=True)
+                pass
                 return []
             
         except Exception as e:
             error_msg = f"PubMed search failed: {str(e)}"
             logger.warning(error_msg)
-            print(f"[PUBMED ERROR] {error_msg}", flush=True)
+            pass
             return []
     
     def _create_citations(
@@ -638,13 +634,13 @@ class LiteratureMiner:
         """
         citations = []
         
-        print(f"[CITATION CREATION] Processing {len(papers)} papers to create citations...", flush=True)
+        pass
         
         for i, paper in enumerate(papers, 1):
             # Show progress for citation creation
             if i <= 5 or i % 10 == 0 or i == len(papers):
                 title_preview = self._console_safe(paper.get("title", "No title"), limit=60)
-                print(f"[CITATION CREATION] Processing paper {i}/{len(papers)}: {title_preview}...", flush=True)
+                pass
             
             # Calculate relevance score
             relevance_score = self._calculate_relevance(
@@ -659,7 +655,9 @@ class LiteratureMiner:
                 title=paper.get("title", ""),
                 authors=paper.get("authors", ""),
                 year=paper.get("year", 0),
-                relevance_score=relevance_score
+                relevance_score=relevance_score,
+                journal=paper.get("journal", "") or None,
+                abstract=paper.get("abstract", "") or None,
             )
             
             citations.append(citation)
@@ -667,9 +665,9 @@ class LiteratureMiner:
             # Show high relevance papers
             if relevance_score > 0.7:
                 title_preview = self._console_safe(paper.get("title", ""), limit=80)
-                print(f"[HIGH RELEVANCE] Paper {i}: Score {relevance_score:.3f} - {title_preview}...", flush=True)
+                pass
         
-        print(f"[CITATION CREATION] Created {len(citations)} citations", flush=True)
+        pass
         return citations
     
     def _calculate_relevance(

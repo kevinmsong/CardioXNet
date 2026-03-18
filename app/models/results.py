@@ -310,12 +310,14 @@ class ScoredHypotheses(BaseModel):
 
 class Citation(BaseModel):
     """Literature citation."""
-    
+
     pmid: str = Field(..., description="PubMed ID")
     title: str = Field(..., description="Paper title")
     authors: str = Field(..., description="Author list")
     year: int = Field(..., description="Publication year")
     relevance_score: float = Field(..., description="Relevance score")
+    journal: Optional[str] = Field(None, description="Journal name")
+    abstract: Optional[str] = Field(None, description="Abstract text")
     
     model_config = ConfigDict(
         json_schema_extra={

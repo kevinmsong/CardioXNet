@@ -404,7 +404,7 @@ class SecondaryPathwayAnalyzer:
             
             # If g:Profiler is unavailable, continue with empty results
             if "temporarily unavailable" in str(e).lower() or "503" in str(e):
-                print("[GPROFILER FALLBACK] Service unavailable in secondary analysis")
+                pass
             
             return []
     

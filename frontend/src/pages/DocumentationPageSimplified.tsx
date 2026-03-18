@@ -110,14 +110,14 @@ const PIPELINE_STAGES: PipelineStage[] = [
   {
     num: '09', title: 'Literature Mining', subtitle: 'PubMed evidence', pct: 88, phase: 'validation',
     icon: <Article sx={{ fontSize: 20 }} />,
-    desc: 'PubMed abstract screening — 50 results per seed gene. Traceability linking genes to discovered pathways.',
-    details: ['50 PubMed abstracts per seed gene', 'Gene-to-pathway citation traceability', 'Disease context-guided queries'],
+    desc: 'PubMed abstract screening — up to 100 papers per pathway hypothesis. Gene-only queries maximise recall; relevance scoring ranks cardiac papers highest. Returns title, journal, abstract, and relevance score per citation.',
+    details: ['Up to 100 papers per pathway hypothesis', 'Gene-only query — no cardiac filter bias', 'Titles, journals & abstracts returned'],
   },
   {
     num: '10', title: 'Network Topology Analysis', subtitle: 'Hub gene identification', pct: 93, phase: 'validation',
     icon: <Share sx={{ fontSize: 20 }} />,
-    desc: 'PageRank, betweenness, closeness, and degree centrality on unified PPI network from top pathways.',
-    details: ['PageRank, betweenness, closeness, degree', 'Unified PPI network from top pathways', 'Hub gene scores feed therapeutic target ranking'],
+    desc: 'Five centrality metrics on unified PPI network from top pathways. Hub score = 35% betweenness + 25% PageRank + 20% degree + 15% eigenvector + 5% closeness. Hub scores feed therapeutic target ranking via centrality bonus.',
+    details: ['Betweenness, PageRank, degree, eigenvector, closeness', 'Unified PPI network from top pathways', 'Centrality bonus = hub_score × 0.5 in target ranking'],
   },
   {
     num: '11', title: 'Therapeutic Targets', subtitle: 'Druggable hub genes', pct: 95, phase: 'output',
@@ -461,7 +461,7 @@ export default function DocumentationPageSimplified() {
                     { src: 'STRING v11.5', use: 'PPI networks, 75 neighbors/gene' },
                     { src: 'g:Profiler', use: 'GO:BP, KEGG, Reactome, WikiPathways' },
                     { src: 'GTEx v8', use: 'Cardiac tissue expression (live API)' },
-                    { src: 'PubMed/NCBI', use: 'Literature mining, 50 abstracts/gene' },
+                    { src: 'PubMed/NCBI', use: 'Literature mining, up to 100 papers/hypothesis' },
                     { src: 'DrugBank v5.1.10', use: 'Druggability curated gene lists (Nov 2023)' },
                     { src: 'ChEMBL REST API', use: 'Live drug phase & activity lookup (EBI)' },
                   ].map(({ src, use }) => (
@@ -494,7 +494,7 @@ export default function DocumentationPageSimplified() {
                     { param: 'FDR threshold', value: '≤ 0.05' },
                     { param: 'Permutations', value: '25' },
                     { param: 'Top hypotheses', value: '15' },
-                    { param: 'PubMed per gene', value: '50' },
+                    { param: 'PubMed per hypothesis', value: '100' },
                     { param: 'Jaccard threshold', value: '≥ 0.85' },
                     { param: 'Min fold-enrichment', value: '2.0×' },
                   ].map(({ param, value }) => (

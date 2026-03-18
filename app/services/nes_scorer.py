@@ -60,8 +60,8 @@ class NESScorer:
         Returns:
             ScoredHypotheses with ranked pathway hypotheses
         """
-        print(f"[NES SCORER DEBUG] Received {final_result.total_count} pathways to score")
-        print(f"[NES SCORER DEBUG] final_pathways list length: {len(final_result.final_pathways)}")
+        pass
+        pass
         
         logger.info(
             f"Calculating final NES scores for {final_result.total_count} pathways"
@@ -80,7 +80,7 @@ class NESScorer:
         
         for i, agg_pathway in enumerate(final_result.final_pathways):
             if i < 3:  # Log first 3 pathways
-                print(f"[NES SCORER DEBUG] Processing pathway {i+1}: {agg_pathway.pathway.pathway_name}")
+                pass
             
             # Calculate final NES with optional centrality
             nes_score, components = self._calculate_nes(
@@ -106,7 +106,7 @@ class NESScorer:
             
             scored_pathways.append(scored_pathway)
         
-        print(f"[NES SCORER DEBUG] Scored {len(scored_pathways)} pathways")
+        pass
         
         # Sort by NES score (descending)
         scored_pathways.sort(key=lambda p: p.nes_score, reverse=True)

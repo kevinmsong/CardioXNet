@@ -193,9 +193,6 @@ class SeedGeneTracer:
         Returns:
             Updated scored_hypotheses with literature_associations populated
         """
-        print("\n" + "=" * 60, flush=True)
-        print("[STAGE 4 LITERATURE] Starting Smart Literature Association Checking", flush=True)
-        print("=" * 60, flush=True)
         
         # OPTIMIZATION 1: Filter out generic pathways before checking
         specific_hypotheses = [
@@ -205,7 +202,6 @@ class SeedGeneTracer:
         
         filtered_count = len(scored_hypotheses) - len(specific_hypotheses)
         if filtered_count > 0:
-            print(f"[LITERATURE OPTIMIZATION] Filtered {filtered_count} generic pathways (e.g., 'system process', 'biological process')", flush=True)
             logger.info(f"Filtered {filtered_count} generic pathways to optimize literature mining")
         
         # OPTIMIZATION 2: Only check top N specific pathways
@@ -213,8 +209,6 @@ class SeedGeneTracer:
         
         literature_msg = f"Checking literature for top {len(hypotheses_to_check)} specific pathways (filtered from {len(scored_hypotheses)} total)"
         logger.info(literature_msg)
-        print(f"[LITERATURE DEBUG] {literature_msg}", flush=True)
-        print(f"[LITERATURE OPTIMIZATION] Smart filtering enabled - checking only specific cardiac-relevant pathways", flush=True)
         
         for i, hypothesis in enumerate(hypotheses_to_check, 1):
             pathway_name = hypothesis.aggregated_pathway.pathway.pathway_name
@@ -225,36 +219,28 @@ class SeedGeneTracer:
             # Show hypothesis progress
             progress_msg = f"Hypothesis {i} of {max_hypotheses}: Checking literature for '{pathway_name}'"
             logger.info(progress_msg)
-            print(f"[LITERATURE DEBUG] {progress_msg}", flush=True)
             
             if not seed_genes:
-                print(f"[LITERATURE DEBUG] Hypothesis {i}/{max_hypotheses}: No traced seed genes, skipping", flush=True)
                 hypothesis.literature_associations = {
                     'has_literature_support': False,
                     'associations': []
                 }
                 continue
             
-            print(f"[LITERATURE DEBUG] Hypothesis {i}/{len(hypotheses_to_check)}: Checking {len(seed_genes)} traced seed genes", flush=True)
             
             # Check each seed gene with detailed progress
             associations = []
             for j, seed_gene in enumerate(seed_genes, 1):
-                print(f"[LITERATURE SEARCH] Hypothesis {i}/{len(hypotheses_to_check)}, Gene {j}/{len(seed_genes)}: Searching for '{seed_gene}' + '{pathway_name}'", flush=True)
                 try:
                     query = self._build_pubmed_query(pathway_name, seed_gene)
-                    print(f"[PUBMED QUERY] Hypothesis {i}/{len(hypotheses_to_check)}, Gene {j}/{len(seed_genes)}: {query}", flush=True)
 
                     max_results = 25
-                    print(f"[PUBMED SEARCH] Querying PubMed with max {max_results} results...", flush=True)
                     results = self.pubmed_client.search(
                         query,
                         max_results=max_results
                     )
-                    print(f"[PUBMED RESULT] Retrieved {len(results)} papers", flush=True)
                     
                     if results:
-                        print(f"[LITERATURE SUCCESS] Gene {j}/{len(seed_genes)}: Found {len(results)} papers for '{seed_gene}' + '{pathway_name}'", flush=True)
                         associations.append({
                             'seed_gene': seed_gene,
                             'citation_count': len(results),
@@ -262,7 +248,6 @@ class SeedGeneTracer:
                             'has_support': True
                         })
                     else:
-                        print(f"[LITERATURE INFO] Gene {j}/{len(seed_genes)}: No papers found for '{seed_gene}' + '{pathway_name}'", flush=True)
                         associations.append({
                             'seed_gene': seed_gene,
                             'citation_count': 0,
@@ -273,7 +258,6 @@ class SeedGeneTracer:
                 except Exception as e:
                     error_msg = f"Error checking literature for {pathway_name} + {seed_gene}: {e}"
                     logger.error(error_msg)
-                    print(f"[LITERATURE ERROR] Gene {j}/{len(seed_genes)}: {error_msg}", flush=True)
                     associations.append({
                         'seed_gene': seed_gene,
                         'citation_count': 0,
@@ -297,7 +281,6 @@ class SeedGeneTracer:
             # Show completion status for this hypothesis
             result_msg = f"Hypothesis {i}/{len(hypotheses_to_check)} complete: {supported_genes}/{len(seed_genes)} genes with literature support, {total_citations} total citations"
             logger.debug(f"Pathway {pathway_name}: literature support = {has_support}, citations = {total_citations}")
-            print(f"[LITERATURE SUCCESS] {result_msg}", flush=True)
         
         # Mark remaining hypotheses as not checked (for transparency)
         unchecked_count = len(scored_hypotheses) - len(hypotheses_to_check)
@@ -316,18 +299,11 @@ class SeedGeneTracer:
         hypotheses_with_support = sum(1 for h in hypotheses_to_check if h.literature_associations.get('has_literature_support', False))
         total_citations_found = sum(h.literature_associations.get('total_citations', 0) for h in hypotheses_to_check)
         
-        print("\n" + "=" * 60, flush=True)
         completion_msg = "Smart literature association checking complete"
         logger.info(completion_msg)
-        print(f"[STAGE 4 COMPLETE] {completion_msg}", flush=True)
-        print(f"[LITERATURE SUMMARY] Hypotheses checked: {total_hypotheses_checked} (filtered from {len(scored_hypotheses)} total)", flush=True)
-        print(f"[LITERATURE SUMMARY] Hypotheses with literature support: {hypotheses_with_support}/{total_hypotheses_checked}", flush=True)
-        print(f"[LITERATURE SUMMARY] Total citations found: {total_citations_found}", flush=True)
-        print(f"[LITERATURE OPTIMIZATION] Skipped {unchecked_count} pathways (generic or lower-ranked)", flush=True)
         
         if hypotheses_with_support > 0:
             avg_citations = total_citations_found / hypotheses_with_support
-            print(f"[LITERATURE SUMMARY] Average citations per supported hypothesis: {avg_citations:.1f}", flush=True)
         
         # Calculate estimated time savings
         baseline_queries = len(scored_hypotheses) * 5  # Assume 5 seed genes average
@@ -335,8 +311,6 @@ class SeedGeneTracer:
         saved_queries = baseline_queries - actual_queries
         if saved_queries > 0:
             time_saved_estimate = saved_queries * 2  # Assume ~2 seconds per query
-            print(f"[LITERATURE OPTIMIZATION] Estimated time saved: ~{time_saved_estimate} seconds ({saved_queries} fewer PubMed queries)", flush=True)
         
-        print("=" * 60, flush=True)
         
         return scored_hypotheses

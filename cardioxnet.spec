@@ -15,49 +15,66 @@ frontend_dist = root / "frontend" / "dist"
 
 # ── data files ──────────────────────────────────────────────────────────────
 datas = [
+    # app source — included as plain files so uvicorn's string import works
+    (str(root / "app"), "app"),
     # pre-built React frontend
     (str(frontend_dist), "frontend_dist"),
     # app config
     (str(root / "config"), "config"),
     # pywebview GUI resources
     *collect_data_files("webview"),
+    # scientific / ML data files (fonts, encoders, lookup tables, etc.)
+    *collect_data_files("reportlab"),   # PDF fonts
+    *collect_data_files("jinja2"),      # template resources
+    *collect_data_files("sklearn"),     # sklearn data
+    *collect_data_files("pandas"),      # pandas data
+    *collect_data_files("Bio"),         # BioPython data
+    *collect_data_files("aiohttp"),     # aiohttp mime data
+    *collect_data_files("groq"),        # groq client resources
+    *collect_data_files("scipy"),       # scipy data files
 ]
 
 # ── hidden imports ───────────────────────────────────────────────────────────
 hiddenimports = [
-    # fastapi / starlette internals
+    # uvicorn internals
     "uvicorn.logging",
-    "uvicorn.loops",
-    "uvicorn.loops.auto",
+    "uvicorn.loops", "uvicorn.loops.auto",
     "uvicorn.protocols",
-    "uvicorn.protocols.http",
-    "uvicorn.protocols.http.auto",
-    "uvicorn.protocols.websockets",
-    "uvicorn.protocols.websockets.auto",
-    "uvicorn.lifespan",
-    "uvicorn.lifespan.on",
-    "starlette.routing",
-    "starlette.staticfiles",
-    "starlette.responses",
-    "fastapi.staticfiles",
-    "fastapi.responses",
+    "uvicorn.protocols.http", "uvicorn.protocols.http.auto",
+    "uvicorn.protocols.websockets", "uvicorn.protocols.websockets.auto",
+    "uvicorn.lifespan", "uvicorn.lifespan.on",
+    # fastapi / starlette / pydantic
+    *collect_submodules("fastapi"),
+    *collect_submodules("starlette"),
+    *collect_submodules("pydantic"),
+    *collect_submodules("pydantic_settings"),
     # app modules
     *collect_submodules("app"),
-    # scientific stack
-    "networkx",
-    "networkx.algorithms",
-    "networkx.classes",
-    "sklearn",
-    "scipy",
-    "numpy",
-    "requests",
-    "httpx",
+    # scientific stack — full submodule collection
+    *collect_submodules("networkx"),
+    *collect_submodules("sklearn"),
+    *collect_submodules("scipy"),
+    *collect_submodules("numpy"),
+    *collect_submodules("pandas"),
+    # bioinformatics
+    *collect_submodules("Bio"),
+    # async / HTTP
+    *collect_submodules("aiohttp"),
+    *collect_submodules("httpx"),
+    *collect_submodules("requests"),
+    "anyio", "anyio._backends._asyncio",
+    "h11", "httptools", "watchfiles", "websockets",
+    # data / caching
+    *collect_submodules("diskcache"),
+    *collect_submodules("tenacity"),
+    # AI / report
+    *collect_submodules("groq"),
+    *collect_submodules("reportlab"),
+    *collect_submodules("jinja2"),
+    # g:Profiler
+    "gprofiler",
     # pywebview
-    "webview",
-    "webview.platforms.winforms",
-    "clr",
-    "System",
-    "System.Windows.Forms",
+    "webview", "webview.platforms.winforms",
 ]
 
 # ── analysis ─────────────────────────────────────────────────────────────────

@@ -74,9 +74,9 @@ class PrimaryPathwayAnalyzer:
         
         # DEBUG: Check what genes are in the pathways
         if enriched_pathways:
-            print(f"[STAGE 2A DEBUG] First pathway: {enriched_pathways[0].pathway_name}")
-            print(f"[STAGE 2A DEBUG] Evidence genes: {enriched_pathways[0].evidence_genes[:10] if len(enriched_pathways[0].evidence_genes) > 10 else enriched_pathways[0].evidence_genes}")
-            print(f"[STAGE 2A DEBUG] Evidence count: {enriched_pathways[0].evidence_count}")
+            pass
+            pass
+            pass
         
         # Step 3: Calculate preliminary NES scores
         scored_pathways = self._calculate_nes_scores(enriched_pathways)
@@ -152,8 +152,8 @@ class PrimaryPathwayAnalyzer:
             # This allows the analysis to complete with other data sources
             if "temporarily unavailable" in str(e).lower() or "503" in str(e):
                 logger.warning("g:Profiler unavailable - continuing with empty pathway results")
-                print("\n[GPROFILER FALLBACK] Service unavailable after retries")
-                print("[GPROFILER FALLBACK] Continuing analysis with alternative data sources...\n")
+                pass
+                pass
                 return []  # Return empty list to continue analysis
             
             # For other errors, still raise

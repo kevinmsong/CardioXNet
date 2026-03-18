@@ -61,7 +61,6 @@ class TopologyAnalyzer:
             pathway_id = hypothesis.aggregated_pathway.pathway.pathway_id
             
             logger.info(f"[TOPOLOGY] Analyzing {i}/{min(top_n, len(hypotheses))}: {pathway_id}")
-            print(f"[TOPOLOGY DEBUG] Analyzing pathway {i}/{min(top_n, len(hypotheses))}: {pathway_id}")
             
             try:
                 network_analysis = self._analyze_hypothesis(
@@ -73,13 +72,11 @@ class TopologyAnalyzer:
                 hypothesis_networks[pathway_id] = network_analysis
                 
                 logger.info(f"[TOPOLOGY] Successfully analyzed {pathway_id}: {len(network_analysis.key_nodes)} key nodes")
-                print(f"[TOPOLOGY DEBUG] Found {len(network_analysis.key_nodes)} key nodes for {pathway_id}")
                 
             except Exception as e:
                 logger.error(
                     f"Failed to analyze topology for {pathway_id}: {str(e)}"
                 )
-                print(f"[TOPOLOGY ERROR] Failed for {pathway_id}: {str(e)}")
                 import traceback
                 traceback.print_exc()
                 continue

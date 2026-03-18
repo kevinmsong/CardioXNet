@@ -85,29 +85,24 @@ async def run_analysis(
         Analysis response with analysis ID
     """
     logger.info(f"Starting analysis with {len(request.seed_genes)} seed genes")
-    print(f"[ENDPOINT DEBUG] Starting analysis with {len(request.seed_genes)} genes", flush=True)
     
     try:
-        print("[ENDPOINT DEBUG] About to import Pipeline", flush=True)
         logger.info("[DEBUG] About to import Pipeline")
         # Import unified Pipeline
         from app.services.pipeline import Pipeline
         
-        print("[ENDPOINT DEBUG] Pipeline imported successfully", flush=True)
         logger.info("[DEBUG] Preparing config overrides")
         # Merge disease_context into config_overrides if provided
         config_overrides = request.config_overrides or {}
         if request.disease_context:
             config_overrides['disease_context'] = request.disease_context
         
-        print("[ENDPOINT DEBUG] Creating pipeline instance", flush=True)
         logger.info("[DEBUG] Creating Pipeline instance")
 
         # Create new pipeline instance (apply config overrides so disease_context and other
         # frontend-provided settings are respected by the pipeline instance)
         pipeline = Pipeline(analysis_id=None, config_overrides=config_overrides)
         analysis_id = pipeline.analysis_id
-        print(f"[ENDPOINT DEBUG] Pipeline created with ID: {analysis_id}", flush=True)
         logger.info(f"[DEBUG] Pipeline created with ID: {analysis_id}")
         
         # Store initial state
@@ -264,14 +259,12 @@ async def get_analysis_results(analysis_id: str):
     if not hypotheses and "ranked_hypotheses" in results:
         # Handle analyses loaded from JSON report files
         ranked_hyps = results["ranked_hypotheses"]
-        print(f"[API DEBUG] ranked_hypotheses present: type={type(ranked_hyps)}, len={len(ranked_hyps) if isinstance(ranked_hyps, list) else 'N/A'}", flush=True)
         logger.debug(f"get_analysis_results: ranked_hypotheses present: type={type(ranked_hyps)}, len={len(ranked_hyps) if isinstance(ranked_hyps, list) else 'N/A'}")
         if isinstance(ranked_hyps, list):
             hypotheses = {
                 "hypotheses": ranked_hyps,
                 "total_count": len(ranked_hyps)
             }
-            print(f"[API DEBUG] Set hypotheses from ranked_hypotheses: {len(ranked_hyps)} items", flush=True)
 
     logger.debug(f"get_analysis_results: hypotheses set: {bool(hypotheses)}; total_count={hypotheses.get('total_count') if hypotheses else None}")
     
@@ -653,6 +646,19 @@ def _extract_hypotheses(results: Dict[str, Any]):
     if "stage_3" in results:
         stage_3 = results["stage_3"]
         if isinstance(stage_3, dict) and "hypotheses" in stage_3:
+            # Build per-pathway citation lookup from stage_4_literature
+            lit_citations: Dict[str, list] = {}
+            stage_lit = results.get("stage_4_literature", {})
+            hyp_cit = stage_lit.get("hypothesis_citations", {})
+            for pid, cits in hyp_cit.items():
+                serialized = []
+                for c in cits:
+                    if hasattr(c, "model_dump"):
+                        serialized.append(c.model_dump())
+                    elif isinstance(c, dict):
+                        serialized.append(c)
+                lit_citations[pid] = serialized
+
             # Flatten the hypothesis structure for frontend compatibility
             flattened_hypotheses = []
             for hyp in stage_3["hypotheses"]:
@@ -688,6 +694,7 @@ def _extract_hypotheses(results: Dict[str, Any]):
                     "score_components": hyp.get("score_components", {}),
                     "traced_seed_genes": hyp.get("traced_seed_genes", []),
                     "literature_associations": hyp.get("literature_associations", {}),
+                    "citations": lit_citations.get(pathway_data.get("pathway_id", ""), []),
                     "aggregated_pathway": hyp.get("aggregated_pathway", {}),  # Keep original for details
                     "lineage": lineage,  # NEW: Complete discovery lineage
                 }
@@ -730,14 +737,9 @@ def _run_pipeline_background(pipeline, seed_genes: list, config_overrides: Optio
     
     # Log configuration overrides
     if config_overrides:
-        print(f"[CONFIG DEBUG] Analysis {analysis_id} using {len(config_overrides)} config overrides: {config_overrides}", flush=True)
-        logger.info(f"[CONFIG DEBUG] Analysis {analysis_id} using config overrides: {config_overrides}")
-    else:
-        print(f"[CONFIG DEBUG] Analysis {analysis_id} using default configuration", flush=True)
-    
-    # Ensure logging works in background context
-    print(f"[BACKEND DEBUG] Starting background analysis {analysis_id}", flush=True)
-    logger.info(f"[BACKEND DEBUG] Starting background analysis {analysis_id}")
+        logger.info(f"Analysis {analysis_id} using config overrides: {config_overrides}")
+
+    logger.info(f"Starting background analysis {analysis_id}")
     
     try:
         # Update status
@@ -748,13 +750,11 @@ def _run_pipeline_background(pipeline, seed_genes: list, config_overrides: Optio
             progress=0,
             message="Starting analysis"
         )
-        print(f"[BACKEND DEBUG] Analysis {analysis_id} status updated to running", flush=True)
         
         # Define async progress callback
         async def progress_callback(stage: str, progress: float, message: str):
             # Use both print and logger for maximum visibility
             progress_msg = f"[PROGRESS] {analysis_id}: {stage} - {progress:.1f}% - {message}"
-            print(progress_msg, flush=True)  # Force flush to terminal
             logger.info(progress_msg)
             
             analysis_store.update_analysis(
@@ -768,10 +768,8 @@ def _run_pipeline_background(pipeline, seed_genes: list, config_overrides: Optio
             updated = analysis_store.get_analysis(analysis_id)
             if updated:
                 verify_msg = f"[PROGRESS VERIFIED] {analysis_id}: progress={updated.get('progress')}, stage={updated.get('current_stage')}"
-                print(verify_msg, flush=True)
                 logger.info(verify_msg)
         
-        print(f"[BACKEND DEBUG] About to start pipeline execution for {analysis_id}", flush=True)
         
         # Run pipeline in event loop
         loop = asyncio.new_event_loop()
@@ -781,7 +779,6 @@ def _run_pipeline_background(pipeline, seed_genes: list, config_overrides: Optio
         finally:
             loop.close()
         
-        print(f"[BACKEND DEBUG] Pipeline execution completed for {analysis_id}", flush=True)
         
         # Update analysis store with pipeline results (use the 'results' key returned by pipeline.run)
         analysis_store.update_analysis(
@@ -793,17 +790,13 @@ def _run_pipeline_background(pipeline, seed_genes: list, config_overrides: Optio
         )
         
         completion_msg = f"Analysis {analysis_id} completed successfully"
-        print(f"[BACKEND DEBUG] {completion_msg}", flush=True)
         logger.info(completion_msg)
         
     except Exception as e:
         error_msg = f"Analysis {analysis_id} failed: {str(e)}"
-        print(f"[BACKEND ERROR] {error_msg}", flush=True)
         logger.error(error_msg)
         
         import traceback
-        print(f"[BACKEND ERROR] Traceback:", flush=True)
-        traceback.print_exc()
         
         analysis_store.update_analysis(
             analysis_id,

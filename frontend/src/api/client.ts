@@ -8,8 +8,15 @@ const getBrowserHostname = () => {
   return window.location.hostname || '127.0.0.1';
 };
 
-export const getApiBaseUrl = () =>
-  import.meta.env.VITE_API_URL || `http://${getBrowserHostname()}:8000`;
+export const getApiBaseUrl = () => {
+  if (import.meta.env.VITE_API_URL) return import.meta.env.VITE_API_URL;
+  // When served from the FastAPI backend (packaged exe), use the current page origin
+  // so API calls go to the same host:port instead of hardcoded :8000
+  if (typeof window !== 'undefined' && !import.meta.env.DEV) {
+    return window.location.origin;
+  }
+  return `http://${getBrowserHostname()}:8000`;
+};
 
 export const getApiPath = (path: string) => `${getApiBaseUrl()}${path}`;
 
@@ -19,19 +26,22 @@ export const getWebSocketUrl = (path: string) => {
     if (explicit.startsWith('ws://') || explicit.startsWith('wss://')) {
       return `${explicit}${path}`;
     }
-
     const protocol = typeof window !== 'undefined' && window.location.protocol === 'https:' ? 'wss' : 'ws';
     return `${protocol}://${explicit}${path}`;
+  }
+
+  // In packaged exe, use current page host (host:port) for WebSocket
+  if (typeof window !== 'undefined' && !import.meta.env.DEV) {
+    const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
+    return `${protocol}://${window.location.host}${path}`;
   }
 
   const protocol = typeof window !== 'undefined' && window.location.protocol === 'https:' ? 'wss' : 'ws';
   return `${protocol}://${getBrowserHostname()}:8000${path}`;
 };
 
-const API_BASE_URL = getApiBaseUrl();
-
 export const apiClient = axios.create({
-  baseURL: API_BASE_URL,
+  baseURL: getApiBaseUrl(),
   headers: {
     'Content-Type': 'application/json',
   },

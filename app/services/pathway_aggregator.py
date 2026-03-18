@@ -48,8 +48,8 @@ class PathwayAggregator:
         """
         strategy = strategy or self.settings.nets.aggregation_strategy
         
-        print(f"[AGGREGATOR DEBUG] Starting aggregation with strategy: {strategy}")
-        print(f"[AGGREGATOR DEBUG] Input: {secondary_result.total_secondary_count} pathways")
+        pass
+        pass
         
         logger.info(
             f"Processing {secondary_result.total_secondary_count} secondary pathways "
@@ -84,7 +84,7 @@ class PathwayAggregator:
         else:
             raise ValueError(f"Unknown aggregation strategy: {strategy}")
         
-        print(f"[AGGREGATOR DEBUG] Creating FinalPathwayResult with {len(final_pathways)} pathways")
+        pass
         
         result = FinalPathwayResult(
             final_pathways=final_pathways,
@@ -93,7 +93,7 @@ class PathwayAggregator:
             min_support_threshold=self.settings.nets.min_support_threshold
         )
         
-        print(f"[AGGREGATOR DEBUG] FinalPathwayResult created successfully")
+        pass
         
         logger.info(
             f"Aggregation complete: {len(final_pathways)} final pathways "
@@ -152,10 +152,10 @@ class PathwayAggregator:
         Returns:
             List of aggregated pathways meeting threshold
         """
-        print(f"[AGGREGATOR DEBUG] Filter by support: min_support={min_support}")
-        print(f"[AGGREGATOR DEBUG] Input: {len(secondary_result.aggregated_pathways)} aggregated pathways")
-        print(f"[AGGREGATOR DEBUG] pathway_frequency dict size: {len(secondary_result.pathway_frequency)}")
-        print(f"[AGGREGATOR DEBUG] pathway_support dict size: {len(secondary_result.pathway_support)}")
+        pass
+        pass
+        pass
+        pass
         
         aggregated_pathways = []
         
@@ -164,7 +164,7 @@ class PathwayAggregator:
             support_count = secondary_result.pathway_frequency.get(pathway_id, 0)
             
             if i < 3:  # Log first 3 pathways
-                print(f"[AGGREGATOR DEBUG] Pathway {i+1}: {pathway.pathway_name}, support={support_count}")
+                pass
             
             if support_count >= min_support:
                 supporting_genes = secondary_result.pathway_support.get(pathway_id, [])
@@ -194,7 +194,7 @@ class PathwayAggregator:
                 )
                 aggregated_pathways.append(agg_pathway)
         
-        print(f"[AGGREGATOR DEBUG] After filtering: {len(aggregated_pathways)} pathways with support >= {min_support}")
+        pass
         
         logger.debug(
             f"Intersection strategy: {len(aggregated_pathways)} pathways "
