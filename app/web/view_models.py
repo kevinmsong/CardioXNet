@@ -218,7 +218,8 @@ def csv_rows(resp: Dict[str, Any]) -> List[List[str]]:
     """
     header = [
         "rank", "pathway_name", "pathway_id", "source_db",
-        "discovery_score", "novelty_tier", "literature_saturation", "pubmed_hit_count",
+        "discovery_score", "novelty_tier", "novelty_confidence",
+        "literature_saturation", "pubmed_hit_count",
         "pps_score", "p_adj", "fold_enrichment", "term_size", "evidence_genes",
         "perm_p_value", "perm_q_value",
         "cardiac_relevance_pct", "cardiac_expression_pct",

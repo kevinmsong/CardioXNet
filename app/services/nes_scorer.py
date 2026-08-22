@@ -34,7 +34,7 @@ class NESScorer:
     """
     
     def __init__(self):
-        """Initialize NES scorer."""
+        """Initialize the Pathway Prioritization scorer."""
         self.settings = get_settings()
         logger.info("NESScorer initialized - Enhanced composite scoring for pathway prioritization")
     
@@ -62,11 +62,9 @@ class NESScorer:
         Returns:
             ScoredHypotheses with ranked pathway hypotheses
         """
-        pass
-        pass
         
         logger.info(
-            f"Calculating final NES scores for {final_result.total_count} pathways"
+            f"Scoring {final_result.total_count} pathways (Pathway Prioritization Score)"
         )
         
         scored_pathways = []
@@ -80,10 +78,21 @@ class NESScorer:
             seed_neighbors_1hop = {g.symbol for g in fn_result.neighbors}
             seed_neighbors_1hop.update(seed_gene_symbols)  # Include seed genes themselves
         
-        for i, agg_pathway in enumerate(final_result.final_pathways):
-            if i < 3:  # Log first 3 pathways
-                pass
-            
+        min_fold = getattr(self.settings.nets, 'min_fold_enrichment', 0.0) or 0.0
+        n_below_fold = 0
+
+        for agg_pathway in final_result.final_pathways:
+            # Effect-size floor. min_fold_enrichment has always been a declared
+            # setting but was never read, so a pathway could reach the report on
+            # significance alone with an overlap barely above chance. Pathways
+            # whose enrichment test did not report the sizes needed to compute a
+            # fold are kept: the filter must not silently drop them for a missing
+            # measurement.
+            fold = agg_pathway.pathway.fold_enrichment
+            if min_fold > 1.0 and fold is not None and fold < min_fold:
+                n_below_fold += 1
+                continue
+
             # Calculate final NES with optional centrality
             nes_score, components = self._calculate_nes(
                 agg_pathway,
@@ -107,10 +116,14 @@ class NESScorer:
             )
             
             scored_pathways.append(scored_pathway)
-        
-        pass
-        
-        # Sort by NES score (descending)
+
+        if n_below_fold:
+            logger.info(
+                f"Effect-size filter removed {n_below_fold} pathways below "
+                f"{min_fold}x fold enrichment"
+            )
+
+        # Sort by the Pathway Prioritization Score (descending)
         scored_pathways.sort(key=lambda p: p.nes_score, reverse=True)
         
         # Assign ranks

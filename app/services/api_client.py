@@ -18,17 +18,14 @@ logger = logging.getLogger(__name__)
 
 class APIClientError(Exception):
     """Base exception for API client errors."""
-    pass
 
 
 class APITimeoutError(APIClientError):
     """Raised when API request times out."""
-    pass
 
 
 class APIRateLimitError(APIClientError):
     """Raised when API rate limit is exceeded."""
-    pass
 
 
 class APIClient:

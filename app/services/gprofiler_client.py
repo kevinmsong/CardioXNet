@@ -57,7 +57,6 @@ class GProfilerClient:
             f"Querying g:Profiler for {len(gene_symbols)} genes, "
             f"sources: {sources}, FDR threshold: {fdr_threshold}"
         )
-        pass
         
         # Retry logic for 503 errors
         max_retries = 3
@@ -85,7 +84,6 @@ class GProfilerClient:
                 logger.info(
                     f"Retrieved {len(pathways)} significant pathways from g:Profiler"
                 )
-                pass
                 if pathways:
                     pass
                 
@@ -102,20 +100,16 @@ class GProfilerClient:
                             f"g:Profiler returned 503 (attempt {attempt + 1}/{max_retries}). "
                             f"Retrying in {wait_time}s..."
                         )
-                        pass
-                        pass
                         time.sleep(wait_time)
                         continue
                     else:
                         logger.error(f"g:Profiler unavailable after {max_retries} attempts")
-                        pass
                         raise APIClientError(
                             f"g:Profiler service temporarily unavailable. Please try again in a few minutes."
                         )
                 else:
                     # Non-503 error, don't retry
                     logger.error(f"g:Profiler query failed: {error_msg}")
-                    pass
                     raise APIClientError(f"g:Profiler query failed: {error_msg}")
 
     def close(self):

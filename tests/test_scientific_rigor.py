@@ -397,3 +397,100 @@ class TestSeedLiteratureGrounding:
         # as a grounded call is what let negative controls look like discoveries.
         assert self.score(seed_corpus=0)["novelty_tier"] == "Ungrounded"
         assert self.score(seed_corpus=10_000)["novelty_tier"] != "Ungrounded"
+
+
+class TestEffectSizeFilter:
+    """min_fold_enrichment was a declared setting that nothing ever read."""
+
+    @staticmethod
+    def result(pathways):
+        from app.models import FinalPathwayResult
+        return FinalPathwayResult(
+            final_pathways=pathways, total_count=len(pathways),
+            aggregation_strategy="frequency", min_support_threshold=1,
+        )
+
+    def test_weak_effect_pathways_are_dropped(self):
+        scorer = NESScorer()
+        scorer.settings.nets.min_fold_enrichment = 2.0
+        # expected overlap = 100*200/20000 = 1.0, so evidence 1 -> fold 1.0
+        weak = make_pathway("W:1", evidence=1, term_size=100)
+        strong = make_pathway("S:1", evidence=10, term_size=100)
+        out = scorer.score(self.result([weak, strong]))
+        assert [h.aggregated_pathway.pathway.pathway_id for h in out.hypotheses] == ["S:1"]
+
+    def test_pathways_without_a_measurable_fold_are_kept(self):
+        # A missing measurement must not be treated as a failed one.
+        scorer = NESScorer()
+        scorer.settings.nets.min_fold_enrichment = 2.0
+        entry = PathwayEntry(pathway_id="U:1", pathway_name="unknown sizes",
+                             source_db="KEGG", p_value=1e-6, p_adj=1e-6,
+                             evidence_count=5, evidence_genes=["A"] * 5)
+        agg = AggregatedPathway(pathway=entry, support_count=1,
+                                source_primary_pathways=[], aggregation_score=1.0,
+                                combined_p_value=1e-6, aggregated_nes=0.0,
+                                consistency_score=1.0, confidence_score=1.0,
+                                support_fraction=1.0)
+        assert entry.fold_enrichment is None
+        assert scorer.score(self.result([agg])).total_count == 1
+
+
+class TestResultsSnapshot:
+    """The snapshot the UI loads must reflect the final scores.
+
+    stage_3 is written as a frozen model_dump() after semantic filtering and
+    again after seed tracing, both before Stage 8. Discovery Score, novelty tier
+    and permutation q therefore reached the PDF report but never results.json,
+    so the app showed em-dashes for its own headline metric.
+    """
+
+    def test_stage_3_is_written_after_discovery_scoring(self):
+        import inspect
+        from app.services.pipeline import Pipeline
+
+        source = inspect.getsource(Pipeline._run_stage_4_5_validation)
+        assert 'self.results["stage_3"]' in source, (
+            "Stage 8 must re-store stage_3 or the UI keeps a pre-Stage-8 snapshot"
+        )
+
+
+class TestCsvExport:
+    """Header and row widths must agree, or every column after the mismatch is
+    silently mislabelled in the export researchers actually analyse."""
+
+    @staticmethod
+    def response():
+        return {
+            "seed_genes": [{"symbol": "MYH7"}],
+            "hypotheses": {"hypotheses": [{
+                "pathway_id": "R:1", "pathway_name": "test", "source_db": "REAC",
+                "nes_score": 1.5, "p_adj": 1e-6, "evidence_count": 4,
+                "evidence_genes": ["A", "B", "C", "D"],
+                "traced_seed_genes": ["MYH7"], "citations": [],
+                "score_components": {
+                    "discovery_score": 1.2, "novelty_tier": "Novel",
+                    "novelty_confidence": "verified_gap",
+                    "literature_saturation": 0.3, "pubmed_hit_count": 12,
+                    "empirical_qvalue": 0.01, "fold_enrichment": 5.0,
+                    "term_size": 40, "cardiac_relevance": 0.2,
+                    "cardiac_expression_ratio": 0.5, "druggability_tier": "medium",
+                },
+            }]},
+        }
+
+    def test_header_and_rows_have_equal_width(self):
+        from app.web.view_models import csv_rows
+        rows = csv_rows(self.response())
+        header = rows[0]
+        for row in rows[1:]:
+            assert len(row) == len(header), (
+                f"row has {len(row)} fields against a {len(header)}-field header"
+            )
+
+    def test_values_land_under_their_own_headers(self):
+        from app.web.view_models import csv_rows
+        rows = csv_rows(self.response())
+        record = dict(zip(rows[0], rows[1]))
+        assert record["novelty_tier"] == "Novel"
+        assert record["novelty_confidence"] == "verified_gap"
+        assert record["pubmed_hit_count"] == "12"

@@ -105,8 +105,6 @@ class LiteratureMiner:
             literature_msg = f"Validating top {top_n} hypotheses using seed gene-specific literature mining"
         
         logger.info(literature_msg)
-        pass
-        pass
         
         hypothesis_citations = {}
         
@@ -120,7 +118,6 @@ class LiteratureMiner:
             if not contributing_seed_symbols:
                 # Fallback to all seed genes if tracing not available
                 contributing_seed_symbols = [gene.symbol for gene in seed_genes]
-                pass
             else:
                 pass
             
@@ -133,8 +130,6 @@ class LiteratureMiner:
             # Detailed progress output
             progress_msg = f"Hypothesis {i} of {top_n}: Literature search for '{pathway_name}' + {len(contributing_genes)} contributing seed genes"
             logger.info(progress_msg)
-            pass
-            pass
             
             try:
                 citations = self._mine_hypothesis_literature(
@@ -149,12 +144,10 @@ class LiteratureMiner:
                 
                 result_msg = f"Hypothesis {i}/{len(hypotheses_to_process)} complete: Found {len(citations)} citations for '{pathway_name}' + {len(contributing_genes)} seed genes"
                 logger.info(result_msg)
-                pass
                 
             except Exception as e:
                 error_msg = f"Hypothesis {i}/{len(hypotheses_to_process)} failed: Literature mining failed for '{pathway_name}': {str(e)}"
                 logger.error(error_msg)
-                pass
                 hypothesis_citations[pathway_id] = []
         
         result = LiteratureEvidence(
@@ -177,13 +170,9 @@ class LiteratureMiner:
         
         completion_msg = f"Literature validation complete for {len(hypothesis_citations)} hypotheses"
         logger.info(completion_msg)
-        pass
-        pass
-        pass
         
         if hypotheses_with_citations > 0:
             avg_citations = total_citations / hypotheses_with_citations
-            pass
         
         return result
     
@@ -220,9 +209,6 @@ class LiteratureMiner:
             literature_msg = f"Validating top {top_n} hypotheses using parallel seed gene-specific literature mining"
         
         logger.info(literature_msg)
-        pass
-        pass
-        pass
         
         hypothesis_citations = {}
         
@@ -237,7 +223,6 @@ class LiteratureMiner:
             if not contributing_seed_symbols:
                 # Fallback to all seed genes if tracing not available
                 contributing_seed_symbols = [gene.symbol for gene in seed_genes]
-                pass
             else:
                 pass
             
@@ -258,8 +243,6 @@ class LiteratureMiner:
             async with semaphore:
                 progress_msg = f"Hypothesis {i} of {len(hypotheses_to_process)}: Literature search for '{pathway_name}' + {len(contributing_genes)} contributing seed genes"
                 logger.info(progress_msg)
-                pass
-                pass
                 
                 try:
                     # Run the synchronous literature mining in a thread pool
@@ -276,14 +259,12 @@ class LiteratureMiner:
                     
                     result_msg = f"Hypothesis {i}/{len(hypotheses_to_process)} complete: Found {len(citations)} citations for '{pathway_name}' + {len(contributing_genes)} seed genes"
                     logger.info(result_msg)
-                    pass
                     
                     return pathway_id, citations
                     
                 except Exception as e:
                     error_msg = f"Hypothesis {i}/{len(hypotheses_to_process)} failed: Literature mining failed for '{pathway_name}': {str(e)}"
                     logger.error(error_msg)
-                    pass
                     return pathway_id, []
         
         # Execute all tasks concurrently
@@ -313,13 +294,9 @@ class LiteratureMiner:
         
         completion_msg = f"Parallel literature validation complete for {len(hypothesis_citations)} hypotheses"
         logger.info(completion_msg)
-        pass
-        pass
-        pass
         
         if hypotheses_with_citations > 0:
             avg_citations = total_citations / hypotheses_with_citations
-            pass
         
         return result
     
@@ -344,19 +321,15 @@ class LiteratureMiner:
         """
         # Show gene context for this pathway search
         gene_symbols = [gene.symbol for gene in seed_genes[:5]]  # Show up to 5 genes
-        pass
         
         # Construct search query with seed genes + pathway terms
         query = self._construct_query(pathway_name, seed_genes, disease_context, disease_synonyms)
         
-        pass
         logger.debug(f"Literature query: {query}")
         
         # Search PubMed
-        pass
         papers = self._search_pubmed(query)
         
-        pass
         
         # Calculate relevance scores and create citations
         citations = self._create_citations(papers, pathway_name, seed_genes)
@@ -398,7 +371,6 @@ class LiteratureMiner:
         """
         # Show which seed genes are being used for this specific hypothesis
         gene_symbols = [gene.symbol for gene in contributing_seed_genes]
-        pass
         
         # Construct targeted query with only contributing seed genes.
         # The strict query is the intersection (genes x pathway x disease). When
@@ -447,7 +419,6 @@ class LiteratureMiner:
         # Search PubMed with hypothesis-specific query
         papers = self._search_pubmed(query)
         
-        pass
         
         # Calculate relevance scores with hypothesis-specific context
         citations = self._create_hypothesis_citations(
@@ -646,13 +617,11 @@ class LiteratureMiner:
         """
         citations = []
         
-        pass
         
         for i, paper in enumerate(papers, 1):
             # Show progress for citation creation
             if i <= 3 or i % 10 == 0 or i == len(papers):
                 title_preview = self._console_safe(paper.get("title", "No title"), limit=50)
-                pass
             
             # Calculate hypothesis-specific relevance score
             relevance_score = self._calculate_hypothesis_relevance(
@@ -680,9 +649,7 @@ class LiteratureMiner:
             if relevance_score > 0.7:
                 contributing_genes_str = ", ".join([g.symbol for g in contributing_seed_genes])
                 title_preview = self._console_safe(paper.get("title", ""), limit=60)
-                pass
         
-        pass
         return citations
     
     def _calculate_hypothesis_relevance(
@@ -826,7 +793,6 @@ class LiteratureMiner:
                 pass
                 # Fetch paper details
                 paper_details = self.pubmed_client._fetch_papers(papers)
-                pass
                 return paper_details
             else:
                 pass
@@ -835,7 +801,6 @@ class LiteratureMiner:
         except Exception as e:
             error_msg = f"PubMed search failed: {str(e)}"
             logger.warning(error_msg)
-            pass
             return []
     
     def _create_citations(
@@ -857,13 +822,11 @@ class LiteratureMiner:
         """
         citations = []
         
-        pass
         
         for i, paper in enumerate(papers, 1):
             # Show progress for citation creation
             if i <= 5 or i % 10 == 0 or i == len(papers):
                 title_preview = self._console_safe(paper.get("title", "No title"), limit=60)
-                pass
             
             # Calculate relevance score
             relevance_score = self._calculate_relevance(
@@ -888,9 +851,7 @@ class LiteratureMiner:
             # Show high relevance papers
             if relevance_score > 0.7:
                 title_preview = self._console_safe(paper.get("title", ""), limit=80)
-                pass
         
-        pass
         return citations
     
     def _calculate_relevance(

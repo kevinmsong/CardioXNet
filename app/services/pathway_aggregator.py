@@ -48,8 +48,6 @@ class PathwayAggregator:
         """
         strategy = strategy or self.settings.nets.aggregation_strategy
         
-        pass
-        pass
         
         logger.info(
             f"Processing {secondary_result.total_secondary_count} secondary pathways "
@@ -84,7 +82,6 @@ class PathwayAggregator:
         else:
             raise ValueError(f"Unknown aggregation strategy: {strategy}")
         
-        pass
         
         result = FinalPathwayResult(
             final_pathways=final_pathways,
@@ -93,7 +90,6 @@ class PathwayAggregator:
             min_support_threshold=self.settings.nets.min_support_threshold
         )
         
-        pass
         
         logger.info(
             f"Aggregation complete: {len(final_pathways)} final pathways "
@@ -152,10 +148,6 @@ class PathwayAggregator:
         Returns:
             List of aggregated pathways meeting threshold
         """
-        pass
-        pass
-        pass
-        pass
         
         aggregated_pathways = []
         
@@ -163,8 +155,6 @@ class PathwayAggregator:
             pathway_id = pathway.pathway_id
             support_count = secondary_result.pathway_frequency.get(pathway_id, 0)
             
-            if i < 3:  # Log first 3 pathways
-                pass
             
             if support_count >= min_support:
                 supporting_genes = secondary_result.pathway_support.get(pathway_id, [])
@@ -194,7 +184,6 @@ class PathwayAggregator:
                 )
                 aggregated_pathways.append(agg_pathway)
         
-        pass
         
         logger.debug(
             f"Intersection strategy: {len(aggregated_pathways)} pathways "

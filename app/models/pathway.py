@@ -74,9 +74,16 @@ class PathwayEntry(BaseModel):
 
 
 class ScoredPathwayEntry(PathwayEntry):
-    """Pathway entry with NES score."""
+    """Pathway entry carrying the preliminary screening score."""
     
-    preliminary_nes: float = Field(..., description="Preliminary NES score")
+    preliminary_nes: float = Field(
+        ...,
+        description=(
+            "Expansion screening score: min(-log10(p_adj), 20) * sqrt(evidence_count) "
+            "* db_weight. Recall-oriented and deliberately different from the final "
+            "Pathway Prioritization Score."
+        ),
+    )
     literature_support: Optional[Dict] = Field(None, description="Literature expansion metadata")
     contributing_seed_genes: List[str] = Field(
         default_factory=list,
@@ -140,8 +147,15 @@ class ScoredPathway(BaseModel):
     """Final scored pathway hypothesis."""
     
     aggregated_pathway: AggregatedPathway = Field(..., description="Aggregated pathway data")
-    nes_score: float = Field(..., description="Final NES score")
-    rank: int = Field(..., description="Rank by NES score")
+    nes_score: float = Field(
+        ...,
+        description=(
+            "Pathway Prioritization Score. Field name retained for backwards "
+            "compatibility with persisted reports; this is NOT a GSEA normalized "
+            "enrichment score."
+        ),
+    )
+    rank: int = Field(..., description="Rank by Discovery Score after Stage 8, else by PPS")
     score_components: Dict[str, Any] = Field(
         default_factory=dict,
         description="Breakdown of score calculation (can contain floats or nested dicts)"

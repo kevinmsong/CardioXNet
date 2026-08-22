@@ -150,11 +150,20 @@ Score should be read as a triage heuristic, not as a forecast.
 
 ## 7. Regression suite
 
-55 tests (`tests/test_scientific_rigor.py` plus the pre-existing suite) pin each
+63 tests (`tests/test_scientific_rigor.py` plus the pre-existing suite) pin each
 defect found in the audit: the degenerate permutation universe, BH correctness
 against a reference implementation, generic-term dominance, pathway-specific
 query construction, saturation from corpus size, novelty-confidence gating, seed
-grounding, and semantic-filter discrimination.
+grounding, semantic-filter discrimination, the effect-size floor, CSV
+header/row alignment, and the freshness of the results snapshot the UI reads.
+
+The degree-preserving permutation variants were **removed** rather than left
+unused, and a test asserts they stay removed: they drew replacements from
+per-degree bins over the supplied universe, which here means from the
+neighbourhood itself, and reported `degree_preserved: True` while doing it. The
+two tests that previously covered them asserted that behaviour was correct, and
+one supplied a 5-gene universe for a 3-gene neighbourhood -- the exact degenerate
+case the assertions were meant to catch.
 
 ---
 
@@ -164,9 +173,12 @@ grounding, and semantic-filter discrimination.
   ("GAB1 signalosome") has little PubMed footprint regardless of how well studied
   the biology is. The concept-corpus check catches the worst cases and flags them
   `unverified`, but the metric remains vocabulary-dependent.
-- **Corpus coverage.** Some reported pathways still fall outside the literature
-  mining window and are backfilled with a single count query; where even that
-  fails they are marked `not_measured` and damped rather than scored as novel.
+- **Corpus coverage.** Pathways outside the literature-mining window are
+  backfilled with a single count query, and NCBI throttling is retried, so across
+  all seven runs every one of the 161 reported hypotheses carries a measured
+  corpus (125 `pubmed_corpus`, 36 `ungrounded_seeds`, zero `not_measured`).
+  A pathway whose count cannot be obtained at all is still damped and flagged
+  rather than scored as novel.
 - **Not pinned.** STRING, g:Profiler, GTEx, ChEMBL and PubMed all drift. Record
   the run date with any reported figure.
 - **Single-species, single-domain.** Human only; cardiac semantic scoring uses

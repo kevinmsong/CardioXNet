@@ -17,9 +17,9 @@
     <li style="margin-bottom: 10px;"><strong style="color:var(--text)">Functional neighborhood.</strong> High-confidence STRING interaction partners are assembled around the seeds.</li>
     <li style="margin-bottom: 10px;"><strong style="color:var(--text)">Primary pathways.</strong> Enrichment (g:Profiler over GO:BP / KEGG / Reactome / WikiPathways) identifies enriched pathways. Pathways <em>already known</em> for the seeds (per Reactome) are filtered out so the focus stays on new biology.</li>
     <li style="margin-bottom: 10px;"><strong style="color:var(--text)">Secondary expansion.</strong> For each primary pathway, the literature is mined for co-mentioned genes; these expand the gene set and reveal <em>secondary</em> pathways not reachable from the seeds alone. This is where unreported connections emerge.</li>
-    <li style="margin-bottom: 10px;"><strong style="color:var(--text)">Aggregation &amp; scoring.</strong> Pathway instances are deduplicated and combined (Fisher's method), then scored with a Network Enrichment Score (NES) that blends statistical significance, evidence size, database weight, replication support, and network centrality.</li>
+    <li style="margin-bottom: 10px;"><strong style="color:var(--text)">Aggregation &amp; scoring.</strong> Pathway instances are deduplicated and combined (Fisher's method), then scored with the Pathway Prioritization Score (PPS): a weighted composite of statistical significance (0.30), fold enrichment (0.30), gene-set specificity (0.25) and cross-source replication (0.15), scaled by database weight and seed proximity.</li>
     <li style="margin-bottom: 10px;"><strong style="color:var(--text)">Cardiac filtering.</strong> A semantic filter keeps hypotheses with genuine cardiovascular relevance, optionally focused by your chosen disease context.</li>
-    <li style="margin-bottom: 10px;"><strong style="color:var(--text)">Validation.</strong> Degree-preserving permutation tests, GTEx cardiac tissue expression, and curated druggability annotate each surviving hypothesis.</li>
+    <li style="margin-bottom: 10px;"><strong style="color:var(--text)">Validation.</strong> A size-matched permutation null over the protein-coding genome with Benjamini&ndash;Hochberg FDR control, GTEx v8 cardiac tissue expression, and curated druggability annotate each surviving hypothesis.</li>
     <li style="margin-bottom: 10px;"><strong style="color:var(--text)">Evidence.</strong> Comprehensive PubMed mining attaches ranked citations, and each hypothesis is traced back through its full seed &rarr; primary &rarr; secondary &rarr; final lineage.</li>
     <li><strong style="color:var(--text)">Topology.</strong> A network analysis highlights hub genes and prioritized druggable therapeutic targets.</li>
   </ol>
@@ -51,7 +51,10 @@
         <tr><th>Column</th><th>Meaning</th></tr>
       </thead>
       <tbody>
-        <tr style="cursor:default;"><td><strong>NES</strong></td><td style="white-space:normal;">Network Enrichment Score &mdash; the primary ranking. Combines &minus;log<sub>10</sub> adjusted p-value, evidence size, database weight, replication support, and network centrality.</td></tr>
+        <tr style="cursor:default;"><td><strong>Discovery</strong></td><td style="white-space:normal;">Discovery Score &mdash; the primary ranking. PPS &times; literature novelty: high for pathways that are well supported by the enrichment evidence <em>and</em> under-reported for these seed genes in this disease context.</td></tr>
+        <tr style="cursor:default;"><td><strong>Novelty</strong></td><td style="white-space:normal;">Literature tier from the number of PubMed records at the pathway &times; seed genes &times; disease intersection: Highly Novel, Novel, Emerging, Established. <em>Ungrounded</em> means the seed genes have too little literature in this disease for any novelty call to be meaningful &mdash; it is an undefined result, not a weak one.</td></tr>
+        <tr style="cursor:default;"><td><strong>PPS</strong></td><td style="white-space:normal;">Pathway Prioritization Score &mdash; a weighted composite of significance, fold enrichment, gene-set specificity and replication. <strong>Not</strong> a GSEA normalized enrichment score.</td></tr>
+        <tr style="cursor:default;"><td><strong>Perm. q</strong></td><td style="white-space:normal;">Benjamini&ndash;Hochberg corrected empirical p-value from a size-matched permutation null. <em>n/t</em> means the null could not be built. Most enriched pathways clear this null comfortably, so it confirms an overlap is not chance rather than ranking among strong hypotheses.</td></tr>
         <tr style="cursor:default;"><td><strong>p<sub>adj</sub></strong></td><td style="white-space:normal;">Multiple-testing&ndash;corrected enrichment p-value (Benjamini&ndash;Hochberg).</td></tr>
         <tr style="cursor:default;"><td><strong>Genes</strong></td><td style="white-space:normal;">Number of evidence genes supporting the pathway hypothesis.</td></tr>
         <tr style="cursor:default;"><td><strong>Cardiac rel.</strong></td><td style="white-space:normal;">Semantic cardiovascular relevance of the pathway (0&ndash;100%), focused by your disease context.</td></tr>
@@ -69,7 +72,7 @@
   <h2 style="margin-top:0;">Reading the results</h2>
   <ul>
     <li><strong>Summary tiles</strong> show how many hypotheses are unreported for your seeds, how many came from secondary expansion, and total literature support.</li>
-    <li><strong>Pathway table</strong> &mdash; click any column header to re-sort by NES, adjusted p-value, gene count, cardiac relevance, tissue specificity, or citation count. Click a row to open its detail page.</li>
+    <li><strong>Pathway table</strong> &mdash; click any column header to re-sort by Discovery Score, PPS, adjusted p-value, permutation q, fold enrichment, gene count, cardiac relevance, tissue specificity, or citation count. Click a row to open its detail page.</li>
     <li><strong>Pathway detail</strong> &mdash; discovery lineage, statistics (permutation-based empirical p-values, cardiac expression and specificity), evidence genes, and ranked PubMed citations with abstracts.</li>
     <li><strong>Network &amp; targets</strong> &mdash; hub genes and prioritized druggable targets.</li>
     <li><strong>Export</strong> &mdash; download the full table as CSV, or the report as PDF / Markdown / JSON.</li>
@@ -81,7 +84,7 @@
   <p style="margin-bottom:0;">
     A hypothesis is flagged <strong>unreported</strong> when the seed genes account for fewer than half of the
     pathway's evidence genes &mdash; meaning the pathway was reached through neighborhood and literature
-    expansion rather than being a pathway the seeds are already annotated to. Combine the flag with NES,
+    expansion rather than being a pathway the seeds are already annotated to. Combine the flag with the Discovery Score,
     replication support count, and literature evidence to prioritize hypotheses for experimental follow-up.
     Novelty here is relative to your seeds and the reference databases; always confirm against the current
     literature before drawing conclusions.

@@ -106,8 +106,6 @@ class PrimaryPathwayAnalyzer:
         # DEBUG: Check what genes are in the pathways
         if enriched_pathways:
             pass
-            pass
-            pass
         
         # Step 3: Calculate preliminary NES scores
         scored_pathways = self._calculate_nes_scores(enriched_pathways)
@@ -183,8 +181,6 @@ class PrimaryPathwayAnalyzer:
             # This allows the analysis to complete with other data sources
             if "temporarily unavailable" in str(e).lower() or "503" in str(e):
                 logger.warning("g:Profiler unavailable - continuing with empty pathway results")
-                pass
-                pass
                 return []  # Return empty list to continue analysis
             
             # For other errors, still raise

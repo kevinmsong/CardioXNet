@@ -57,7 +57,6 @@ async def lifespan(app: FastAPI):
     yield
     
     # Shutdown - simplified to avoid issues
-    pass
 
 
 # Create FastAPI application

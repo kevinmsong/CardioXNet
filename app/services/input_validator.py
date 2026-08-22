@@ -19,7 +19,6 @@ logger = logging.getLogger(__name__)
 
 class ValidationError(Exception):
     """Raised when input validation fails."""
-    pass
 
 
 class InputValidator:

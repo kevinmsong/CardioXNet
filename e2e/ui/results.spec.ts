@@ -11,11 +11,21 @@ test.describe('Results (fixture)', () => {
     await expect(page.getByRole('heading', { name: 'Discovery results' })).toBeVisible();
     await expect(page.getByTestId('summary-stats')).toBeVisible();
 
-    // Four hypotheses in the fixture; three reached by expansion (seed-independent).
+    // Four hypotheses in the fixture, all reached by expansion (seed-independent).
     const rows = page.getByTestId('pathway-row');
     await expect(rows).toHaveCount(4);
     await expect(page.getByTestId('novel-badge').first()).toBeVisible();
-    expect(await page.getByTestId('novel-badge').count()).toBe(3);
+    expect(await page.getByTestId('novel-badge').count()).toBe(4);
+
+    // The Discovery Score is the primary ranking and must actually reach the
+    // page. It previously did not: stage_3 was snapshotted before the scoring
+    // stage ran, so results.json carried none of these fields.
+    const first = rows.first();
+    await expect(first).toHaveAttribute('data-discovery', /^[0-9]/);
+    const discovery = await rows.evaluateAll((els) =>
+      els.map((e) => parseFloat(e.getAttribute('data-discovery') || '0')));
+    expect(discovery).toEqual([...discovery].sort((a, b) => b - a));
+    expect(discovery[0]).toBeGreaterThan(0);
 
     await expect(page.getByTestId('results-table')).toBeVisible();
     await expect(page.getByTestId('network')).toBeVisible();

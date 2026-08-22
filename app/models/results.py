@@ -94,7 +94,7 @@ class PrimaryTriageResult(BaseModel):
     
     primary_pathways: List[ScoredPathwayEntry] = Field(
         default_factory=list,
-        description="Novel candidate pathways with NES scores"
+        description="Candidate pathways with Pathway Prioritization Scores"
     )
     known_pathways: List[PathwayEntry] = Field(
         default_factory=list,

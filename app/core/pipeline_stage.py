@@ -64,7 +64,6 @@ class PipelineStage(ABC):
     @abstractmethod
     def name(self) -> str:
         """Stage identifier."""
-        pass
     
     @property
     def dependencies(self) -> List[str]:
@@ -115,7 +114,6 @@ class PipelineStage(ABC):
         Returns:
             Stage execution result
         """
-        pass
     
     async def run(self, context: Dict[str, Any]) -> StageResult:
         """
@@ -173,7 +171,6 @@ class ConditionalStage(PipelineStage):
         Returns:
             True if stage should execute
         """
-        pass
     
     async def run(self, context: Dict[str, Any]) -> StageResult:
         """Run with condition check."""

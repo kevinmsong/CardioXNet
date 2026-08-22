@@ -21,17 +21,14 @@ logger = logging.getLogger(__name__)
 
 class BaseAPIError(Exception):
     """Base exception for API errors."""
-    pass
 
 
 class TimeoutError(BaseAPIError):
     """Raised when API request times out."""
-    pass
 
 
 class RateLimitError(BaseAPIError):
     """Raised when API rate limit is exceeded."""
-    pass
 
 
 class BaseAPIClient(ABC):
@@ -196,7 +193,6 @@ class BaseAPIClient(ABC):
         Returns:
             True if healthy
         """
-        pass
 
 
 class LibraryBasedClient(BaseAPIClient):
@@ -211,11 +207,9 @@ class LibraryBasedClient(BaseAPIClient):
     
     async def initialize(self):
         """No session needed for library clients."""
-        pass
     
     async def cleanup(self):
         """No cleanup needed for library clients."""
-        pass
     
     async def health_check(self) -> bool:
         """Check if required libraries are available."""
