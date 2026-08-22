@@ -242,9 +242,17 @@ class TestNoveltyScoring:
     def test_ceiling_saturates(self):
         assert self.score(10_000)["literature_saturation"] == 1.0
 
-    def test_failed_lookup_is_flagged_not_silently_zero(self):
+    def test_unmeasured_corpus_is_flagged_and_not_maximally_novel(self):
+        # A pathway whose corpus was never measured (lookup failed, or it fell
+        # outside the literature-mining window) must not inherit the novelty of
+        # a genuinely unstudied pathway.
         result = self.score(-1)
-        assert result["saturation_basis"] == "retrieved_citations"
+        assert result["saturation_basis"] == "not_measured"
+        assert result["novelty_confidence"] == "unverified"
+        assert result["literature_saturation"] > 0.0
+        # A verified gap (0 records, searchable concept) must still beat it.
+        verified = self.score(0, citations=None)
+        assert verified["literature_saturation"] < result["literature_saturation"]
 
     def test_discovery_fields_are_all_present(self):
         result = self.score(50)
@@ -345,3 +353,47 @@ class TestNoveltyConfidence:
     def test_verified_gap_outranks_unverified(self):
         assert (self.score(0, concept=5000)["discovery_score"]
                 > self.score(0, concept=0)["discovery_score"])
+
+
+class TestSeedLiteratureGrounding:
+    """Novelty is meaningless when the seeds have no literature to be novel against.
+
+    Negative controls exposed this: olfactory-receptor and random gene panels
+    produced more Highly Novel calls (13/13 and 21/23) than any real
+    cardiovascular panel, because nobody has written about those genes in heart
+    failure, so every pathway intersection returned zero records.
+    """
+
+    @staticmethod
+    def score(seed_corpus, hits=0):
+        validator = HypothesisValidator()
+        return validator.calculate_validation_score(
+            _StubHypothesis(make_pathway()), [], {},
+            [GeneInfo(input_id="OR51E2", entrez_id="0", symbol="OR51E2")],
+            pubmed_hit_count=hits, concept_hit_count=5000,
+            seed_disease_corpus=seed_corpus,
+        )
+
+    def test_ungrounded_seeds_suppress_novelty(self):
+        result = self.score(seed_corpus=0)
+        assert result["novelty_confidence"] == "ungrounded_seeds"
+        assert result["literature_saturation"] > 0.0
+
+    def test_grounded_seeds_allow_a_verified_gap(self):
+        result = self.score(seed_corpus=10_000)
+        assert result["novelty_confidence"] == "verified_gap"
+        assert result["literature_saturation"] == 0.0
+
+    def test_grounded_gap_outranks_ungrounded(self):
+        assert (self.score(seed_corpus=10_000)["discovery_score"]
+                > self.score(seed_corpus=0)["discovery_score"])
+
+    def test_missing_corpus_does_not_suppress(self):
+        # A failed lookup must not silently veto every novelty call.
+        assert self.score(seed_corpus=None)["novelty_confidence"] == "verified_gap"
+
+    def test_ungrounded_seeds_get_an_undefined_tier(self):
+        # Not a weak result -- an undefined one. Reporting it on the same scale
+        # as a grounded call is what let negative controls look like discoveries.
+        assert self.score(seed_corpus=0)["novelty_tier"] == "Ungrounded"
+        assert self.score(seed_corpus=10_000)["novelty_tier"] != "Ungrounded"

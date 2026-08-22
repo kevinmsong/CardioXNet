@@ -68,7 +68,12 @@ class PubMedClient:
     @classmethod
     def _throttle(cls) -> None:
         """Block until the next E-utilities request is allowed."""
-        min_interval = 0.11 if os.environ.get("NCBI_API_KEY") else 0.34
+        # NCBI allows 3 req/s without a key and 10 with one. The unkeyed
+        # interval sits deliberately below the 0.334 s that 3/s implies:
+        # E-utilities measures bursts, and pacing exactly at the limit returned
+        # HTTP 429 often enough to corrupt the literature-saturation metric,
+        # which silently degrades to "no records found".
+        min_interval = 0.12 if os.environ.get("NCBI_API_KEY") else 0.40
         with cls._rate_lock:
             now = time.monotonic()
             wait = cls._last_request_ts + min_interval - now
@@ -103,32 +108,46 @@ class PubMedClient:
         if cache_key in self._search_cache:
             return self._search_cache[cache_key]
 
+        params_base = {
+            "db": "pubmed",
+            "term": query,
+            "rettype": "count",
+            "retmode": "json",
+            "tool": self.settings.app_name,
+            "email": Entrez.email,
+        }
+        # Publication-date bounds, used by the temporal-holdout benchmark to ask
+        # what the literature looked like as of a cutoff year.
+        if mindate or maxdate:
+            params_base["datetype"] = "pdat"
+            params_base["mindate"] = mindate or "1800"
+            params_base["maxdate"] = maxdate or "3000"
+        api_key = os.environ.get("NCBI_API_KEY")
+        if api_key:
+            params_base["api_key"] = api_key
+
+        # Retry on throttling. A dropped count is not a neutral failure: it makes
+        # the pathway look unstudied, which is the strongest novelty signal the
+        # scorer has, so a 429 would promote exactly the wrong pathways.
         count = -1
-        try:
-            self._throttle()
-            params = {
-                "db": "pubmed",
-                "term": query,
-                "rettype": "count",
-                "retmode": "json",
-                "tool": self.settings.app_name,
-                "email": Entrez.email,
-            }
-            # Publication-date bounds, used by the temporal-holdout benchmark to
-            # ask what the literature looked like as of a cutoff year.
-            if mindate or maxdate:
-                params["datetype"] = "pdat"
-                params["mindate"] = mindate or "1800"
-                params["maxdate"] = maxdate or "3000"
-            api_key = os.environ.get("NCBI_API_KEY")
-            if api_key:
-                params["api_key"] = api_key
-            response = requests.get(self.esearch_url, params=params, timeout=30)
-            response.raise_for_status()
-            count = int(response.json()["esearchresult"]["count"])
-        except Exception as e:  # network, parse, or quota failure
-            logger.warning(f"PubMed count lookup failed for query: {str(e)}")
-            return -1
+        for attempt in range(4):
+            try:
+                self._throttle()
+                response = requests.get(self.esearch_url, params=params_base, timeout=30)
+                if response.status_code == 429:
+                    raise requests.HTTPError("429 Too Many Requests")
+                response.raise_for_status()
+                count = int(response.json()["esearchresult"]["count"])
+                break
+            except Exception as e:
+                if attempt == 3:
+                    logger.warning(
+                        f"PubMed count lookup failed after {attempt + 1} attempts: {str(e)}"
+                    )
+                    return -1
+                backoff = 1.5 * (2 ** attempt)
+                logger.debug(f"PubMed count retry {attempt + 1} in {backoff:.1f}s: {str(e)}")
+                time.sleep(backoff)
 
         self._search_cache[cache_key] = count
         return count

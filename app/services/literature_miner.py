@@ -437,7 +437,8 @@ class LiteratureMiner:
                 self.pubmed_client.count_hits(f"({concept_clause})")
                 if concept_clause else 0
             )
-            self._last_concept_counts[hypothesis_id] = concept_hits
+            if concept_hits >= 0:
+                self._last_concept_counts[hypothesis_id] = concept_hits
             logger.info(
                 f"Hypothesis {hypothesis_id}: 0 records at the intersection; "
                 f"pathway concept alone has {concept_hits} records"

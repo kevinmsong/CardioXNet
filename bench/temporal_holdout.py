@@ -137,6 +137,13 @@ def main() -> None:
 
     for run_path in args.runs:
         run = json.loads(Path(run_path).read_text(encoding="utf-8"))
+        # A bench run JSON records where the report was written; the ranked
+        # hypotheses live in that report, not in the run wrapper.
+        report_path = (run.get("report_files") or {}).get("json")
+        if report_path and Path(report_path).exists():
+            report = json.loads(Path(report_path).read_text(encoding="utf-8"))
+            report["_bench"] = run.get("_bench", {})
+            run = report
         bench = run.get("_bench", {})
         disease = bench.get("disease") or run.get("disease_context") or "heart_failure"
         seed_symbols = bench.get("seed_genes") or [
@@ -194,6 +201,17 @@ def main() -> None:
             [r["novelty_pre"] for r in records], [r["growth"] for r in records]
         )
         # Baseline: does the enrichment score on its own predict growth?
+        # Absolute post-cutoff volume, not a rate. The rate normalises away the
+        # very effect being tested when hits_pre is small, so both are reported.
+        summary["spearman_novelty_vs_absolute"] = spearman(
+            [r["novelty_pre"] for r in records], [r["hits_post"] for r in records]
+        )
+        summary["n_measurable"] = sum(1 for r in records if r["hits_pre"] > 0)
+        measurable = [r for r in records if r["hits_pre"] > 0]
+        if len(measurable) >= 3:
+            summary["spearman_discovery_vs_growth_measurable"] = spearman(
+                [r["discovery_pre"] for r in measurable], [r["growth"] for r in measurable]
+            )
         summary["spearman_pps_vs_growth"] = spearman(
             [r["pps"] for r in records], [r["growth"] for r in records]
         )

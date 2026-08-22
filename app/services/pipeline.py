@@ -1216,6 +1216,81 @@ class Pipeline:
             # Return empty result to continue pipeline
             return LiteratureEvidence(hypothesis_citations={})
     
+    def _seed_disease_corpus(self, seed_genes: List[GeneInfo]) -> Optional[int]:
+        """PubMed records matching (seed genes AND disease context).
+
+        One query per run. Returns None if the lookup fails, in which case
+        novelty is scored without the grounding check rather than being
+        wrongly suppressed.
+        """
+        try:
+            miner = self.literature_miner
+            gene_clause = miner._gene_clause(seed_genes)
+            disease_clause = miner._disease_clause(
+                self.disease_context, self.disease_synonyms
+            )
+            query = f"({gene_clause}) AND ({disease_clause})"
+            count = miner.pubmed_client.count_hits(query)
+            if count < 0:
+                logger.warning("Seed-disease corpus lookup failed; novelty ungated")
+                return None
+            logger.info(
+                f"Seed-disease literature corpus: {count} records "
+                f"(threshold for grounded novelty: "
+                f"{self.hypothesis_validator.MIN_SEED_DISEASE_CORPUS})"
+            )
+            self.results['seed_disease_corpus'] = count
+            return count
+        except Exception as e:
+            logger.warning(f"Seed-disease corpus lookup failed: {str(e)}")
+            return None
+
+    def _backfill_corpus_counts(
+        self,
+        scored_hypotheses: ScoredHypotheses,
+        hit_counts: Dict[str, int],
+        concept_counts: Dict[str, int],
+        seed_genes: List[GeneInfo],
+    ) -> None:
+        """Measure the PubMed corpus for reported pathways literature mining skipped."""
+        # None means the pathway was never mined; a negative value means the
+        # count lookup was attempted and failed. Both need measuring.
+        missing = [
+            h for h in scored_hypotheses.hypotheses
+            if (hit_counts.get(h.aggregated_pathway.pathway.pathway_id) or -1) < 0
+        ]
+        if not missing:
+            return
+
+        logger.info(f"Backfilling PubMed corpus size for {len(missing)} hypotheses")
+        miner = self.literature_miner
+        n_ok = 0
+        for hypothesis in missing:
+            pathway = hypothesis.aggregated_pathway.pathway
+            traced = getattr(hypothesis, 'traced_seed_genes', None) or []
+            contributing = [g for g in seed_genes if g.symbol in traced] or seed_genes
+            try:
+                query = miner._construct_hypothesis_query(
+                    pathway.pathway_name, contributing,
+                    self.disease_context, self.disease_synonyms,
+                )
+                count = miner.pubmed_client.count_hits(query)
+                if count < 0:
+                    continue
+                hit_counts[pathway.pathway_id] = count
+                n_ok += 1
+                if count == 0:
+                    concept_clause = miner._pathway_clause(pathway.pathway_name)
+                    concept = (
+                        miner.pubmed_client.count_hits(f"({concept_clause})")
+                        if concept_clause else 0
+                    )
+                    if concept >= 0:
+                        concept_counts[pathway.pathway_id] = concept
+            except Exception as e:
+                logger.warning(f"Corpus backfill failed for {pathway.pathway_id}: {str(e)}")
+        logger.info(f"Corpus backfill measured {n_ok}/{len(missing)} hypotheses")
+
     def _backfill_permutation_tests(
         self,
         scored_hypotheses: ScoredHypotheses,
@@ -1360,6 +1435,21 @@ class Pipeline:
 
             hit_counts = getattr(literature_evidence, 'hypothesis_hit_counts', {}) or {}
             concept_counts = getattr(literature_evidence, 'concept_hit_counts', {}) or {}
+
+            # Literature mining runs on a capped window of hypotheses, but more
+            # than that can survive to the report. Any pathway without a measured
+            # corpus would be scored 'not_measured' and pushed down the ranking,
+            # so measure the missing ones here. This is one cached esearch per
+            # pathway -- far cheaper than the abstract retrieval mining does.
+            self._backfill_corpus_counts(
+                scored_hypotheses, hit_counts, concept_counts, seed_genes
+            )
+
+            # Literature footprint of the seed genes themselves in this disease.
+            # Novelty is expressed relative to it: if the seeds have no presence
+            # in the disease literature, a zero-record pathway intersection is a
+            # statement about the seeds, not a discovery.
+            seed_disease_corpus = self._seed_disease_corpus(seed_genes)
             validation_scores = {}
 
             # Backfill permutation tests for surviving hypotheses that were not
@@ -1387,6 +1477,7 @@ class Pipeline:
                     seed_genes,
                     pubmed_hit_count=hit_counts.get(pathway_id),
                     concept_hit_count=concept_counts.get(pathway_id),
+                    seed_disease_corpus=seed_disease_corpus,
                 )
 
                 validation_scores[pathway_id] = validation_score
@@ -1404,7 +1495,7 @@ class Pipeline:
                     'literature_evidence', 'network_evidence', 'novelty_score',
                     'novelty_tier', 'literature_saturation', 'discovery_score',
                     'pubmed_hit_count', 'saturation_basis', 'n_relevant_citations',
-                    'novelty_confidence', 'concept_hit_count',
+                    'novelty_confidence', 'concept_hit_count', 'seed_disease_corpus',
                 ):
                     if key in validation_score:
                         hypothesis.score_components[key] = validation_score[key]

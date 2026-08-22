@@ -44,6 +44,11 @@ class HypothesisValidator:
     # the top of the ranking nor silently discarded.
     UNVERIFIED_CORPUS_PROXY = 60
 
+    # The seed genes must have at least this many PubMed records in the chosen
+    # disease context before any per-pathway novelty claim is meaningful. Below
+    # it, a zero intersection says nothing about the pathway.
+    MIN_SEED_DISEASE_CORPUS = 100
+
     @staticmethod
     def _citation_relevance(citation) -> float:
         """Relevance of a citation, accepting both Citation objects and dicts."""
@@ -59,6 +64,7 @@ class HypothesisValidator:
         seed_genes: List[GeneInfo],
         pubmed_hit_count: Optional[int] = None,
         concept_hit_count: Optional[int] = None,
+        seed_disease_corpus: Optional[int] = None,
     ) -> Dict[str, float]:
         """
         Calculate comprehensive validation score combining multiple evidence types.
@@ -171,7 +177,23 @@ class HypothesisValidator:
             # abstracts at all, so their zero is an artefact of the vocabulary,
             # not a finding. Without this check those pathways take the top of
             # the ranking on maximal novelty they have not earned.
-            if pubmed_hit_count == 0 and concept_hit_count is not None:
+            # Novelty is only interpretable when the seed genes have a
+            # literature footprint in this disease to begin with. If they do
+            # not, every pathway returns zero records and every pathway looks
+            # maximally novel -- absence of literature about the seeds, not a
+            # discovery.
+            #
+            # This is what the negative controls exposed: olfactory-receptor and
+            # random gene panels produced *more* Highly Novel calls (13/13 and
+            # 21/23) than any real cardiovascular panel, purely because nobody
+            # has written about those genes in heart failure.
+            if (seed_disease_corpus is not None
+                    and 0 <= seed_disease_corpus < self.MIN_SEED_DISEASE_CORPUS):
+                scores['novelty_confidence'] = 'ungrounded_seeds'
+                scores['seed_disease_corpus'] = seed_disease_corpus
+                corpus_size = max(corpus_size, self.UNVERIFIED_CORPUS_PROXY)
+                saturation_basis = 'ungrounded_seeds'
+            elif pubmed_hit_count == 0 and concept_hit_count is not None and concept_hit_count >= 0:
                 if concept_hit_count < self.MIN_CONCEPT_CORPUS:
                     scores['novelty_confidence'] = 'unverified'
                     scores['concept_hit_count'] = concept_hit_count
@@ -183,10 +205,14 @@ class HypothesisValidator:
                     scores['novelty_confidence'] = 'verified_gap'
                     scores['concept_hit_count'] = concept_hit_count
         else:
-            # The count lookup failed. Fall back to the retrieved count and mark
-            # the basis so downstream consumers can discount the value.
-            corpus_size = n_relevant
-            saturation_basis = 'retrieved_citations'
+            # The corpus size was never measured for this pathway -- either the
+            # count lookup failed or the pathway fell outside the literature
+            # mining window. Falling back to the retrieved citation count would
+            # report 0 records and hand the pathway maximal novelty it has not
+            # earned, floating unmeasured pathways to the top of the ranking.
+            corpus_size = max(n_relevant, self.UNVERIFIED_CORPUS_PROXY)
+            saturation_basis = 'not_measured'
+            scores['novelty_confidence'] = 'unverified'
 
         literature_saturation = math.log10(corpus_size + 1) / math.log10(self.SATURATION_CEILING + 1)
         literature_saturation = max(0.0, min(literature_saturation, 1.0))
@@ -211,12 +237,20 @@ class HypothesisValidator:
         scores['novelty_score'] = composite_novelty * 0.15
         scores['literature_saturation'] = round(literature_saturation, 4)
         scores['n_relevant_citations'] = n_relevant
-        scores['novelty_tier'] = (
-            'Highly Novel' if composite_novelty >= 0.80 else
-            'Novel'        if composite_novelty >= 0.55 else
-            'Emerging'     if composite_novelty >= 0.30 else
-            'Established'
-        )
+        # When the seed genes have no literature footprint in this disease, the
+        # tier is not a weak result -- it is an undefined one, and reporting it
+        # on the same scale as a grounded call invites exactly the
+        # misinterpretation the negative controls produced. It is labelled as
+        # undefined instead.
+        if scores.get('novelty_confidence') == 'ungrounded_seeds':
+            scores['novelty_tier'] = 'Ungrounded'
+        else:
+            scores['novelty_tier'] = (
+                'Highly Novel' if composite_novelty >= 0.80 else
+                'Novel'        if composite_novelty >= 0.55 else
+                'Emerging'     if composite_novelty >= 0.30 else
+                'Established'
+            )
 
         # ── Discovery Score (NES × novelty) ─────────────────────────────────
         # Surfaces pathways that are strongly enriched AND under-reported —

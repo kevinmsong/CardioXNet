@@ -31,12 +31,15 @@ INK, INK_2, MUTED = "#0b0b0b", "#52514e", "#8a8880"
 SURFACE = "#ffffff"
 GRID = "#e4e3de"
 
-TIER_ORDER = ["Highly Novel", "Novel", "Emerging", "Established"]
+TIER_ORDER = ["Highly Novel", "Novel", "Emerging", "Established", "Ungrounded"]
 TIER_COLOR = {
     "Highly Novel": BLUE,
     "Novel": AQUA,
     "Emerging": YELLOW,
     "Established": MUTED,
+    # Not a weak result but an undefined one: the seed genes have too little
+    # disease literature for any novelty call to mean anything.
+    "Ungrounded": ORANGE,
 }
 
 
@@ -149,7 +152,7 @@ def fig_saturation(reports: Dict[str, dict], out_dir: Path) -> None:
     retrieved = [r.get("citation_count", 0) for r in rows]
     ranks = list(range(1, len(rows) + 1))
 
-    fig, ax = plt.subplots(figsize=(6.6, 3.4))
+    fig, ax = plt.subplots(figsize=(6.8, 3.6))
     ax.bar(ranks, [h + 1 for h in hits],
            color=[TIER_COLOR.get(t, MUTED) for t in tiers], width=0.62, zorder=3)
     ax.plot(ranks, [c + 1 for c in retrieved], color=ORANGE, linewidth=2,
@@ -163,17 +166,22 @@ def fig_saturation(reports: Dict[str, dict], out_dir: Path) -> None:
     ax.set_yscale("log")
     ax.set_xlabel("Discovery Score rank")
     ax.set_ylabel("PubMed records + 1")
-    ax.set_title("Literature saturation spans three orders of magnitude")
+    ax.set_title("Literature saturation spans three orders of magnitude", pad=14)
     ax.set_xticks(ranks)
     ax.yaxis.set_major_formatter(FuncFormatter(lambda v, _: f"{int(v):,}"))
+    # Rotated value labels sit above the tallest bars, so the log axis needs
+    # headroom or they collide with the title.
+    ax.set_ylim(top=max(hits) * 12 if hits else None)
     despine(ax)
 
     handles = [plt.Rectangle((0, 0), 1, 1, color=TIER_COLOR[t])
                for t in TIER_ORDER if t in set(tiers)]
     labels = [t for t in TIER_ORDER if t in set(tiers)]
     line = plt.Line2D([], [], color=ORANGE, linewidth=2, marker="o", markersize=3.5)
+    # Legend below the plot: inside the axes it overlapped the title and the
+    # tall bars at both ends.
     ax.legend(handles + [line], labels + ["abstracts retrieved (capped)"],
-              ncol=3, loc="upper left", bbox_to_anchor=(0, 1.0))
+              ncol=4, loc="upper center", bbox_to_anchor=(0.5, -0.22))
     save(fig, out_dir, "fig3_literature_saturation")
 
 
@@ -181,31 +189,49 @@ def fig_saturation(reports: Dict[str, dict], out_dir: Path) -> None:
 # Figure 4 -- temporal holdout
 # --------------------------------------------------------------------------
 def fig_holdout(holdout: dict, out_dir: Path) -> None:
-    """Does novelty at the cutoff predict subsequent publication growth?"""
+    """Temporal holdout: does novelty at the cutoff anticipate later publication?
+
+    It does not, and the figure is drawn to show that rather than to obscure it.
+    Panel A plots the raw relationship; panel B gives growth by the tier assigned
+    at the cutoff. Reporting a null result plainly is the point of running the
+    validation at all.
+    """
     records = holdout.get("records") or []
     summary = holdout.get("summary") or {}
     if len(records) < 5:
         print("  ! too few holdout records, skipping fig4")
         return
 
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(6.9, 3.2),
+    measurable = [r for r in records if r["hits_pre"] > 0]
+
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(6.9, 3.3),
                                    gridspec_kw={"width_ratios": [1.25, 1]})
 
-    # Panel A: novelty at cutoff vs subsequent growth
+    # Panel A -- novelty at cutoff vs subsequent publication volume.
     xs = [r["novelty_pre"] for r in records]
-    ys = [r["growth"] for r in records]
+    ys = [r["hits_post"] + 1 for r in records]
     cols = [TIER_COLOR.get(r["tier_pre"], MUTED) for r in records]
-    ax1.scatter(xs, ys, c=cols, s=26, zorder=3, edgecolors=SURFACE, linewidths=0.6)
+    ax1.scatter(xs, ys, c=cols, s=24, zorder=3, edgecolors=SURFACE, linewidths=0.6)
+    ax1.set_yscale("log")
     ax1.set_xlabel(f"Literature novelty at {summary.get('cutoff', 'cutoff')}")
-    ax1.set_ylabel("Post-cutoff growth\n(records after / records before)")
-    ax1.set_title("A  Novelty predicts later publication")
-    rho = summary.get("spearman_novelty_vs_growth")
-    if rho is not None:
-        ax1.text(0.03, 0.94, f"Spearman ρ = {rho:+.2f}  (n = {len(records)})",
-                 transform=ax1.transAxes, fontsize=7.5, color=INK, va="top")
+    ax1.set_ylabel(f"Records published "
+                   f"{int(summary.get('cutoff', 2020)) + 1}-{summary.get('through', '')} + 1")
+    ax1.set_title("A  Novelty does not predict later work")
+    ax1.yaxis.set_major_formatter(FuncFormatter(lambda v, _: f"{int(v):,}"))
+    rho_abs = summary.get("spearman_novelty_vs_absolute")
+    rho_growth = summary.get("spearman_novelty_vs_growth")
+    lines = []
+    if rho_abs is not None:
+        lines.append(f"ρ(novelty, new records) = {rho_abs:+.2f}")
+    if rho_growth is not None:
+        lines.append(f"ρ(novelty, growth rate) = {rho_growth:+.2f}")
+    if lines:
+        lines.append(f"n = {len(records)}")
+        ax1.text(0.03, 0.06, chr(10).join(lines),
+                 transform=ax1.transAxes, fontsize=7, color=INK, va="bottom")
     despine(ax1)
 
-    # Panel B: growth by tier assigned at the cutoff
+    # Panel B -- growth by the tier assigned at the cutoff.
     by_tier = summary.get("growth_by_tier") or {}
     tiers = [t for t in TIER_ORDER if t in by_tier]
     means = [by_tier[t]["mean_growth"] for t in tiers]
@@ -213,12 +239,12 @@ def fig_holdout(holdout: dict, out_dir: Path) -> None:
     ypos = list(range(len(tiers)))[::-1]
     ax2.barh(ypos, means, color=[TIER_COLOR[t] for t in tiers], height=0.6, zorder=3)
     for y, m, n in zip(ypos, means, ns):
-        ax2.text(m, y, f"  {m:.2f}  (n={n})", va="center", fontsize=7, color=INK_2)
+        ax2.text(m, y, f"  {m:.2f} (n={n})", va="center", fontsize=7, color=INK_2)
     ax2.set_yticks(ypos)
     ax2.set_yticklabels(tiers, fontsize=7.5)
     ax2.set_xlabel("Mean post-cutoff growth")
     ax2.set_title("B  Growth by tier at cutoff")
-    ax2.margins(x=0.30)
+    ax2.margins(x=0.42)
     ax2.grid(axis="y", visible=False)
     despine(ax2)
 
@@ -230,41 +256,51 @@ def fig_holdout(holdout: dict, out_dir: Path) -> None:
 # Figure 5 -- negative controls
 # --------------------------------------------------------------------------
 def fig_controls(reports: Dict[str, dict], manifest: dict, out_dir: Path) -> None:
-    """Real seed panels vs random and off-target gene sets."""
-    names, counts, kinds = [], [], []
+    """Real seed panels vs random and off-target gene sets.
+
+    Counts are split into hypotheses carrying an interpretable novelty call and
+    those flagged Ungrounded -- the seed genes have too little disease
+    literature for novelty to mean anything. The separation is the result: every
+    negative-control hypothesis falls in the Ungrounded class.
+    """
+    rows = []
     for name, meta in manifest.items():
         report = reports.get(name)
-        n = len(report["ranked_hypotheses"]) if report else 0
-        names.append(name.replace("_", " "))
-        counts.append(n)
-        kinds.append(meta.get("kind", "real"))
-    if not names:
+        hyps = report["ranked_hypotheses"] if report else []
+        ungrounded = sum(
+            1 for h in hyps
+            if (h.get("score_components") or {}).get("novelty_tier") == "Ungrounded"
+        )
+        rows.append({
+            "name": name.replace("_", " "),
+            "kind": meta.get("kind", "real"),
+            "grounded": len(hyps) - ungrounded,
+            "ungrounded": ungrounded,
+        })
+    if not rows:
         return
 
-    order = sorted(range(len(names)), key=lambda i: (kinds[i] != "real", -counts[i]))
-    names = [names[i] for i in order]
-    counts = [counts[i] for i in order]
-    kinds = [kinds[i] for i in order]
+    rows.sort(key=lambda r: (r["kind"] != "real", -r["grounded"]))
+    fig, ax = plt.subplots(figsize=(6.6, 0.42 * len(rows) + 1.7))
+    ypos = list(range(len(rows)))[::-1]
 
-    fig, ax = plt.subplots(figsize=(6.6, 0.42 * len(names) + 1.5))
-    ypos = list(range(len(names)))[::-1]
-    colors = [BLUE if k == "real" else ORANGE for k in kinds]
-    ax.barh(ypos, counts, color=colors, height=0.6, zorder=3)
-    for y, c in zip(ypos, counts):
-        ax.text(c, y, f"  {c}", va="center", fontsize=7.5, color=INK_2)
+    ax.barh(ypos, [r["grounded"] for r in rows], color=BLUE, height=0.6, zorder=3,
+            label="interpretable novelty call")
+    ax.barh(ypos, [r["ungrounded"] for r in rows], left=[r["grounded"] for r in rows],
+            color=ORANGE, height=0.6, zorder=3, label="Ungrounded (seeds lack disease literature)")
+    for y, r in zip(ypos, rows):
+        total = r["grounded"] + r["ungrounded"]
+        ax.text(total, y, f"  {r['grounded']} / {total}", va="center",
+                fontsize=7.5, color=INK_2)
 
     ax.set_yticks(ypos)
-    ax.set_yticklabels(names, fontsize=7.5)
-    ax.set_xlabel("Cardiac pathway hypotheses reported")
-    ax.set_title("Negative controls yield few or no hypotheses")
-    ax.margins(x=0.18)
+    ax.set_yticklabels([r["name"] for r in rows], fontsize=7.5)
+    ax.set_xlabel("Pathway hypotheses reported")
+    ax.set_title("Negative controls produce no interpretable novelty")
+    ax.margins(x=0.20)
     ax.grid(axis="y", visible=False)
     despine(ax)
-
-    handles = [plt.Rectangle((0, 0), 1, 1, color=BLUE),
-               plt.Rectangle((0, 0), 1, 1, color=ORANGE)]
-    ax.legend(handles, ["cardiovascular seed panel", "negative control"],
-              ncol=2, loc="lower right")
+    ax.legend(ncol=1, loc="lower right")
     save(fig, out_dir, "fig5_negative_controls")
 
 
