@@ -339,10 +339,12 @@ class ReportGenerator:
                 {
                     "pmid": c.pmid,
                     "title": c.title,
+                    "journal": getattr(c, 'journal', ''),
                     "year": c.year,
+                    "abstract": getattr(c, 'abstract', ''),
                     "relevance": c.relevance_score
                 }
-                for c in citations[:3]  # Top 3 citations
+                for c in citations
             ]
             
             # Get key nodes from topology analysis
@@ -362,25 +364,51 @@ class ReportGenerator:
             
             # Get traced seed genes
             seed_genes = h.traced_seed_genes if h.traced_seed_genes else []
-            
+
             # Get literature associations
             lit_support = h.literature_associations.get('has_literature_support', False) if h.literature_associations else False
-            
+
+            # Pull novelty / discovery data from score_components (set by HypothesisValidator)
+            sc = h.score_components or {}
+            novelty_tier     = sc.get('novelty_tier', '')
+            literature_sat   = sc.get('literature_saturation', None)
+            n_relevant_cits  = sc.get('n_relevant_citations', len(citation_summaries))
+            discovery_score  = sc.get('discovery_score', None)
+
+            pathway_obj = h.aggregated_pathway.pathway
             table_rows.append({
                 "rank": h.rank,
                 "pathway_id": pathway_id,
-                "pathway_name": h.aggregated_pathway.pathway.pathway_name,
-                "source_db": h.aggregated_pathway.pathway.source_db,
+                "pathway_name": pathway_obj.pathway_name,
+                "source_db": pathway_obj.source_db,
+                # Retained under the historical key for API/report compatibility.
+                # This is the Pathway Prioritization Score, not a GSEA NES.
                 "nes_score": h.nes_score,
-                "p_adj": h.aggregated_pathway.pathway.p_adj,
-                "evidence_count": h.aggregated_pathway.pathway.evidence_count,
+                "pps_score": h.nes_score,
+                "p_adj": pathway_obj.p_adj,
+                "fold_enrichment": pathway_obj.fold_enrichment,
+                "term_size": pathway_obj.term_size,
+                "empirical_pvalue": sc.get('empirical_pvalue'),
+                "empirical_qvalue": sc.get('empirical_qvalue'),
+                "permutation_testable": sc.get('permutation_testable'),
+                "pubmed_hit_count": sc.get('pubmed_hit_count'),
+                "evidence_count": pathway_obj.evidence_count,
                 "support_count": h.aggregated_pathway.support_count,
                 "seed_genes": seed_genes,
                 "literature_support": lit_support,
                 "citations": citation_summaries,
                 "citation_count": len(citations),
+                "n_relevant_citations": n_relevant_cits,
                 "key_nodes": key_nodes,
-                "source_primaries": h.aggregated_pathway.source_primary_pathways
+                "source_primaries": h.aggregated_pathway.source_primary_pathways,
+                # Novelty / discovery fields
+                "novelty_tier": novelty_tier,
+                "literature_saturation": literature_sat,
+                "discovery_score": discovery_score,
+                "score_components": {
+                    k: v for k, v in sc.items()
+                    if not isinstance(v, (dict, list))
+                },
             })
         
         return table_rows
@@ -421,7 +449,7 @@ class ReportGenerator:
         if supported_hypotheses > 0:
             return (
                 f"Analysis prioritized {total_hypotheses} cardiac-relevant pathway hypotheses. "
-                f"The top-ranked pathway is '{top_name}' (NES: {top_nes:.2f}). "
+                f"The top-ranked pathway is '{top_name}' (PPS: {top_nes:.3f}). "
                 f"Automated PubMed co-mention searches found direct support for "
                 f"{supported_hypotheses} of {total_hypotheses} final pathways. "
                 f"These results should be treated as candidate associations pending expert review."
@@ -429,7 +457,7 @@ class ReportGenerator:
         
         return (
             f"Analysis prioritized {total_hypotheses} cardiac-relevant pathway hypotheses. "
-            f"The top-ranked pathway is '{top_name}' (NES: {top_nes:.2f}). "
+            f"The top-ranked pathway is '{top_name}' (PPS: {top_nes:.3f}). "
             f"Automated PubMed co-mention searches did not retrieve direct support for the final ranked pathways; "
             f"that should be interpreted as an unresolved literature gap in this query strategy, not proof of novelty "
             f"or absence from the literature."
@@ -454,11 +482,27 @@ class ReportGenerator:
 
 ## Top Pathway Discoveries
 
-| Rank | Pathway | Source | NES Score | Adj. P-value | Evidence Genes | Literature Citations |
-|------|---------|--------|-----------|--------------|----------------|---------------------|
+Ranked by Discovery Score. Column definitions are given in the Methods note below.
+
+| Rank | Pathway | Source | Discovery | Novelty | PPS | Enrich. p<sub>adj</sub> | Fold | Perm. q | Genes | PubMed hits |
+|------|---------|--------|-----------|---------|-----|--------------|------|---------|-------|-------------|
 {% for h in ranked_hypotheses[:20] -%}
-| {{ h.rank }} | {{ h.pathway_name }} | {{ h.source_db }} | {{ "%.2f"|format(h.nes_score) }} | {{ "%.2e"|format(h.p_adj) }} | {{ h.evidence_count }} | {{ h.citation_count }} |
+| {{ h.rank }} | {{ h.pathway_name }} | {{ h.source_db }} | {{ "%.3f"|format(h.discovery_score) if h.discovery_score is not none else "—" }} | {{ h.novelty_tier or "—" }} | {{ "%.3f"|format(h.nes_score) }} | {{ "%.2e"|format(h.p_adj) }} | {{ "%.1f"|format(h.fold_enrichment) if h.fold_enrichment is not none else "—" }} | {{ "%.3g"|format(h.empirical_qvalue) if h.empirical_qvalue is not none else "n/t" }} | {{ h.evidence_count }} | {{ h.pubmed_hit_count if h.pubmed_hit_count is not none and h.pubmed_hit_count >= 0 else "—" }} |
 {% endfor %}
+
+**Column definitions.**
+`Discovery` = PPS x literature novelty; the primary ranking metric, high for pathways
+that are both well supported and under-reported.
+`Novelty` = literature tier derived from `PubMed hits`.
+`PPS` = Pathway Prioritization Score, a weighted composite of significance (0.30),
+fold enrichment (0.30), gene-set specificity (0.25) and cross-source replication
+(0.15), scaled by database weight and seed proximity. **This is not a GSEA
+normalized enrichment score.**
+`Enrich. p_adj` = FDR-adjusted enrichment p-value from g:Profiler.
+`Fold` = observed / expected overlap.
+`Perm. q` = Benjamini-Hochberg corrected empirical p-value from a degree-matched
+permutation null over the annotated background; `n/t` means the test was not run.
+`PubMed hits` = total records at the pathway x seed genes x disease intersection.
 
 ---
 
@@ -467,7 +511,7 @@ class ReportGenerator:
 {% for item in ai_pathway_interpretations[:5] %}
 ### {{ loop.index }}. {{ item.pathway.name }}
 
-**NES Score:** {{ "%.2f"|format(item.pathway.nes_score) }} | **P-value:** {{ "%.2e"|format(item.pathway.p_value) }} | **Database:** {{ item.pathway.database }}
+**PPS:** {{ "%.3f"|format(item.pathway.nes_score) }} | **Enrichment p:** {{ "%.2e"|format(item.pathway.p_value) }} | **Database:** {{ item.pathway.database }}
 
 {{ item.interpretation }}
 
@@ -570,25 +614,27 @@ class ReportGenerator:
         <tr>
             <th>Rank</th>
             <th>Pathway</th>
-            <th>NES Score</th>
-            <th>P-adj</th>
+            <th title="PPS x literature novelty">Discovery</th>
+            <th>Novelty</th>
+            <th title="Pathway Prioritization Score - not a GSEA NES">PPS</th>
+            <th title="FDR-adjusted enrichment p-value (g:Profiler)">Enrich. p-adj</th>
+            <th title="Benjamini-Hochberg corrected permutation p-value">Perm. q</th>
             <th>Evidence</th>
             <th>Seed Genes</th>
-            <th>Literature Support</th>
-            <th>Citations</th>
-            <th>Key Nodes</th>
+            <th title="PubMed records at pathway x seeds x disease">PubMed hits</th>
         </tr>
         {% for h in ranked_hypotheses[:10] %}
         <tr>
             <td>{{ h.rank }}</td>
             <td>{{ h.pathway_name }}</td>
-            <td>{{ "%.2f"|format(h.nes_score) }}</td>
+            <td><strong>{{ "%.3f"|format(h.discovery_score) if h.discovery_score is not none else "—" }}</strong></td>
+            <td>{{ h.novelty_tier or "—" }}</td>
+            <td>{{ "%.3f"|format(h.nes_score) }}</td>
             <td>{{ "%.2e"|format(h.p_adj) }}</td>
+            <td>{{ "%.3g"|format(h.empirical_qvalue) if h.empirical_qvalue is not none else "n/t" }}</td>
             <td>{{ h.evidence_count }}</td>
             <td>{{ h.seed_genes | join(', ') if h.seed_genes else 'N/A' }}</td>
-            <td>{{ 'Yes' if h.literature_support else 'No' }}</td>
-            <td>{{ h.citation_count }}</td>
-            <td>{{ h.key_nodes | length if h.key_nodes else 0 }}</td>
+            <td>{{ h.pubmed_hit_count if h.pubmed_hit_count is not none and h.pubmed_hit_count >= 0 else "—" }}</td>
         </tr>
         {% endfor %}
     </table>
@@ -730,22 +776,41 @@ class ReportGenerator:
         els.append(hr())
         hypotheses = report_data.get("ranked_hypotheses", [])
         if hypotheses:
-            tbl_data = [["Rank", "Pathway Name", "DB", "NES", "Adj. P", "Genes", "Lit."]]
+            def _fmt(value, spec, blank="-"):
+                return format(value, spec) if isinstance(value, (int, float)) else blank
+
+            tbl_data = [["Rank", "Pathway Name", "DB", "Disc.", "Novelty",
+                         "PPS", "Enr. p", "Perm. q", "Genes", "PubMed"]]
             for h in hypotheses[:30]:
                 tbl_data.append([
                     str(h.get("rank", "")),
-                    Paragraph(str(h.get("pathway_name", ""))[:65], small_style),
-                    str(h.get("source_db", ""))[:8],
-                    f"{h.get('nes_score', 0):.2f}",
-                    f"{h.get('p_adj', 1):.1e}",
+                    Paragraph(str(h.get("pathway_name", ""))[:60], small_style),
+                    str(h.get("source_db", ""))[:6],
+                    _fmt(h.get("discovery_score"), ".3f"),
+                    Paragraph(str(h.get("novelty_tier") or "-"), small_style),
+                    _fmt(h.get("nes_score"), ".3f"),
+                    _fmt(h.get("p_adj"), ".0e"),
+                    _fmt(h.get("empirical_qvalue"), ".2g", blank="n/t"),
                     str(h.get("evidence_count", 0)),
-                    str(h.get("citation_count", 0)),
+                    str(h["pubmed_hit_count"]) if isinstance(h.get("pubmed_hit_count"), int)
+                        and h["pubmed_hit_count"] >= 0 else "-",
                 ])
             t = Table(tbl_data,
-                      colWidths=[0.4*inch, 2.9*inch, 0.55*inch, 0.5*inch,
-                                 0.65*inch, 0.45*inch, 0.4*inch])
+                      colWidths=[0.35*inch, 2.15*inch, 0.42*inch, 0.48*inch, 0.68*inch,
+                                 0.42*inch, 0.48*inch, 0.48*inch, 0.42*inch, 0.52*inch])
             t.setStyle(base_tbl_style())
             els.append(t)
+            els.append(sp(6))
+            els.append(Paragraph(
+                "<b>Disc.</b> Discovery Score = PPS x literature novelty (primary ranking). "
+                "<b>PPS</b> Pathway Prioritization Score: weighted composite of significance (0.30), "
+                "fold enrichment (0.30), gene-set specificity (0.25) and replication (0.15) - "
+                "not a GSEA normalized enrichment score. "
+                "<b>Enr. p</b> FDR-adjusted enrichment p-value (g:Profiler). "
+                "<b>Perm. q</b> Benjamini-Hochberg corrected empirical p-value from a "
+                "degree-matched permutation null; n/t = not tested. "
+                "<b>PubMed</b> records at the pathway x seed genes x disease intersection.",
+                caption_style))
         else:
             els.append(Paragraph("No pathway hypotheses available.", body_style))
 
@@ -759,7 +824,7 @@ class ReportGenerator:
                 pw    = item.get("pathway", {})
                 interp = item.get("interpretation", "")
                 els.append(Paragraph(f"{i}. {pw.get('name', 'Unknown')}", h2_style))
-                stats = (f"NES = {pw.get('nes_score', 0):.2f}  |  "
+                stats = (f"PPS = {pw.get('nes_score', 0):.3f}  |  "
                          f"p = {pw.get('p_value', 1):.2e}  |  "
                          f"DB: {pw.get('database', '')}  |  "
                          f"Citations: {pw.get('citation_count', 0)}")
@@ -789,7 +854,7 @@ class ReportGenerator:
                     if para.strip():
                         els.append(Paragraph(para.strip(), body_style))
                 els.append(sp())
-            gene_data = [["Gene", "Druggability", "NES", "Pathways"]]
+            gene_data = [["Gene", "Druggability", "PPS", "Pathways"]]
             for g in top_genes[:20]:
                 gene_data.append([
                     str(g.get("gene_symbol", g.get("symbol", ""))),

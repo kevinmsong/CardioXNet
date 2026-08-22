@@ -130,10 +130,17 @@ class NETSConfig(BaseSettings):
     
     # Semantic Filtering Configuration (Disease-context aware, comprehensive)
     semantic_relevance_threshold: float = Field(
-        default=0.15,  # More inclusive for comprehensive pathway discovery
-        ge=0.001,
+        default=0.01,
+        ge=0.0,
         le=0.7,
-        description="Minimum semantic cardiovascular disease relevance score (0.15 for comprehensive discovery, validated range: 0.001-0.7)"
+        description=(
+            "Minimum cardiac semantic relevance. Since the scorer was corrected "
+            "so that a pathway with no cardiac evidence scores exactly 0.0 "
+            "(it previously scored 0.304 regardless), this threshold now means "
+            "'must carry at least some cardiac evidence'. Values above ~0.3 "
+            "retain only pathways named for the heart and will exclude "
+            "mechanistically relevant terms such as Inflammasomes."
+        )
     )
 
     # Max hypotheses sent to literature mining
@@ -184,10 +191,16 @@ class NETSConfig(BaseSettings):
         description="Enable permutation-based empirical p-value calculation"
     )
     n_permutations: int = Field(
-        default=25,
+        default=1000,
         ge=10,
         le=10000,
-        description="Number of permutations for empirical p-value (validated range: 10-10000)"
+        description=(
+            "Number of permutations for the empirical p-value. The smallest "
+            "attainable p is 1/(n+1), so this value sets the resolution floor: "
+            "n=25 could never yield p < 0.038 and therefore could not survive "
+            "FDR correction at any sensible threshold. 1000 gives a floor of "
+            "1e-3. (validated range: 10-10000)"
+        )
     )
     min_fold_enrichment: float = Field(
         default=2.0,
@@ -196,6 +209,31 @@ class NETSConfig(BaseSettings):
         description="Minimum fold-enrichment (observed/expected overlap ratio) for pathway inclusion. Ensures biological effect size beyond statistical significance. Default 2.0 = 2× enrichment."
     )
     
+    # Final cardiac name filter. Retains a pathway if its NAME carries a cardiac
+    # or disease term, or if it clears the semantic-rescue bar (high cardiac
+    # relevance + replication + significance). Exposed here so it can be set via
+    # config_overrides: the pipeline only applies overrides for keys that exist
+    # on this model, so before this field was declared the filter was permanently
+    # on and could not be turned off from the UI or API.
+    #
+    # Name matching is a source of circularity for a discovery tool -- a pathway
+    # that is genuinely novel for the heart is unlikely to be named for it -- so
+    # this is reported alongside results and its effect is quantified in the
+    # benchmark rather than left implicit.
+    enforce_final_name_filter: bool = Field(
+        default=False,
+        description=(
+            "Require cardiac/disease terms in the pathway name (with semantic "
+            "rescue) at the final filter stage. Defaults to OFF: on the reference "
+            "VEGFA/MMP9/IL6/TNF/ACE heart-failure panel it cut 66 hypotheses to 23 "
+            "and removed every one of the 6 Highly Novel pathways, because a "
+            "pathway that is genuinely under-studied for the heart is precisely "
+            "the one unlikely to carry a cardiac term in its name. Cardiac "
+            "relevance is enforced upstream by the evidence-based semantic filter "
+            "instead. Set True to restore name-based gating."
+        )
+    )
+
     # Redundancy filtering
     redundancy_jaccard_threshold: float = Field(
         default=0.7, ge=0.0, le=1.0,
@@ -242,7 +280,8 @@ class NETSConfig(BaseSettings):
         env_prefix="NETS_",
         env_file=".env",
         env_file_encoding="utf-8",
-        case_sensitive=False
+        case_sensitive=False,
+        extra="ignore",  # tolerate non-NETS_ keys present in the shared .env (e.g. GROQ_API_KEY)
     )
 
 
@@ -304,7 +343,8 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",
-        case_sensitive=False
+        case_sensitive=False,
+        extra="ignore",
     )
 
 

@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+{% block title %}CardioXNet — Discover cardiac repair pathways{% endblock %}
+
+{% block content %}
+<div style="margin-bottom: 22px;">
+  <h1>From known genes to unreported pathways</h1>
+  <p class="muted" style="max-width: 70ch;">
+    Enter a set of seed genes. CardioXNet assembles their functional neighborhood, finds
+    primary enriched pathways, then expands through the literature into <strong>secondary
+    pathways</strong> — surfacing cardiac mechanisms not already reported for your seeds, each
+    traced back to its evidence and citations.
+  </p>
+</div>
+
+<div class="grid-2">
+  <div>
+    <form class="card" action="/ui/analyze" method="post" data-testid="analyze-form"
+          x-data="{ genes: '', get count() { return this.genes.split(/[^A-Za-z0-9._-]+/).filter(Boolean).length } }">
+      <h2 style="margin-top:0;">Seed genes</h2>
+
+      <div class="field">
+        <label for="genes">Enter or paste gene symbols</label>
+        <textarea id="genes" name="genes" rows="4" x-model="genes"
+                  data-testid="gene-input"
+                  placeholder="Example: PIK3R1 ITGB1 SRC"></textarea>
+        <div class="hint"><span class="num" x-text="count"></span> gene symbol(s) detected · separate by spaces, commas, or new lines</div>
+      </div>
+
+      <div class="toolbar" style="margin-bottom: 18px;">
+        <button type="button" class="btn" data-testid="validate-btn"
+                hx-post="/ui/validate" hx-include="#genes" hx-target="#validation"
+                hx-swap="innerHTML" hx-indicator="#val-spin">
+          Validate genes <span id="val-spin" class="htmx-indicator spinner" style="display:none;"></span>
+        </button>
+        <button type="button" class="btn btn-sm"
+                @click="genes = 'PIK3R1 ITGB1 SRC'">Load example</button>
+        <button type="button" class="btn btn-sm btn-danger" @click="genes = ''"
+                x-show="genes.length">Clear</button>
+      </div>
+
+      <div id="validation" data-testid="validation-area"></div>
+
+      <hr class="divider" />
+
+      <div class="field">
+        <label for="disease_context">Disease context <span class="muted" style="font-weight:400;">(optional — focuses scoring &amp; literature)</span></label>
+        <select id="disease_context" name="disease_context" data-testid="disease-select">
+          <option value="">General — no specific disease focus</option>
+          {% for d in disease_options %}
+          <option value="{{ d.value }}">{{ d.label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="field">
+        <label>Analysis depth</label>
+        <div class="segmented" data-testid="preset-group">
+          {% for key, p in presets.items() %}
+          <div style="position: relative;">
+            <input type="radio" name="preset" id="preset-{{ key }}" value="{{ key }}"
+                   {{ 'checked' if key == default_preset else '' }} />
+            <label class="seg-card" for="preset-{{ key }}">
+              <div class="seg-label">{{ p.label }}</div>
+              <div class="seg-desc">{{ p.desc }}</div>
+            </label>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <details class="adv" style="margin-bottom: 20px;" data-testid="advanced">
+        <summary data-testid="advanced-toggle">Advanced parameters</summary>
+        <div class="adv-body">
+          {% for key, label, mn, mx, step in advanced_fields %}
+          <div class="field" style="margin-bottom:0;">
+            <label for="adv-{{ key }}">{{ label }}</label>
+            <input type="number" id="adv-{{ key }}" name="{{ key }}"
+                   min="{{ mn }}" max="{{ mx }}" step="{{ step }}"
+                   placeholder="preset default" />
+          </div>
+          {% endfor %}
+        </div>
+      </details>
+
+      <button type="submit" class="btn btn-primary btn-lg btn-block" data-testid="start-btn"
+              :disabled="count === 0">
+        ▶ Start discovery
+      </button>
+      <div class="hint" style="text-align:center;">
+        A run takes ~5–20 minutes depending on depth. You'll watch each stage live.
+      </div>
+    </form>
+  </div>
+
+  <aside>
+    <div class="card">
+      <h3 style="margin-top:0;">How discovery works</h3>
+      <ol style="padding-left: 18px; margin: 0; color: var(--muted);">
+        <li style="margin-bottom:8px;"><strong style="color:var(--text);">Seed genes</strong> — your validated input.</li>
+        <li style="margin-bottom:8px;"><strong style="color:var(--text);">Functional neighborhood</strong> — STRING interaction partners.</li>
+        <li style="margin-bottom:8px;"><strong style="color:var(--text);">Primary pathways</strong> — enrichment, with pathways already known for the seeds filtered out.</li>
+        <li style="margin-bottom:8px;"><strong style="color:var(--text);">Secondary expansion</strong> — literature-mined genes open up <em>unreported</em> pathways.</li>
+        <li style="margin-bottom:8px;"><strong style="color:var(--text);">Scoring &amp; filtering</strong> — NES score + cardiac semantic relevance.</li>
+        <li><strong style="color:var(--text);">Evidence</strong> — PubMed citations + seed-gene lineage for every hypothesis.</li>
+      </ol>
+      <hr class="divider" />
+      <p class="small muted" style="margin:0;">
+        See the <a href="/documentation">documentation</a> for a full walkthrough and the
+        <a href="/api-reference">API reference</a> for programmatic access.
+      </p>
+    </div>
+  </aside>
+</div>
+{% endblock %}
+
+{% block scripts_extra %}
+<style>.htmx-indicator{opacity:0}.htmx-request .htmx-indicator{opacity:1;display:inline-block!important}</style>
+{% endblock %}

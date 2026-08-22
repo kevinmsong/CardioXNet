@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% block title %}Documentation — CardioXNet{% endblock %}
+
+{% block content %}
+<h1>Documentation</h1>
+<p class="muted" style="max-width: 75ch;">
+  CardioXNet discovers cardiac repair pathways by reasoning outward from a set of seed genes —
+  from what is <em>known</em> about them to <em>unreported</em> pathway hypotheses, each backed by
+  network evidence and literature. This page explains the pipeline, how to run an analysis, and how
+  to read every column of the results.
+</p>
+
+<div class="card">
+  <h2 style="margin-top:0;">The known &rarr; unknown pipeline</h2>
+  <ol style="padding-left: 20px; color: var(--muted);">
+    <li style="margin-bottom: 10px;"><strong style="color:var(--text)">Seed validation.</strong> Your gene symbols are mapped to NCBI Entrez identifiers.</li>
+    <li style="margin-bottom: 10px;"><strong style="color:var(--text)">Functional neighborhood.</strong> High-confidence STRING interaction partners are assembled around the seeds.</li>
+    <li style="margin-bottom: 10px;"><strong style="color:var(--text)">Primary pathways.</strong> Enrichment (g:Profiler over GO:BP / KEGG / Reactome / WikiPathways) identifies enriched pathways. Pathways <em>already known</em> for the seeds (per Reactome) are filtered out so the focus stays on new biology.</li>
+    <li style="margin-bottom: 10px;"><strong style="color:var(--text)">Secondary expansion.</strong> For each primary pathway, the literature is mined for co-mentioned genes; these expand the gene set and reveal <em>secondary</em> pathways not reachable from the seeds alone. This is where unreported connections emerge.</li>
+    <li style="margin-bottom: 10px;"><strong style="color:var(--text)">Aggregation &amp; scoring.</strong> Pathway instances are deduplicated and combined (Fisher's method), then scored with a Network Enrichment Score (NES) that blends statistical significance, evidence size, database weight, replication support, and network centrality.</li>
+    <li style="margin-bottom: 10px;"><strong style="color:var(--text)">Cardiac filtering.</strong> A semantic filter keeps hypotheses with genuine cardiovascular relevance, optionally focused by your chosen disease context.</li>
+    <li style="margin-bottom: 10px;"><strong style="color:var(--text)">Validation.</strong> Degree-preserving permutation tests, GTEx cardiac tissue expression, and curated druggability annotate each surviving hypothesis.</li>
+    <li style="margin-bottom: 10px;"><strong style="color:var(--text)">Evidence.</strong> Comprehensive PubMed mining attaches ranked citations, and each hypothesis is traced back through its full seed &rarr; primary &rarr; secondary &rarr; final lineage.</li>
+    <li><strong style="color:var(--text)">Topology.</strong> A network analysis highlights hub genes and prioritized druggable therapeutic targets.</li>
+  </ol>
+  <p class="small muted">A full methods description, scoring formulas, and limitations are in <code>docs/METHODS.md</code>.</p>
+</div>
+
+<div class="card">
+  <h2 style="margin-top:0;">Running an analysis</h2>
+  <ol style="padding-left: 20px;">
+    <li><strong>Enter seed genes</strong> on the <a href="/">Discover</a> page (space-, comma-, or newline-separated). Use <em>Validate genes</em> to confirm they map to known symbols.</li>
+    <li><strong>Pick a disease context</strong> (optional) to focus semantic and literature scoring &mdash; e.g. heart failure or diabetic cardiomyopathy.</li>
+    <li><strong>Choose analysis depth:</strong>
+      <ul>
+        <li><strong>Fast screening</strong> (~5 min) &mdash; quick triage. Skips the slow <em>live</em> GTEx and Open Targets calls and the permutation null, substituting fast offline curated estimates for the tissue-specificity and druggability columns.</li>
+        <li><strong>Balanced</strong> (~10 min) &mdash; recommended default; full live validation.</li>
+        <li><strong>Comprehensive</strong> (~20 min) &mdash; deepest expansion, literature recall, and validation.</li>
+      </ul>
+      Advanced parameters (STRING neighbors, FDR threshold, PubMed depth, permutations) can override any preset.</li>
+    <li><strong>Start discovery</strong> and watch the live stage timeline. You'll be taken to the results automatically.</li>
+  </ol>
+</div>
+
+<div class="card">
+  <h2 style="margin-top:0;">Results columns at a glance</h2>
+  <p class="muted small">Every column in the pathway hypotheses table, and what it measures.</p>
+  <div class="table-wrap">
+    <table class="table">
+      <thead>
+        <tr><th>Column</th><th>Meaning</th></tr>
+      </thead>
+      <tbody>
+        <tr style="cursor:default;"><td><strong>NES</strong></td><td style="white-space:normal;">Network Enrichment Score &mdash; the primary ranking. Combines &minus;log<sub>10</sub> adjusted p-value, evidence size, database weight, replication support, and network centrality.</td></tr>
+        <tr style="cursor:default;"><td><strong>p<sub>adj</sub></strong></td><td style="white-space:normal;">Multiple-testing&ndash;corrected enrichment p-value (Benjamini&ndash;Hochberg).</td></tr>
+        <tr style="cursor:default;"><td><strong>Genes</strong></td><td style="white-space:normal;">Number of evidence genes supporting the pathway hypothesis.</td></tr>
+        <tr style="cursor:default;"><td><strong>Cardiac rel.</strong></td><td style="white-space:normal;">Semantic cardiovascular relevance of the pathway (0&ndash;100%), focused by your disease context.</td></tr>
+        <tr style="cursor:default;"><td><strong>Cardiac expr.</strong></td><td style="white-space:normal;">The share of the pathway's genes expressed in cardiac tissue (GTEx Heart - Left Ventricle + Atrial Appendage, median TPM &ge; 1). A fast curated estimate is used when live validation is off. Per-gene cardiac specificity (heart vs. other tissues) is shown on each pathway's detail page.</td></tr>
+        <tr style="cursor:default;"><td><strong>Druggability</strong></td><td style="white-space:normal;">Therapeutic tractability tier (<span class="badge tier-high">high</span> / <span class="badge tier-medium">medium</span> / <span class="badge tier-low">low</span>) from curated DrugBank / ChEMBL / TTD target sets, refined with live Open Targets evidence when enabled.</td></tr>
+        <tr style="cursor:default;"><td><strong>Lit.</strong></td><td style="white-space:normal;">Count of supporting PubMed citations attached to the hypothesis.</td></tr>
+        <tr style="cursor:default;"><td><strong>Traced seeds</strong></td><td style="white-space:normal;">Which of your seed genes this hypothesis was reached from during expansion.</td></tr>
+        <tr style="cursor:default;"><td><span class="badge badge-unreported">unreported</span></td><td style="white-space:normal;">Flagged when seed genes are a minority (&lt;50%) of the pathway's evidence &mdash; i.e. it was reached through expansion rather than already being annotated to the seeds.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="card">
+  <h2 style="margin-top:0;">Reading the results</h2>
+  <ul>
+    <li><strong>Summary tiles</strong> show how many hypotheses are unreported for your seeds, how many came from secondary expansion, and total literature support.</li>
+    <li><strong>Pathway table</strong> &mdash; click any column header to re-sort by NES, adjusted p-value, gene count, cardiac relevance, tissue specificity, or citation count. Click a row to open its detail page.</li>
+    <li><strong>Pathway detail</strong> &mdash; discovery lineage, statistics (permutation-based empirical p-values, cardiac expression and specificity), evidence genes, and ranked PubMed citations with abstracts.</li>
+    <li><strong>Network &amp; targets</strong> &mdash; hub genes and prioritized druggable targets.</li>
+    <li><strong>Export</strong> &mdash; download the full table as CSV, or the report as PDF / Markdown / JSON.</li>
+  </ul>
+</div>
+
+<div class="card">
+  <h2 style="margin-top:0;">Interpreting the <span class="badge badge-unreported">unreported</span> flag</h2>
+  <p style="margin-bottom:0;">
+    A hypothesis is flagged <strong>unreported</strong> when the seed genes account for fewer than half of the
+    pathway's evidence genes &mdash; meaning the pathway was reached through neighborhood and literature
+    expansion rather than being a pathway the seeds are already annotated to. Combine the flag with NES,
+    replication support count, and literature evidence to prioritize hypotheses for experimental follow-up.
+    Novelty here is relative to your seeds and the reference databases; always confirm against the current
+    literature before drawing conclusions.
+  </p>
+</div>
+{% endblock %}

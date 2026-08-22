@@ -1,0 +1,151 @@
+{% extends "base.html" %}
+{% block title %}{{ hyp.pathway_name }} — CardioXNet{% endblock %}
+
+{% block content %}
+<div class="breadcrumb"><a href="/">Discover</a> / <a href="/results/{{ analysis_id }}">Results</a> / Pathway</div>
+
+<div class="toolbar">
+  <h1 style="margin:0;" data-testid="pathway-title">{{ hyp.pathway_name }}</h1>
+</div>
+<div style="margin-bottom: 18px;">
+  <span class="pw-id">{{ hyp.pathway_id }}</span>
+  {% if hyp.source_db %}<span class="badge badge-db">{{ hyp.source_db }}</span>{% endif %}
+  {% if score_components.get('novelty_tier') %}<span class="badge tier-novelty">{{ score_components.get('novelty_tier') }}</span>{% endif %}
+  {% if is_novel %}<span class="badge badge-unreported" data-testid="novel-badge">seed-independent</span>{% endif %}
+</div>
+
+<!-- Lineage -->
+<div class="card" style="margin-bottom: 20px;">
+  <div class="card-title"><h2 style="margin:0;">Discovery lineage</h2></div>
+  <p class="muted small">How this pathway was reached, from your seed genes through expansion.</p>
+  {% set prim = lineage.primary_pathways or [] %}
+  {% set sec = lineage.secondary_pathways or [] %}
+  <div class="lineage" data-testid="lineage">
+    <div class="lineage-step seed">
+      <div class="lstage">Seed genes</div>
+      <div class="lval mono">{{ (lineage.seed_genes or hyp.traced_seed_genes or [])|join(', ') or '—' }}</div>
+    </div>
+    <div class="lineage-step">
+      <div class="lstage">Primary pathways</div>
+      <div class="lval">{{ prim|length }} contributing</div>
+    </div>
+    <div class="lineage-step">
+      <div class="lstage">Secondary expansion</div>
+      <div class="lval">{{ sec|length }} instance(s)</div>
+    </div>
+    <div class="lineage-step final">
+      <div class="lstage">Final pathway</div>
+      <div class="lval">{{ lineage.final_pathway_name or hyp.pathway_name }}</div>
+    </div>
+  </div>
+  <p class="hint" style="margin-top: 12px;">
+    Discovery method: <strong>{{ lineage.discovery_method or '—' }}</strong> ·
+    Support count: <strong>{{ lineage.support_count if lineage.support_count is defined else (hyp.aggregated_pathway or {}).get('support_count', 0) }}</strong>
+    (number of primary pathways independently pointing to this hypothesis)
+  </p>
+</div>
+
+<div class="grid-2">
+  <!-- Metrics -->
+  <div class="card">
+    <div class="card-title"><h2 style="margin:0;">Scores &amp; statistics</h2></div>
+    <dl class="kv" data-testid="metrics">
+      {% if score_components.get('discovery_score') is not none %}
+      <dt title="Pathway Prioritization Score × literature novelty. The primary ranking metric.">Discovery Score</dt>
+      <dd><strong>{{ '%.3f'|format(score_components.get('discovery_score')) }}</strong></dd>
+      {% endif %}
+      <dt title="Weighted composite of significance (0.30), fold enrichment (0.30), gene-set specificity (0.25) and replication (0.15), scaled by database weight and seed proximity. Not a GSEA normalized enrichment score.">Pathway Prioritization Score</dt>
+      <dd><strong>{{ '%.3f'|format(hyp.nes_score or 0) }}</strong>
+        {% if score_components.get('significance') is not none %}
+        <div class="pw-id">sig {{ '%.2f'|format(score_components.get('significance')) }} ·
+          eff {{ '%.2f'|format(score_components.get('effect_size', 0)) }} ·
+          spec {{ '%.2f'|format(score_components.get('specificity', 0)) }} ·
+          rep {{ '%.2f'|format(score_components.get('replication', 0)) }}</div>
+        {% endif %}
+      </dd>
+      <dt title="FDR-adjusted enrichment p-value from g:Profiler">Enrichment p<sub>adj</sub></dt>
+      <dd>{{ '%.2e'|format(hyp.p_adj) if hyp.p_adj is not none else '—' }}</dd>
+      {% if score_components.get('fold_enrichment') is not none %}
+      <dt title="Observed overlap ÷ overlap expected from term size, query size and annotation universe">Fold enrichment</dt>
+      <dd>{{ '%.2f'|format(score_components.get('fold_enrichment')) }}×
+        {% if score_components.get('term_size') %}<span class="pw-id">term size {{ score_components.get('term_size') }}</span>{% endif %}</dd>
+      {% endif %}
+      <dt>Evidence genes</dt><dd>{{ hyp.evidence_count or (hyp.evidence_genes or [])|length }}</dd>
+      <dt>Cardiac relevance</dt><dd>{{ (score_components.get('cardiac_relevance', 0)*100)|round(1) }}%</dd>
+      <dt>Cardiac expression</dt><dd>{{ (score_components.get('cardiac_expression_ratio', 0)*100)|round(1) }}% of genes expressed in heart (GTEx, median TPM ≥ 1)</dd>
+      {% if score_components.get('cardiac_specificity_ratio') %}<dt>Cardiac specificity</dt><dd>{{ '%.1f'|format(score_components.get('cardiac_specificity_ratio')) }}× vs other tissues</dd>{% endif %}
+      {% if score_components.get('mean_cardiac_tpm') %}<dt>Mean cardiac TPM</dt><dd>{{ '%.1f'|format(score_components.get('mean_cardiac_tpm')) }}</dd>{% endif %}
+      {% if score_components.get('literature_saturation') is not none %}
+      <dt title="log10(PubMed hits + 1) ÷ log10(1001). 0 = nothing published at this intersection, 1 = ≥1000 records.">Literature saturation</dt>
+      <dd>{{ '%.2f'|format(score_components.get('literature_saturation')) }}
+        {% if score_components.get('pubmed_hit_count') is not none and score_components.get('pubmed_hit_count') >= 0 %}
+        <div class="pw-id">{{ score_components.get('pubmed_hit_count') }} PubMed records at pathway × seeds × disease</div>
+        {% endif %}
+        {% if score_components.get('saturation_basis') == 'retrieved_citations' %}
+        <div class="pw-id">count lookup unavailable — derived from retrieved citations, treat as a lower bound</div>
+        {% endif %}
+      </dd>
+      {% endif %}
+      {% if score_components.get('permutation_testable') %}
+      <dt title="Empirical p from a degree-matched null drawn from the annotated background gene pool">Permutation p</dt>
+      <dd>{{ '%.4f'|format(score_components.get('empirical_pvalue')) }}
+        {% if score_components.get('p_resolution_floor') %}<span class="pw-id">floor {{ '%.1e'|format(score_components.get('p_resolution_floor')) }}</span>{% endif %}</dd>
+      {% if score_components.get('empirical_qvalue') is not none %}
+      <dt title="Benjamini–Hochberg corrected across every pathway that was tested">Permutation q (BH)</dt>
+      <dd>{{ '%.4f'|format(score_components.get('empirical_qvalue')) }}</dd>
+      {% endif %}
+      {% if score_components.get('permutation_z_score') is not none %}<dt>Permutation z-score</dt><dd>{{ '%.2f'|format(score_components.get('permutation_z_score')) }}</dd>{% endif %}
+      {% elif score_components.get('permutation_skip_reason') %}
+      <dt>Permutation test</dt><dd class="muted">not run — {{ score_components.get('permutation_skip_reason') }}</dd>
+      {% endif %}
+      <dt>Druggability</dt><dd>
+        <span class="badge tier-{{ score_components.get('druggability_tier', 'low') }}">{{ score_components.get('druggability_tier', '—') }}</span>
+        {% if score_components.get('approved_drug_count') %}· {{ score_components.get('approved_drug_count') }} approved{% endif %}
+        {% if score_components.get('clinical_trial_count') %}· {{ score_components.get('clinical_trial_count') }} in trials{% endif %}
+      </dd>
+    </dl>
+  </div>
+
+  <!-- Evidence genes -->
+  <div class="card">
+    <div class="card-title"><h2 style="margin:0;">Evidence genes</h2></div>
+    <p class="muted small">{{ (hyp.evidence_genes or [])|length }} genes; seed genes highlighted.</p>
+    <div class="gene-grid" data-testid="evidence-genes">
+      {% for g in (hyp.evidence_genes or []) %}
+        <span class="gene-tag {{ 'seed' if g in seed_symbols or g in (hyp.traced_seed_genes or []) else '' }}">{{ g }}</span>
+      {% endfor %}
+      {% if not hyp.evidence_genes %}<span class="muted">—</span>{% endif %}
+    </div>
+  </div>
+</div>
+
+<!-- Literature -->
+<div class="card" style="margin-top: 20px;">
+  <div class="card-title"><h2 style="margin:0;">Literature evidence</h2></div>
+  <p class="muted small">{{ citations|length }} citation(s), ranked by relevance. Click a title to read the abstract.</p>
+  {% if citations %}
+  <div data-testid="citations">
+    {% for c in citations %}
+    <div class="cite" x-data="{ open: false }" data-testid="citation">
+      <div class="cite-title">
+        <a href="https://pubmed.ncbi.nlm.nih.gov/{{ c.pmid }}/" target="_blank" rel="noopener">{{ c.title or 'Untitled' }}</a>
+        {% if c.abstract %}<button type="button" class="btn btn-sm" style="margin-left:8px;" @click="open = !open" x-text="open ? 'Hide abstract' : 'Abstract'"></button>{% endif %}
+      </div>
+      <div class="cite-meta">
+        {% if c.journal %}{{ c.journal }} · {% endif %}{% if c.year %}{{ c.year }} · {% endif %}
+        PMID <span class="mono">{{ c.pmid }}</span>
+        {% if c.relevance_score %} · relevance {{ (c.relevance_score*100)|round(0)|int }}%{% endif %}
+      </div>
+      {% if c.abstract %}<div class="cite-abstract" x-show="open" x-cloak>{{ c.abstract }}</div>{% endif %}
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="empty">No literature citations were retrieved for this pathway.</div>
+  {% endif %}
+</div>
+
+<div style="margin-top: 20px;"><a class="btn" href="/results/{{ analysis_id }}">← Back to all results</a></div>
+{% endblock %}
+
+{% block head_extra %}<style>[x-cloak]{display:none!important;}</style>{% endblock %}

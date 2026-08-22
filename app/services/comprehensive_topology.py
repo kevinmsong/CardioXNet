@@ -215,8 +215,9 @@ class ComprehensiveTopologyAnalyzer:
             for interaction in string_network['interactions']:
                 g1 = interaction.get('gene1')
                 g2 = interaction.get('gene2')
-                score = interaction.get('combined_score', 0) / 1000.0
-                
+                raw = interaction.get('score', interaction.get('combined_score', 0))
+                score = raw / 1000.0 if raw > 1 else raw  # handle both 0-1000 and 0-1 scales
+
                 if g1 in all_genes and g2 in all_genes and score >= confidence:
                     G.add_edge(g1, g2, weight=score)
                     edges_added += 1

@@ -35,6 +35,7 @@ from app.services import (
 from app.services.pathway_aggregator_rigorous import RigorousPathwayAggregator
 from app.services.semantic_filter import SemanticFilter
 from app.services.hypothesis_validator import HypothesisValidator
+from app.services.gene_background import background_with, BACKGROUND_SOURCE, BACKGROUND_RETRIEVED
 from app.core.config import get_settings
 
 logger = logging.getLogger(__name__)
@@ -218,7 +219,7 @@ class Pipeline:
             await self._update_progress("nes_scoring", 65, "Calculating NES scores")
             stage_start_time = time.time()
             logger.info(f"[PIPELINE] Calling Stage 5a with {final_result.total_count} pathways")
-            scored_hypotheses = await self._run_stage_5_scoring(final_result, None)
+            scored_hypotheses = await self._run_stage_5_scoring(final_result, None, fn_result=fn_result)
             elapsed = time.time() - stage_start_time
             pass
             logger.info(f"Stage 5a complete: {scored_hypotheses.total_count} scored hypotheses")
@@ -348,11 +349,14 @@ class Pipeline:
                     "status": "completed"
                 }
                 
+                # Not all retained pathways are cardiac-named: the filter also
+                # keeps pathways that clear the semantic-rescue bar. The previous
+                # log line asserted "100% cardiac-named", which was false whenever
+                # a rescue fired.
                 logger.info(
-                    f"[PIPELINE] Stage 4b MANDATORY name filter complete: {scored_hypotheses.total_count}/{pre_final_filter_count} "
-                    f"pathways retained ({retention_rate:.1f}%) - 100% contain cardiac/disease terms in pathway name"
+                    f"[PIPELINE] Final name filter complete: {scored_hypotheses.total_count}/{pre_final_filter_count} "
+                    f"pathways retained ({retention_rate:.1f}%) via cardiac name match or semantic rescue"
                 )
-                logger.info(f"[PIPELINE DEBUG] [SUCCESS] Stage 4b: {scored_hypotheses.total_count}/{pre_final_filter_count} pathways retained (100% cardiac-named)")
                 logger.info(f"[TIMING] Stage 6c (Final Filter) completed in {elapsed:.2f}s (Total: {time.time() - pipeline_start_time:.2f}s)")
                 
                 if scored_hypotheses.total_count == 0:
@@ -389,7 +393,7 @@ class Pipeline:
                 # Run comprehensive topology analysis on top 50 pathways
                 comprehensive_topology_result = self.comprehensive_topology.analyze(
                     top_pathways=scored_hypotheses.hypotheses,
-                    string_network=self.results.get('stage_1_fn', {}),
+                    string_network=fn_result.model_dump(),
                     druggability_data=druggability_data,
                     top_n=50
                 )
@@ -429,6 +433,35 @@ class Pipeline:
                 self.warnings.append(f"Stage 7 topology analysis failed: {str(e)}")
                 # Non-critical failure - continue pipeline
             
+            # Stage 8: Multi-Evidence Validation, Novelty and Discovery Scoring.
+            #
+            # This stage computes the Discovery Score -- the primary output of the
+            # tool -- and was previously defined but never invoked, so every run
+            # emitted discovery_score = null, novelty_tier = "" and
+            # literature_saturation = null. It runs here because it consumes both
+            # the literature evidence (Stage 6a) and the network topology
+            # (Stage 7).
+            await self._update_progress("discovery_scoring", 96, "Scoring novelty and discovery")
+            stage_start_time = time.time()
+            try:
+                scored_hypotheses = await self._run_stage_4_5_validation(
+                    scored_hypotheses,
+                    comprehensive_topology_result,
+                    literature_evidence,
+                    validation_result.valid_genes,
+                    fn_result=fn_result,
+                )
+                elapsed = time.time() - stage_start_time
+                logger.info(
+                    f"[TIMING] Stage 8 discovery scoring completed in {elapsed:.2f}s "
+                    f"(Total: {time.time() - pipeline_start_time:.2f}s)"
+                )
+            except Exception as e:
+                logger.error(f"Stage 8 discovery scoring failed but continuing: {str(e)}")
+                import traceback
+                traceback.print_exc()
+                self.warnings.append(f"Stage 8 discovery scoring failed: {str(e)}")
+
             # Generate Reports
             await self._update_progress("report_generation", 97, "Generating reports")
             stage_start_time = time.time()
@@ -669,14 +702,22 @@ class Pipeline:
             )
     
 
-    async def _run_stage_5_scoring(self, final_result: FinalPathwayResult, clinical_evidence_result: Optional['ClinicalEvidenceResult']) -> ScoredHypotheses:
-        """Run Stage 5a: Final NES Scoring."""
-        logger.info("Running Stage 5a: Final NES Scoring")
-        pass
-        
+    async def _run_stage_5_scoring(
+        self,
+        final_result: FinalPathwayResult,
+        clinical_evidence_result: Optional['ClinicalEvidenceResult'],
+        fn_result: Optional[FunctionalNeighborhood] = None,
+    ) -> ScoredHypotheses:
+        """Run Stage 3: Pathway Prioritization Scoring.
+
+        ``fn_result`` supplies the seed-proximity term of the centrality weight.
+        It was previously not passed, so the weight was pinned at 1.0 for every
+        pathway and contributed nothing to the ranking.
+        """
+        logger.info("Running Stage 3: Pathway Prioritization Scoring")
+
         try:
-            # Pass None for clinical evidence (Stage 3 removed)
-            scored_hypotheses = self.nes_scorer.score(final_result, None)
+            scored_hypotheses = self.nes_scorer.score(final_result, fn_result=fn_result)
             pass
             
             # Note: Stage 5a results will be stored AFTER Stage 4a semantic filtering
@@ -888,14 +929,33 @@ class Pipeline:
             pass
             logger.info(f"Stage 3c: Processing top 25 of {scored_hypotheses.total_count} hypotheses for enhanced validation")
             
-            # Get all genes for permutation testing
-            # Extract all unique genes from seed genes and neighbors
+            # Background gene pool for the permutation null.
+            #
+            # This MUST be drawn from outside the analysis. Two earlier attempts
+            # failed for the same underlying reason:
+            #   * the functional neighbourhood itself -- every "permuted"
+            #     neighbourhood was the neighbourhood again (measured: null mean
+            #     11.2 against an observed 12, p ~ 1 for every pathway);
+            #   * the neighbourhood plus the genes annotated to the returned
+            #     pathways -- g:Profiler reports *intersections*, so those genes
+            #     are already inside the neighbourhood by construction (measured:
+            #     307 background genes for a 302-gene neighbourhood, ratio 1.0x).
+            #
+            # The pool is therefore the HGNC protein-coding genome, unioned with
+            # any analysis gene missing from that snapshot so the observed
+            # overlap is always drawable from the null.
             seed_gene_symbols = [g.symbol for g in seed_genes]
             fn_genes = [g.symbol for g in fn.neighbors] if fn.neighbors else []
-            all_genes = list(set(seed_gene_symbols + fn_genes))
-            
-            pass
-            
+            analysis_genes = set(seed_gene_symbols) | set(fn_genes)
+            for _hyp in scored_hypotheses.hypotheses:
+                analysis_genes.update(_hyp.aggregated_pathway.pathway.evidence_genes or [])
+            all_genes = background_with(analysis_genes)
+            logger.info(
+                f"Permutation background pool: {len(all_genes)} genes "
+                f"for a {len(set(fn_genes))}-gene neighbourhood "
+                f"(ratio {len(all_genes) / max(len(set(fn_genes)), 1):.1f}x)"
+            )
+
             # Calculate gene degrees from functional neighborhood for degree-preserving permutation
             # Degree = number of connections each gene has in the network
             gene_degrees = {}
@@ -936,19 +996,25 @@ class Pipeline:
                     if not hypothesis.score_components:
                         hypothesis.score_components = {}
                     
-                    # 1. Cardiac Tissue Expression Validation with GTEx
+                    # 1. Cardiac Tissue Expression Validation.
+                    #    Live GTEx lookups when enabled; otherwise a fast offline
+                    #    curated-gene estimate so the tissue-specificity column is
+                    #    always populated (the fast preset disables the live calls).
                     try:
-                        tissue_score = await self.tissue_validator.calculate_expression_score(pathway_genes)
+                        if self.settings.nets.tissue_expression_validation:
+                            tissue_score = await self.tissue_validator.calculate_expression_score(pathway_genes)
+                        else:
+                            tissue_score = self.tissue_validator.calculate_offline_expression_score(pathway_genes)
                         hypothesis.score_components['cardiac_expression_ratio'] = tissue_score.cardiac_expression_ratio
                         hypothesis.score_components['cardiac_expressed_genes'] = tissue_score.expressed_genes
                         hypothesis.score_components['tissue_validation_passed'] = tissue_score.validation_passed
                         hypothesis.score_components['mean_cardiac_tpm'] = tissue_score.mean_cardiac_tpm
                         hypothesis.score_components['cardiac_specificity_ratio'] = tissue_score.mean_cardiac_specificity_ratio
-                        
+
                         if not tissue_score.validation_passed:
                             tissue_filtered += 1
                     except Exception as e:
-                        logger.warning(f"GTEx tissue validation failed for hypothesis {i}: {str(e)}")
+                        logger.warning(f"Tissue expression validation failed for hypothesis {i}: {str(e)}")
                         hypothesis.score_components['tissue_validation_passed'] = False
                         tissue_filtered += 1
                 
@@ -956,20 +1022,33 @@ class Pipeline:
                     # SCIENTIFIC RIGOR: Use degree-preserving permutation to control for network topology
                     # Reduced from 1000 to 100 permutations for performance while maintaining statistical validity
                     try:
-                        if all_genes and fn_genes and gene_degrees and self.settings.nets.permutation_test_enabled:
-                            empirical_p, perm_stats = self.permutation_tester.calculate_degree_preserving_pvalue(
+                        if all_genes and fn_genes and self.settings.nets.permutation_test_enabled:
+                            # Size-matched uniform null over the protein-coding
+                            # genome. Degree-matched sampling is deliberately NOT
+                            # used here: STRING degrees are known only for genes
+                            # inside the neighbourhood, so degree bins would draw
+                            # replacements almost exclusively from the
+                            # neighbourhood itself and reintroduce the degenerate
+                            # null this background was introduced to fix. The
+                            # statistics dict records degree_preserved=False so
+                            # the report does not claim a control that was not
+                            # applied.
+                            empirical_p, perm_stats = self.permutation_tester.calculate_empirical_pvalue(
                                 pathway_genes,
                                 fn_genes,
-                                gene_degrees,
                                 all_genes,
-                                n_permutations=None  # Use config default (1000 for rigorous testing)
+                                n_permutations=None,
                             )
                             hypothesis.score_components['empirical_pvalue'] = empirical_p
-                            hypothesis.score_components['permutation_z_score'] = perm_stats.get('z_score', 0)
+                            hypothesis.score_components['permutation_z_score'] = perm_stats.get('z_score')
                             hypothesis.score_components['observed_overlap'] = perm_stats.get('observed_overlap', 0)
-                            hypothesis.score_components['expected_overlap'] = perm_stats.get('mean_null_overlap', 0)
-                            hypothesis.score_components['n_permutations_used'] = perm_stats.get('n_permutations', 100)
+                            hypothesis.score_components['expected_overlap'] = perm_stats.get('mean_null_overlap')
+                            hypothesis.score_components['n_permutations_used'] = perm_stats.get('n_permutations', 0)
                             hypothesis.score_components['degree_preserved'] = perm_stats.get('degree_preserved', True)
+                            hypothesis.score_components['permutation_testable'] = perm_stats.get('testable', False)
+                            hypothesis.score_components['p_resolution_floor'] = perm_stats.get('p_resolution_floor')
+                            if not perm_stats.get('testable', False):
+                                hypothesis.score_components['permutation_skip_reason'] = perm_stats.get('reason')
                         else:
                             hypothesis.score_components['empirical_pvalue'] = None
                             hypothesis.score_components['permutation_z_score'] = None
@@ -978,37 +1057,70 @@ class Pipeline:
                         hypothesis.score_components['empirical_pvalue'] = None
                         hypothesis.score_components['permutation_z_score'] = None
                     
-                    # 3. Druggability Analysis
-                    try:
-                        drug_score = self.druggability_analyzer.calculate_druggability_score(pathway_genes)
-                        hypothesis.score_components['druggable_genes'] = drug_score.druggable_genes
-                        hypothesis.score_components['druggable_ratio'] = drug_score.druggable_ratio
-                        hypothesis.score_components['approved_drug_count'] = drug_score.approved_drug_count
-                        hypothesis.score_components['clinical_trial_count'] = drug_score.clinical_trial_count
-                        hypothesis.score_components['druggability_tier'] = drug_score.druggability_tier
-                        
-                        if drug_score.druggability_tier == 'high':
-                            high_druggability += 1
-                    except Exception as e:
-                        logger.warning(f"Druggability analysis failed for hypothesis {i}: {str(e)}")
-                        hypothesis.score_components['druggability_tier'] = 'unknown'
+                    # 3. Druggability Analysis. The curated tier is computed offline
+                    #    and always runs; the live Open Targets lookup is added only
+                    #    when external druggability is enabled (skipped by fast preset).
+                    if self.settings.nets.druggability_analysis:
+                        try:
+                            drug_score = self.druggability_analyzer.calculate_druggability_score(
+                                pathway_genes,
+                                use_external=self.settings.nets.external_druggability_enabled,
+                            )
+                            hypothesis.score_components['druggable_genes'] = drug_score.druggable_genes
+                            hypothesis.score_components['druggable_ratio'] = drug_score.druggable_ratio
+                            hypothesis.score_components['approved_drug_count'] = drug_score.approved_drug_count
+                            hypothesis.score_components['clinical_trial_count'] = drug_score.clinical_trial_count
+                            hypothesis.score_components['druggability_tier'] = drug_score.druggability_tier
+
+                            if drug_score.druggability_tier == 'high':
+                                high_druggability += 1
+                        except Exception as e:
+                            logger.warning(f"Druggability analysis failed for hypothesis {i}: {str(e)}")
+                            hypothesis.score_components['druggability_tier'] = 'unknown'
                         
                 except Exception as e:
                     logger.error(f"Failed to process hypothesis {i}: {str(e)}")
                     continue  # Skip this hypothesis and continue with the next
             
+            # ---- Multiple-testing correction on the empirical p-values -------
+            # The permutation test is run once per hypothesis, so the raw
+            # empirical p-values are a family and need FDR control before any of
+            # them is called significant. Untestable hypotheses carry p = None
+            # and are excluded from the correction rather than counted in m.
+            raw_p = [h.score_components.get('empirical_pvalue') for h in top_hypotheses]
+            q_values = self.permutation_tester.benjamini_hochberg(raw_p)
+            n_tested = sum(1 for v in raw_p if v is not None)
+            n_sig = 0
+            for hypothesis, q in zip(top_hypotheses, q_values):
+                hypothesis.score_components['empirical_qvalue'] = q
+                if q is not None and q <= self.settings.nets.fdr_threshold:
+                    hypothesis.score_components['empirical_significant'] = True
+                    n_sig += 1
+                elif q is not None:
+                    hypothesis.score_components['empirical_significant'] = False
+            logger.info(
+                f"Permutation FDR: {n_sig}/{n_tested} hypotheses with q <= "
+                f"{self.settings.nets.fdr_threshold} (BH across {n_tested} tests)"
+            )
+
             # Store validation results
             self.results["stage_3_6_enhanced_validation"] = {
                 "hypotheses_validated": len(top_hypotheses),
                 "total_hypotheses": scored_hypotheses.total_count,
-                "validation_scope": "top_50_only",
+                "validation_scope": f"top_{len(top_hypotheses)}",
                 "tissue_expression": {
                     "low_expression_count": tissue_filtered,
                     "passed_count": len(top_hypotheses) - tissue_filtered
                 },
                 "permutation_testing": {
-                    "applied": all_genes and fn_genes,
-                    "n_permutations": 100
+                    "applied": bool(all_genes and fn_genes),
+                    "n_permutations": self.permutation_tester.n_permutations,
+                    "random_seed": self.permutation_tester.random_seed,
+                    "background_pool_size": len(all_genes),
+                    "p_resolution_floor": 1.0 / (self.permutation_tester.n_permutations + 1),
+                    "n_tested": n_tested,
+                    "n_significant_bh": n_sig,
+                    "multiple_testing_correction": "benjamini_hochberg",
                 },
                 "druggability": {
                     "high_tier_count": high_druggability,
@@ -1085,9 +1197,15 @@ class Pipeline:
                 max_concurrent=3  # Allow 3 concurrent literature searches
             )
             
+            # Serialize Citation objects to dicts so they survive json.dump(default=str)
+            # as structured objects (otherwise they become repr strings and the results
+            # API/UI cannot read citation fields). See endpoints._extract_hypotheses.
             self.results["stage_4_literature"] = {
                 "hypotheses_validated": len(literature_evidence.hypothesis_citations),
-                "hypothesis_citations": literature_evidence.hypothesis_citations
+                "hypothesis_citations": {
+                    pid: [c.model_dump() if hasattr(c, "model_dump") else c for c in cits]
+                    for pid, cits in literature_evidence.hypothesis_citations.items()
+                }
             }
             
             return literature_evidence
@@ -1098,96 +1216,241 @@ class Pipeline:
             # Return empty result to continue pipeline
             return LiteratureEvidence(hypothesis_citations={})
     
+    def _backfill_permutation_tests(
+        self,
+        scored_hypotheses: ScoredHypotheses,
+        fn_result: FunctionalNeighborhood,
+        seed_genes: List[GeneInfo],
+    ) -> None:
+        """Ensure every surviving hypothesis carries an empirical p and BH q.
+
+        Stage 4b tests only the top N hypotheses by the ranking in force at that
+        point. Later stages filter and re-rank, so the reported set and the
+        tested set can diverge. This tests whatever is missing and then applies
+        Benjamini-Hochberg across the whole reported set.
+        """
+        if not self.settings.nets.permutation_test_enabled:
+            return
+        if not scored_hypotheses.hypotheses:
+            return
+
+        fn_genes = [g.symbol for g in fn_result.neighbors] if fn_result.neighbors else []
+        if not fn_genes:
+            return
+
+        analysis_genes = {g.symbol for g in seed_genes} | set(fn_genes)
+        for hyp in scored_hypotheses.hypotheses:
+            analysis_genes.update(hyp.aggregated_pathway.pathway.evidence_genes or [])
+        background = background_with(analysis_genes)
+
+        n_backfilled = 0
+        for hyp in scored_hypotheses.hypotheses:
+            if not hyp.score_components:
+                hyp.score_components = {}
+            if hyp.score_components.get('empirical_pvalue') is not None:
+                continue
+            if hyp.score_components.get('permutation_skip_reason'):
+                continue
+            try:
+                empirical_p, stats = self.permutation_tester.calculate_empirical_pvalue(
+                    hyp.aggregated_pathway.pathway.evidence_genes,
+                    fn_genes,
+                    background,
+                    n_permutations=None,
+                )
+                hyp.score_components['empirical_pvalue'] = empirical_p
+                hyp.score_components['permutation_z_score'] = stats.get('z_score')
+                hyp.score_components['observed_overlap'] = stats.get('observed_overlap', 0)
+                hyp.score_components['expected_overlap'] = stats.get('mean_null_overlap')
+                hyp.score_components['n_permutations_used'] = stats.get('n_permutations', 0)
+                hyp.score_components['permutation_testable'] = stats.get('testable', False)
+                hyp.score_components['p_resolution_floor'] = stats.get('p_resolution_floor')
+                if not stats.get('testable', False):
+                    hyp.score_components['permutation_skip_reason'] = stats.get('reason')
+                n_backfilled += 1
+            except Exception as e:
+                logger.warning(f"Backfill permutation test failed: {str(e)}")
+
+        # Re-apply BH across every reported hypothesis that has a p-value.
+        raw_p = [h.score_components.get('empirical_pvalue') for h in scored_hypotheses.hypotheses]
+        q_values = self.permutation_tester.benjamini_hochberg(raw_p)
+        n_sig = 0
+        for hyp, q in zip(scored_hypotheses.hypotheses, q_values):
+            hyp.score_components['empirical_qvalue'] = q
+            if q is not None:
+                hyp.score_components['empirical_significant'] = q <= self.settings.nets.fdr_threshold
+                n_sig += int(q <= self.settings.nets.fdr_threshold)
+
+        n_tested = sum(1 for v in raw_p if v is not None)
+        self.results['permutation_final'] = {
+            'n_backfilled': n_backfilled,
+            'n_tested': n_tested,
+            'n_reported': len(scored_hypotheses.hypotheses),
+            'n_significant_bh': n_sig,
+            'fdr_threshold': self.settings.nets.fdr_threshold,
+            'correction_family': 'all reported hypotheses',
+            'null_model': 'size-matched uniform sampling from the protein-coding genome',
+            'background_source': BACKGROUND_SOURCE,
+            'background_retrieved': BACKGROUND_RETRIEVED,
+            'background_size': len(background),
+            'n_permutations': self.permutation_tester.n_permutations,
+            'random_seed': self.permutation_tester.random_seed,
+        }
+        logger.info(
+            f"Permutation (final set): {n_backfilled} backfilled, "
+            f"{n_sig}/{n_tested} with q <= {self.settings.nets.fdr_threshold}"
+        )
+
+    @staticmethod
+    def _network_evidence_for_pathway(pathway_genes, hub_index) -> Dict:
+        """Per-pathway network evidence derived from the comprehensive topology.
+
+        The validator expects a ``key_nodes`` list. The earlier revision sourced
+        this from ``TopologyAnalyzer.hypothesis_networks``, but that analyzer is
+        never run by :meth:`run`, so the network term was always zero. Hub genes
+        from the comprehensive topology stage carry the same information and are
+        actually computed.
+        """
+        key_nodes = []
+        for gene in pathway_genes or []:
+            hub = hub_index.get(gene)
+            if hub is None:
+                continue
+            key_nodes.append({
+                'gene': gene,
+                # A hub that sits on many shortest paths between pathway members
+                # is acting as a mediator in the sense the validator scores.
+                'role': 'mediator' if hub.get('betweenness_centrality', 0) > 0 else 'member',
+                'betweenness_centrality': hub.get('betweenness_centrality', 0.0),
+                'hub_score': hub.get('hub_score', 0.0),
+            })
+        return {'key_nodes': key_nodes}
+
     async def _run_stage_4_5_validation(
         self,
         scored_hypotheses: ScoredHypotheses,
-        topology_result: TopologyResult,
+        comprehensive_topology_result,
         literature_evidence: LiteratureEvidence,
-        seed_genes: List[GeneInfo]
+        seed_genes: List[GeneInfo],
+        fn_result: Optional[FunctionalNeighborhood] = None,
     ) -> ScoredHypotheses:
         """
-        Run Stage 4.5: Multi-Evidence Validation & Final Ranking.
-        
-        Combines evidence from:
-        - Statistical significance (Stage 2-3)
-        - Replication support (Stage 2c)
-        - Literature evidence (Stage 4)
-        - Network topology (Stage 4)
-        - Novelty (seed overlap)
-        
-        Returns hypotheses with validation scores and re-ranked by confidence.
+        Run Stage 8: Multi-Evidence Validation, Novelty and Discovery Scoring.
+
+        Combines statistical strength, replication, literature evidence, network
+        topology and literature novelty into a validation score, and computes the
+        Discovery Score = PPS x novelty, which surfaces pathways that are both
+        well supported by the enrichment evidence and under-reported in the
+        literature at the (pathway x seed genes x disease) intersection.
+
+        Hypotheses are re-ranked by Discovery Score and their ``rank`` fields are
+        renumbered contiguously from 1.
         """
-        multi_msg = "Running Stage 4.5: Multi-Evidence Validation"
-        logger.info(multi_msg)
-        pass
-        
+        logger.info("Running Stage 8: Multi-Evidence Validation and Discovery Scoring")
+
         try:
+            # Index hub genes once so the per-pathway lookup is O(1).
+            hub_index = {}
+            if comprehensive_topology_result is not None:
+                for hub in getattr(comprehensive_topology_result, 'hub_genes', []) or []:
+                    entry = hub if isinstance(hub, dict) else hub.__dict__
+                    symbol = entry.get('gene_symbol') or entry.get('gene')
+                    if symbol:
+                        hub_index[symbol] = entry
+
+            hit_counts = getattr(literature_evidence, 'hypothesis_hit_counts', {}) or {}
+            concept_counts = getattr(literature_evidence, 'concept_hit_counts', {}) or {}
             validation_scores = {}
-            
-            # Calculate validation score for each hypothesis
+
+            # Backfill permutation tests for surviving hypotheses that were not
+            # inside the top-N window at Stage 4b. Without this, a pathway can
+            # reach the final report with no q-value purely because of where it
+            # sat in an earlier, differently-ordered ranking. Re-running BH over
+            # the full tested set afterwards also makes the correction family
+            # match the set actually reported.
+            if fn_result is not None:
+                self._backfill_permutation_tests(scored_hypotheses, fn_result, seed_genes)
+
             for hypothesis in scored_hypotheses.hypotheses:
-                pathway_id = hypothesis.aggregated_pathway.pathway.pathway_id
-                
-                # Get literature citations for this hypothesis
+                pathway = hypothesis.aggregated_pathway.pathway
+                pathway_id = pathway.pathway_id
+
                 lit_citations = literature_evidence.hypothesis_citations.get(pathway_id, [])
-                
-                # Get network analysis for this hypothesis
-                network_analysis_obj = topology_result.hypothesis_networks.get(pathway_id)
-                if network_analysis_obj is not None:
-                    network_analysis = network_analysis_obj.model_dump()
-                else:
-                    network_analysis = {}
-                
-                # Calculate comprehensive validation score
+                network_analysis = self._network_evidence_for_pathway(
+                    pathway.evidence_genes, hub_index
+                )
+
                 validation_score = self.hypothesis_validator.calculate_validation_score(
                     hypothesis,
                     lit_citations,
                     network_analysis,
-                    seed_genes
+                    seed_genes,
+                    pubmed_hit_count=hit_counts.get(pathway_id),
+                    concept_hit_count=concept_counts.get(pathway_id),
                 )
-                
+
                 validation_scores[pathway_id] = validation_score
-                
-                # Add validation scores to hypothesis score_components
+
                 if not hypothesis.score_components:
                     hypothesis.score_components = {}
-                
-                hypothesis.score_components['validation_score'] = validation_score['total_validation_score']
-                hypothesis.score_components['confidence_level'] = validation_score['confidence_level']
-                hypothesis.score_components['statistical_strength'] = validation_score['statistical_strength']
-                hypothesis.score_components['replication_support'] = validation_score['replication_support']
-                hypothesis.score_components['literature_evidence'] = validation_score['literature_evidence']
-                hypothesis.score_components['network_evidence'] = validation_score['network_evidence']
-                hypothesis.score_components['novelty_score'] = validation_score['novelty_score']
-            
-            # Re-rank by validation score (optional - keep NES ranking but add validation info)
-            # For now, keep NES ranking but add validation scores
-            
-            # Store validation results
-            self.results["stage_4_5_validation"] = {
+
+                # Propagate every field the validator produced. The earlier
+                # revision copied only five of them and silently dropped
+                # discovery_score, novelty_tier and literature_saturation --
+                # the three the report and UI actually read.
+                for key in (
+                    'total_validation_score', 'confidence_level',
+                    'statistical_strength', 'replication_support',
+                    'literature_evidence', 'network_evidence', 'novelty_score',
+                    'novelty_tier', 'literature_saturation', 'discovery_score',
+                    'pubmed_hit_count', 'saturation_basis', 'n_relevant_citations',
+                    'novelty_confidence', 'concept_hit_count',
+                ):
+                    if key in validation_score:
+                        hypothesis.score_components[key] = validation_score[key]
+                hypothesis.score_components['validation_score'] =                     validation_score['total_validation_score']
+
+            # Re-rank by Discovery Score and renumber contiguously. Ranks were
+            # previously carried over from the pre-filter ordering, so a surviving
+            # set of 32 pathways displayed ranks such as 1, 14, 19 ... 4649.
+            scored_hypotheses.hypotheses.sort(
+                key=lambda h: (h.score_components or {}).get('discovery_score', 0.0),
+                reverse=True,
+            )
+            for i, hypothesis in enumerate(scored_hypotheses.hypotheses, start=1):
+                hypothesis.rank = i
+
+            tier_counts: Dict[str, int] = {}
+            for v in validation_scores.values():
+                tier = v.get('novelty_tier', 'Unknown')
+                tier_counts[tier] = tier_counts.get(tier, 0) + 1
+
+            self.results["stage_8_discovery"] = {
                 "hypotheses_validated": len(validation_scores),
                 "high_confidence_count": sum(1 for v in validation_scores.values() if v['confidence_level'] == 'high'),
                 "medium_confidence_count": sum(1 for v in validation_scores.values() if v['confidence_level'] == 'medium'),
                 "low_confidence_count": sum(1 for v in validation_scores.values() if v['confidence_level'] == 'low'),
-                "mean_validation_score": sum(v['total_validation_score'] for v in validation_scores.values()) / len(validation_scores) if validation_scores else 0
+                "novelty_tiers": tier_counts,
+                "mean_validation_score": (
+                    sum(v['total_validation_score'] for v in validation_scores.values())
+                    / len(validation_scores)
+                ) if validation_scores else 0,
+                "ranked_by": "discovery_score",
+                "saturation_ceiling": self.hypothesis_validator.SATURATION_CEILING,
             }
-            
+
             logger.info(
-                f"Stage 4.5 complete: {len(validation_scores)} hypotheses validated, "
-                f"{self.results['stage_4_5_validation']['high_confidence_count']} high confidence, "
-                f"{self.results['stage_4_5_validation']['medium_confidence_count']} medium confidence, "
-                f"{self.results['stage_4_5_validation']['low_confidence_count']} low confidence"
+                f"Stage 8 complete: {len(validation_scores)} hypotheses scored; "
+                f"novelty tiers {tier_counts}"
             )
-            
+
             return scored_hypotheses
-            
+
         except Exception as e:
-            logger.error(f"Stage 4.5 validation failed: {str(e)}")
-            import traceback
-            traceback.print_exc()
-            self.warnings.append(f"Multi-evidence validation failed: {str(e)}")
+            logger.error(f"Stage 8 validation failed: {str(e)}")
+            self.warnings.append(f"Stage 8 validation failed: {str(e)}")
             return scored_hypotheses
-    
+
     async def _run_stage_6_seed_tracing(
         self,
         scored_hypotheses: ScoredHypotheses,

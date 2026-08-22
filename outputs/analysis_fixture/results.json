@@ -1,0 +1,247 @@
+{
+  "stage_0": {
+    "valid_genes": [
+      {"input_id": "GATA4", "entrez_id": "2626", "hgnc_id": "HGNC:4173", "symbol": "GATA4", "species": "Homo sapiens"},
+      {"input_id": "TBX5", "entrez_id": "6910", "hgnc_id": "HGNC:11604", "symbol": "TBX5", "species": "Homo sapiens"},
+      {"input_id": "NKX2-5", "entrez_id": "1482", "hgnc_id": "HGNC:2488", "symbol": "NKX2-5", "species": "Homo sapiens"}
+    ]
+  },
+  "stage_3": {
+    "total_count": 4,
+    "hypotheses": [
+      {
+        "nes_score": 5.21,
+        "rank": 1,
+        "traced_seed_genes": ["GATA4"],
+        "literature_associations": {"associations": []},
+        "aggregated_pathway": {
+          "support_count": 3,
+          "aggregation_score": 0.88,
+          "combined_p_value": 1.2e-9,
+          "aggregated_nes": 5.21,
+          "consistency_score": 0.81,
+          "confidence_score": 0.86,
+          "support_fraction": 0.6,
+          "contributing_seed_genes": ["GATA4", "TBX5"],
+          "source_primary_pathways": [
+            {"pathway_id": "REAC:R-HSA-170834", "pathway_name": "Signaling by TGF-beta Receptor Complex"},
+            {"pathway_id": "GO:0030509", "pathway_name": "BMP signaling pathway"},
+            {"pathway_id": "KEGG:04350", "pathway_name": "TGF-beta signaling pathway"}
+          ],
+          "source_secondary_pathways": [
+            {"pathway_id": "REAC:R-HSA-2173789", "pathway_name": "TGF-beta receptor signaling activates SMADs"},
+            {"pathway_id": "GO:0061030", "pathway_name": "epithelial cell differentiation involved in mammary gland alveolus development"}
+          ],
+          "pathway": {
+            "pathway_id": "REAC:R-HSA-170834",
+            "pathway_name": "TGF-beta receptor signaling in cardiac fibrosis",
+            "source_db": "REAC",
+            "p_value": 3.1e-11,
+            "p_adj": 6.4e-9,
+            "evidence_count": 18,
+            "evidence_genes": ["TGFB1", "TGFBR1", "TGFBR2", "SMAD2", "SMAD3", "SMAD4", "SMAD7", "GATA4", "CTGF", "COL1A1", "COL3A1", "ACTA2", "SERPINE1", "FN1", "TIMP1", "MMP2", "POSTN", "THBS1"]
+          }
+        },
+        "score_components": {
+          "cardiac_relevance": 0.62,
+          "cardiac_specificity_ratio": 0.71,
+          "cardiac_expression_ratio": 0.66,
+          "mean_cardiac_tpm": 142.4,
+          "tissue_validation_passed": true,
+          "empirical_pvalue": 0.018,
+          "permutation_z_score": 3.12,
+          "n_permutations_used": 25,
+          "degree_preserved": true,
+          "druggable_genes": ["TGFB1", "TGFBR1", "MMP2", "SERPINE1"],
+          "druggable_ratio": 0.22,
+          "approved_drug_count": 1,
+          "clinical_trial_count": 4,
+          "druggability_tier": "medium",
+          "db_weight": 1.5,
+          "agg_weight": 1.5,
+          "centrality_weight": 1.4
+        }
+      },
+      {
+        "nes_score": 4.63,
+        "rank": 2,
+        "traced_seed_genes": ["TBX5"],
+        "literature_associations": {"associations": []},
+        "aggregated_pathway": {
+          "support_count": 2,
+          "confidence_score": 0.74,
+          "source_primary_pathways": [
+            {"pathway_id": "GO:0035329", "pathway_name": "hippo signaling"},
+            {"pathway_id": "REAC:R-HSA-2028269", "pathway_name": "Signaling by Hippo"}
+          ],
+          "source_secondary_pathways": [
+            {"pathway_id": "GO:0003222", "pathway_name": "ventricular trabecula myocardium morphogenesis"}
+          ],
+          "pathway": {
+            "pathway_id": "GO:0035329",
+            "pathway_name": "Hippo-YAP signaling in cardiomyocyte proliferation",
+            "source_db": "GO:BP",
+            "p_value": 8.4e-8,
+            "p_adj": 5.1e-6,
+            "evidence_count": 14,
+            "evidence_genes": ["YAP1", "WWTR1", "TEAD1", "LATS1", "LATS2", "STK3", "STK4", "SAV1", "MOB1A", "NF2", "TBX5", "CCND1", "CTGF", "AMOTL2"]
+          }
+        },
+        "score_components": {
+          "cardiac_relevance": 0.55,
+          "cardiac_specificity_ratio": 0.6,
+          "cardiac_expression_ratio": 0.57,
+          "mean_cardiac_tpm": 98.2,
+          "tissue_validation_passed": true,
+          "empirical_pvalue": 0.04,
+          "permutation_z_score": 2.55,
+          "n_permutations_used": 25,
+          "druggable_genes": ["YAP1"],
+          "druggable_ratio": 0.07,
+          "approved_drug_count": 0,
+          "clinical_trial_count": 1,
+          "druggability_tier": "low",
+          "centrality_weight": 1.25
+        }
+      },
+      {
+        "nes_score": 4.10,
+        "rank": 3,
+        "traced_seed_genes": ["NKX2-5", "GATA4"],
+        "literature_associations": {"associations": []},
+        "aggregated_pathway": {
+          "support_count": 2,
+          "confidence_score": 0.69,
+          "source_primary_pathways": [
+            {"pathway_id": "KEGG:04330", "pathway_name": "Notch signaling pathway"},
+            {"pathway_id": "REAC:R-HSA-1980143", "pathway_name": "Signaling by NOTCH1"}
+          ],
+          "source_secondary_pathways": [
+            {"pathway_id": "GO:0055007", "pathway_name": "cardiac muscle cell differentiation"}
+          ],
+          "pathway": {
+            "pathway_id": "KEGG:04330",
+            "pathway_name": "Notch signaling in cardiac regeneration",
+            "source_db": "KEGG",
+            "p_value": 5.0e-7,
+            "p_adj": 2.2e-5,
+            "evidence_count": 16,
+            "evidence_genes": ["NOTCH1", "NOTCH2", "JAG1", "DLL1", "DLL4", "HEY1", "HEY2", "HES1", "RBPJ", "MAML1", "GATA4", "MYC", "HEYL", "NRARP", "DTX1", "LFNG"]
+          }
+        },
+        "score_components": {
+          "cardiac_relevance": 0.49,
+          "cardiac_specificity_ratio": 0.52,
+          "cardiac_expression_ratio": 0.5,
+          "mean_cardiac_tpm": 76.5,
+          "empirical_pvalue": 0.061,
+          "permutation_z_score": 2.2,
+          "druggable_genes": ["NOTCH1", "JAG1"],
+          "druggable_ratio": 0.12,
+          "approved_drug_count": 0,
+          "clinical_trial_count": 2,
+          "druggability_tier": "medium",
+          "centrality_weight": 1.18
+        }
+      },
+      {
+        "nes_score": 3.42,
+        "rank": 4,
+        "traced_seed_genes": ["TBX5", "GATA4", "NKX2-5"],
+        "literature_associations": {"associations": []},
+        "aggregated_pathway": {
+          "support_count": 1,
+          "confidence_score": 0.55,
+          "source_primary_pathways": [
+            {"pathway_id": "GO:0003007", "pathway_name": "heart morphogenesis"}
+          ],
+          "source_secondary_pathways": [],
+          "pathway": {
+            "pathway_id": "GO:0003007",
+            "pathway_name": "Core cardiac transcription factor network",
+            "source_db": "GO:BP",
+            "p_value": 9.0e-6,
+            "p_adj": 3.0e-4,
+            "evidence_count": 5,
+            "evidence_genes": ["GATA4", "TBX5", "NKX2-5", "MEF2C", "HAND2"]
+          }
+        },
+        "score_components": {
+          "cardiac_relevance": 0.74,
+          "cardiac_specificity_ratio": 0.8,
+          "cardiac_expression_ratio": 0.8,
+          "mean_cardiac_tpm": 210.0,
+          "empirical_pvalue": 0.09,
+          "permutation_z_score": 1.7,
+          "druggable_genes": [],
+          "druggable_ratio": 0.0,
+          "approved_drug_count": 0,
+          "clinical_trial_count": 0,
+          "druggability_tier": "low",
+          "centrality_weight": 1.1
+        }
+      }
+    ]
+  },
+  "stage_4_literature": {
+    "hypotheses_validated": 4,
+    "hypothesis_citations": {
+      "REAC:R-HSA-170834": [
+        {"pmid": "30971826", "title": "TGF-beta signaling in cardiac fibrosis: mechanisms and therapeutic targets", "authors": "Khalil H, Kanisicak O, Molkentin JD", "year": 2019, "journal": "Cardiovascular Research", "relevance_score": 0.91, "abstract": "Transforming growth factor beta (TGF-beta) is a central mediator of cardiac fibrosis. Activation of SMAD2/3 downstream of TGFBR1 drives myofibroblast differentiation and extracellular matrix deposition, positioning this axis as a therapeutic target in heart failure."},
+        {"pmid": "27786258", "title": "GATA4 regulates the fibrotic response after myocardial infarction", "authors": "Aharonov A, et al.", "year": 2017, "journal": "Circulation", "relevance_score": 0.78, "abstract": "GATA4 modulates cardiac fibroblast activation and interacts with the TGF-beta-SMAD pathway to influence scar formation and remodeling following ischemic injury."},
+        {"pmid": "33503357", "title": "SERPINE1 and matrix remodeling in the failing heart", "authors": "Ghosh AK, Vaughan DE", "year": 2021, "journal": "Journal of Molecular and Cellular Cardiology", "relevance_score": 0.66, "abstract": "Plasminogen activator inhibitor-1 (SERPINE1) is induced by TGF-beta and contributes to maladaptive matrix turnover in cardiac fibrosis."}
+      ],
+      "GO:0035329": [
+        {"pmid": "31371093", "title": "Hippo-YAP signaling controls cardiomyocyte proliferation and heart regeneration", "authors": "Wang J, Liu S, Heallen T, Martin JF", "year": 2018, "journal": "Nature Reviews Cardiology", "relevance_score": 0.88, "abstract": "The Hippo-YAP pathway is a key regulator of cardiomyocyte renewal. Inhibition of the Hippo kinases or activation of YAP promotes adult cardiomyocyte proliferation and functional recovery after injury."},
+        {"pmid": "28860235", "title": "TBX5 cooperates with YAP in cardiac gene regulation", "authors": "Murakami M, et al.", "year": 2017, "journal": "Developmental Cell", "relevance_score": 0.6, "abstract": "TBX5 interacts with YAP/TEAD complexes to regulate cardiac developmental gene programs relevant to regeneration."}
+      ],
+      "KEGG:04330": [
+        {"pmid": "29348261", "title": "Notch signaling in cardiac development and regeneration", "authors": "Zhou XL, Liu JC", "year": 2018, "journal": "Stem Cell Research & Therapy", "relevance_score": 0.83, "abstract": "Notch signaling regulates cardiomyocyte proliferation, fibroblast behavior, and angiogenesis, and its reactivation has been proposed as a strategy for cardiac repair."},
+        {"pmid": "26371183", "title": "NKX2-5 and Notch crosstalk in the developing myocardium", "authors": "Kratsios P, et al.", "year": 2016, "journal": "Circulation Research", "relevance_score": 0.58, "abstract": "NKX2-5 modulates Notch target gene expression during ventricular maturation, linking core cardiac transcription factors to Notch-dependent regeneration programs."}
+      ],
+      "GO:0003007": [
+        {"pmid": "29030600", "title": "The cardiac transcription factor network: GATA4, TBX5 and NKX2-5", "authors": "Luna-Zurita L, et al.", "year": 2016, "journal": "Cell", "relevance_score": 0.72, "abstract": "GATA4, TBX5 and NKX2-5 form an interdependent regulatory network that governs cardiomyocyte identity; perturbation of any factor reshapes the others' genomic occupancy."}
+      ]
+    }
+  },
+  "stage_7_topology": {
+    "network_summary": {
+      "node_count": 12,
+      "edge_count": 18,
+      "modularity": 0.42,
+      "clustering_coefficient": 0.51,
+      "density": 0.27,
+      "n_hub_genes": 6,
+      "n_targets": 3,
+      "n_modules": 2,
+      "n_crosstalk": 4
+    },
+    "hub_genes": [
+      {"gene_symbol": "TGFB1", "degree_centrality": 1.0, "betweenness_centrality": 0.34, "closeness_centrality": 0.9, "eigenvector_centrality": 0.41, "pagerank": 0.12, "hub_score": 0.62, "pathways": ["TGF-beta receptor signaling in cardiac fibrosis", "Core cardiac transcription factor network"]},
+      {"gene_symbol": "SMAD3", "degree_centrality": 0.82, "betweenness_centrality": 0.21, "closeness_centrality": 0.8, "eigenvector_centrality": 0.36, "pagerank": 0.1, "hub_score": 0.5, "pathways": ["TGF-beta receptor signaling in cardiac fibrosis"]},
+      {"gene_symbol": "YAP1", "degree_centrality": 0.73, "betweenness_centrality": 0.28, "closeness_centrality": 0.75, "eigenvector_centrality": 0.3, "pagerank": 0.09, "hub_score": 0.47, "pathways": ["Hippo-YAP signaling in cardiomyocyte proliferation"]},
+      {"gene_symbol": "GATA4", "degree_centrality": 0.64, "betweenness_centrality": 0.3, "closeness_centrality": 0.72, "eigenvector_centrality": 0.29, "pagerank": 0.08, "hub_score": 0.45, "pathways": ["TGF-beta receptor signaling in cardiac fibrosis", "Notch signaling in cardiac regeneration", "Core cardiac transcription factor network"]},
+      {"gene_symbol": "NOTCH1", "degree_centrality": 0.55, "betweenness_centrality": 0.15, "closeness_centrality": 0.68, "eigenvector_centrality": 0.24, "pagerank": 0.07, "hub_score": 0.38, "pathways": ["Notch signaling in cardiac regeneration"]},
+      {"gene_symbol": "TBX5", "degree_centrality": 0.45, "betweenness_centrality": 0.18, "closeness_centrality": 0.64, "eigenvector_centrality": 0.22, "pagerank": 0.06, "hub_score": 0.35, "pathways": ["Hippo-YAP signaling in cardiomyocyte proliferation", "Core cardiac transcription factor network"]}
+    ],
+    "therapeutic_targets": [
+      {"gene_symbol": "TGFB1", "therapeutic_score": 0.89, "centrality_score": 1.0, "druggability_score": 0.7, "evidence_score": 0.9, "pathway_count": 2, "pathways": ["TGF-beta receptor signaling in cardiac fibrosis"], "drugs": []},
+      {"gene_symbol": "NOTCH1", "therapeutic_score": 0.66, "centrality_score": 0.55, "druggability_score": 0.6, "evidence_score": 0.7, "pathway_count": 1, "pathways": ["Notch signaling in cardiac regeneration"], "drugs": []},
+      {"gene_symbol": "YAP1", "therapeutic_score": 0.61, "centrality_score": 0.73, "druggability_score": 0.4, "evidence_score": 0.7, "pathway_count": 1, "pathways": ["Hippo-YAP signaling in cardiomyocyte proliferation"], "drugs": []}
+    ],
+    "functional_modules": [
+      {"module_id": 0, "genes": ["TGFB1", "SMAD3", "GATA4"], "size": 3},
+      {"module_id": 1, "genes": ["YAP1", "TBX5", "NOTCH1"], "size": 3}
+    ],
+    "pathway_crosstalk": [
+      {"pathway_a": "TGF-beta receptor signaling in cardiac fibrosis", "pathway_b": "Core cardiac transcription factor network", "shared_genes": ["GATA4"], "overlap": 1},
+      {"pathway_a": "Hippo-YAP signaling in cardiomyocyte proliferation", "pathway_b": "Core cardiac transcription factor network", "shared_genes": ["TBX5"], "overlap": 1}
+    ]
+  },
+  "top_genes": [
+    {"gene": "TGFB1", "pathway_count": 2, "importance_score": 18.4, "druggability_tier": "medium", "is_druggable": true, "is_fda_approved": false, "is_clinical_trial": true, "centrality": 1.0, "final_score": 27.6},
+    {"gene": "GATA4", "pathway_count": 3, "importance_score": 16.1, "druggability_tier": "low", "is_druggable": false, "is_fda_approved": false, "is_clinical_trial": false, "centrality": 0.64, "final_score": 22.0},
+    {"gene": "YAP1", "pathway_count": 1, "importance_score": 12.3, "druggability_tier": "low", "is_druggable": true, "is_fda_approved": false, "is_clinical_trial": true, "centrality": 0.73, "final_score": 18.1},
+    {"gene": "NOTCH1", "pathway_count": 1, "importance_score": 11.0, "druggability_tier": "medium", "is_druggable": true, "is_fda_approved": false, "is_clinical_trial": true, "centrality": 0.55, "final_score": 16.5}
+  ]
+}

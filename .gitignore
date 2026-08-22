@@ -61,11 +61,38 @@ data/cache/
 *.log
 *.sqlite
 .pytest_cache/
-frontend/tests/artifacts/
-frontend/test-results/
-frontend/playwright-report/
 *.backup
 *.broken
 
+# Playwright (e2e/ is dev tooling only; the app needs no Node)
+e2e/artifacts/
+e2e/test-results/
+e2e/playwright-report/
+e2e/node_modules/
+
 # Keep example outputs
 !outputs/.gitkeep
+
+# Keep the deterministic test fixture analysis (used by the fast e2e suite)
+!outputs/analysis_fixture/
+!outputs/analysis_fixture/results.json
+
+# Manuscript workspace: drafts and generated figures are tracked, but LaTeX
+# build artefacts, bibliography caches and large intermediate exports are not.
+paper/build/
+paper/**/*.aux
+paper/**/*.bbl
+paper/**/*.blg
+paper/**/*.fdb_latexmk
+paper/**/*.fls
+paper/**/*.out
+paper/**/*.synctex.gz
+paper/**/*.toc
+paper/**/*.log
+paper/.tmp/
+
+# Benchmark outputs: the harness is tracked, its results are regenerated.
+bench/out/
+
+# Local run logs from development sessions.
+run_logs/

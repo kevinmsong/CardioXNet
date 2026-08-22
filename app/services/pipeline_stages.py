@@ -4,6 +4,7 @@ from app.core.pipeline_stage import PipelineStage, StageResult, StageStatus
 from app.core.service_registry import get_service
 from typing import Dict, Any, List
 import logging
+from app.services.gene_background import background_with
 
 logger = logging.getLogger(__name__)
 
@@ -373,11 +374,18 @@ class PermutationTestingStage(PipelineStage):
         # Extract all genes from functional neighborhood
         all_fn_genes = [g.symbol for g in fn_result.seed_genes] + [g.symbol for g in fn_result.neighbors]
 
+        # The background pool must come from OUTSIDE the analysis. Passing the
+        # neighbourhood as both sample and universe -- as this stage previously
+        # did -- makes every permuted set the neighbourhood itself, so the null
+        # overlap equals the observed overlap and the p-value is ~1 for every
+        # pathway. See app/services/gene_background.py.
+        background = background_with(set(all_fn_genes))
+
         permutation_tester = get_service("permutation_tester")
         result = permutation_tester.adjust_pvalues_with_permutation(
             filtered_hypotheses,
             all_fn_genes,
-            all_fn_genes  # all_genes is the functional neighborhood
+            background,
         )
 
         return StageResult(

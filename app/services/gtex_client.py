@@ -81,8 +81,14 @@ class GTExClient:
     def _get_versioned_gencode_id(self, gene_symbol: str) -> Optional[str]:
         """
         Convert gene symbol to versioned GENCODE ID for GTEx API v2.
-        
-        GTEx API v2 requires versioned GENCODE IDs (e.g., ENSG00000173020.15)
+
+        GTEx API v2 ``medianGeneExpression`` requires the *current* versioned
+        GENCODE ID (e.g. ENSG00000173020.15). A hardcoded version suffix goes
+        stale whenever GTEx bumps the GENCODE patch (e.g. GATA4 was .14, now .17)
+        and then silently returns an empty tissue list — which previously zeroed
+        out the cardiac tissue score for every gene in the static map. So we
+        resolve the live ID first and fall back to the (best-effort, possibly
+        stale) static map only when the lookup endpoint is unreachable.
         """
         # Check cache first
         cache_key = gene_symbol.upper()
@@ -91,9 +97,10 @@ class GTExClient:
             if cached_id:
                 logger.debug(f"Using cached GENCODE ID for {gene_symbol}: {cached_id}")
             return cached_id
-        
-        # Comprehensive cardiovascular gene mappings with versions (GTEx v8 compatible)
-        symbol_to_gencode = {
+
+        # Offline / API-down fallback only. Versions here may be stale; the live
+        # lookup below is authoritative and runs first.
+        static_fallback = {
             # Natriuretic peptides and signaling (corrected from API lookup)
             'NPPA': 'ENSG00000175206.10',  # Corrected from API
             'NPPB': 'ENSG00000120937.8',   # BNP - corrected from API
@@ -158,20 +165,19 @@ class GTExClient:
             'IFT172': 'ENSG00000138619.13',
         }
         
-        # Try static mapping first for performance
-        gencode_id = symbol_to_gencode.get(gene_symbol.upper())
-        
-        # If not in static mapping, try dynamic lookup
+        # Live lookup is authoritative — it always returns the current versioned
+        # ID for the requested symbol. Fall back to the static map only if the
+        # endpoint is unreachable.
+        gencode_id = self._lookup_gene_id_dynamic(gene_symbol)
         if not gencode_id:
-            gencode_id = self._lookup_gene_id_dynamic(gene_symbol)
-            # Cache the result (even if None to avoid repeated failed lookups)
-            self._gencode_cache[cache_key] = gencode_id
+            gencode_id = static_fallback.get(cache_key)
             if gencode_id:
-                logger.info(f"[OK] Cached dynamic lookup: {gene_symbol} -> {gencode_id}")
-        else:
-            # Cache static mapping results too
-            self._gencode_cache[cache_key] = gencode_id
-            
+                logger.debug(f"Using static fallback GENCODE ID for {gene_symbol}: {gencode_id}")
+
+        # Cache the result (even if None to avoid repeated failed lookups)
+        self._gencode_cache[cache_key] = gencode_id
+        if gencode_id:
+            logger.info(f"[OK] Resolved GENCODE ID: {gene_symbol} -> {gencode_id}")
         return gencode_id
     
     def _lookup_gene_id_dynamic(self, gene_symbol: str) -> Optional[str]:

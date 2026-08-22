@@ -253,7 +253,10 @@ class RigorousPathwayAggregator:
                 p_value=template.p_value,
                 p_adj=combined_p,  # Use combined p-value
                 evidence_count=template.evidence_count,
-                evidence_genes=template.evidence_genes
+                evidence_genes=template.evidence_genes,
+                term_size=getattr(template, 'term_size', None),
+                query_size=getattr(template, 'query_size', None),
+                effective_domain_size=getattr(template, 'effective_domain_size', None),
             ),
             support_count=support_count,
             source_primary_pathways=supporting_primary_ids,
@@ -540,7 +543,10 @@ class RigorousPathwayAggregator:
                     p_value=primary.p_value,
                     p_adj=primary.p_adj,
                     evidence_count=primary.evidence_count,
-                    evidence_genes=primary.evidence_genes
+                    evidence_genes=primary.evidence_genes,
+                    term_size=getattr(primary, 'term_size', None),
+                    query_size=getattr(primary, 'query_size', None),
+                    effective_domain_size=getattr(primary, 'effective_domain_size', None),
                 ),
                 support_count=1,
                 source_primary_pathways=[],

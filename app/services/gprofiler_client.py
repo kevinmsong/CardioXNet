@@ -163,7 +163,9 @@ class GProfilerClient:
             # Map source to standard format
             source_db = self._map_source(source)
             
-            # Create PathwayEntry
+            # Create PathwayEntry. term_size/query_size/effective_domain_size are
+            # carried through so fold enrichment (effect size) can be computed
+            # downstream; ranking on the p-value alone favours large generic terms.
             pathway = PathwayEntry(
                 pathway_id=term_id,
                 pathway_name=term_name,
@@ -171,7 +173,10 @@ class GProfilerClient:
                 p_value=p_value,
                 p_adj=p_adj,
                 evidence_count=evidence_count,
-                evidence_genes=intersection  # Actual gene symbols from library!
+                evidence_genes=intersection,  # Actual gene symbols from library!
+                term_size=entry.get("term_size"),
+                query_size=entry.get("query_size"),
+                effective_domain_size=entry.get("effective_domain_size"),
             )
             
             pathways.append(pathway)

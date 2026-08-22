@@ -1,9 +1,10 @@
 services:
-  backend:
+  # Single service: FastAPI serves both the server-rendered UI and the JSON API on :8000.
+  app:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: cardioxnet-backend
+    container_name: cardioxnet
     ports:
       - "8000:8000"
     environment:
@@ -13,17 +14,6 @@ services:
     volumes:
       - ./data:/app/data
       - ./outputs:/app/outputs
-    restart: unless-stopped
-
-  frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-    container_name: cardioxnet-frontend
-    ports:
-      - "3000:80"
-    depends_on:
-      - backend
     restart: unless-stopped
 
 volumes:

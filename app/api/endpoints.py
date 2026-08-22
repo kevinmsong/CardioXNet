@@ -641,6 +641,33 @@ def _extract_seed_genes(results: Dict[str, Any]) -> list:
     return []
 
 
+def _merge_citations(miner_citations: list, lit_assoc: dict) -> list:
+    """Merge literature_miner citations with seed_gene_tracer papers, deduplicating by PMID."""
+    seen_pmids: set = set()
+    merged = []
+    for c in miner_citations:
+        pmid = c.get("pmid", "")
+        if pmid and pmid not in seen_pmids:
+            seen_pmids.add(pmid)
+            merged.append(c)
+    # Add papers from seed_gene_tracer associations that aren't already included
+    for assoc in lit_assoc.get("associations", []):
+        for paper in assoc.get("papers", []):
+            pmid = paper.get("pmid", "")
+            if not pmid or pmid in seen_pmids:
+                continue
+            seen_pmids.add(pmid)
+            merged.append({
+                "pmid": pmid,
+                "title": paper.get("title", ""),
+                "year": paper.get("year", 0),
+                "relevance_score": paper.get("relevance_score", 0.0),
+                "journal": paper.get("journal"),
+                "abstract": paper.get("abstract"),
+            })
+    return merged
+
+
 def _extract_hypotheses(results: Dict[str, Any]):
     """Extract hypotheses from analysis results and flatten structure for frontend."""
     if "stage_3" in results:
@@ -694,7 +721,10 @@ def _extract_hypotheses(results: Dict[str, Any]):
                     "score_components": hyp.get("score_components", {}),
                     "traced_seed_genes": hyp.get("traced_seed_genes", []),
                     "literature_associations": hyp.get("literature_associations", {}),
-                    "citations": lit_citations.get(pathway_data.get("pathway_id", ""), []),
+                    "citations": _merge_citations(
+                        lit_citations.get(pathway_data.get("pathway_id", ""), []),
+                        hyp.get("literature_associations", {})
+                    ),
                     "aggregated_pathway": hyp.get("aggregated_pathway", {}),  # Keep original for details
                     "lineage": lineage,  # NEW: Complete discovery lineage
                 }
@@ -704,6 +734,31 @@ def _extract_hypotheses(results: Dict[str, Any]):
                 "hypotheses": flattened_hypotheses,
                 "total_count": stage_3.get("total_count", len(flattened_hypotheses))
             }
+
+    # Fallback: use ranked_hypotheses (report JSON format)
+    ranked = results.get("ranked_hypotheses", [])
+    if ranked:
+        for h in ranked:
+            # Normalise citation relevance key
+            for c in h.get("citations", []):
+                if "relevance" in c and "relevance_score" not in c:
+                    c["relevance_score"] = c["relevance"]
+            # Ensure lineage is populated
+            if "lineage" not in h:
+                h["lineage"] = {
+                    "seed_genes": h.get("seed_genes", []),
+                    "primary_pathways": h.get("source_primaries", []),
+                    "secondary_pathways": [],
+                    "final_pathway_id": h.get("pathway_id", ""),
+                    "final_pathway_name": h.get("pathway_name", ""),
+                }
+            # Ensure traced_seed_genes
+            if "traced_seed_genes" not in h:
+                h["traced_seed_genes"] = h.get("seed_genes", [])
+        return {
+            "hypotheses": ranked,
+            "total_count": len(ranked)
+        }
     return None
 
 

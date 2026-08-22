@@ -1,4 +1,6 @@
 import logging
+import os
+import threading
 import time
 from typing import List, Dict, Any, Optional, cast
 from Bio import Entrez
@@ -55,6 +57,81 @@ class PubMedClient:
         self._fetch_cache = {}
         
         logger.info(f"PubMedClient initialized (email: {Entrez.email}, max_results: {self.max_results})")
+
+    # ---- NCBI E-utilities rate limiting -------------------------------------
+    # NCBI permits 3 requests/second without an API key and 10/second with one.
+    # The limiter is process-wide because several PubMedClient instances and the
+    # async mining path share the same NCBI quota.
+    _rate_lock = threading.Lock()
+    _last_request_ts = 0.0
+
+    @classmethod
+    def _throttle(cls) -> None:
+        """Block until the next E-utilities request is allowed."""
+        min_interval = 0.11 if os.environ.get("NCBI_API_KEY") else 0.34
+        with cls._rate_lock:
+            now = time.monotonic()
+            wait = cls._last_request_ts + min_interval - now
+            if wait > 0:
+                time.sleep(wait)
+                now = time.monotonic()
+            cls._last_request_ts = now
+
+    def count_hits(
+        self,
+        query: str,
+        mindate: Optional[str] = None,
+        maxdate: Optional[str] = None,
+    ) -> int:
+        """Return the total number of PubMed records matching ``query``.
+
+        This is the ``<Count>`` field of an esearch response and is *not*
+        capped by ``retmax``. Literature saturation must be derived from this
+        number rather than from the number of records actually downloaded,
+        otherwise saturation is bounded by the retrieval limit and becomes
+        constant across pathways.
+
+        Args:
+            query: PubMed query string.
+            mindate: Inclusive lower publication-date bound, e.g. "2021".
+            maxdate: Inclusive upper publication-date bound, e.g. "2020".
+
+        Returns -1 when the count could not be determined, so callers can
+        distinguish "no papers" (0) from "lookup failed".
+        """
+        cache_key = ("count", query, mindate, maxdate)
+        if cache_key in self._search_cache:
+            return self._search_cache[cache_key]
+
+        count = -1
+        try:
+            self._throttle()
+            params = {
+                "db": "pubmed",
+                "term": query,
+                "rettype": "count",
+                "retmode": "json",
+                "tool": self.settings.app_name,
+                "email": Entrez.email,
+            }
+            # Publication-date bounds, used by the temporal-holdout benchmark to
+            # ask what the literature looked like as of a cutoff year.
+            if mindate or maxdate:
+                params["datetype"] = "pdat"
+                params["mindate"] = mindate or "1800"
+                params["maxdate"] = maxdate or "3000"
+            api_key = os.environ.get("NCBI_API_KEY")
+            if api_key:
+                params["api_key"] = api_key
+            response = requests.get(self.esearch_url, params=params, timeout=30)
+            response.raise_for_status()
+            count = int(response.json()["esearchresult"]["count"])
+        except Exception as e:  # network, parse, or quota failure
+            logger.warning(f"PubMed count lookup failed for query: {str(e)}")
+            return -1
+
+        self._search_cache[cache_key] = count
+        return count
     
     @retry(
         stop=stop_after_attempt(3),
@@ -82,6 +159,7 @@ class PubMedClient:
                 'usehistory': 'n'
             }
             
+            self._throttle()
             response = requests.get(self.esearch_url, params=params, timeout=30)
             response.raise_for_status()
             
@@ -125,6 +203,7 @@ class PubMedClient:
                 'rettype': 'abstract'
             }
             
+            self._throttle()
             response = requests.get(self.efetch_url, params=params, timeout=60)
             response.raise_for_status()
             
@@ -345,6 +424,7 @@ class PubMedClient:
         """
         try:
             # Search PubMed with timeout handling
+            self._throttle()
             handle = Entrez.esearch(
                 db="pubmed",
                 term=query,
@@ -415,7 +495,7 @@ class PubMedClient:
                 
                 # Be nice to NCBI - rate limit
                 if i + batch_size < len(pmids):
-                    time.sleep(0.34)  # ~3 requests per second
+                    pass  # pacing handled by the shared _throttle() limiter
                     
             except Exception as e:
                 logger.error(f"Failed to fetch batch {i}-{i+batch_size}: {str(e)}")
@@ -445,15 +525,24 @@ class PubMedClient:
             # Extract PMID
             pmid = str(medline_citation.get("PMID", ""))
             
-            # Extract title
-            title = article.get("ArticleTitle", "")
-            
+            # Extract title — Biopython may return StringElement, dict, or plain str
+            title_raw = article.get("ArticleTitle", "")
+            if isinstance(title_raw, str):
+                title = title_raw
+            elif isinstance(title_raw, dict):
+                # Structured title (e.g. with markup) — join all text values
+                title = " ".join(str(v) for v in title_raw.values() if v)
+            else:
+                title = str(title_raw) if title_raw else ""
+
             # Extract abstract
             abstract_parts = article.get("Abstract", {}).get("AbstractText", [])
             if isinstance(abstract_parts, list):
                 abstract = " ".join([str(part) for part in abstract_parts])
-            else:
+            elif abstract_parts:
                 abstract = str(abstract_parts)
+            else:
+                abstract = ""
             
             # Extract authors
             author_list = article.get("AuthorList", [])
@@ -578,31 +667,36 @@ class PubMedClient:
         """
         try:
             # Fetch paper details
+            self._throttle()
             handle = Entrez.efetch(
                 db="pubmed",
-                id=batch_pmids,
-                rettype="medline",
+                id=",".join(batch_pmids),
+                rettype="abstract",
                 retmode="xml",
                 retmax=len(batch_pmids)
             )
-            
+
             records = Entrez.read(handle)
             handle.close()
-            
+
             # Parse records safely
             papers = []
             try:
-                # Cast to dict-like for type checker
                 records_dict = cast(Dict[str, Any], records)
                 pubmed_articles = list(records_dict.get("PubmedArticle", []))
             except (AttributeError, TypeError, KeyError):
                 pubmed_articles = []
-                
+
             for record in pubmed_articles:
                 paper = self._parse_paper(record)
                 if paper:
                     papers.append(paper)
-                    
+
+            # If biopython parse produced nothing, fall back to HTTP XML parser
+            if not papers and batch_pmids:
+                logger.warning(f"Biopython parse returned 0 papers for {len(batch_pmids)} PMIDs — falling back to HTTP fetch")
+                papers = self._fetch_papers_with_http_fallback(batch_pmids)
+
             return papers
             
         except (HTTPError, URLError, socket.error) as e:
@@ -794,6 +888,7 @@ class PubMedClient:
         """
         try:
             # Use the existing sync search method
+            self._throttle()
             handle = Entrez.esearch(db="pubmed", term=query, retmax=max_results, usehistory="n")
             record = Entrez.read(handle)
             handle.close()

@@ -10,7 +10,7 @@ on:
 jobs:
   test-and-smoke:
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 30
 
     steps:
       - name: Check out repository
@@ -21,13 +21,6 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-          cache: 'npm'
-          cache-dependency-path: frontend/package-lock.json
-
       - name: Install backend dependencies
         run: |
           python -m pip install --upgrade pip
@@ -36,31 +29,21 @@ jobs:
       - name: Run backend tests
         run: python -m pytest -q
 
-      - name: Install frontend dependencies
-        working-directory: frontend
-        run: npm ci
+      # Node is used ONLY to run the Playwright tests; the app itself has no build step.
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
 
-      - name: Install Playwright Chromium
-        working-directory: frontend
-        run: npx playwright install --with-deps chromium
-
-      - name: Build frontend
-        working-directory: frontend
-        run: npm run build
-
-      - name: Run TypeScript type check
-        working-directory: frontend
-        run: npx tsc --noEmit
-
-      - name: Serve built frontend and run smoke tests
-        working-directory: frontend
-        env:
-          CI: true
-          VITE_APP_URL: http://localhost:4173
+      - name: Install Playwright
+        working-directory: e2e
         run: |
-          npx vite preview --port 4173 &
-          sleep 3
-          npm run test:ui:smoke
+          npm install
+          npx playwright install --with-deps chromium
+
+      - name: Run fast UI suite (server-rendered, no external APIs)
+        working-directory: e2e
+        run: npx playwright test ui
 
       - name: Upload Playwright artifacts
         if: always()
@@ -68,7 +51,6 @@ jobs:
         with:
           name: playwright-artifacts
           path: |
-            frontend/playwright-report
-            frontend/test-results
-            frontend/tests/artifacts
+            e2e/playwright-report
+            e2e/artifacts
           if-no-files-found: ignore

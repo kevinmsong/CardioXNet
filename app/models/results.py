@@ -339,6 +339,32 @@ class LiteratureEvidence(BaseModel):
         default_factory=dict,
         description="Citations per pathway ID"
     )
+
+    hypothesis_hit_counts: Dict[str, int] = Field(
+        default_factory=dict,
+        description=(
+            "Total PubMed records matching the (seed genes x pathway concept x "
+            "disease context) query per pathway ID. This is the esearch Count "
+            "field and is NOT capped by the retrieval limit, so it is the "
+            "quantity literature saturation must be computed from. -1 means the "
+            "count lookup failed and saturation is undefined for that pathway."
+        )
+    )
+
+    query_tier: Dict[str, str] = Field(
+        default_factory=dict,
+        description="Which query specificity tier produced the hits for each pathway ID"
+    )
+
+    concept_hit_counts: Dict[str, int] = Field(
+        default_factory=dict,
+        description=(
+            "PubMed records matching the pathway concept alone, recorded only "
+            "when the full intersection query returned zero. Distinguishes a "
+            "genuine literature gap (concept well represented, intersection "
+            "empty) from a pathway name PubMed cannot match at all."
+        )
+    )
     
     model_config = ConfigDict(
         json_schema_extra={

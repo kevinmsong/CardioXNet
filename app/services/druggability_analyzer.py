@@ -251,14 +251,19 @@ class DruggabilityAnalyzer:
     
     def calculate_druggability_score(
         self,
-        pathway_genes: List[str]
+        pathway_genes: List[str],
+        use_external: bool = True,
     ) -> DruggabilityScore:
         """
         Calculate druggability score for pathway.
-        
+
         Args:
             pathway_genes: List of gene symbols in pathway
-            
+            use_external: When True, supplement the curated tiers with a live
+                Open Targets lookup. When False, score is computed entirely from
+                the offline curated drug-target sets (no network calls) — used by
+                the fast preset so the druggability column is still populated.
+
         Returns:
             DruggabilityScore with metrics
         """
@@ -279,8 +284,8 @@ class DruggabilityAnalyzer:
         approved = set(pathway_set & self.approved_drug_targets)
         clinical = set(pathway_set & self.clinical_trial_targets)
 
-        # ── Open Targets live evidence (supplementary) ─────────────────────
-        ot_hits = self._query_open_targets(list(pathway_set))
+        # ── Open Targets live evidence (supplementary, optional) ───────────
+        ot_hits = self._query_open_targets(list(pathway_set)) if use_external else []
 
         ot_target_count = 0
         ot_approved_count = 0

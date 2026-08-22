@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}Not found — CardioXNet{% endblock %}
+{% block content %}
+<div class="empty">
+  <h1>Not found</h1>
+  <p class="muted">{{ message or 'The page you requested does not exist.' }}</p>
+  <a class="btn btn-primary" href="/">← Back to discovery</a>
+</div>
+{% endblock %}

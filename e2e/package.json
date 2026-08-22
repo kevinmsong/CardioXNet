@@ -1,0 +1,15 @@
+{
+  "name": "cardioxnet-e2e",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Playwright end-to-end tests for CardioXNet (dev tooling only — the app itself needs no Node).",
+  "scripts": {
+    "test": "playwright test",
+    "test:ui": "playwright test ui",
+    "test:discovery": "playwright test discovery",
+    "test:discovery:headed": "playwright test discovery --headed"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.47.0"
+  }
+}

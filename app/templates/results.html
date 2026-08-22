@@ -1,0 +1,210 @@
+{% extends "base.html" %}
+{% block title %}Results — CardioXNet{% endblock %}
+{% block head_extra %}<script src="/static/vendor/cytoscape.min.js" defer></script>{% endblock %}
+
+{% block content %}
+<div class="breadcrumb"><a href="/">Discover</a> / Results</div>
+
+<div class="toolbar">
+  <h1 style="margin:0;">Discovery results</h1>
+  <span class="badge badge-db" style="text-transform:none;">{{ analysis_id }}</span>
+  <div class="spacer"></div>
+  <a class="btn btn-sm" href="/results/{{ analysis_id }}/export.csv" data-testid="export-csv">⬇ CSV</a>
+  {% if report_urls.get('pdf') %}<a class="btn btn-sm" href="/api/v1/analysis/{{ analysis_id }}/report/pdf">⬇ PDF</a>{% endif %}
+  {% if report_urls.get('markdown') %}<a class="btn btn-sm" href="/api/v1/analysis/{{ analysis_id }}/report/markdown">⬇ Markdown</a>{% endif %}
+  <a class="btn btn-sm" href="/api/v1/analysis/{{ analysis_id }}/results">JSON</a>
+</div>
+
+<!-- Summary -->
+<div class="stats" style="margin-bottom: 22px;" data-testid="summary-stats">
+  <div class="stat accent"><div class="v num">{{ summary.pathway_count }}</div><div class="k">Pathway hypotheses</div></div>
+  <div class="stat novel"><div class="v num">{{ summary.novel_count }}</div><div class="k" title="Pathways in the Novel or Highly Novel literature tier: few PubMed records exist at the intersection of this pathway, the seed genes and the disease context">Literature-novel</div></div>
+  <div class="stat"><div class="v num">{{ summary.fdr_significant }}</div><div class="k" title="Permutation q ≤ 0.05 after Benjamini–Hochberg correction across all tested pathways">Permutation FDR ≤ 0.05</div></div>
+  <div class="stat"><div class="v num">{{ summary.seed_independent_count }}</div><div class="k" title="Seed genes are a minority of the pathway's evidence genes, so the pathway is carried by network expansion rather than by the seeds themselves">Seed-independent</div></div>
+  <div class="stat"><div class="v num">{{ summary.expanded_count }}</div><div class="k">From secondary expansion</div></div>
+  <div class="stat"><div class="v num">{{ summary.seed_count }}</div><div class="k">Seed genes</div></div>
+</div>
+
+<!-- Seed genes -->
+{% if results.seed_genes %}
+<div class="card" style="margin-bottom: 20px;">
+  <div class="card-title"><h3 style="margin:0;">Seed genes</h3></div>
+  <div class="chips">
+    {% for g in results.seed_genes %}<span class="chip">{{ g.symbol }}</span>{% endfor %}
+  </div>
+</div>
+{% endif %}
+
+<!-- Pathway table -->
+<div class="card" style="margin-bottom: 20px;">
+  <div class="card-title"><h2 style="margin:0;">Pathway hypotheses</h2></div>
+  <p class="muted small">
+    Ranked by <strong>Discovery Score</strong> = PPS &times; literature novelty &mdash; pathways that are
+    well supported by the enrichment evidence <em>and</em> under-reported for these seed genes in this
+    disease context. Click any column header to re-sort, or a row to open its evidence &amp; lineage.
+  </p>
+
+  {% if rows %}
+  <div class="table-wrap">
+    <table class="table" id="results-table" data-testid="results-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Pathway</th>
+          <th class="sortable num" data-col="discovery" data-type="num" title="Discovery Score = PPS × literature novelty. The primary ranking metric: high means strongly enriched and under-reported.">Discovery ▾</th>
+          <th title="Literature novelty tier from the number of PubMed records at the pathway × seed genes × disease intersection">Novelty</th>
+          <th class="sortable num" data-col="pps" data-type="num" title="Pathway Prioritization Score: weighted composite of significance (0.30), fold enrichment (0.30), gene-set specificity (0.25) and cross-source replication (0.15), scaled by database weight and seed proximity. Bounded roughly 0–1.8. This is NOT a GSEA normalized enrichment score.">PPS</th>
+          <th class="sortable num" data-col="padj" data-type="num" title="FDR-adjusted enrichment p-value reported by g:Profiler">p<sub>adj</sub></th>
+          <th class="sortable num" data-col="permq" data-type="num" title="Permutation q-value: empirical p from a degree-matched null over the annotated background, Benjamini–Hochberg corrected across all tested pathways. Blank when the test could not be run.">Perm. q</th>
+          <th class="sortable num" data-col="fold" data-type="num" title="Fold enrichment: observed overlap divided by the overlap expected from term size, query size and annotation universe">Fold</th>
+          <th class="sortable num" data-col="evidence" data-type="num" title="Number of query genes annotated to this term">Genes</th>
+          <th class="sortable num" data-col="cardiac" data-type="num" title="Semantic cardiovascular relevance of the pathway (0–100%)">Cardiac rel.</th>
+          <th class="sortable num" data-col="cardiac_expr" data-type="num" title="Share of the pathway's genes expressed in cardiac tissue (GTEx Heart LV + Atrial Appendage, median TPM ≥ 1; curated estimate when live validation is off)">Cardiac expr.</th>
+          <th title="Therapeutic druggability tier from curated drug-target sets (DrugBank/ChEMBL/TTD), refined with Open Targets when enabled">Druggability</th>
+          <th class="sortable num" data-col="lit" data-type="num">Lit.</th>
+          <th>Traced seeds</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in rows %}
+        <tr data-testid="pathway-row"
+            data-discovery="{{ r.discovery_score if r.discovery_score is not none else -1 }}"
+            data-pps="{{ r.pps_score }}" data-padj="{{ r.p_adj if r.p_adj is not none else 1 }}"
+            data-permq="{{ r.empirical_qvalue if r.empirical_qvalue is not none else 1 }}"
+            data-fold="{{ r.fold_enrichment if r.fold_enrichment is not none else 0 }}"
+            data-evidence="{{ r.evidence_count }}" data-cardiac="{{ r.cardiac_relevance }}"
+            data-cardiac_expr="{{ r.cardiac_expression }}" data-lit="{{ r.literature_count }}"
+            onclick="location.href='/results/{{ analysis_id }}/pathway/{{ r.pathway_id|urlencode }}'">
+          <td class="num muted">{{ r.rank }}</td>
+          <td class="pw-name">
+            <a data-testid="pathway-link" href="/results/{{ analysis_id }}/pathway/{{ r.pathway_id|urlencode }}">{{ r.pathway_name }}</a>
+            <div>
+              <span class="pw-id">{{ r.pathway_id }}</span>
+              {% if r.source_db %}<span class="badge badge-db">{{ r.source_db }}</span>{% endif %}
+              {% if r.seed_independent %}<span class="badge badge-unreported" data-testid="novel-badge" title="Seed genes are a minority of this pathway's evidence genes">seed-independent</span>{% endif %}
+            </div>
+          </td>
+          <td class="num"><strong>{{ '%.3f'|format(r.discovery_score) if r.discovery_score is not none else '—' }}</strong></td>
+          <td>{% if r.novelty_tier and r.novelty_tier != '—' %}<span class="badge tier-novelty">{{ r.novelty_tier }}</span>{% if r.pubmed_hit_count is not none and r.pubmed_hit_count >= 0 %}<div class="pw-id">{{ r.pubmed_hit_count }} PubMed hits</div>{% endif %}
+            {% if r.novelty_confidence == 'unverified' %}<div class="pw-id" title="The pathway name has almost no lexical footprint in PubMed, so the empty result cannot be read as a literature gap">unverified</div>{% endif %}{% else %}<span class="meter-na">n/a</span>{% endif %}</td>
+          <td class="num">{{ '%.3f'|format(r.pps_score) }}</td>
+          <td class="num">{{ r.p_adj_fmt }}</td>
+          <td class="num">{% if r.empirical_qvalue is not none %}{{ r.empirical_q_fmt }}{% else %}<span class="meter-na">n/t</span>{% endif %}</td>
+          <td class="num">{{ '%.1f'|format(r.fold_enrichment) if r.fold_enrichment is not none else '—' }}</td>
+          <td class="num">{{ r.evidence_count }}</td>
+          <td><span class="meter-cell"><span class="meter"><span style="width: {{ (r.cardiac_relevance*100)|round(0)|int }}%;"></span></span><span class="meter-label">{{ (r.cardiac_relevance*100)|round(0)|int }}%</span></span></td>
+          <td><span class="meter-cell"><span class="meter"><span style="width: {{ (r.cardiac_expression*100)|round(0)|int }}%;"></span></span><span class="meter-label">{{ (r.cardiac_expression*100)|round(0)|int }}%</span></span></td>
+          <td>{% if r.druggability_tier and r.druggability_tier != '—' %}<span class="badge tier-{{ r.druggability_tier }}">{{ r.druggability_tier }}</span>{% else %}<span class="meter-na">n/a</span>{% endif %}</td>
+          <td class="num">{{ r.literature_count }}</td>
+          <td class="mono small">{{ r.traced_seed_genes|join(', ') if r.traced_seed_genes else '—' }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="empty" data-testid="results-empty">
+    No pathway hypotheses passed filtering for this analysis. Try a broader disease context or a deeper preset.
+  </div>
+  {% endif %}
+</div>
+
+<!-- Network + Top genes -->
+<div class="grid-2">
+  <div class="card">
+    <div class="card-title"><h2 style="margin:0;">Interaction network</h2></div>
+    <p class="muted small">Top hub genes; edges link genes sharing a pathway. Seed genes are highlighted.</p>
+    {% if network.nodes %}
+    <div id="network" data-testid="network"></div>
+    <div class="legend">
+      <span><span class="swatch" style="background:#0f766e;"></span>Seed gene</span>
+      <span><span class="swatch" style="background:#64748b;"></span>Hub gene</span>
+    </div>
+    <script type="application/json" id="network-data">{{ network|tojson }}</script>
+    {% else %}
+    <div class="empty">No network data available.</div>
+    {% endif %}
+  </div>
+
+  <div class="card">
+    <div class="card-title"><h2 style="margin:0;">Top genes &amp; targets</h2></div>
+    {% if top_genes %}
+    <div class="table-wrap">
+      <table class="table" data-testid="top-genes-table">
+        <thead><tr><th>Gene</th><th class="num">Pathways</th><th class="num">Score</th><th>Druggability</th></tr></thead>
+        <tbody>
+          {% for g in top_genes[:15] %}
+          <tr style="cursor:default;">
+            <td class="mono"><strong>{{ g.gene }}</strong>
+              {% if g.is_fda_approved %}<span class="badge tier-high">FDA</span>{% elif g.is_clinical_trial %}<span class="badge tier-medium">trial</span>{% endif %}
+            </td>
+            <td class="num">{{ g.pathway_count }}</td>
+            <td class="num">{{ '%.1f'|format(g.importance_score or g.final_score or 0) }}</td>
+            <td>{% if g.druggability_tier %}<span class="badge tier-{{ g.druggability_tier }}">{{ g.druggability_tier }}</span>{% else %}<span class="meter-na">n/a</span>{% endif %}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="empty">No gene prioritization available.</div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts_extra %}
+<script>
+// --- progressive-enhancement column sort (no dependency) ---
+(function () {
+  var table = document.getElementById('results-table');
+  if (!table) return;
+  var tbody = table.tBodies[0];
+  table.querySelectorAll('th.sortable').forEach(function (th) {
+    var asc = false;
+    th.addEventListener('click', function () {
+      var col = th.dataset.col;
+      asc = !asc;
+      var rows = Array.prototype.slice.call(tbody.querySelectorAll('tr'));
+      rows.sort(function (a, b) {
+        var av = parseFloat(a.dataset[col]) || 0, bv = parseFloat(b.dataset[col]) || 0;
+        return asc ? av - bv : bv - av;
+      });
+      rows.forEach(function (r) { tbody.appendChild(r); });
+      table.querySelectorAll('th.sortable').forEach(function (h) {
+        h.innerHTML = h.innerHTML.replace(/ [▴▾]$/, '');
+      });
+      th.innerHTML = th.innerHTML.replace(/ [▴▾]$/, '') + (asc ? ' ▴' : ' ▾');
+    });
+  });
+})();
+
+// --- network graph ---
+(function () {
+  var el = document.getElementById('network');
+  var dataEl = document.getElementById('network-data');
+  if (!el || !dataEl || typeof cytoscape === 'undefined') {
+    if (el) { window.addEventListener('load', initNet); } return;
+  }
+  initNet();
+  function initNet() {
+    if (typeof cytoscape === 'undefined') { setTimeout(initNet, 100); return; }
+    var data = JSON.parse(dataEl.textContent);
+    cytoscape({
+      container: el,
+      elements: { nodes: data.nodes, edges: data.edges },
+      style: [
+        { selector: 'node', style: {
+            'label': 'data(label)', 'width': 'data(size)', 'height': 'data(size)',
+            'background-color': '#64748b', 'color': '#0f172a', 'font-size': 9,
+            'font-family': 'Inter, sans-serif', 'text-valign': 'center', 'text-halign': 'center',
+            'text-outline-color': '#fff', 'text-outline-width': 2 } },
+        { selector: 'node[?is_seed]', style: { 'background-color': '#0f766e' } },
+        { selector: 'edge', style: { 'width': 1, 'line-color': '#cbd5e1', 'opacity': 0.6 } }
+      ],
+      layout: { name: 'cose', animate: false, padding: 20 }
+    });
+  }
+})();
+</script>
+{% endblock %}

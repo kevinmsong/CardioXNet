@@ -45,14 +45,22 @@ class TissueExpressionValidator:
     - Prevents false positives from ubiquitously expressed housekeeping genes
     """
     
+    # Canonical GTEx "expressed" cutoff: a gene with median TPM >= 1.0 in a
+    # tissue is considered expressed there.
+    EXPRESSED_TPM_THRESHOLD = 1.0
+
     def __init__(self):
         """Initialize GTEx-based tissue expression validator."""
         self.settings = get_settings()
         self.gtex_client = GTExClient()
-        
+
         # Cache for GTEx expression data to avoid repeated API calls
         self._expression_cache = {}
-        
+
+        # Curated cardiac-expressed gene set, used for the fast offline estimate
+        # and when live GTEx is unreachable.
+        self._curated_cardiac_genes = self._load_cardiac_gene_set()
+
         logger.info("TissueExpressionValidator initialized with GTEx integration - Enhanced for cardiac specificity")
     
     def _load_cardiac_gene_set(self) -> set:
@@ -186,12 +194,12 @@ class TissueExpressionValidator:
         if not valid_profiles:
             # Fallback to curated gene list if GTEx cardiac tissue API fails
             logger.debug("GTEx cardiac tissue data unavailable, using fallback cardiac gene list")
-            fallback_genes = self.gtex_client.get_fallback_cardiac_genes()
-            expressed_genes = [gene for gene in pathway_genes if gene.upper() in fallback_genes]
-            
+            expressed_genes = [gene for gene in pathway_genes
+                               if gene and gene.upper() in self._curated_cardiac_genes]
+
             cardiac_expression_ratio = len(expressed_genes) / len(pathway_genes)
             validation_passed = cardiac_expression_ratio >= min_ratio
-            
+
             score = TissueExpressionScore(
                 cardiac_expression_ratio=cardiac_expression_ratio,
                 expressed_genes=expressed_genes,
@@ -204,24 +212,29 @@ class TissueExpressionValidator:
             self._expression_cache[cache_key] = score
             return score
         
-        # Calculate metrics from GTEx data
-        expressed_genes = []
-        cardiac_tpm_values = []
-        specificity_ratios = []
-        
-        for gene, profile in valid_profiles.items():
-            # Consider gene "expressed" if cardiac specificity ratio >= threshold
-            if profile.cardiac_specificity_ratio >= min_ratio:
-                expressed_genes.append(gene)
-                cardiac_tpm_values.append(profile.cardiac_median_tpm)
-                specificity_ratios.append(profile.cardiac_specificity_ratio)
-        
+        # Calculate metrics from GTEx data.
+        #
+        # A gene counts as cardiac-expressed when its median TPM in heart tissue
+        # clears the canonical GTEx "expressed" cutoff (>= 1.0 TPM). This is the
+        # share reported in the results table, and it stays meaningful for
+        # broadly-expressed cardiac genes (e.g. VEGFA ~127 TPM in heart) that a
+        # strict tissue-*specificity* cutoff would wrongly drop to zero.
+        # The mean TPM and mean specificity ratio are reported over every gene
+        # with a GTEx profile so the detail page reflects real expression even
+        # when few genes are heart-specific.
+        expressed_genes = [
+            gene for gene, profile in valid_profiles.items()
+            if profile.cardiac_median_tpm >= self.EXPRESSED_TPM_THRESHOLD
+        ]
+        cardiac_tpm_values = [p.cardiac_median_tpm for p in valid_profiles.values()]
+        specificity_ratios = [p.cardiac_specificity_ratio for p in valid_profiles.values()]
+
         # Calculate final metrics
         total_genes = len(pathway_genes)
         cardiac_expression_ratio = len(expressed_genes) / total_genes if total_genes > 0 else 0.0
         mean_cardiac_tpm = sum(cardiac_tpm_values) / len(cardiac_tpm_values) if cardiac_tpm_values else 0.0
         mean_specificity_ratio = sum(specificity_ratios) / len(specificity_ratios) if specificity_ratios else 0.0
-        
+
         validation_passed = cardiac_expression_ratio >= min_ratio
         
         logger.info(
@@ -241,6 +254,43 @@ class TissueExpressionValidator:
         )
         self._expression_cache[cache_key] = score
         return score
+
+    def calculate_offline_expression_score(
+        self,
+        pathway_genes: List[str]
+    ) -> TissueExpressionScore:
+        """Fast, fully-offline cardiac-expression estimate (no GTEx network calls).
+
+        Uses the curated cardiac gene set so the results table still shows a
+        meaningful tissue-specificity value when live GTEx validation is disabled
+        (e.g. the fast preset). The returned ``cardiac_expression_ratio`` is the
+        fraction of the pathway's genes that are cardiac-specific.
+        """
+        if not pathway_genes:
+            return TissueExpressionScore(
+                cardiac_expression_ratio=0.0,
+                expressed_genes=[],
+                total_genes=0,
+                mean_cardiac_tpm=0.0,
+                mean_cardiac_specificity_ratio=0.0,
+                validation_passed=False,
+                gtex_profiles={},
+            )
+
+        expressed = [g for g in pathway_genes if g and g.upper() in self._curated_cardiac_genes]
+        total = len(pathway_genes)
+        ratio = len(expressed) / total if total else 0.0
+        min_ratio = getattr(self.settings.nets, 'min_cardiac_expression_ratio', 0.3)
+
+        return TissueExpressionScore(
+            cardiac_expression_ratio=ratio,
+            expressed_genes=expressed,
+            total_genes=total,
+            mean_cardiac_tpm=0.0,
+            mean_cardiac_specificity_ratio=2.0 if expressed else 0.0,
+            validation_passed=ratio >= min_ratio,
+            gtex_profiles={},
+        )
 
     async def warm_gene_cache(
         self,

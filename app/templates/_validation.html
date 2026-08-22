@@ -1,0 +1,29 @@
+{# htmx fragment: result of POST /ui/validate #}
+{% if error %}
+  <div class="alert alert-error" data-testid="validation-error">
+    <strong>Validation failed.</strong> {{ error }}
+  </div>
+{% elif result %}
+  {% set valid = result.valid_genes or [] %}
+  {% set invalid = result.invalid_genes or [] %}
+  {% if valid %}
+  <div class="alert alert-success" data-testid="validation-success">
+    <strong>✓ {{ valid|length }} gene{{ '' if valid|length == 1 else 's' }} validated.</strong>
+  </div>
+  <div class="chips" style="margin-bottom: 10px;">
+    {% for g in valid %}<span class="chip">{{ g.symbol }}</span>{% endfor %}
+  </div>
+  {% endif %}
+  {% if invalid %}
+  <div class="alert alert-warn" data-testid="validation-warning">
+    <strong>⚠ {{ invalid|length }} not recognized:</strong>
+    <span class="mono">{{ invalid|join(', ') }}</span><br />
+    <span class="small">These will be skipped; you can still run with the valid genes.</span>
+  </div>
+  {% endif %}
+  {% if not valid and not invalid %}
+  <div class="alert alert-info">No gene symbols detected. Paste symbols like <span class="mono">GATA4 NKX2-5 MEF2C</span>.</div>
+  {% endif %}
+{% else %}
+  <div class="alert alert-info">Enter at least one gene symbol to validate.</div>
+{% endif %}

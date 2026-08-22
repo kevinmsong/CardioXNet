@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block title %}API Reference — CardioXNet{% endblock %}
+
+{% block content %}
+<h1>API reference</h1>
+<p class="muted" style="max-width: 75ch;">
+  The server-rendered UI is a thin layer over a JSON API. Everything the UI does is available
+  programmatically under <code>/api/v1</code>. Interactive OpenAPI docs are at
+  <a href="/docs">/docs</a> (Swagger) and <a href="/redoc">/redoc</a>.
+</p>
+
+<div class="card">
+  <h2 style="margin-top:0;">Endpoints</h2>
+  <div class="table-wrap">
+    <table class="table">
+      <thead><tr><th>Method</th><th>Path</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr style="cursor:default;"><td class="mono">GET</td><td class="mono">/health</td><td>Liveness check.</td></tr>
+        <tr style="cursor:default;"><td class="mono">POST</td><td class="mono">/api/v1/genes/validate</td><td>Validate gene symbols → Entrez IDs.</td></tr>
+        <tr style="cursor:default;"><td class="mono">POST</td><td class="mono">/api/v1/analysis/run</td><td>Start an analysis; returns an <span class="mono">analysis_id</span>.</td></tr>
+        <tr style="cursor:default;"><td class="mono">GET</td><td class="mono">/api/v1/analysis/{id}/status</td><td>Poll progress (stage + percentage).</td></tr>
+        <tr style="cursor:default;"><td class="mono">GET</td><td class="mono">/api/v1/analysis/{id}/results</td><td>Normalized results (hypotheses, topology, top genes).</td></tr>
+        <tr style="cursor:default;"><td class="mono">GET</td><td class="mono">/api/v1/analysis/{id}/detailed-results</td><td>Full per-stage pipeline output.</td></tr>
+        <tr style="cursor:default;"><td class="mono">GET</td><td class="mono">/api/v1/analysis/{id}/report/{format}</td><td>Download report: <span class="mono">pdf · markdown · html · json</span>.</td></tr>
+        <tr style="cursor:default;"><td class="mono">GET</td><td class="mono">/api/v1/config/defaults</td><td>Default pipeline configuration.</td></tr>
+        <tr style="cursor:default;"><td class="mono">WS</td><td class="mono">/api/v1/analysis/{id}/progress</td><td>WebSocket stream of progress messages.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="card">
+  <h2 style="margin-top:0;">Start an analysis</h2>
+  <pre><code>POST /api/v1/analysis/run
+Content-Type: application/json
+
+{
+  "seed_genes": ["PIK3R1", "ITGB1", "SRC"],
+  "disease_context": "diabetic_cardiomyopathy",
+  "config_overrides": {
+    "string_neighbor_count": 50,
+    "fdr_threshold": 0.05,
+    "top_hypotheses_count": 10,
+    "pubmed_max_results": 10
+  }
+}</code></pre>
+  <p class="muted small">Response: <span class="mono">{ "analysis_id": "analysis_…", "status": "started" }</span>. Poll <span class="mono">/status</span> until <span class="mono">completed</span>, then fetch <span class="mono">/results</span>.</p>
+</div>
+
+<div class="card">
+  <h2 style="margin-top:0;">Example (curl)</h2>
+  <pre><code>id=$(curl -s localhost:8000/api/v1/analysis/run \
+  -H 'content-type: application/json' \
+  -d '{"seed_genes":["PIK3R1","ITGB1","SRC"],"disease_context":"diabetic_cardiomyopathy"}' \
+  | python -c 'import sys,json;print(json.load(sys.stdin)["analysis_id"])')
+
+curl -s localhost:8000/api/v1/analysis/$id/status
+curl -s localhost:8000/api/v1/analysis/$id/results</code></pre>
+</div>
+{% endblock %}

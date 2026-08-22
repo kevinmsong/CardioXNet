@@ -17,6 +17,37 @@ from app.core.config import get_settings
 logger = logging.getLogger(__name__)
 
 
+def preliminary_score(pathway, db_weight: float) -> float:
+    """Screening score deciding which pathways advance to neighbourhood expansion.
+
+    This is a *recall* step, and is deliberately NOT the same score used for the
+    final ranking. Expansion re-enriches the neighbours of a chosen pathway, so
+    pathways with broader gene coverage supply more material to expand; scoring
+    expansion candidates for specificity starves the candidate pool. Measured on
+    the VEGFA/MMP9/IL6/TNF/ACE panel, a specificity-weighted screen cut the final
+    output from 22 hypotheses to 3 and lost the mechanistically interesting hits
+    (NLRP3 inflammasome, TLR3 cascade, NF-kappa B).
+
+    Specificity is applied later instead, in the Pathway Prioritization Score,
+    where it belongs -- ranking is the precision step.
+
+        screen = min(-log10(p_adj), 20) * sqrt(evidence_count) * db_weight
+
+    The square root is what keeps this from collapsing into "sort by gene count".
+    The previous form multiplied by the raw count and capped -log10(p) at 50, a
+    cap essentially every candidate reached, so the screen became pure size
+    ordering. (The project's own documentation had long described this term as
+    a square root; the code did not implement one.)
+    """
+    import math as _m
+
+    if pathway.p_adj > 0:
+        neg_log_p = min(-_m.log10(pathway.p_adj), 20.0)
+    else:
+        neg_log_p = 20.0
+    return neg_log_p * _m.sqrt(max(pathway.evidence_count, 1)) * db_weight
+
+
 class PrimaryPathwayAnalyzer:
     """Performs primary pathway enrichment and triage with NES scoring (Stage 2a).
     
@@ -180,21 +211,10 @@ class PrimaryPathwayAnalyzer:
         db_weights = self.settings.nets.db_weights
         
         for pathway in pathways:
-            # Calculate -log10(P_adj), handle very small p-values
-            if pathway.p_adj > 0:
-                log_p = -math.log10(pathway.p_adj)
-            else:
-                # For p-values reported as 0, use equivalent of p_adj = 1e-50
-                log_p = 50.0
-            
-            # Cap at 50 to prevent extreme scores
-            log_p = min(log_p, 50.0)
-            
-            # Get database weight
+            # Screening score: significance x effect size x specificity.
+            # See preliminary_score() for why raw gene count was removed.
             db_weight = db_weights.get(pathway.source_db, 1.0)
-            
-            # Calculate NES
-            nes = log_p * pathway.evidence_count * db_weight
+            nes = preliminary_score(pathway, db_weight)
             
             # Determine contributing seed genes
             seed_symbols = {g.symbol for g in self.seed_genes}
@@ -217,6 +237,9 @@ class PrimaryPathwayAnalyzer:
                 p_adj=pathway.p_adj,
                 evidence_count=pathway.evidence_count,
                 evidence_genes=pathway.evidence_genes,
+                term_size=getattr(pathway, 'term_size', None),
+                query_size=getattr(pathway, 'query_size', None),
+                effective_domain_size=getattr(pathway, 'effective_domain_size', None),
                 preliminary_nes=nes,
                 contributing_seed_genes=contributing_seeds,
                 literature_support=None

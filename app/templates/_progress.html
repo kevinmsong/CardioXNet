@@ -1,0 +1,48 @@
+{# Self-replacing progress fragment. While running it re-fetches itself every 2s
+   (hx-swap=outerHTML); on a terminal state it renders without poll attributes so
+   polling stops. Completion triggers an HX-Redirect header from the route. #}
+{% set status = (analysis.status if analysis else 'pending') %}
+{% set progress = (analysis.progress if analysis else 0) or 0 %}
+{% set running = status in ['pending', 'running'] %}
+<div id="progress-poll" data-testid="progress-poll" data-status="{{ status }}"
+     {% if running %}hx-get="/progress/{{ analysis_id }}/fragment" hx-trigger="every 2s" hx-swap="outerHTML"{% endif %}>
+
+  {% if status == 'failed' %}
+    <div class="alert alert-error" data-testid="progress-failed">
+      <strong>Analysis failed.</strong> {{ analysis.error or 'An unexpected error occurred.' }}
+    </div>
+    <a href="/" class="btn">← Start a new analysis</a>
+  {% else %}
+    <div class="toolbar" style="margin-bottom: 6px;">
+      <strong data-testid="progress-stage">
+        {% if running %}<span class="spinner"></span>{% endif %}
+        {{ analysis.current_stage if analysis and analysis.current_stage else 'Initializing' }}
+      </strong>
+      <span class="spacer num" data-testid="progress-pct">{{ progress|round(0)|int }}%</span>
+    </div>
+    <div class="progress-bar"><span style="width: {{ progress }}%;"></span></div>
+    {% if analysis and analysis.message %}
+    <p class="hint" data-testid="progress-message">{{ analysis.message }}</p>
+    {% endif %}
+
+    <ul class="timeline" data-testid="stage-timeline">
+      {% set ns = namespace(active_done=false) %}
+      {% for pct, label in timeline %}
+        {% if progress >= pct %}
+          <li class="done"><span class="dot"></span>{{ label }}</li>
+        {% elif not ns.active_done %}
+          <li class="active"><span class="dot"></span>{{ label }}{% set ns.active_done = true %}</li>
+        {% else %}
+          <li><span class="dot"></span>{{ label }}</li>
+        {% endif %}
+      {% endfor %}
+    </ul>
+
+    {% if status == 'completed' %}
+    <div class="alert alert-success" style="margin-top:16px;" data-testid="progress-complete">
+      <strong>Discovery complete.</strong>
+      <a href="/results/{{ analysis_id }}">View results →</a>
+    </div>
+    {% endif %}
+  {% endif %}
+</div>

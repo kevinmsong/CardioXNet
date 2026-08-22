@@ -29,17 +29,69 @@ class PermutationTester:
     4. Empirical p-value = (# permutations >= observed + 1) / (n_permutations + 1)
     """
     
-    def __init__(self):
-        """Initialize permutation tester."""
+    # The null is only meaningful if the background pool is substantially larger
+    # than the sample drawn from it. When the universe equals the functional
+    # neighbourhood, every "permuted" neighbourhood is the neighbourhood itself,
+    # the null overlap equals the observed overlap, and the p-value is ~1 for
+    # every pathway regardless of the biology. Enforced rather than assumed,
+    # because that is exactly the defect this guard was written to catch.
+    MIN_UNIVERSE_RATIO = 3.0
+
+    def __init__(self, random_seed: int = 20260821):
+        """Initialize permutation tester.
+
+        Args:
+            random_seed: Seed for the dedicated RNG. A private ``random.Random``
+                instance is used rather than the module-level functions so that
+                empirical p-values are reproducible and are not perturbed by
+                unrelated callers consuming from the global random stream.
+        """
         self.settings = get_settings()
-        # Further reduced from 100 to 50 for speed optimization
         self.n_permutations = self.settings.nets.n_permutations if hasattr(
             self.settings.nets, 'n_permutations'
-        ) else 50
+        ) else 1000
+        self._rng = random.Random(random_seed)
+        self.random_seed = random_seed
         self._cache: Dict[Tuple[Any, ...], Tuple[float, Dict]] = {}
         self._cache_lock = threading.Lock()
-        
-        logger.info(f"PermutationTester initialized with {self.n_permutations} permutations")
+
+        logger.info(
+            f"PermutationTester initialized with {self.n_permutations} permutations "
+            f"(seed={random_seed}, resolution floor p={1/(self.n_permutations+1):.2g})"
+        )
+
+    def _validate_universe(
+        self, fn_genes: List[str], all_genes: List[str]
+    ) -> Optional[str]:
+        """Return a reason string if the background pool cannot support a test."""
+        n_universe = len(set(all_genes))
+        n_sample = len(set(fn_genes))
+        if n_sample == 0:
+            return "empty_sample"
+        if n_universe < n_sample * self.MIN_UNIVERSE_RATIO:
+            return (
+                f"universe_too_small: {n_universe} background genes for a "
+                f"{n_sample}-gene sample (need >= {int(n_sample * self.MIN_UNIVERSE_RATIO)})"
+            )
+        return None
+
+    @staticmethod
+    def undefined_result(reason: str, observed_overlap: int = 0) -> Tuple[Optional[float], Dict]:
+        """A test that could not be run. p is None -- never 1.0.
+
+        Returning 1.0 for an untestable pathway would be indistinguishable from
+        a genuine null result and would silently propagate into the report.
+        """
+        return None, {
+            'observed_overlap': observed_overlap,
+            'mean_null_overlap': None,
+            'std_null_overlap': None,
+            'null_overlaps': [],
+            'n_permutations': 0,
+            'z_score': None,
+            'testable': False,
+            'reason': reason,
+        }
     
     def calculate_empirical_pvalue(
         self,
@@ -62,22 +114,32 @@ class PermutationTester:
         """
         if n_permutations is None:
             n_permutations = self.n_permutations
-        
+
         # Convert to sets for faster operations
         pathway_set = set(pathway_genes)
         fn_set = set(fn_genes)
         all_genes_set = set(all_genes)
-        
+
+        reason = self._validate_universe(fn_genes, all_genes)
+        if reason:
+            logger.warning(f"Permutation test not run: {reason}")
+            return self.undefined_result(reason, len(pathway_set & fn_set))
+
         # Observed overlap
         observed_overlap = len(pathway_set & fn_set)
-        
+
         # If no overlap, return p=1.0
         if observed_overlap == 0:
             return 1.0, {
                 'observed_overlap': 0,
-                'mean_null_overlap': 0,
+                'mean_null_overlap': 0.0,
+                'std_null_overlap': 0.0,
                 'null_overlaps': [],
-                'n_permutations': n_permutations
+                'n_permutations': n_permutations,
+                'z_score': 0.0,
+                'testable': True,
+                'reason': 'no_overlap',
+                'degree_preserved': False,
             }
         
         # Generate null distribution
@@ -85,7 +147,7 @@ class PermutationTester:
         
         for i in range(n_permutations):
             # Randomly sample same number of genes from universe
-            permuted_fn = set(random.sample(list(all_genes_set), len(fn_genes)))
+            permuted_fn = set(self._rng.sample(list(all_genes_set), min(len(fn_genes), len(all_genes_set))))
             null_overlap = len(pathway_set & permuted_fn)
             null_overlaps.append(null_overlap)
         
@@ -109,9 +171,16 @@ class PermutationTester:
             'std_null_overlap': std_null,
             'null_overlaps': null_overlaps,
             'n_permutations': n_permutations,
-            'z_score': (observed_overlap - mean_null) / std_null if std_null > 0 else 0
+            'z_score': (observed_overlap - mean_null) / std_null if std_null > 0 else 0,
+            'testable': True,
+            # Uniform size-matched sampling. Degree matching is not applied --
+            # see the note at the pipeline call site.
+            'degree_preserved': False,
+            'null_model': 'size_matched_uniform',
+            'p_resolution_floor': 1.0 / (n_permutations + 1),
+            'universe_size': len(all_genes_set),
         }
-        
+
         return empirical_p, statistics
     
     def calculate_empirical_pvalue_adaptive(
@@ -164,7 +233,7 @@ class PermutationTester:
         # Phase 1: Initial permutations
         null_overlaps = []
         for i in range(min_permutations):
-            permuted_fn = set(random.sample(list(all_genes_set), len(fn_genes)))
+            permuted_fn = set(self._rng.sample(list(all_genes_set), min(len(fn_genes), len(all_genes_set))))
             null_overlap = len(pathway_set & permuted_fn)
             null_overlaps.append(null_overlap)
         
@@ -195,7 +264,7 @@ class PermutationTester:
             )
             remaining = max_permutations - min_permutations
             for i in range(remaining):
-                permuted_fn = set(random.sample(list(all_genes_set), len(fn_genes)))
+                permuted_fn = set(self._rng.sample(list(all_genes_set), min(len(fn_genes), len(all_genes_set))))
                 null_overlap = len(pathway_set & permuted_fn)
                 null_overlaps.append(null_overlap)
         
@@ -254,21 +323,32 @@ class PermutationTester:
         """
         if n_permutations is None:
             n_permutations = self.n_permutations
-        
+
         pathway_set = set(pathway_genes)
         fn_set = set(fn_genes)
-        
+
+        # Refuse to produce a number when the background pool cannot support a
+        # null. See MIN_UNIVERSE_RATIO.
+        reason = self._validate_universe(fn_genes, all_genes)
+        if reason:
+            logger.warning(f"Permutation test not run: {reason}")
+            return self.undefined_result(reason, len(pathway_set & fn_set))
+
         # Observed overlap
         observed_overlap = len(pathway_set & fn_set)
-        
+
         if observed_overlap == 0:
             return 1.0, {
                 'observed_overlap': 0,
-                'mean_null_overlap': 0,
+                'mean_null_overlap': 0.0,
+                'std_null_overlap': 0.0,
                 'null_overlaps': [],
-                'n_permutations': n_permutations
+                'n_permutations': n_permutations,
+                'z_score': 0.0,
+                'testable': True,
+                'reason': 'no_overlap',
             }
-        
+
         # Bin genes by degree
         degree_bins = self._bin_genes_by_degree(gene_degrees, all_genes)
         
@@ -300,9 +380,12 @@ class PermutationTester:
             'null_overlaps': null_overlaps,
             'n_permutations': n_permutations,
             'z_score': (observed_overlap - mean_null) / std_null if std_null > 0 else 0,
-            'degree_preserved': True
+            'degree_preserved': True,
+            'testable': True,
+            'p_resolution_floor': 1.0 / (n_permutations + 1),
+            'universe_size': len(set(all_genes)),
         }
-        
+
         return empirical_p, statistics
 
     def calculate_degree_preserving_pvalue_adaptive(
@@ -463,10 +546,38 @@ class PermutationTester:
                 # Exclude already sampled genes
                 available = [g for g in degree_bins[degree] if g not in sampled]
                 if available:
-                    sampled.add(random.choice(available))
+                    sampled.add(self._rng.choice(available))
         
         return sampled
     
+    @staticmethod
+    def benjamini_hochberg(pvalues: List[Optional[float]]) -> List[Optional[float]]:
+        """Benjamini-Hochberg FDR correction, preserving input order.
+
+        ``None`` entries (tests that could not be run) are carried through as
+        ``None`` and are excluded from the ranking and from ``m``, so untestable
+        pathways neither receive a q-value nor dilute the correction applied to
+        the pathways that were actually tested.
+
+        The step-up procedure enforces monotonicity: q_(i) = min over j >= i of
+        (m/j) * p_(j), clipped to 1.
+        """
+        indexed = [(i, p) for i, p in enumerate(pvalues) if p is not None]
+        out: List[Optional[float]] = [None] * len(pvalues)
+        m = len(indexed)
+        if m == 0:
+            return out
+
+        indexed.sort(key=lambda t: t[1])
+        running_min = 1.0
+        # Walk from the largest p-value down so the min-suffix is available.
+        for rank in range(m, 0, -1):
+            orig_idx, p = indexed[rank - 1]
+            q = (m / rank) * p
+            running_min = min(running_min, q)
+            out[orig_idx] = min(1.0, running_min)
+        return out
+
     def adjust_pvalues_with_permutation(
         self,
         pathways: List[Any],

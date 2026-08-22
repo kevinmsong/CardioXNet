@@ -1,0 +1,15 @@
+# Desktop packaging dependencies (native window + bundler).
+# Install alongside requirements.txt only when building/running the desktop app:
+#     pip install -r requirements.txt -r requirements-desktop.txt
+#
+# Runtime UI shell + bundler
+pywebview>=5.0
+pyinstaller>=6.6
+
+# macOS native backend for pywebview (Cocoa / WKWebView). Markers keep these
+# from being installed on Windows/Linux, where they don't apply.
+pyobjc-core>=10.1 ; sys_platform == "darwin"
+pyobjc-framework-Cocoa>=10.1 ; sys_platform == "darwin"
+pyobjc-framework-WebKit>=10.1 ; sys_platform == "darwin"
+pyobjc-framework-Quartz>=10.1 ; sys_platform == "darwin"
+pyobjc-framework-Security>=10.1 ; sys_platform == "darwin"

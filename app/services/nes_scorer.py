@@ -1,4 +1,11 @@
-"""Final NES scoring service (Stage 5a)."""
+"""Pathway Prioritization Score (PPS) computation -- Stage 3 of the pipeline.
+
+The score is stored on ``ScoredPathway.nes_score`` for backwards compatibility
+with the persisted reports and the JSON API, but it is *not* a GSEA normalized
+enrichment score and must not be described as one: there is no running-sum
+statistic and no permutation-derived normalisation behind it. It is a weighted
+composite of significance, effect size, gene-set specificity and replication.
+"""
 
 import logging
 import math
@@ -17,14 +24,13 @@ logger = logging.getLogger(__name__)
 
 
 class NESScorer:
-    """Calculates final NES scores for pathway hypotheses (Stage 3a).
-    
-    Scientific Rigor Enhancements:
-    - Log-scale statistical significance prevents p-value dominance
-    - Evidence count weighting ensures robust pathway membership
-    - Multi-database quality weighting (Reactome > GO > KEGG > WikiPathways)
-    - Replication-based aggregation weight rewards cross-source validation
-    - Composite scoring balances statistical significance with biological evidence
+    """Computes the Pathway Prioritization Score for each aggregated pathway.
+
+    The score balances four normalised, independently interpretable terms:
+    statistical significance, effect size (fold enrichment), gene-set
+    specificity, and cross-source replication. Weighting them -- rather than
+    multiplying significance by raw gene count, as an earlier revision did --
+    is what stops maximally generic gene sets from dominating the ranking.
     """
     
     def __init__(self):
@@ -39,24 +45,20 @@ class NESScorer:
         topology_result = None
     ) -> ScoredHypotheses:
         """
-        Calculate final NES scores for aggregated pathways with optional network centrality.
-        
-        Enhanced NES = -log10(P_adj) * evidence_count * db_weight * agg_weight * centrality_weight
-        
-        Where:
-        - -log10(P_adj): Statistical significance
-        - evidence_count: Number of genes in pathway
-        - db_weight: Database quality weight from config
-        - agg_weight: Aggregation weight based on support count
-        - centrality_weight: Network centrality bonus (1.0-1.8×) based on:
-            * Seed gene proximity (% genes within 1-hop of seed genes)
-            * PageRank centrality (network importance of pathway genes)
-            
+        Score and rank aggregated pathways.
+
+        PPS = db_weight * centrality_weight * (
+                 0.30 * significance + 0.30 * effect_size
+               + 0.25 * specificity  + 0.15 * replication )
+
+        See :meth:`_calculate_nes` for the definition of each term and for why
+        the previous multiplicative formula was replaced.
+
         Args:
             final_result: Final pathway result from Stage 2c
-            fn_result: Optional functional neighborhood result for proximity calculation
-            topology_result: Optional topology result for centrality metrics
-            
+            fn_result: Optional functional neighborhood, for seed-proximity weighting
+            topology_result: Optional topology result, for PageRank weighting
+
         Returns:
             ScoredHypotheses with ranked pathway hypotheses
         """
@@ -128,6 +130,22 @@ class NESScorer:
         
         return result
     
+    # Saturation points for the individual score terms.
+    #  - p = 1e-10 is where additional significance stops carrying information:
+    #    beyond it the differences are dominated by annotation bias and the
+    #    numerical floor of the enrichment test, not by biology.
+    #  - 10x fold enrichment is a strong, uncommon effect size.
+    P_SATURATION_EXP = 10.0
+    FOLD_SATURATION = 10.0
+
+    # Weights of the four evidence terms. They sum to 1.0, so the composite
+    # before the database multiplier is bounded in [0, 1] and is directly
+    # interpretable as "fraction of attainable evidence".
+    W_SIGNIFICANCE = 0.30
+    W_EFFECT = 0.30
+    W_SPECIFICITY = 0.25
+    W_REPLICATION = 0.15
+
     def _calculate_nes(
         self,
         agg_pathway: AggregatedPathway,
@@ -136,82 +154,116 @@ class NESScorer:
         seed_neighbors_1hop: Optional[set] = None
     ) -> tuple[float, Dict[str, float]]:
         """
-        Calculate final NES score with component breakdown including network centrality.
-        
-        Args:
-            agg_pathway: Aggregated pathway
-            fn_result: Optional functional neighborhood for proximity calculation
-            topology_result: Optional topology result for PageRank centrality
-            seed_neighbors_1hop: Pre-calculated set of seed genes + 1-hop neighbors
-            
-        Returns:
-            Tuple of (nes_score, components_dict)
+        Compute the Pathway Prioritization Score (PPS) with a component breakdown.
+
+        PPS = db_weight * centrality_weight * (
+                 0.30 * significance
+               + 0.30 * effect_size
+               + 0.25 * specificity
+               + 0.15 * replication )
+
+        Every term is normalised to [0, 1] before weighting:
+
+        significance = min(-log10(p_adj) / 10, 1)
+            Statistical evidence, saturating at p_adj = 1e-10.
+
+        effect_size   = min(log2(fold_enrichment) / log2(10), 1)
+            Observed/expected overlap. Falls back to a set-size-normalised
+            proxy when the enrichment test did not report the sizes needed.
+
+        specificity   = 1 - min(log10(term_size) / log10(500), 1)
+            How tightly scoped the gene set is.
+
+        replication   = min(support_count / 5, 1)
+            Agreement across independent primary enrichments.
+
+        Why this replaces the previous formula
+        --------------------------------------
+        The earlier score was
+
+            log10(-log10(p_adj) * evidence_count * db_weight * agg_weight * cw + 1)
+
+        which multiplied significance by the *raw* gene count. Because -log10(p)
+        was additionally capped at 50 and essentially every top term hit that
+        cap, the ranking reduced to "sort by gene count". The result was that
+        maximally generic GO terms won every time: on the reference VEGFA/MMP9/
+        IL6/TNF/ACE run the top hits were "cell surface receptor signaling
+        pathway" (187 genes), "multicellular organism development" (152) and
+        "developmental process" (202) -- terms that are true of almost any gene
+        list and carry no discovery value. Weighting effect size and specificity
+        against significance, rather than multiplying by set size, removes that
+        bias.
         """
         pathway = agg_pathway.pathway
-        
-        # Component 1: -log10(P_adj)
-        # Handle zero or extremely small p-values with a reasonable cap
+
+        # -- Significance ----------------------------------------------------
         if pathway.p_adj > 0:
-            p_adj_component = -math.log10(pathway.p_adj)
+            neg_log_p = -math.log10(pathway.p_adj)
         else:
-            # For p-values reported as 0, use a very small value
-            # Equivalent to p_adj = 1e-50 (extremely significant but not infinite)
-            p_adj_component = 50.0
-        
-        # Cap at 50 to prevent extreme scores from numerical precision issues
-        p_adj_component = min(p_adj_component, 50.0)
-        
-        # Component 2: Evidence count
-        evidence_component = float(pathway.evidence_count)
-        
-        # Component 3: Database weight
+            # p reported as exactly 0 is a numerical floor, not infinite
+            # evidence. Treat it as the saturation point, no more.
+            neg_log_p = self.P_SATURATION_EXP
+        significance = min(neg_log_p / self.P_SATURATION_EXP, 1.0)
+
+        # -- Effect size -----------------------------------------------------
+        fold = pathway.fold_enrichment
+        if fold and fold > 0:
+            effect_size = min(math.log2(fold) / math.log2(self.FOLD_SATURATION), 1.0)
+            effect_size = max(0.0, effect_size)
+            fold_reported = fold
+        else:
+            # The enrichment test did not report term/query/domain sizes.
+            # Approximate the effect with the share of the term recovered by the
+            # query, which is the part of fold enrichment we can still observe.
+            term_size = pathway.term_size or max(pathway.evidence_count, 1)
+            effect_size = min(pathway.evidence_count / term_size, 1.0)
+            fold_reported = None
+
+        # -- Specificity -----------------------------------------------------
+        specificity = pathway.gene_set_specificity
+
+        # -- Replication -----------------------------------------------------
+        replication = min(agg_pathway.support_count / 5.0, 1.0)
+
+        composite = (
+            self.W_SIGNIFICANCE * significance
+            + self.W_EFFECT * effect_size
+            + self.W_SPECIFICITY * specificity
+            + self.W_REPLICATION * replication
+        )
+
         db_weights = self.settings.nets.db_weights
         db_weight = db_weights.get(pathway.source_db, 1.0)
-        
-        # Component 4: Aggregation weight
-        agg_weight = self._calculate_aggregation_weight(agg_pathway.support_count)
-        
-        # Component 5: Network Centrality Weight (NEW - Enhanced Scoring)
+
         centrality_weight = self._calculate_centrality_weight(
-            pathway,
-            fn_result,
-            topology_result,
-            seed_neighbors_1hop
+            pathway, fn_result, topology_result, seed_neighbors_1hop
         )
-        
-        # Calculate raw NES with centrality component
-        raw_nes = p_adj_component * evidence_component * db_weight * agg_weight * centrality_weight
-        
-        # Apply log10 transformation for better interpretability
-        # log10(abs(raw_nes) + 1) compresses large values (50 -> 1.7, 100 -> 2.0)
-        # +1 ensures log is defined for raw_nes = 0
-        import math as m
-        nes_score = m.log10(abs(raw_nes) + 1) * (1 if raw_nes >= 0 else -1)
-        
-        # Build components breakdown
+
+        nes_score = composite * db_weight * centrality_weight
+
         components = {
-            "p_adj_component": p_adj_component,
-            "evidence_component": evidence_component,
+            "significance": round(significance, 4),
+            "effect_size": round(effect_size, 4),
+            "specificity": round(specificity, 4),
+            "replication": round(replication, 4),
+            "composite": round(composite, 4),
             "db_weight": db_weight,
-            "agg_weight": agg_weight,
-            "centrality_weight": centrality_weight,  # NEW
+            "centrality_weight": round(centrality_weight, 4),
             "raw_p_adj": pathway.p_adj,
+            "neg_log10_p_adj": round(neg_log_p, 4),
+            "fold_enrichment": round(fold_reported, 3) if fold_reported else None,
+            "term_size": pathway.term_size,
             "support_count": agg_pathway.support_count,
-            "raw_nes": raw_nes  # Store raw NES for reference
         }
-        
+
         logger.debug(
             f"Pathway {pathway.pathway_id}: "
-            f"P_adj={pathway.p_adj:.2e}, "
-            f"evidence={pathway.evidence_count}, "
-            f"db_weight={db_weight:.2f}, "
-            f"agg_weight={agg_weight:.2f}, "
-            f"centrality_weight={centrality_weight:.2f}, "
-            f"NES={nes_score:.2f}"
+            f"sig={significance:.2f} eff={effect_size:.2f} spec={specificity:.2f} "
+            f"rep={replication:.2f} -> PPS={nes_score:.3f}"
         )
-        
+
         return nes_score, components
-    
+
     def _calculate_centrality_weight(
         self,
         pathway,

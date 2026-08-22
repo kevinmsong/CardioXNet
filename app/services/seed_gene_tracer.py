@@ -228,36 +228,40 @@ class SeedGeneTracer:
                 continue
             
             
-            # Check each seed gene with detailed progress
+            # BATCHED: single combined query for all seed genes per hypothesis
             associations = []
-            for j, seed_gene in enumerate(seed_genes, 1):
-                try:
-                    query = self._build_pubmed_query(pathway_name, seed_gene)
+            try:
+                gene_clause = " OR ".join(
+                    f'"{g}"[Title/Abstract]' for g in seed_genes
+                )
+                query = f'({gene_clause}) AND "{pathway_name}"[Title/Abstract]'
+                results = self.pubmed_client.search(query, max_results=50)
 
-                    max_results = 25
-                    results = self.pubmed_client.search(
-                        query,
-                        max_results=max_results
-                    )
-                    
-                    if results:
+                if results:
+                    # Attribute papers to individual seed genes by checking text
+                    for seed_gene in seed_genes:
+                        gene_papers = [
+                            r for r in results
+                            if seed_gene.lower() in (r.get('title', '') + ' ' + r.get('abstract', '')).lower()
+                        ]
                         associations.append({
                             'seed_gene': seed_gene,
-                            'citation_count': len(results),
-                            'pmids': [r.get('pmid') for r in results[:3]],
+                            'citation_count': len(gene_papers) if gene_papers else len(results),
+                            'pmids': [r.get('pmid') for r in (gene_papers or results)],
+                            'papers': gene_papers or results,
                             'has_support': True
                         })
-                    else:
+                else:
+                    for seed_gene in seed_genes:
                         associations.append({
                             'seed_gene': seed_gene,
                             'citation_count': 0,
                             'pmids': [],
                             'has_support': False
                         })
-                
-                except Exception as e:
-                    error_msg = f"Error checking literature for {pathway_name} + {seed_gene}: {e}"
-                    logger.error(error_msg)
+            except Exception as e:
+                logger.error(f"Error checking literature for {pathway_name}: {e}")
+                for seed_gene in seed_genes:
                     associations.append({
                         'seed_gene': seed_gene,
                         'citation_count': 0,

@@ -14,11 +14,11 @@ from pathlib import Path
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse
 from app.core.config import get_settings
 from app.core.logging import setup_logging
 from app.api.endpoints import router
 from app.api.websocket import ws_router
+from app.web.routes import web_router
 
 # Initialize logging
 logger = setup_logging()
@@ -83,45 +83,19 @@ app.add_middleware(
 app.include_router(router)
 app.include_router(ws_router)  # WebSocket for real-time progress
 
+# Mount static assets (CSS + vendored htmx/alpine/cytoscape) for the server-rendered UI
+_STATIC_DIR = Path(__file__).resolve().parent / "static"
+app.mount("/static", StaticFiles(directory=str(_STATIC_DIR)), name="static")
+
+# Include the server-rendered web UI (home, progress, results, docs).
+# Registered last so the JSON API (/api/v1/*) and OpenAPI routes take precedence.
+app.include_router(web_router)
+
 
 @app.get("/health")
 async def health_check():
     """Health check endpoint."""
     return {"status": "healthy"}
-
-
-# Serve built React frontend if dist/ exists (packaged / production mode)
-_FRONTEND_DIST = Path(__file__).parent.parent / "frontend" / "dist"
-# Also check next to the exe (PyInstaller _MEIPASS or cwd)
-import sys as _sys
-_MEIPASS_DIST = Path(getattr(_sys, "_MEIPASS", ".")) / "frontend_dist"
-
-def _get_dist() -> Path | None:
-    if _MEIPASS_DIST.exists():
-        return _MEIPASS_DIST
-    if _FRONTEND_DIST.exists():
-        return _FRONTEND_DIST
-    return None
-
-_dist = _get_dist()
-if _dist:
-    app.mount("/assets", StaticFiles(directory=str(_dist / "assets")), name="assets")
-
-    @app.get("/")
-    async def serve_frontend():
-        return FileResponse(str(_dist / "index.html"))
-
-    @app.get("/{full_path:path}")
-    async def serve_spa(full_path: str):
-        """Serve React SPA — fall back to index.html for client-side routes."""
-        candidate = _dist / full_path
-        if candidate.exists() and candidate.is_file():
-            return FileResponse(str(candidate))
-        return FileResponse(str(_dist / "index.html"))
-else:
-    @app.get("/")
-    async def root():
-        return {"name": "CardioXNet API", "version": "0.1.0", "status": "running", "docs": "/docs"}
 
 
 if __name__ == "__main__":

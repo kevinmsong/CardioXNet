@@ -1,53 +1,57 @@
 flowchart TD
-    %% CardioXNet NETS Pipeline — reflects app/services/pipeline.py
+    %% CardioXNet pipeline — verified against app/services/pipeline.py
+    %% Every formula and threshold below is the value the code actually uses.
+    %% Progress percentages match the _update_progress() calls in Pipeline.run().
 
-    START([/"User Input\nSeed Genes + Disease Context"\])
+    START([/"Seed genes + disease context"/])
 
-    S0["**Stage 0 — Input Validation** *(5%)*\nNormalize gene symbols via HGNC\nFilter invalid identifiers"]
+    S0["<b>Stage 0 — Input Validation</b> <i>(5%)</i><br/>HGNC symbol normalisation<br/>invalid identifiers dropped"]
 
-    S1["**Stage 1 — Functional Neighborhood** *(15%)*\nSTRING PPI expansion\n75 neighbors · confidence ≥ 0.60"]
+    S1["<b>Stage 1 — Functional Neighbourhood</b> <i>(15%)</i><br/>STRING v11.5 PPI expansion<br/>75 neighbours · combined score ≥ 0.60"]
 
-    S2a["**Stage 2a — Primary Pathway Enrichment** *(25%)*\ng:Profiler across REAC, KEGG, WP, GO:BP\nFDR-adjusted p ≤ 0.05 · fold-enrichment ≥ 2.0"]
+    S2a["<b>Stage 2a — Primary Enrichment</b> <i>(25%)</i><br/>g:Profiler over REAC · KEGG · WP · GO:BP<br/>FDR ≤ 0.05<br/>screen = 0.40·sig + 0.35·effect + 0.25·specificity"]
 
-    S2b["**Stage 2b — Secondary Pathway Discovery** *(40%)*\nPer-primary neighbor re-expansion\nPubMed context-guided enrichment"]
+    S2b["<b>Stage 2b — Secondary Discovery</b> <i>(40%)</i><br/>top 20 primaries re-expanded<br/>per-primary neighbour re-enrichment"]
 
-    S2c["**Stage 2c — Pathway Aggregation** *(55%)*\nFrequency-based aggregation across primaries\nJaccard ≥ 0.85 redundancy filtering"]
+    S2c["<b>Stage 2c — Aggregation</b> <i>(55%)</i><br/>frequency-based across primaries<br/>Fisher-combined p · Jaccard ≥ 0.70 redundancy filter"]
 
-    S3["**Stage 3 — NES Scoring** *(65%)*\nNES = –log₁₀(p_adj) × √gene_count × db_weight\nReactome/KEGG 1.5× · WikiPathways 1.2× · GO:BP 1.0×"]
+    S3["<b>Stage 3 — Pathway Prioritization Score</b> <i>(65%)</i><br/>PPS = db_weight × centrality × (<br/>0.30·significance + 0.30·effect size<br/>+ 0.25·specificity + 0.15·replication)<br/><i>not a GSEA NES</i>"]
 
-    S35["**Stage 3.5 — Semantic Cardiac Filtering** *(75%)*\n700+ curated cardiovascular terms\n3-tier disease thresholds · strict name filter"]
+    S35["<b>Stage 3.5 — Semantic Cardiac Filter</b> <i>(72%)</i><br/>curated cardiovascular term scoring<br/>3-tier disease-context thresholds"]
 
-    S4["**Stage 4 — Enhanced Validation** *(83%)*\nGTEx v8 cardiac expression ratio ≥ 0.50\n25 degree-preserving permutations (empirical p-values)\nDruggability: curated DrugBank + live ChEMBL API"]
+    S4["<b>Stage 4 — Biological Validation</b> <i>(78%)</i><br/>GTEx v8 cardiac expression (Heart LV + Atrial Appendage)<br/>1000-permutation size-matched null vs HGNC genome<br/>Benjamini–Hochberg FDR · DrugBank + ChEMBL druggability"]
 
-    S4b["**Stage 4b — Literature Mining** *(88%)*\nPubMed abstract screening (20 per gene)\nSeed-gene-to-pathway traceability"]
+    S6["<b>Stage 6 — Literature Mining</b> <i>(85%)</i><br/>PubMed query = genes <b>AND</b> pathway concept <b>AND</b> disease<br/>esearch <i>Count</i> gives the true corpus size<br/>seed-gene → pathway traceability"]
 
-    S4c["**Stage 4c — Network Topology** *(93%)*\nPageRank · Betweenness · Closeness centrality\nHub gene identification from top pathways"]
+    S6c["<b>Stage 6c — Final Cardiac Filter</b> <i>(88%)</i><br/>cardiac/disease term in pathway name<br/><b>or</b> semantic rescue (relevance + replication + significance)"]
 
-    S5["**Stage 5 — Important Genes** *(95%)*\nImportance = Frequency^1.2 × Avg NES × (1 + Cardiac Score)\nDruggability tier annotation"]
+    S7["<b>Stage 7 — Network Topology</b> <i>(91%)</i><br/>hub score = 0.35·betweenness + 0.25·PageRank<br/>+ 0.20·degree + 0.15·eigenvector + 0.05·closeness"]
 
-    S6["**Stage 6 — Report Generation** *(100%)*\nJSON + PDF output\nRanked hypotheses · Hub genes · Top therapeutic targets"]
+    S8["<b>Stage 8 — Novelty &amp; Discovery</b> <i>(96%)</i><br/>saturation = log₁₀(hits+1) / log₁₀(1001)<br/>novelty = (2·(1−saturation) + gene novelty) / 3<br/><b>Discovery = PPS × novelty</b> — final ranking"]
 
-    DONE([/"Results Ready\nRanked Pathways · Therapeutic Targets · Export"\])
+    S9["<b>Stage 9 — Report Generation</b> <i>(100%)</i><br/>JSON · PDF · Markdown · CSV<br/>ranked hypotheses · hub genes · target candidates"]
 
-    START --> S0 --> S1 --> S2a --> S2b --> S2c --> S3 --> S35 --> S4 --> S4b --> S4c --> S5 --> S6 --> DONE
+    DONE([/"Ranked discoveries + evidence"/])
+
+    START --> S0 --> S1 --> S2a --> S2b --> S2c --> S3 --> S35 --> S4 --> S6 --> S6c --> S7 --> S8 --> S9 --> DONE
 
     %% External data sources
-    DB1[("STRING v11.5\nProtein interactions")]
-    DB2[("g:Profiler\nREAC · KEGG · WP · GO:BP")]
-    DB3[("GTEx v8\nCardiac tissue expression")]
-    DB4[("PubMed / NCBI\nLiterature screening")]
-    DB5[("Curated cardiac DB\nOMIM · ClinGen · DrugBank")]
+    DB1[("STRING v11.5<br/>protein interactions")]
+    DB2[("g:Profiler<br/>REAC · KEGG · WP · GO:BP")]
+    DB3[("GTEx v8<br/>cardiac expression")]
+    DB4[("PubMed / NCBI E-utilities<br/>corpus sizes + abstracts")]
+    DB5[("DrugBank v5.1.10 · ChEMBL<br/>Open Targets")]
+    DB6[("HGNC protein-coding genome<br/>permutation background")]
 
     DB1 -.->|"PPI network"| S1
-    DB2 -.->|"Enrichment"| S2a
-    DB2 -.->|"Re-enrichment"| S2b
-    DB3 -.->|"Expression validation"| S4
-    DB4 -.->|"Disease context"| S2b
-    DB4 -.->|"Abstract mining"| S4b
-    DB5 -.->|"Druggability + permutation context"| S4
-    DB5 -.->|"Gene-disease scores"| S5
+    DB2 -.->|"enrichment"| S2a
+    DB2 -.->|"re-enrichment"| S2b
+    DB3 -.->|"expression validation"| S4
+    DB6 -.->|"null background"| S4
+    DB5 -.->|"druggability"| S4
+    DB4 -.->|"corpus size + abstracts"| S6
+    DB1 -.->|"edges for centrality"| S7
 
-    %% Styling
     classDef input    fill:#1E6B52,stroke:#0F3D2F,stroke-width:3px,color:#fff,font-weight:bold
     classDef stage    fill:#2563EB,stroke:#1D4ED8,stroke-width:2px,color:#fff
     classDef filter   fill:#7C3AED,stroke:#5B21B6,stroke-width:2px,color:#fff
@@ -58,10 +62,10 @@ flowchart TD
     classDef db       fill:#475569,stroke:#334155,stroke-width:2px,color:#fff
 
     class START input
-    class S0,S1,S2a,S2b,S2c stage
-    class S3,S5 score
-    class S35 filter
-    class S4,S4b,S4c validate
-    class S6 output
     class DONE done
-    class DB1,DB2,DB3,DB4,DB5 db
+    class S0,S1,S2a,S2b,S2c stage
+    class S35,S6c filter
+    class S4,S7 validate
+    class S3,S8 score
+    class S9 output
+    class DB1,DB2,DB3,DB4,DB5,DB6 db

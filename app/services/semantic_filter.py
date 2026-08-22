@@ -753,6 +753,27 @@ class SemanticFilter:
                     "repolarization", "refractory period", "conduction velocity",
                     "electrocardiogram", "ecg", "ekg", "electrophysiology"
                 }
+            },
+            "cardiac_regeneration": {
+                "high_priority": {
+                    "cardiac regeneration", "heart regeneration", "myocardial regeneration",
+                    "cardiomyocyte proliferation", "cardiomyocyte renewal",
+                    "cardiac progenitor", "cardiac stem cell", "cardiac precursor",
+                    "heart repair", "myocardial repair", "cardiac repair",
+                    "dedifferentiation", "transdifferentiation", "reprogramming",
+                    "direct reprogramming", "cardiac reprogramming",
+                    "induced cardiomyocyte", "icm", "neonatal heart regeneration",
+                    "zebrafish heart regeneration", "cardiac cell therapy"
+                },
+                "moderate": {
+                    "cell cycle re-entry", "cytokinesis", "cardiomyocyte cell cycle",
+                    "hippo pathway", "yap", "taz", "notch signaling",
+                    "wnt signaling", "cardiac wnt", "fgf signaling",
+                    "epicardium", "epicardial", "epicardial activation",
+                    "endocardial", "cardiac fibroblast", "fibroblast reprogramming",
+                    "extracellular matrix", "cardiac ecm", "cardiac scaffold",
+                    "angiogenesis", "neovascularization", "cardiac vasculature"
+                }
             }
         }
         
@@ -844,6 +865,15 @@ class SemanticFilter:
         
         return (score > 0, score)
     
+    # Unambiguous cardiac qualifiers. Their presence means the pathway is about
+    # the heart whatever other generic tissue words the name also contains.
+    CARDIAC_QUALIFIERS = (
+        "cardiac", "cardio", "heart", "myocard", "atrial", "atrium",
+        "ventricul", "ventricle", "coronary", "aortic", "aorta",
+        "sarcomere", "pericard", "endocard", "epicard", "purkinje",
+        "sinoatrial", "atrioventricular", "valve",
+    )
+
     def calculate_cardiac_relevance(
         self,
         pathway_name: str,
@@ -915,9 +945,19 @@ class SemanticFilter:
             # STRICTER: 0.05 per match, max 15%
             scores["pathway_name_cardiac"] = min(name_cardiac_matches * 0.05, 0.15)
         
-        # Category 5: NEGATIVE PENALTY for non-cardiac terms (-50% max)
+        # Category 5: NEGATIVE PENALTY for non-cardiac terms (-50% max).
+        #
+        # The penalty is suppressed when the text is explicitly cardiac-qualified.
+        # Several negative terms are generic tissue words ("muscle", "muscle
+        # contraction") that exist to exclude skeletal-muscle pathways, but they
+        # match inside cardiac pathway names too. Unguarded, "cardiac muscle
+        # contraction" collected a -0.20 penalty that cancelled its 0.17 of
+        # positive cardiac evidence and scored 0.000 -- the canonical cardiac
+        # pathway, rejected as non-cardiac. "Skeletal muscle contraction" carries
+        # no qualifier and is still penalised.
+        cardiac_qualified = any(q in text for q in self.CARDIAC_QUALIFIERS)
         negative_matches = sum(1 for term in self.negative_terms if term in text)
-        if negative_matches > 0:
+        if negative_matches > 0 and not cardiac_qualified:
             scores["negative_penalty"] = -min(negative_matches * 0.10, 0.50)
         
         # Fuzzy pattern matching boost (REDUCED - 5% max - STRICTER)
@@ -959,8 +999,18 @@ class SemanticFilter:
         # First shift to positive: add 0.5 to make range 0 to 1.35
         # Then normalize: divide by 1.35 to get 0-1 range
         # ADDITIONAL: Apply power function to penalize low scores more (x^1.2)
-        total_shifted = total_raw + 0.5
-        total_normalized = max(0.0, min(total_shifted / 1.35, 1.0))
+        # Normalise over the POSITIVE range only, after clamping the penalty at
+        # zero. A previous revision shifted the raw total by +0.5 before
+        # dividing by 1.35, to accommodate the negative penalty. That shift gave
+        # a pathway with *no cardiac evidence at all* a score of
+        # (0 + 0.5)/1.35 = 0.370, or 0.304 after the power term -- despite the
+        # comment below asserting there was no baseline. Every non-cardiac
+        # pathway therefore scored an identical 0.304, the metric could not
+        # discriminate, and any threshold below 0.304 (the presets use 0.01)
+        # filtered nothing. On the reference heart-failure panel this admitted
+        # Malaria, Leishmaniasis and Melanoma at the same relevance as
+        # Inflammasomes, leaving pathway-name matching as the only real gate.
+        total_normalized = min(max(0.0, total_raw) / 0.85, 1.0)
         # Apply power function to make scoring stricter (requires more terms for high scores)
         total_normalized = total_normalized ** 1.2
         

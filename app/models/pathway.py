@@ -14,6 +14,49 @@ class PathwayEntry(BaseModel):
     p_adj: float = Field(..., description="FDR-adjusted p-value")
     evidence_count: int = Field(..., description="Number of genes from input in pathway")
     evidence_genes: List[str] = Field(default_factory=list, description="Gene IDs in pathway")
+
+    # Effect-size inputs from the enrichment test. Without these only the
+    # p-value is available, and p-value alone systematically favours very large,
+    # generic gene sets because significance grows with set size independently
+    # of how concentrated the query genes actually are.
+    term_size: Optional[int] = Field(
+        None, description="Total number of genes annotated to this term in the source database"
+    )
+    query_size: Optional[int] = Field(
+        None, description="Number of query genes tested against this term"
+    )
+    effective_domain_size: Optional[int] = Field(
+        None, description="Size of the annotation universe used by the enrichment test"
+    )
+
+    @property
+    def fold_enrichment(self) -> Optional[float]:
+        """Observed/expected overlap ratio.
+
+        expected = term_size * query_size / effective_domain_size
+        Returns None when the enrichment test did not report the sizes needed.
+        """
+        if not (self.term_size and self.query_size and self.effective_domain_size):
+            return None
+        expected = (self.term_size * self.query_size) / self.effective_domain_size
+        if expected <= 0:
+            return None
+        return self.evidence_count / expected
+
+    @property
+    def gene_set_specificity(self) -> float:
+        """1.0 for a tightly-scoped term, falling to 0.0 for very broad ones.
+
+        Log-scaled against a 500-gene reference: a 10-gene term scores 0.63, a
+        100-gene term 0.26, a 500-gene term 0.0. Used to stop maximally generic
+        GO terms ("developmental process", 200+ genes) from dominating the
+        ranking purely on set size.
+        """
+        import math as _m
+        size = self.term_size or max(self.evidence_count, 1)
+        if size <= 1:
+            return 1.0
+        return max(0.0, 1.0 - _m.log10(size) / _m.log10(500))
     
     model_config = ConfigDict(
         json_schema_extra={
