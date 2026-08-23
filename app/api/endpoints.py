@@ -18,12 +18,26 @@ from app.models import (
     ErrorResponse,
     GeneInfo
 )
+from functools import lru_cache
+
 from app.core.config import get_settings
 from app.api.state import analysis_store
 
 logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/v1", tags=["analysis"])
+
+
+@lru_cache(maxsize=1)
+def _gene_validator():
+    """The single shared GeneValidator, built on first use.
+
+    This was the only consumer of the service registry that startup populated
+    with ~20 eagerly-constructed services. Building it lazily here keeps the one
+    instance that was actually wanted and lets the rest go.
+    """
+    from app.services.gene_validator import GeneValidator
+    return GeneValidator()
 
 
 @router.get("/health")
@@ -52,9 +66,7 @@ async def validate_genes(request: GeneValidationRequest):
     logger.info(f"Validating {len(request.gene_ids)} genes")
     
     try:
-        from app.services.fast_service_init import get_service_fast
-        validator = get_service_fast("gene_validator")
-        result = validator.validate_genes(request.gene_ids)
+        result = _gene_validator().validate_genes(request.gene_ids)
         
         return GeneValidationResponse(result=result)
         

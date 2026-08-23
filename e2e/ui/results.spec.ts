@@ -40,7 +40,7 @@ test.describe('Results (fixture)', () => {
     expect(firstBefore).not.toEqual(firstAfter);
   });
 
-  test('drilling into a pathway shows lineage, metrics and citations', async ({ page }) => {
+  test('drilling into a pathway shows lineage and metrics', async ({ page }) => {
     await page.goto(`/results/${FIXTURE}`);
     // Follow the first hypothesis link (href navigation avoids sticky-header click interception).
     const href = await page.getByTestId('pathway-link').first().getAttribute('href');
@@ -52,6 +52,22 @@ test.describe('Results (fixture)', () => {
     await expect(page.getByTestId('lineage')).toBeVisible();
     await expect(page.getByTestId('metrics')).toBeVisible();
     await expect(page.getByTestId('evidence-genes')).toBeVisible();
+  });
+
+  test('citations render and expand for a pathway that has them', async ({ page }) => {
+    // Deliberately NOT the first row. Rows rank by Discovery Score, and the
+    // top-ranked hypothesis is the one with the *fewest* PubMed records at the
+    // pathway x seeds x disease intersection -- frequently zero, which is the
+    // finding, not a failure. Pick a row that actually carries citations.
+    await page.goto(`/results/${FIXTURE}`);
+    const rows = page.getByTestId('pathway-row');
+    const counts = await rows.evaluateAll((els) =>
+      els.map((e) => Number(e.getAttribute('data-lit') || '0')));
+    const index = counts.findIndex((c) => c > 0);
+    expect(index, 'fixture must contain at least one cited pathway').toBeGreaterThanOrEqual(0);
+
+    const href = await rows.nth(index).getByTestId('pathway-link').getAttribute('href');
+    await page.goto(href!);
 
     const citations = page.getByTestId('citation');
     expect(await citations.count()).toBeGreaterThan(0);
@@ -60,6 +76,19 @@ test.describe('Results (fixture)', () => {
     const firstCite = citations.first();
     await firstCite.getByRole('button', { name: /Abstract/ }).click();
     await expect(firstCite.locator('.cite-abstract')).toBeVisible();
+  });
+
+  test('a pathway with no citations shows the empty state, not a blank', async ({ page }) => {
+    await page.goto(`/results/${FIXTURE}`);
+    const rows = page.getByTestId('pathway-row');
+    const counts = await rows.evaluateAll((els) =>
+      els.map((e) => Number(e.getAttribute('data-lit') || '0')));
+    const index = counts.findIndex((c) => c === 0);
+    test.skip(index < 0, 'fixture has no zero-citation pathway');
+
+    const href = await rows.nth(index).getByTestId('pathway-link').getAttribute('href');
+    await page.goto(href!);
+    await expect(page.getByText(/No literature citations were retrieved/i)).toBeVisible();
   });
 
   test('CSV export is downloadable', async ({ page }) => {

@@ -21,8 +21,6 @@ from .tissue_expression_validator import TissueExpressionValidator
 from .permutation_tester import PermutationTester
 from .druggability_analyzer import DruggabilityAnalyzer
 from .seed_gene_tracer import SeedGeneTracer
-from .hpa_client import HPAClient
-from .epigenomic_client import EpigenomicClient
 from .pipeline import Pipeline, PipelineError
 
 __all__ = [
@@ -50,8 +48,6 @@ __all__ = [
     "TissueExpressionValidator",
     "PermutationTester",
     "DruggabilityAnalyzer",
-    "HPAClient",
-    "EpigenomicClient",
     "SeedGeneTracer",
     "Pipeline",
     "PipelineError",

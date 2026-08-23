@@ -14,38 +14,10 @@ from app.models import (
 from app.services import GProfilerClient, ReactomeClient, APIClientError
 from app.core.config import get_settings
 
+from app.services.expansion_screen import preliminary_score
+
 logger = logging.getLogger(__name__)
 
-
-def preliminary_score(pathway, db_weight: float) -> float:
-    """Screening score deciding which pathways advance to neighbourhood expansion.
-
-    This is a *recall* step, and is deliberately NOT the same score used for the
-    final ranking. Expansion re-enriches the neighbours of a chosen pathway, so
-    pathways with broader gene coverage supply more material to expand; scoring
-    expansion candidates for specificity starves the candidate pool. Measured on
-    the VEGFA/MMP9/IL6/TNF/ACE panel, a specificity-weighted screen cut the final
-    output from 22 hypotheses to 3 and lost the mechanistically interesting hits
-    (NLRP3 inflammasome, TLR3 cascade, NF-kappa B).
-
-    Specificity is applied later instead, in the Pathway Prioritization Score,
-    where it belongs -- ranking is the precision step.
-
-        screen = min(-log10(p_adj), 20) * sqrt(evidence_count) * db_weight
-
-    The square root is what keeps this from collapsing into "sort by gene count".
-    The previous form multiplied by the raw count and capped -log10(p) at 50, a
-    cap essentially every candidate reached, so the screen became pure size
-    ordering. (The project's own documentation had long described this term as
-    a square root; the code did not implement one.)
-    """
-    import math as _m
-
-    if pathway.p_adj > 0:
-        neg_log_p = min(-_m.log10(pathway.p_adj), 20.0)
-    else:
-        neg_log_p = 20.0
-    return neg_log_p * _m.sqrt(max(pathway.evidence_count, 1)) * db_weight
 
 
 class PrimaryPathwayAnalyzer:
@@ -102,10 +74,6 @@ class PrimaryPathwayAnalyzer:
             f"Found {len(enriched_pathways)} significantly enriched pathways "
             f"(FDR < {self.settings.nets.fdr_threshold})"
         )
-        
-        # DEBUG: Check what genes are in the pathways
-        if enriched_pathways:
-            pass
         
         # Step 3: Calculate preliminary NES scores
         scored_pathways = self._calculate_nes_scores(enriched_pathways)
@@ -207,8 +175,7 @@ class PrimaryPathwayAnalyzer:
         db_weights = self.settings.nets.db_weights
         
         for pathway in pathways:
-            # Screening score: significance x effect size x specificity.
-            # See preliminary_score() for why raw gene count was removed.
+            # Recall-oriented expansion screen; see expansion_screen.py.
             db_weight = db_weights.get(pathway.source_db, 1.0)
             nes = preliminary_score(pathway, db_weight)
             

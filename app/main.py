@@ -35,23 +35,11 @@ async def lifespan(app: FastAPI):
     logger.info(f"Environment: {settings.environment}")
     logger.info(f"Debug mode: {settings.debug}")
     
-    # Initialize services - FAST, eager loading
-    logger.info("Initializing services (fast mode)...")
-    try:
-        from app.services.fast_service_init import initialize_services_fast
-        from app.core.service_registry import register_service
-        services = initialize_services_fast()
-        
-        # Register all services with the service registry for modular pipeline
-        for name, service_factory in services.items():
-            service_instance = service_factory()  # Call the factory to get the instance
-            register_service(name, service_instance)
-        
-        logger.info(f"Services initialized and registered successfully ({len(services)} services)")
-    except Exception as e:
-        logger.error(f"Failed to initialize services: {e}")
-        raise
-    
+    # Services are constructed where they are used: Pipeline builds its own in
+    # __init__, and the one endpoint that needed a shared instance holds it
+    # itself. This block used to eagerly construct ~20 services at boot and
+    # register them for the modular pipeline, which was deleted in 7808c51 --
+    # opening every HTTP client on startup to populate a registry nothing read.
     logger.info("CardioXNet API ready")
     
     yield
