@@ -72,10 +72,14 @@ biology.
   or hatching where category distinctions matter.
 - Plot text uses regular sans serif fonts and defines abbreviations or encoded
   quantities in the caption.
-- Figure 5 is the grounding development benchmark. Its 40/40 control and 0/124
+- Figure 4 is the grounding development benchmark. Its 40/40 control and 0/124
   real-panel results are regression invariants, not unbiased specificity.
-- Figure 4 is the all-hypothesis temporal holdout. Correlations are descriptive
-  because pathways overlap within panels.
+  Its source file is `fig5_negative_controls.pdf`: the manuscript includes the
+  controls float before the holdout float, so the compiled figure numbers are
+  swapped relative to these two filenames. Cite the compiled number.
+- Figure 5 is the all-hypothesis temporal holdout
+  (`fig4_temporal_holdout.pdf`). Correlations are descriptive because pathways
+  overlap within panels.
 - Figures 6a and 6b demonstrate interface behavior and are not additional
   scientific evidence.
 

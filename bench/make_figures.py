@@ -342,14 +342,7 @@ def fig_specificity(reports: Dict[str, dict], out_dir: Path) -> None:
         ha="right",
         va="top",
     )
-    ax.text(
-        0.0,
-        -0.25,
-        "Heart-failure benchmark. Specificity enters PPS, so this is a consistency check.",
-        transform=ax.transAxes,
-        fontsize=7,
-        color=MUTED,
-    )
+    # The caption already states the panel and the consistency-check caveat.
     save(fig, out_dir, "fig2_term_specificity")
 
 
