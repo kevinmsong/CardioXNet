@@ -1,3 +1,4 @@
+import pytest
 import requests
 
 from app.services.druggability_analyzer import DruggabilityAnalyzer
@@ -27,22 +28,23 @@ def test_calculate_druggability_score_includes_live_target_evidence(monkeypatch)
                             "approvedName": "SRC proto-oncogene",
                             "tractability": [
                                 {"label": "Approved Drug", "modality": "SM", "value": True},
-                                {"label": "Advanced Clinical", "modality": "SM", "value": True},
                             ],
-                            "knownDrugs": {
+                            # Current Open Targets shape: drugAndClinicalCandidates,
+                            # maxClinicalStage, and diseases nested under `disease`.
+                            "drugAndClinicalCandidates": {
                                 "count": 12,
                                 "rows": [
                                     {
-                                        "phase": 4,
-                                        "status": "Completed",
-                                        "disease": {"name": "cardiovascular disease"},
-                                        "drug": {"id": "CHEMBL1", "name": "Drug A", "maximumClinicalTrialPhase": 4},
+                                        "maxClinicalStage": "APPROVAL",
+                                        "drug": {"id": "CHEMBL1", "name": "Drug A",
+                                                 "maximumClinicalStage": "APPROVAL"},
+                                        "diseases": [{"disease": {"name": "cardiovascular disease"}}],
                                     },
                                     {
-                                        "phase": 2,
-                                        "status": "Recruiting",
-                                        "disease": {"name": "heart failure"},
-                                        "drug": {"id": "CHEMBL2", "name": "Drug B", "maximumClinicalTrialPhase": 2},
+                                        "maxClinicalStage": "PHASE_2",
+                                        "drug": {"id": "CHEMBL2", "name": "Drug B",
+                                                 "maximumClinicalStage": "PHASE_2"},
+                                        "diseases": [{"disease": {"name": "heart failure"}}],
                                     },
                                 ],
                             },
@@ -88,3 +90,41 @@ def test_calculate_druggability_score_falls_back_when_live_lookup_fails(monkeypa
     assert score.druggability_source != "curated"
     assert "unavailable" in score.druggability_source
     assert analyzer.last_lookup_failures == 1
+
+
+def test_query_does_not_use_fields_open_targets_removed():
+    """Static guard against the schema drift that silently zeroed druggability.
+
+    The query asked for `knownDrugs(size:)`, `phase`, `status`, `disease { name }`
+    and `drug { maximumClinicalTrialPhase }`. Open Targets removed all of them, so
+    every request returned HTTP 400 -- and `except Exception: pass` in the caller
+    meant external druggability read 0 for every gene in every run, indefinitely.
+    """
+    query = DruggabilityAnalyzer._OT_QUERY
+    for removed in ("knownDrugs", "maximumClinicalTrialPhase"):
+        assert removed not in query, f"{removed} no longer exists on the Open Targets schema"
+    assert "drugAndClinicalCandidates" in query
+    assert "maxClinicalStage" in query
+
+
+@pytest.mark.live
+def test_open_targets_query_is_accepted_by_the_live_schema():
+    """Opt-in live check that the query still matches the API.
+
+    Run with `pytest -m live`. Skipped when the network is unavailable so the
+    default suite stays offline-safe.
+    """
+    import requests
+
+    analyzer = DruggabilityAnalyzer()
+    try:
+        resp = requests.post(
+            analyzer._OT_GRAPHQL_URL,
+            json={"query": analyzer._OT_QUERY, "variables": {"term": "MYH7"}},
+            timeout=30,
+        )
+    except requests.RequestException as exc:
+        pytest.skip(f"Open Targets unreachable: {exc}")
+
+    assert resp.status_code == 200, resp.text[:400]
+    assert "errors" not in resp.json(), resp.text[:400]

@@ -61,6 +61,15 @@ class DruggabilityAnalyzer:
     # Minimum spacing between Open Targets requests. This fires one POST per gene
     # per pathway, which without pacing is a burst of thousands.
     _OT_MIN_INTERVAL = 0.05
+    # Open Targets schema, verified against the live API on 2026-08-22.
+    #
+    # The previous query asked for `knownDrugs(size: 10)` with `phase`, `status`,
+    # `disease { name }` and `drug { maximumClinicalTrialPhase }`. None of those
+    # exist any more: `knownDrugs` was replaced by `drugAndClinicalCandidates`,
+    # the phase field is `maxClinicalStage`, and diseases are nested one level
+    # deeper. Every request returned HTTP 400 -- and because the caller swallowed
+    # exceptions with `except Exception: pass`, external druggability silently
+    # read 0 for every gene in every run ever made.
     _OT_QUERY = """
     query SearchTarget($term: String!) {
       search(queryString: $term, entityNames: ["target"], page: {index: 0, size: 5}) {
@@ -71,13 +80,12 @@ class DruggabilityAnalyzer:
             ... on Target {
               approvedSymbol
               tractability { label modality value }
-              knownDrugs(size: 10) {
+              drugAndClinicalCandidates {
                 count
                 rows {
-                  phase
-                  status
-                  disease { name }
-                  drug { id name maximumClinicalTrialPhase }
+                  maxClinicalStage
+                  drug { id name maximumClinicalStage }
+                  diseases { disease { name } }
                 }
               }
             }
@@ -355,18 +363,29 @@ class DruggabilityAnalyzer:
             for obj in ot_hits:
                 gene_sym = obj.get("approvedSymbol", "")
                 tractability = obj.get("tractability") or []
-                drugs_data = obj.get("knownDrugs") or {}
+                drugs_data = obj.get("drugAndClinicalCandidates") or {}
                 drug_rows = drugs_data.get("rows") or []
 
-                has_approved = any(
+                # Clinical stage now comes from the candidate rows themselves.
+                # The old code read a tractability label "Advanced Clinical",
+                # which is not one the API emits, so it never matched.
+                stages = {
+                    (r.get("maxClinicalStage") or "").upper() for r in drug_rows
+                }
+                has_approved = "APPROVAL" in stages or any(
                     t.get("label") == "Approved Drug" and t.get("value") for t in tractability
                 )
-                has_clinical = any(
-                    t.get("label") == "Advanced Clinical" and t.get("value") for t in tractability
-                )
+                has_clinical = any(s.startswith("PHASE") for s in stages)
+
+                def _disease_names(row):
+                    return [
+                        ((d.get("disease") or {}).get("name") or "")
+                        for d in (row.get("diseases") or [])
+                    ]
+
                 has_cv = any(
-                    any(term in (r.get("disease") or {}).get("name", "").lower() for term in _cv_terms)
-                    for r in drug_rows
+                    term in name.lower()
+                    for r in drug_rows for name in _disease_names(r) for term in _cv_terms
                 )
 
                 ot_target_count += 1
@@ -382,9 +401,10 @@ class DruggabilityAnalyzer:
                     ot_cv_count += 1
 
                 top_drugs = [
-                    {"name": r["drug"]["name"], "phase": r.get("phase", 0)}
+                    {"name": (r.get("drug") or {}).get("name"),
+                     "stage": r.get("maxClinicalStage")}
                     for r in drug_rows
-                    if r.get("drug", {}).get("name")
+                    if (r.get("drug") or {}).get("name")
                 ][:5]
                 target_evidence.append({"gene_symbol": gene_sym, "top_drugs": top_drugs})
 
