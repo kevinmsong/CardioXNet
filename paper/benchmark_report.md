@@ -1,6 +1,6 @@
 # CardioXNet benchmark report
 
-Run date: 2026-08-22. All figures and tables in `paper/` were generated from these
+Run date: 2026-08-22 (regenerated after the API-correctness fixes). All figures and tables in `paper/` were generated from these
 runs; regenerate with the commands in `paper/README.md`.
 
 External resources at run time: STRING v12.0, g:Profiler (`e104_eg51_p15`),
@@ -17,13 +17,13 @@ controls. Each analysis is five seed genes under the `balanced` preset.
 
 | Run | Kind | Seed genes | Disease context | Runtime | Hypotheses |
 |-----|------|-----------|-----------------|---------|-----------|
-| `hf_inflammatory` | real | VEGFA, MMP9, IL6, TNF, ACE | heart failure | 320 s | 19 |
-| `dcm_structural` | real | MYH7, TTN, LMNA, MYBPC3, TNNT2 | cardiomyopathy | 239 s | 35 |
-| `arrhythmia_channels` | real | SCN5A, KCNQ1, KCNH2, RYR2, CACNA1C | arrhythmia | 459 s | 36 |
-| `mi_ischemic` | real | LDLR, APOB, PCSK9, NOS3, EDN1 | myocardial infarction | 247 s | 35 |
-| `olfactory` | negative | OR51E2, OR2W1, OR1A1, OR5K1, OR10A4 | heart failure | 69 s | 9 |
-| `random_1` | negative | RPF2, CLRN3, PRKAG1, OR8U9, CACNA1D | heart failure | 190 s | 20 |
-| `random_2` | negative | C2CD4A, GORASP1, CHIC1, VCY, PLCD4 | heart failure | 108 s | 7 |
+| `hf_inflammatory` | real | VEGFA, MMP9, IL6, TNF, ACE | heart failure | 256 s | 19 |
+| `dcm_structural` | real | MYH7, TTN, LMNA, MYBPC3, TNNT2 | cardiomyopathy | 199 s | 37 |
+| `arrhythmia_channels` | real | SCN5A, KCNQ1, KCNH2, RYR2, CACNA1C | arrhythmia | 350 s | 40 |
+| `mi_ischemic` | real | LDLR, APOB, PCSK9, NOS3, EDN1 | myocardial infarction | 322 s | 36 |
+| `olfactory` | negative | OR51E2, OR2W1, OR1A1, OR5K1, OR10A4 | heart failure | 100 s | 12 |
+| `random_1` | negative | RPF2, CLRN3, PRKAG1, OR8U9, CACNA1D | heart failure | 287 s | 21 |
+| `random_2` | negative | C2CD4A, GORASP1, CHIC1, VCY, PLCD4 | heart failure | 100 s | 7 |
 
 ---
 
@@ -55,25 +55,25 @@ broad cardiac fallback instead of AND-ed.
 
 ## 4. Negative controls (Figure 5)
 
-**Every hypothesis returned by every negative control is flagged `Ungrounded`;
-none of the 130 hypotheses from the four real panels is.** The separation is
-complete.
+**Every one of the 40 hypotheses returned by the three negative controls is
+flagged `Ungrounded`; none of the 132 hypotheses from the four real panels is.**
+The separation is complete, in both directions.
 
 The discriminating quantity is the seed genes' own literature footprint in the
 chosen disease — one PubMed query per run:
 
 | Panel | Seed–disease corpus |
 |-------|--------------------:|
-| hf_inflammatory | 10,867 |
-| dcm_structural | 919 |
-| arrhythmia_channels | 699 |
-| mi_ischemic | 342 |
+| hf_inflammatory | 10,868 |
+| dcm_structural | 2,487 |
+| arrhythmia_channels | 1,538 |
+| mi_ischemic | 2,371 |
 | olfactory (negative) | 0 |
 | random_1 (negative) | 6 |
 | random_2 (negative) | 1 |
 
-Real panels exceed the grounding threshold of 100 records by 3.4× to 109×;
-negative controls fall below it by two orders of magnitude.
+Real panels exceed the grounding threshold of 100 records by 15× to 109×;
+negative controls fall below it by one to two orders of magnitude.
 
 This control was worth running because it initially **failed**. Before the
 grounding check, olfactory-receptor and random gene panels produced *more*
@@ -92,24 +92,24 @@ went.** This is the headline validation result and it is negative.
 
 Literature was frozen at the end of 2020, novelty recomputed from pre-2020
 records only, and each pathway's 2021–2026 publication record measured
-(n = 125 pathways across the four real panels).
+(n = 132 pathways across the four real panels).
 
 | Comparison | Spearman ρ |
 |------------|-----------:|
-| Discovery Score (2020) vs post-cutoff growth rate | −0.01 |
-| Novelty (2020) vs post-cutoff growth rate | +0.00 |
+| Discovery Score (2020) vs post-cutoff growth rate | −0.04 |
+| Novelty (2020) vs post-cutoff growth rate | −0.03 |
 | Novelty (2020) vs absolute post-cutoff records | **−0.98** |
-| PPS (2020) vs post-cutoff growth rate | −0.12 |
-| Discovery vs growth, measurable pathways only (n = 118) | +0.07 |
+| PPS (2020) vs post-cutoff growth rate | −0.14 |
+| Discovery vs growth, measurable pathways only (n = 121) | +0.04 |
 
 Mean post-cutoff growth by the tier assigned at the cutoff:
 
 | Tier at 2020 | n | Mean growth | Median growth |
 |--------------|--:|------------:|--------------:|
-| Highly Novel | 12 | **0.31** | 0.00 |
-| Novel | 23 | 0.89 | 0.75 |
-| Emerging | 42 | 0.77 | 0.74 |
-| Established | 48 | 0.63 | 0.55 |
+| Highly Novel | 17 | **0.33** | 0.00 |
+| Novel | 23 | 0.86 | 0.75 |
+| Emerging | 41 | 0.78 | 0.74 |
+| Established | 51 | 0.63 | 0.55 |
 
 Pathways called **Highly Novel grew the least**, and half of them gained no
 publications at all in five years. The ρ = −0.98 against absolute record counts
@@ -133,6 +133,12 @@ Score should be read as a triage heuristic, not as a forecast.
 - **Permutation null.** 1,000 size-matched permutations per pathway drawn from
   the 19,410-gene protein-coding background. On `hf_inflammatory`, observed
   overlaps of 30 against a null mean of 0.45 ± 0.65 (z ≈ 46).
+- **External evidence is now actually retrieved.** The Open Targets query had
+  been returning HTTP 400 on every request since the API changed
+  `knownDrugs` to `drugAndClinicalCandidates`; `except Exception: pass` in the
+  caller hid it, so external druggability read 0 for every gene of every earlier
+  run. With the query repaired, MYH7 returns mavacamten, omecamtiv mecarbil and
+  danicamtiv against dilated cardiomyopathy and heart failure.
 - **Multiple testing.** Benjamini–Hochberg across every reported hypothesis,
   verified against `statsmodels.multipletests` in the test suite. Pathways whose
   null cannot be built carry `q = null` and are excluded from the correction
@@ -143,19 +149,47 @@ Score should be read as a triage heuristic, not as a forecast.
   enriched pathways clear it by a wide margin and most reported pathways reach
   the floor. The test establishes that an overlap is not chance; it does not
   rank among strong hypotheses and must not be read as doing so.
-- **Reproducibility.** Seeded RNG and a pinned background make empirical
-  p-values identical across reruns; a regression test asserts it.
+- **Reproducibility.** Seeded RNG and a pinned background make the permutation
+  step identical across reruns, and a regression test asserts it. The *pipeline*
+  is not bit-reproducible, because the databases it queries are not.
+
+  Measured directly: two back-to-back runs of the same seed panel on identical
+  code produced identical functional neighbourhoods (219 genes, 2,261 STRING
+  interactions) and identical primary enrichment (1,787 pathways), then diverged
+  by a single pathway at secondary expansion (3,045 vs 3,046). The redundancy
+  filter amplified that to a 34- vs 37-pathway final set, which in turn shifts
+  Benjamini-Hochberg q-values (m changes) and the seed-proximity term of the
+  centrality weight.
+
+  The resulting noise floor, over the 33 pathways common to both runs:
+
+  | Comparison | Pathways changed | Max relative PPS change | Novelty tier changes |
+  |---|---:|---:|---:|
+  | Same code, run A vs run B | 6 / 33 | 6.0% | 0 |
+  | Across the Nov refactor | 0 / 37 | 0.0% | 0 |
+
+  **No novelty tier moved in any comparison.** Report any single number with its
+  run date, and treat differences below roughly 6% in PPS as run-to-run variation
+  rather than signal.
 
 ---
 
 ## 7. Regression suite
 
-63 tests (`tests/test_scientific_rigor.py` plus the pre-existing suite) pin each
+71 tests (`tests/test_scientific_rigor.py` plus the pre-existing suite) pin each
 defect found in the audit: the degenerate permutation universe, BH correctness
 against a reference implementation, generic-term dominance, pathway-specific
 query construction, saturation from corpus size, novelty-confidence gating, seed
 grounding, semantic-filter discrimination, the effect-size floor, CSV
-header/row alignment, and the freshness of the results snapshot the UI reads.
+header/row alignment, the freshness of the results snapshot the UI reads, and a
+sentinel per external API so that a failed call can never be read as a
+measurement of zero.
+
+A further 20 Playwright assertions cover what only the rendered page can prove:
+Discovery-Score ordering, `n/t` for an untested permutation, valid novelty tiers,
+the PPS component breakdown, and CSV header/row width equality. A live
+end-to-end spec drives a real analysis through the browser against STRING,
+g:Profiler and PubMed.
 
 The degree-preserving permutation variants were **removed** rather than left
 unused, and a test asserts they stay removed: they drew replacements from
@@ -179,8 +213,12 @@ case the assertions were meant to catch.
   corpus (125 `pubmed_corpus`, 36 `ungrounded_seeds`, zero `not_measured`).
   A pathway whose count cannot be obtained at all is still damped and flagged
   rather than scored as novel.
-- **Not pinned.** STRING, g:Profiler, GTEx, ChEMBL and PubMed all drift. Record
-  the run date with any reported figure.
+- **Not pinned.** STRING, g:Profiler, GTEx, Open Targets and PubMed all drift,
+  and their schemas change: the Open Targets query silently broke and returned
+  nothing for an unknown period. Every external client now carries a failure
+  sentinel and logs at WARNING, and an opt-in `pytest -m live` test asserts the
+  Open Targets query still matches the published schema. Record the run date with
+  any reported figure.
 - **Single-species, single-domain.** Human only; cardiac semantic scoring uses
   curated term lists that will miss lexically dissimilar evidence.
 - **Hypotheses, not findings.** Every output is a candidate for experimental
