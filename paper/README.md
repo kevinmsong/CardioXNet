@@ -1,49 +1,114 @@
-# CardioXNet manuscript workspace
+# CardioXNet IEEE Access manuscript workspace
 
-Drafts, figures and tables for the CardioXNet methods paper.
+This directory contains the IEEE Access manuscript source, benchmark
+documentation, figures, tables, and rendered review copy. The required front
+matter affiliation is Department of Biomedical Engineering, The University of
+Alabama at Birmingham.
 
 ## Contents
 
-| Path | What it holds |
-|------|---------------|
-| `abstract.md` | The 250-word abstract. |
-| `figures/` | Generated figures (`.pdf` vector + `.png` at 300 dpi). |
-| `tables/` | Generated tables (`.csv` for import, `.md` for review). |
-| `benchmark_report.md` | Full benchmark results with the numbers the abstract cites. |
+| Path | Contents |
+|------|----------|
+| `CardioXNet_IEEE_Access.tex` | IEEE Access manuscript source |
+| `CardioXNet_IEEE_Access.pdf` | Rendered manuscript for visual review |
+| `references.bib` | Bibliographic database |
+| `abstract.md` | Standalone 248-word abstract and claim boundaries |
+| `benchmark_report.md` | Regenerated benchmark values and interpretation limits |
+| `figures/` | Publication PDFs and 600-dpi PNG exports |
+| `tables/` | Generated CSV tables and Markdown review copies |
 
-Figures and tables are **generated, never hand-edited** — regenerate them rather
-than patching a value, so what the manuscript claims always matches what the code
-produced.
+Figures and tables are generated from benchmark artifacts. Regenerate them
+after any analysis or filtering change so that the numerical claims, captions,
+and graphics remain synchronized.
 
-## Regenerating everything
+The `ieeeaccess.cls`, IEEE bibliography style, font assets, and archived
+template package are from the official IEEE Access LaTeX template dated May 13,
+2026.
+
+## Regenerating the analyses and figures
+
+The commands below call live external resources and can take approximately one
+hour for the complete suite.
 
 ```bash
-# 1. Run the analyses (real seed panels + negative controls). ~1 h, hits live APIs.
+# 1. Regenerate four real panels and three controls.
 python bench/run_suite.py
 
-# 2. Temporal-holdout validation. Cached, so reruns are free.
+# 2. Recompute the all-hypothesis temporal holdout.
 python bench/temporal_holdout.py \
     --runs bench/out/hf_inflammatory.json bench/out/dcm_structural.json \
            bench/out/arrhythmia_channels.json bench/out/mi_ischemic.json \
-    --cutoff 2020 --through 2026 --out bench/out/holdout.json
+    --cutoff 2020 --through 2026 --retrieved-on YYYY-MM-DD \
+    --cache bench/out/pubmed_counts_holdout.json \
+    --out bench/out/holdout.json
 
-# 3. Figures and tables.
+# 3. Regenerate figures and tables.
 python bench/make_figures.py --manifest bench/out/manifest.json \
     --holdout bench/out/holdout.json --out paper
 ```
 
-`bench/out/` is git-ignored: it holds raw analysis JSON and the PubMed count
-cache, which are large and reproducible. Only the drafts and the generated
-figures/tables in this directory are tracked.
+Main-benchmark PubMed counts are cached in `bench/out/pubmed_counts.json`; the
+holdout command uses its dedicated cache. These caches reproduce counts already
+retrieved. A genuinely fresh retrieval requires a new or cleared cache and a
+newly recorded retrieval date.
 
-## Reproducibility notes
+The application views in Figure 6 are generated from the committed
+deterministic fixture, rather than from a live benchmark run:
 
-- The permutation background is a pinned snapshot
-  (`app/data/protein_coding_genes.txt`, HGNC protein-coding symbols retrieved
-  2026-08-21), so empirical p-values are comparable across runs.
-- `PermutationTester` uses a seeded private RNG (default seed 20260821).
-- PubMed counts are cached in `bench/out/pubmed_counts.json`. Delete it to
-  re-query live; keep it to reproduce the exact numbers in the manuscript.
-- External resources that are *not* pinned and will drift: STRING v12.0,
-  g:Profiler, GTEx v8, ChEMBL and PubMed itself. Record the run date with any
-  reported figure.
+```bash
+npm run screenshots:manuscript
+```
+
+Figure 7 summarizes representative cardiovascular literature-gap candidates.
+Its exact-query zeros are operational results at the pathway,
+contributing-gene, and disease intersection, not claims of globally unreported
+biology.
+
+## Figure quality and interpretation
+
+- PDF is the preferred manuscript format. Matching PNG exports are written at
+  600 dpi for raster-delivery requirements.
+- Scientific plots use a colorblind-safe palette plus redundant marker shapes
+  or hatching where category distinctions matter.
+- Plot text uses regular sans serif fonts and defines abbreviations or encoded
+  quantities in the caption.
+- Figure 4 is the grounding development benchmark. Its 40/40 control and 0/133
+  real-panel results are regression invariants, not unbiased specificity.
+- Figure 5 is the all-hypothesis temporal holdout. Correlations are descriptive
+  because pathways overlap within panels.
+- Figure 6 demonstrates interface behavior and is not additional scientific
+  evidence.
+
+## Building and checking the manuscript
+
+```bash
+cd paper
+pdflatex -interaction=nonstopmode -halt-on-error CardioXNet_IEEE_Access.tex
+bibtex CardioXNet_IEEE_Access
+pdflatex -interaction=nonstopmode -halt-on-error CardioXNet_IEEE_Access.tex
+pdflatex -interaction=nonstopmode -halt-on-error CardioXNet_IEEE_Access.tex
+```
+
+Render every page to an image and inspect captions, float placement, font
+legibility, table overflow, and figure completeness before submission. The
+current draft uses the IEEE Access two-column class and retains `XX` as the
+volume placeholder until publication metadata are assigned.
+
+## Reproducibility and failure semantics
+
+- The permutation baseline contains 19,410 pinned human protein-coding symbols.
+  Genes present in an analysis but absent from that snapshot are added before
+  sampling, so the effective benchmark pools contain 19,410 to 19,415 symbols.
+- The permutation procedure uses a private random-number generator with default
+  seed 20260821 and 1,000 size-matched draws per testable pathway.
+- g:Profiler calls run in spawned workers with a configurable hard deadline per
+  attempt, 120 seconds by default, and a configurable retry count, two by default. Timed-out workers are terminated and
+  reaped. Retry exhaustion fails the pipeline explicitly rather than returning
+  malformed or partial enrichment. A complete empty result is valid.
+- STRING, g:Profiler, GTEx endpoints, Open Targets, and PubMed are live resources
+  that can drift. Record retrieval timestamps, endpoints, and configured or
+  response-verified resource identifiers with reported values. ChEMBL-derived
+  druggability is part of the embedded curated snapshot, not a live query.
+- `bench/out/` is ignored by Git because it contains reproducible raw analysis
+  JSON and query caches. The manuscript, generated figures, and generated
+  tables in `paper/` are tracked.

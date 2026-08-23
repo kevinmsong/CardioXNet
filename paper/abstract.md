@@ -1,56 +1,49 @@
 # Abstract
 
-**CardioXNet: prioritising under-examined cardiovascular pathways by coupling
-network expansion to literature saturation**
+**CardioXNet: Evidence-Weighted Network Expansion for Auditable Discovery of Cardiovascular Literature Gaps**
 
-Pathway enrichment analysis reliably returns what is statistically significant,
-but significance grows with gene-set size, so rankings are dominated by broad,
-already-familiar terms and offer no guidance toward what remains unexamined. We
-present CardioXNet, an open pipeline that reasons from a small seed-gene panel
-and a disease context to ranked, mechanistically specific cardiovascular
-hypotheses. Seed genes are expanded through STRING protein interactions,
-enriched across Reactome, KEGG, WikiPathways and GO:BP, re-expanded to recover
-secondary pathways, then scored by a Pathway Prioritization Score that weights
-statistical significance, fold enrichment, gene-set specificity and cross-source
-replication — replacing the significance-times-set-size heuristic that otherwise
-promotes generic terms. Each hypothesis is validated against GTEx cardiac
-expression, a size-matched permutation null over the protein-coding genome with
-Benjamini–Hochberg control, and curated druggability. The pipeline's distinctive
-component is literature saturation: the true PubMed corpus size at the
-intersection of pathway concept, contributing seed genes and disease context,
-which yields a Discovery Score favouring pathways that are well supported yet
-sparsely reported. Across four cardiovascular panels, corpus sizes spanned three
-orders of magnitude within single runs, and hypotheses were mechanistically
-specific rather than generic. Negative controls established the metric's
-boundary: random and olfactory-receptor panels produced no interpretable novelty
-once scores were conditioned on the seeds' own literature footprint. A
-temporal-holdout test was, however, negative — pathways flagged novel in 2020
-did not accumulate publications through 2026 — establishing the Discovery Score
-as a triage heuristic rather than a validated predictor of scientific
-importance. The permutation background and sampling are pinned; residual
-run-to-run variation comes from the live databases themselves.
+Pathway enrichment ranks overrepresentation but does not show whether a
+pathway-gene-disease connection has been reported. CardioXNet is an auditable
+workflow that expands focused cardiovascular gene panels through protein
+associations, performs multi-resource enrichment, and combines a
+specificity-aware Pathway Prioritization Score with uncapped PubMed counts for
+prespecified pathway, contributing-gene, and disease title/abstract queries.
+Cardiac expression and druggability remain separate annotations. A grounding
+gate withholds novelty labels when the seed-disease corpus contains fewer than
+100 records, and a pathway-concept check distinguishes searchable zero-count
+gaps from vocabulary failures. In a regenerated development benchmark of four
+cardiovascular panels and three controls, CardioXNet returned 133 real-panel
+hypotheses, with 0/133 Ungrounded, and 40 control hypotheses, with 40/40
+Ungrounded. Heart-failure query counts varied 350.6-fold, from 31 to 10,868,
+while capped abstract retrieval varied only from 26 to 30. Seven real-panel
+hypotheses met the prespecified verified-gap rule. Rank-leading gaps included
+GAB1 signalosome and NTRK2 signaling in structural cardiomyopathy, cGMP-PKG and
+GPER1 signaling in arrhythmia, and P2Y12 and GPER1 signaling in myocardial
+infarction. These candidates combined 6.7- to 17.5-fold enrichment with
+empirical q-values of 0.00124 to 0.00162, yet the prespecified PubMed
+title/abstract queries returned zero records in the regenerated benchmark. These zeros identify unreported
+query intersections, not globally unreported biology. In an all-hypothesis
+temporal holdout, the Discovery Score showed negligible association with
+2021-2026 publication growth (Spearman rho = -0.0635; n = 133). CardioXNet
+converts broad enrichment output into an inspectable shortlist of statistically
+supported, literature-sparse cardiovascular connections for expert review,
+without claiming biological validation or forecasting scientific impact.
 
 ---
 
-*Word count: 257 (title excluded).*
+*Word count: 248 (title excluded).*
 
-## Notes for the manuscript
+## Evidence boundaries for the manuscript
 
-**What the abstract claims, and where it is supported.**
+| Claim | Evidence and boundary |
+|-------|-----------------------|
+| PPS deemphasizes large annotations | On the heart-failure panel, the highest final-PPS term contained 6 genes and the top 15 ranged from 5 to 103 genes. Term size and final PPS had rho = -0.9293 within the top 15. Because specificity is an explicit PPS component, this is a consistency check rather than independent validation. |
+| Uncapped counts preserve literature discrimination | Heart-failure exact-query counts ranged from 31 to 10,868, a 350.6-fold span, while the capped display set ranged from 26 to 30 abstracts, a 1.15-fold span. |
+| Seven current verified gaps were detected | Seven of 133 real-panel hypotheses met the prespecified zero-count rule in the regenerated benchmark. A zero means no PubMed title/abstract record matched that exact query in the benchmark snapshot, not that the biology is globally unreported. |
+| Grounding invariants held | All 40 control hypotheses were Ungrounded and none of the 133 real-panel hypotheses was Ungrounded. Because the controls motivated the gate, this is a development regression invariant, not an unbiased estimate of specificity. |
+| The temporal holdout was negative overall | Across all 133 real-panel hypotheses, Discovery Score versus 2021-2026 growth had rho = -0.0635. The sensitivity analysis among 122 hypotheses with nonzero pre-cutoff counts had rho = +0.0225. Pathways overlap within panels, so these correlations are descriptive. |
 
-| Claim | Evidence |
-|-------|----------|
-| Significance-times-size promotes generic terms | `benchmark_report.md` §2; the prior formula returned 187-, 152- and 202-gene terms at top rank |
-| PPS returns specific pathways | Figure 2; largest top-15 term is 107 genes |
-| Corpus sizes span three orders of magnitude | Figure 3; tens to ~10,900 records on `hf_inflammatory` |
-| Negative controls yield no interpretable novelty | Figure 5; 0/40 grounded across three control panels, and 133/133 grounded across the four real panels |
-| Temporal holdout is negative | Figure 4; ρ = −0.03 (growth), −0.98 (absolute records), n = 132 |
-
-**Deliberately not claimed.** That the Discovery Score predicts importance; that
-low PubMed counts prove biological novelty; that the permutation test ranks among
-strong hypotheses; that degree-matched network nulls are applied.
-
-**Framing.** The negative holdout result is reported in the abstract rather than
-confined to the discussion. It is the honest read of the validation, it defines
-what the tool is for, and a methods paper that reports the limits of its own
-central metric is the stronger one.
+The manuscript deliberately does not claim global biological novelty,
+experimental validation, out-of-sample specificity, predictive validity, or a
+degree-aware network null. The Discovery Score is an auditable triage heuristic
+for literature-sparse query intersections, not a forecast of scientific impact.

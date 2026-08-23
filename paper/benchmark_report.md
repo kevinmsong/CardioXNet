@@ -1,225 +1,217 @@
 # CardioXNet benchmark report
 
-Run date: 2026-08-22 (regenerated after the API-correctness fixes). All figures and tables in `paper/` were generated from these
-runs; regenerate with the commands in `paper/README.md`.
+The main benchmark and temporal holdout were regenerated from fresh retrievals.
+The holdout included all 133 real-panel hypotheses.
 
-External resources at run time: STRING v12.0, g:Profiler (`e104_eg51_p15`),
-GTEx v8, ChEMBL, DrugBank v5.1.10, PubMed via NCBI E-utilities. The permutation
-background is a pinned HGNC protein-coding snapshot (19,410 symbols, retrieved
-2026-08-21); the permutation RNG seed is 20260821.
+External resources recorded for the main run were STRING v12.0, the configured
+g:Profiler identifier `e104_eg51_p15`, GTEx v8, optional live Open Targets, and
+PubMed via NCBI E-utilities. Baseline druggability used an embedded curated
+snapshot derived from DrugBank v5.1.10, TTD 2023, ChEMBL v31, and related
+references. The g:Profiler identifier is declared configuration metadata rather
+than a build value verified from the response. The permutation baseline is a pinned snapshot of 19,410 human
+protein-coding symbols. Analysis genes absent from the
+snapshot are added before sampling, yielding effective run-specific pools of
+19,410 to 19,415 symbols. The private permutation random-number generator uses
+seed 20260821.
 
----
+This report distinguishes an exact-query literature gap from global biological
+novelty. A zero means that no PubMed title/abstract record matched the
+prespecified pathway, contributing-gene, and disease query on the retrieval
+date. It does not show that the underlying pathway or biology is unreported
+under other terminology or in full text.
 
-## 1. Analyses
+## 1. Benchmark analyses
 
-Four cardiovascular seed panels chosen for distinct biology, plus three negative
-controls. Each analysis is five seed genes under the `balanced` preset.
+Four cardiovascular seed panels represented distinct disease biology. Three
+control panels tested whether the grounding safeguard continued to reject
+novelty estimates when the seeds had insufficient disease literature. Every
+analysis used five seeds and the `balanced` preset.
 
 | Run | Kind | Seed genes | Disease context | Runtime | Hypotheses |
-|-----|------|-----------|-----------------|---------|-----------|
-| `hf_inflammatory` | real | VEGFA, MMP9, IL6, TNF, ACE | heart failure | 257 s | 21 |
-| `dcm_structural` | real | MYH7, TTN, LMNA, MYBPC3, TNNT2 | cardiomyopathy | 181 s | 34 |
-| `arrhythmia_channels` | real | SCN5A, KCNQ1, KCNH2, RYR2, CACNA1C | arrhythmia | 355 s | 41 |
-| `mi_ischemic` | real | LDLR, APOB, PCSK9, NOS3, EDN1 | myocardial infarction | 323 s | 37 |
-| `olfactory` | negative | OR51E2, OR2W1, OR1A1, OR5K1, OR10A4 | heart failure | 96 s | 12 |
-| `random_1` | negative | RPF2, CLRN3, PRKAG1, OR8U9, CACNA1D | heart failure | 202 s | 19 |
-| `random_2` | negative | C2CD4A, GORASP1, CHIC1, VCY, PLCD4 | heart failure | 144 s | 9 |
+|-----|------|------------|-----------------|--------:|-----------:|
+| `hf_inflammatory` | Real | VEGFA, MMP9, IL6, TNF, ACE | Heart failure | 257 s | 21 |
+| `dcm_structural` | Real | MYH7, TTN, LMNA, MYBPC3, TNNT2 | Cardiomyopathy | 181 s | 34 |
+| `arrhythmia_channels` | Real | SCN5A, KCNQ1, KCNH2, RYR2, CACNA1C | Arrhythmia | 355 s | 41 |
+| `mi_ischemic` | Real | LDLR, APOB, PCSK9, NOS3, EDN1 | Myocardial infarction | 323 s | 37 |
+| `olfactory` | Control | OR51E2, OR2W1, OR1A1, OR5K1, OR10A4 | Heart failure | 96 s | 12 |
+| `random_1` | Control | RPF2, CLRN3, PRKAG1, OR8U9, CACNA1D | Heart failure | 202 s | 19 |
+| `random_2` | Control | C2CD4A, GORASP1, CHIC1, VCY, PLCD4 | Heart failure | 144 s | 9 |
 
----
+The four real panels produced 133 hypotheses and the controls produced 40.
+These outputs were regenerated in full after the semantic-filter change because
+that filter changes the pathways eligible for secondary expansion.
 
-## 2. Ranking behaviour (Figure 2)
+## 2. Ranking behavior
 
-The corrected Pathway Prioritization Score no longer ranks by gene-set size. On
-`hf_inflammatory` the largest annotated term in the top 15 has 107 genes and the
-top-ranked term has 10. Under the previous formula the same seed panel returned
-"cell surface receptor signaling pathway" (187 genes), "multicellular organism
-development" (152) and "developmental process" (202) in the top ranks — terms
-true of almost any gene list.
+The corrected Pathway Prioritization Score (PPS) first combines adjusted
+significance, fold enrichment, annotated-set specificity, and support from
+multiple upstream primary pathways, then applies the bounded semantic
+cardiovascular-relevance multiplier used by the implementation. Cardiac
+expression and druggability are separate annotations. They do not enter PPS or
+the Discovery Score.
 
----
+On `hf_inflammatory`, the final-PPS-ranked top term contained 6 annotated genes,
+and the top 15 ranged from 5 to 103 genes. Within those 15, term size and final
+PPS were inversely rank-associated (Spearman rho = -0.9293; n = 15). Because
+gene-set specificity is an explicit PPS component, this is a descriptive
+consistency check rather than independent validation.
 
-## 3. Literature saturation is discriminative (Figure 3)
+## 3. Uncapped literature counts
 
-PubMed corpus sizes at the (pathway × seed genes × disease) intersection on
-`hf_inflammatory` range from **31 to 10,866 records** — three orders of
-magnitude. The number of abstracts actually retrieved is flat at ~28–30 across
-every pathway, because retrieval is capped.
+For `hf_inflammatory`, the uncapped PubMed title/abstract counts at the exact
+pathway, contributing-gene, and disease intersections ranged from 31 to 10,868,
+a 350.6-fold span. The abstract sets retained for display ranged only from 26 to
+30 records because retrieval was capped, a 1.15-fold span. The uncapped count
+therefore preserves discrimination that the displayed evidence set cannot.
 
-This is the measurement that was previously broken. Deriving saturation from
-retrieved citations rather than the corpus size made it constant, and the
-citation sets themselves were near-duplicates (mean pairwise Jaccard 0.55, 120
-unique PMIDs across 32 pathways) because the pathway clause was OR-ed with a
-broad cardiac fallback instead of AND-ed.
+This distinction repairs two earlier measurement errors. Literature saturation
+had been derived from the number of retrieved abstracts rather than the total
+query count, and a broad fallback had been joined with `OR` rather than being
+constrained by the pathway clause. The current score uses the uncapped count
+from the prespecified conjunctive query. Retrieved abstracts are evidence for
+inspection, not the saturation denominator.
 
----
+## 4. Verified exact-query gaps
 
-## 4. Negative controls (Figure 5)
+Seven of 133 real-panel hypotheses met the prespecified verified-gap rule in
+the regenerated benchmark. The rule requires a grounded seed-disease corpus, a searchable
+pathway concept with at least 20 PubMed records, and zero records at the exact
+pathway, contributing-gene, and disease intersection.
 
-**Every one of the 40 hypotheses returned by the three negative controls is
-flagged `Ungrounded`; none of the 133 hypotheses from the four real panels is.**
-The separation is complete, in both directions.
+| Panel | Candidate | Discovery Score | Fold enrichment | Empirical q | Exact-query records | Pathway-concept records |
+|-------|-----------|----------------:|----------------:|------------:|--------------------:|------------------------:|
+| DCM structural | GAB1 signalosome | 2.0087 | 15.824 | 0.001617 | 0 | 1,785 |
+| DCM structural | NTRK2 (TRKB) signaling | 1.9840 | 17.549 | 0.001617 | 0 | 817 |
+| Arrhythmia channels | cGMP-PKG signaling | 1.9070 | 7.908 | 0.001241 | 0 | 1,361 |
+| Arrhythmia channels | GPER1 signaling | 1.8645 | 8.376 | 0.001241 | 0 | 563 |
+| MI ischemic | P2Y12 signaling | 1.8077 | 8.062 | 0.001275 | 0 | 1,854 |
+| MI ischemic | GPER1 signaling | 1.7996 | 6.719 | 0.001275 | 0 | 563 |
+| MI ischemic | Oxytocin signaling | 1.7488 | 6.995 | 0.001275 | 0 | 29,242 |
 
-The discriminating quantity is the seed genes' own literature footprint in the
-chosen disease — one PubMed query per run:
+These candidates combine 6.7- to 17.5-fold enrichment with empirical q-values
+of 0.00124 to 0.00162 under the uniform genome-scale null. They are rank-leading
+literature-sparse intersections for review, not experimentally validated
+mechanisms. For P2Y12, the contribution is not the pathway name in isolation.
+Its zero applies only to the exact query connecting the pathway to the
+contributing genes from this panel and the myocardial-infarction context.
 
-| Panel | Seed–disease corpus |
-|-------|--------------------:|
-| hf_inflammatory | 10,868 |
-| dcm_structural | 2,487 |
-| arrhythmia_channels | 1,538 |
-| mi_ischemic | 2,373 |
-| olfactory (negative) | 0 |
-| random_1 (negative) | 6 |
-| random_2 (negative) | 1 |
+## 5. Grounding regression invariant
 
-Real panels exceed the grounding threshold of 100 records by 15× to 109×;
-negative controls fall below it by one to two orders of magnitude.
+The seed-disease count is measured once per run before pathway-level novelty is
+interpreted.
 
-This control was worth running because it initially **failed**. Before the
-grounding check, olfactory-receptor and random gene panels produced *more*
-"Highly Novel" calls (13/13 and 21/23) than any real cardiovascular panel: with
-seeds nobody has written about in heart failure, every pathway intersection
-returns zero records and every pathway looks maximally novel. Absence of
-literature about the seeds was being read as discovery. Novelty is now only
-reported when the seeds have a literature footprint to be novel against.
+| Panel | Seed-disease records | Grounding result |
+|-------|---------------------:|------------------|
+| `hf_inflammatory` | 10,868 | Grounded |
+| `dcm_structural` | 2,487 | Grounded |
+| `arrhythmia_channels` | 1,538 | Grounded |
+| `mi_ischemic` | 2,373 | Grounded |
+| `olfactory` | 0 | Ungrounded |
+| `random_1` | 6 | Ungrounded |
+| `random_2` | 1 | Ungrounded |
 
----
+All 40 control hypotheses were Ungrounded and none of the 133 real-panel
+hypotheses was Ungrounded. Both invariants held exactly after regeneration.
+This test catches the prior failure in which literature-naive controls appeared
+maximally novel. Because these controls helped motivate the grounding gate and
+were retained during development, the 40/40 versus 0/133 separation is a
+development regression invariant. It is not an unbiased estimate of
+out-of-sample specificity.
 
-## 5. Temporal holdout — a null result (Figure 4)
+## 6. Temporal holdout
 
-**The Discovery Score does not anticipate where the literature subsequently
-went.** This is the headline validation result and it is negative.
+The temporal holdout included all 133 real-panel hypotheses. Pre-cutoff PubMed
+records were censored at 2020-12-31. Post-cutoff records began on 2021-01-01
+and extended through the follow-up retrieval snapshot. Relative growth was defined as
+`post_count / (pre_count + 1)`. Eleven intersections met the verified-gap rule
+at the cutoff, and none was Ungrounded.
 
-Literature was frozen at the end of 2020, novelty recomputed from pre-2020
-records only, and each pathway's 2021–2026 publication record measured
-(n = 132 pathways across the four real panels).
+| Comparison with post-cutoff growth | Spearman rho | n |
+|------------------------------------|-------------:|--:|
+| Discovery Score, all hypotheses | -0.0635 | 133 |
+| Composite novelty, all hypotheses | -0.0283 | 133 |
+| PPS, all hypotheses | -0.1462 | 133 |
+| Discovery Score, nonzero pre-cutoff count only | +0.0225 | 122 |
 
-| Comparison | Spearman ρ |
-|------------|-----------:|
-| Discovery Score (2020) vs post-cutoff growth rate | −0.03 |
-| Novelty (2020) vs post-cutoff growth rate | −0.01 |
-| Novelty (2020) vs absolute post-cutoff records | **−0.98** |
-| PPS (2020) vs post-cutoff growth rate | −0.15 |
-| Discovery vs growth, measurable pathways only (n = 121) | +0.06 |
+Panel-specific Discovery Score associations were heterogeneous.
 
-Mean post-cutoff growth by the tier assigned at the cutoff:
+| Panel | Spearman rho |
+|-------|-------------:|
+| Arrhythmia channels | +0.0485 |
+| DCM structural | -0.2235 |
+| Heart failure | +0.7165 |
+| Myocardial infarction | -0.3826 |
 
-| Tier at 2020 | n | Mean growth | Median growth |
-|--------------|--:|------------:|--------------:|
-| Highly Novel | 17 | **0.33** | 0.00 |
-| Novel | 24 | 0.89 | 0.83 |
-| Emerging | 41 | 0.75 | 0.70 |
-| Established | 50 | 0.61 | 0.55 |
+Operational-tier sizes and median growth were:
 
-Pathways called **Highly Novel grew the least**, and half of them gained no
-publications at all in five years. The ρ = −0.98 against absolute record counts
-is partly structural — novelty is a monotone transform of the pre-cutoff count,
-and large fields keep publishing — but the direction is unambiguous: pathways
-this metric calls novel are not where the field moved.
+| Tier at the cutoff | n | Median growth |
+|--------------------|--:|--------------:|
+| Established | 12 | 0.5413 |
+| Emerging | 48 | 0.6061 |
+| Novel | 55 | 0.6970 |
+| Highly Novel | 18 | 0.0000 |
 
-**Interpretation.** Literature saturation measures how much has been written
-about a pathway–gene–disease intersection. It is a usable *prioritization*
-signal for surfacing under-examined candidates, and it is validated as such: it
-separates real panels from negative controls completely, and it spans three
-orders of magnitude within a single run. It is **not** a validated predictor of
-scientific importance, and a low count is as consistent with an unproductive
-question, or with vocabulary mismatch, as with an opportunity. The Discovery
-Score should be read as a triage heuristic, not as a forecast.
+The overall association was negligible, and panel-specific associations varied
+in direction. The holdout therefore does not validate the Discovery Score as a
+forecast of publication growth or scientific importance. It supports the more
+limited interpretation of the score as a transparent triage measure. Pathways
+overlap within panels, so all correlations are descriptive and the reported
+sample sizes count pathway hypotheses rather than independent biological
+replicates.
 
----
+## 7. Statistical and operational safeguards
 
-## 6. Statistical validation
+- Each pathway overlap is evaluated against 1,000 size-matched random
+  neighborhoods drawn uniformly from the effective protein-coding pool. The
+  finite-sampling correction gives a minimum attainable empirical p-value of
+  `1/1001`.
+- Benjamini-Hochberg correction is applied across all testable reported
+  pathways. Untestable pathways retain missing values and are excluded from the
+  correction family.
+- The uniform null does not preserve STRING degree. It tests whether overlap
+  exceeds a random gene-set expectation, not whether one already strong
+  candidate outranks another.
+- In one paired rerun, 6 of 33 shared PPS values changed, the maximum relative
+  change was 6.0%, and no operational tier changed. This single comparison
+  demonstrates live-resource variation but does not estimate a general noise
+  floor.
+- The official g:Profiler client performs its internal HTTP call without an
+  exposed timeout. CardioXNet now runs each profile attempt in a fresh spawned
+  process with a configurable hard wall-clock deadline, 120 seconds by default. A worker writes to a
+  private temporary file and sends a completion sentinel only after the full
+  response is stored. A timed-out worker is terminated and reaped, with kill
+  escalation if required. Transient failures receive a configurable number of
+  bounded retries, two by default, with exponential backoff. Exhaustion raises
+  an explicit pipeline failure; unreadable, malformed, interrupted, or partial
+  enrichment is never accepted. A complete empty result validly indicates that
+  no terms met the enrichment criteria.
+- Open Targets schema failures, missing GTEx symbols, malformed STRING records,
+  and failed PubMed counts are represented explicitly rather than silently
+  converted to zero evidence.
 
-- **Permutation null.** 1,000 size-matched permutations per pathway drawn from
-  the 19,410-gene protein-coding background. On `hf_inflammatory`, observed
-  overlaps of 30 against a null mean of 0.45 ± 0.65 (z ≈ 46).
-- **External evidence is now actually retrieved.** The Open Targets query had
-  been returning HTTP 400 on every request since the API changed
-  `knownDrugs` to `drugAndClinicalCandidates`; `except Exception: pass` in the
-  caller hid it, so external druggability read 0 for every gene of every earlier
-  run. With the query repaired, MYH7 returns mavacamten, omecamtiv mecarbil and
-  danicamtiv against dilated cardiomyopathy and heart failure.
-- **Multiple testing.** Benjamini–Hochberg across every reported hypothesis,
-  verified against `statsmodels.multipletests` in the test suite. Pathways whose
-  null cannot be built carry `q = null` and are excluded from the correction
-  family rather than assigned p = 1.
-- **Resolution floor.** The smallest attainable empirical p is 1/(n+1) = 1.0e-3
-  at 1,000 permutations, reported alongside every p-value.
-- **Power.** Because the null samples the whole protein-coding genome, genuinely
-  enriched pathways clear it by a wide margin and most reported pathways reach
-  the floor. The test establishes that an overlap is not chance; it does not
-  rank among strong hypotheses and must not be read as doing so.
-- **Reproducibility.** Seeded RNG and a pinned background make the permutation
-  step identical across reruns, and a regression test asserts it. The *pipeline*
-  is not bit-reproducible, because the databases it queries are not.
+## 8. Verification scope
 
-  Measured directly: two back-to-back runs of the same seed panel on identical
-  code produced identical functional neighbourhoods (219 genes, 2,261 STRING
-  interactions) and identical primary enrichment (1,787 pathways), then diverged
-  by a single pathway at secondary expansion (3,045 vs 3,046). The redundancy
-  filter amplified that to a 34- vs 37-pathway final set, which in turn shifts
-  Benjamini-Hochberg q-values (m changes) and the seed-proximity term of the
-  centrality weight.
+The automated regression suite covers score components, multiple testing,
+background construction, grounding, semantic filtering, query construction,
+literature-count semantics, g:Profiler deadline enforcement, external-client
+failure states, persistence, and exports. Browser-level checks cover ranking,
+missing-value display, component explanations, table integrity, navigation, and
+downloads against a committed deterministic fixture. This report intentionally
+does not hardcode the number of tests because the suite evolves independently
+of the benchmark claims.
 
-  The resulting noise floor, over the 33 pathways common to both runs:
+## 9. Interpretation limits
 
-  | Comparison | Pathways changed | Max relative PPS change | Novelty tier changes |
-  |---|---:|---:|---:|
-  | Same code, run A vs run B | 6 / 33 | 6.0% | 0 |
-  | Across the Nov refactor | 0 / 37 | 0.0% | 0 |
-
-  **No novelty tier moved in any comparison.** Report any single number with its
-  run date, and treat differences below roughly 6% in PPS as run-to-run variation
-  rather than signal.
-
----
-
-## 7. Regression suite
-
-87 tests (`tests/test_scientific_rigor.py` plus the pre-existing suite) pin each
-defect found in the audit: the degenerate permutation universe, BH correctness
-against a reference implementation, generic-term dominance, pathway-specific
-query construction, saturation from corpus size, novelty-confidence gating, seed
-grounding, semantic-filter discrimination, the effect-size floor, CSV
-header/row alignment, the freshness of the results snapshot the UI reads, and a
-sentinel per external API so that a failed call can never be read as a
-measurement of zero.
-
-A further 20 Playwright assertions cover what only the rendered page can prove:
-Discovery-Score ordering, `n/t` for an untested permutation, valid novelty tiers,
-the PPS component breakdown, and CSV header/row width equality. A live
-end-to-end spec drives a real analysis through the browser against STRING,
-g:Profiler and PubMed.
-
-The degree-preserving permutation variants were **removed** rather than left
-unused, and a test asserts they stay removed: they drew replacements from
-per-degree bins over the supplied universe, which here means from the
-neighbourhood itself, and reported `degree_preserved: True` while doing it. The
-two tests that previously covered them asserted that behaviour was correct, and
-one supplied a 5-gene universe for a 3-gene neighbourhood -- the exact degenerate
-case the assertions were meant to catch.
-
----
-
-## 8. Known limitations
-
-- **Novelty is lexical.** A pathway named in identifiers rather than prose
-  ("GAB1 signalosome") has little PubMed footprint regardless of how well studied
-  the biology is. The concept-corpus check catches the worst cases and flags them
-  `unverified`, but the metric remains vocabulary-dependent.
-- **Corpus coverage.** Pathways outside the literature-mining window are
-  backfilled with a single count query, and NCBI throttling is retried, so across
-  all seven runs every one of the 161 reported hypotheses carries a measured
-  corpus (125 `pubmed_corpus`, 36 `ungrounded_seeds`, zero `not_measured`).
-  A pathway whose count cannot be obtained at all is still damped and flagged
-  rather than scored as novel.
-- **Not pinned.** STRING, g:Profiler, GTEx, Open Targets and PubMed all drift,
-  and their schemas change: the Open Targets query silently broke and returned
-  nothing for an unknown period. Every external client now carries a failure
-  sentinel and logs at WARNING, and an opt-in `pytest -m live` test asserts the
-  Open Targets query still matches the published schema. Record the run date with
-  any reported figure.
-- **Single-species, single-domain.** Human only; cardiac semantic scoring uses
-  curated term lists that will miss lexically dissimilar evidence.
-- **Hypotheses, not findings.** Every output is a candidate for experimental
-  follow-up.
+- Literature novelty is lexical and restricted to PubMed titles and abstracts.
+  Exact-query zeros require synonym-expanded review and do not cover full text.
+- The pathway-concept check reduces, but cannot eliminate, vocabulary mismatch.
+- Control separation is a development invariant, not unbiased specificity.
+- The temporal analysis is descriptive because pathways overlap within panels.
+- Live resources drift, so retrieval timestamps, endpoints, and configured or
+  response-verified resource identifiers must accompany reported values.
+- The benchmark is human and cardiovascular. Generalization to other species or
+  disease domains has not been established.
+- GTEx bulk-tissue expression is not cell-type or disease-state evidence, and
+  druggability does not imply therapeutic benefit.
+- Every output is a computational hypothesis for expert and experimental
+  assessment.
