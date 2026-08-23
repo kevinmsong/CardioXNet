@@ -960,6 +960,10 @@ class Pipeline:
                         hypothesis.score_components['tissue_validation_passed'] = tissue_score.validation_passed
                         hypothesis.score_components['mean_cardiac_tpm'] = tissue_score.mean_cardiac_tpm
                         hypothesis.score_components['cardiac_specificity_ratio'] = tissue_score.mean_cardiac_specificity_ratio
+                        # None for both above means the curated fallback or the
+                        # offline estimate produced the ratio; TPM and specificity
+                        # were not measured and must not be rendered as if they were.
+                        hypothesis.score_components['gtex_measured'] = tissue_score.gtex_measured
 
                         if not tissue_score.validation_passed:
                             tissue_filtered += 1
@@ -1688,38 +1692,49 @@ class Pipeline:
                     if gene_scores[gene_symbol]['druggability_tier'] == 'unknown':
                         gene_scores[gene_symbol]['druggability_tier'] = 'medium'
         
-        # Add topology/centrality information
-        if topology_result and hasattr(topology_result, 'hypothesis_networks'):
-            for pathway_id, network_data in topology_result.hypothesis_networks.items():
-                if hasattr(network_data, 'hub_genes'):
-                    for hub_gene in network_data.hub_genes:
-                        gene_symbol = hub_gene.gene if hasattr(hub_gene, 'gene') else str(hub_gene)
-                        if gene_symbol in gene_scores:
-                            centrality = hub_gene.centrality if hasattr(hub_gene, 'centrality') else 0.5
-                            gene_scores[gene_symbol]['centrality'] = max(
-                                gene_scores[gene_symbol]['centrality'],
-                                centrality
-                            )
-        
-        # Add gene-disease association scores using curated cardiovascular gene database
+        # Add topology/centrality information.
+        #
+        # This reads `hub_genes`, the field the comprehensive topology analyzer
+        # actually produces. It previously guarded on `hypothesis_networks`, which
+        # exists only on the TopologyResult of the analyzer that run() never calls
+        # -- so the branch was permanently false and every gene kept centrality
+        # 0.0, zeroing the centrality term of the final score.
+        for hub_gene in getattr(topology_result, 'hub_genes', None) or []:
+            gene_symbol = getattr(hub_gene, 'gene_symbol', None)
+            if gene_symbol in gene_scores:
+                gene_scores[gene_symbol]['centrality'] = max(
+                    gene_scores[gene_symbol]['centrality'],
+                    getattr(hub_gene, 'hub_score', 0.0) or 0.0,
+                )
+
+        # Add gene-disease association scores from the curated cardiovascular
+        # gene database.
+        #
+        # This imported app.services.gene_disease_scorer, a module deleted in
+        # commit 6bffbe7. The import lived inside the try, so every run took the
+        # except branch and set every gene's disease score to 0.0 -- silently
+        # removing the disease term from the therapeutic-target ranking.
+        # cardiac_genes_db.get_batch_scores has the same name and signature as
+        # the API that went away.
         try:
-            from app.services.gene_disease_scorer import GeneDiseaseScorer
-            gene_disease_scorer = GeneDiseaseScorer()
-            
-            logger.info(f"Querying gene-disease scorer for {len(gene_scores)} genes...")
-            disease_scores = gene_disease_scorer.get_batch_scores(list(gene_scores.keys()))
-            
+            from app.services.cardiac_genes_db import get_batch_scores
+
+            logger.info(f"Scoring {len(gene_scores)} genes against the curated cardiac gene database")
+            disease_scores = get_batch_scores(list(gene_scores.keys()))
+
             for gene_symbol in gene_scores:
                 gene_scores[gene_symbol]['gene_disease_score'] = disease_scores.get(gene_symbol, 0.0)
-            
+
             scored_genes = sum(1 for s in disease_scores.values() if s > 0)
-            logger.info(f"Gene-disease scores obtained: {scored_genes}/{len(disease_scores)} genes have cardiac disease associations")
+            logger.info(
+                f"Gene-disease scores obtained: {scored_genes}/{len(disease_scores)} "
+                f"genes have curated cardiac disease associations"
+            )
         except Exception as e:
             logger.warning(f"Gene-disease scoring failed (non-critical): {str(e)}")
-            # Set default scores if gene-disease scoring fails
             for gene_symbol in gene_scores:
                 gene_scores[gene_symbol]['gene_disease_score'] = 0.0
-        
+
         # Calculate final score: importance * (1 + druggability_bonus + centrality_bonus + disease_bonus)
         for gene_symbol in gene_scores:
             druggability_bonus = 0.0

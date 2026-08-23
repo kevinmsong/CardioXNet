@@ -162,6 +162,8 @@ class ReportGenerator:
     ) -> Dict[str, Any]:
         """Build comprehensive report data structure."""
         
+        topology_summary = self._build_topology_summary(comprehensive_topology)
+
         report_dict = {
             "analysis_id": analysis_id,
             "timestamp": datetime.now().isoformat(),
@@ -171,9 +173,9 @@ class ReportGenerator:
             "stage_2b": self._build_stage_2b_summary(secondary_result),
             "stage_2c": self._build_stage_2c_summary(final_result),
             "stage_3": self._build_stage_3_summary(scored_hypotheses),
-            "stage_4_topology": self._build_topology_summary(topology_result),
+            "stage_4_topology": topology_summary,
             "stage_4_literature": self._build_literature_summary(literature_evidence),
-            "ranked_hypotheses": self._build_hypotheses_table(scored_hypotheses, topology_result, literature_evidence),
+            "ranked_hypotheses": self._build_hypotheses_table(scored_hypotheses, topology_summary, literature_evidence),
             "testable_hypotheses": self._build_testable_hypotheses(scored_hypotheses),
             "conclusion": self._build_conclusion(scored_hypotheses)
         }
@@ -278,24 +280,44 @@ class ReportGenerator:
             "top_nes_score": scored_hypotheses.hypotheses[0].nes_score if scored_hypotheses.hypotheses else 0
         }
     
-    def _build_topology_summary(self, topology_result: TopologyResult) -> Dict:
-        """Build topology analysis summary."""
-        summaries = {}
-        
-        if topology_result and hasattr(topology_result, 'hypothesis_networks'):
-            for pathway_id, network in topology_result.hypothesis_networks.items():
-                summaries[pathway_id] = {
-                    "key_nodes_count": len(network.key_nodes) if hasattr(network, 'key_nodes') else 0,
-                    "top_key_nodes": [
-                        {
-                            "gene": node.gene_symbol,
-                            "centrality": node.betweenness_centrality,
-                            "role": node.role
-                        }
-                        for node in network.key_nodes[:5]
-                    ] if hasattr(network, 'key_nodes') else []
-                }
-        
+    def _build_topology_summary(self, comprehensive_topology: Any) -> Dict:
+        """Per-pathway topology summary, derived from the comprehensive hub genes.
+
+        This used to read ``topology_result.hypothesis_networks``. That field
+        exists only on the ``TopologyResult`` of an analyzer ``Pipeline.run()``
+        never calls, and the pipeline passed ``None`` for the argument anyway, so
+        the branch was permanently false and this key was always ``{}``. Hub genes
+        from the comprehensive topology stage carry the same information and are
+        actually computed.
+        """
+        summaries: Dict[str, Any] = {}
+        hub_genes = getattr(comprehensive_topology, 'hub_genes', None)
+        if hub_genes is None and isinstance(comprehensive_topology, dict):
+            hub_genes = comprehensive_topology.get('hub_genes')
+        if not hub_genes:
+            return summaries
+
+        def _field(hub, name, default=None):
+            return hub.get(name, default) if isinstance(hub, dict) else getattr(hub, name, default)
+
+        # Index hubs by the pathways they belong to.
+        by_pathway: Dict[str, List[Dict[str, Any]]] = {}
+        for hub in hub_genes:
+            entry = {
+                "gene": _field(hub, 'gene_symbol'),
+                "centrality": _field(hub, 'betweenness_centrality', 0.0),
+                "hub_score": _field(hub, 'hub_score', 0.0),
+            }
+            for pathway_id in _field(hub, 'pathways', None) or []:
+                by_pathway.setdefault(pathway_id, []).append(entry)
+
+        for pathway_id, hubs in by_pathway.items():
+            hubs.sort(key=lambda h: h["hub_score"] or 0.0, reverse=True)
+            summaries[pathway_id] = {
+                "key_nodes_count": len(hubs),
+                "top_key_nodes": hubs[:5],
+            }
+
         return summaries
     
     def _build_literature_summary(self, literature_evidence: LiteratureEvidence) -> Dict:
@@ -320,12 +342,16 @@ class ReportGenerator:
         return summaries
     
     def _build_hypotheses_table(
-        self, 
+        self,
         scored_hypotheses: ScoredHypotheses,
-        topology_result: TopologyResult,
+        topology_summary: Dict,
         literature_evidence: LiteratureEvidence
     ) -> List[Dict]:
-        """Build ranked hypotheses table with detailed evidence."""
+        """Build ranked hypotheses table with detailed evidence.
+
+        ``topology_summary`` is the mapping produced by
+        :meth:`_build_topology_summary`, keyed by pathway id.
+        """
         table_rows = []
         
         for h in scored_hypotheses.hypotheses:
@@ -347,20 +373,10 @@ class ReportGenerator:
                 for c in citations
             ]
             
-            # Get key nodes from topology analysis
-            network = None
-            if topology_result and hasattr(topology_result, 'hypothesis_networks'):
-                network = topology_result.hypothesis_networks.get(pathway_id, None)
-            key_nodes = []
-            if network and hasattr(network, 'key_nodes'):
-                key_nodes = [
-                    {
-                        "gene": node.gene_symbol,
-                        "centrality": node.betweenness_centrality,
-                        "role": node.role
-                    }
-                    for node in network.key_nodes[:3]  # Top 3 key nodes
-                ]
+            # Key nodes for this pathway, from the topology summary built above.
+            # This previously read `topology_result.hypothesis_networks`, a field
+            # of an analyzer the pipeline never runs, so key_nodes was always [].
+            key_nodes = (topology_summary.get(pathway_id, {}) or {}).get("top_key_nodes", [])[:3]
             
             # Get traced seed genes
             seed_genes = h.traced_seed_genes if h.traced_seed_genes else []
