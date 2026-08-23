@@ -144,14 +144,9 @@ class PrimaryPathwayAnalyzer:
             
         except APIClientError as e:
             logger.error(f"g:Profiler enrichment query failed: {str(e)}")
-            
-            # If g:Profiler is completely unavailable (503 after retries), continue with empty results
-            # This allows the analysis to complete with other data sources
-            if "temporarily unavailable" in str(e).lower() or "503" in str(e):
-                logger.warning("g:Profiler unavailable - continuing with empty pathway results")
-                return []  # Return empty list to continue analysis
-            
-            # For other errors, still raise
+            # Enrichment is the evidence-generating core of this stage. A
+            # transport failure is not a measured empty result and must fail the
+            # run rather than silently changing its candidate universe.
             raise
     
     def _calculate_nes_scores(

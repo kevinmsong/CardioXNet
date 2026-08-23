@@ -8,8 +8,9 @@
     <h1>Prioritize pathways beyond the familiar literature</h1>
     <p class="hero-copy">
       CardioXNet expands a focused gene panel through protein interactions and pathway evidence,
-      then ranks mechanistically specific cardiovascular hypotheses by enrichment support and
-      literature saturation. Every result retains its gene lineage, statistics, and citations.
+      then ranks mechanistically specific cardiovascular hypotheses by enrichment support and a
+      grounded, exact-query literature-gap measure. Every result retains its gene lineage,
+      statistics, and citations.
     </p>
   </div>
   <div class="hero-note">
@@ -108,9 +109,11 @@
         <li><strong>Validate inputs.</strong> Normalize gene symbols and record the disease context.</li>
         <li><strong>Expand the network.</strong> Retrieve high-confidence STRING interaction partners.</li>
         <li><strong>Resolve pathways.</strong> Enrich across Reactome, KEGG, WikiPathways, and Gene Ontology.</li>
-        <li><strong>Rank the evidence.</strong> Combine significance, effect size, specificity, and replication.</li>
-        <li><strong>Measure saturation.</strong> Count the exact PubMed pathway, seed, and disease corpus.</li>
-        <li><strong>Audit each result.</strong> Review lineage, expression, permutation statistics, and citations.</li>
+        <li><strong>Compute PPS.</strong> Combine significance, effect size, specificity, and recurrence across upstream expansions, then apply an inspectable, bounded semantic relevance multiplier.</li>
+        <li><strong>Attach orthogonal evidence.</strong> Keep permutation support, cardiac expression, and druggability separately inspectable.</li>
+        <li><strong>Ground the literature query.</strong> Verify the seed-disease corpus and pathway terminology before interpreting the exact PubMed intersection.</li>
+        <li><strong>Rank bounded gaps.</strong> Multiply PPS by composite novelty, weighted 2:1 toward exact-query literature novelty over low seed overlap.</li>
+        <li><strong>Audit each result.</strong> Review lineage, statistics, evidence sources, query count, and run provenance.</li>
       </ol>
       <hr class="divider" />
       <p class="small muted" style="margin:0;">

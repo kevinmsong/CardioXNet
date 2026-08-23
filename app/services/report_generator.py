@@ -5,6 +5,7 @@ import json
 from datetime import datetime
 from pathlib import Path
 from typing import Dict, Any, List
+from xml.sax.saxutils import escape
 from jinja2 import Environment, FileSystemLoader, Template
 
 logger = logging.getLogger(__name__)
@@ -73,7 +74,8 @@ class ReportGenerator:
         literature_evidence: LiteratureEvidence,
         comprehensive_topology: Any = None,
         top_genes: List[Dict[str, Any]] = None,
-        output_formats: List[str] = None
+        output_formats: List[str] = None,
+        run_metadata: Dict[str, Any] = None,
     ) -> Dict[str, str]:
         """
         Generate comprehensive analysis report.
@@ -116,7 +118,8 @@ class ReportGenerator:
             topology_result,
             literature_evidence,
             comprehensive_topology,
-            top_genes
+            top_genes,
+            run_metadata,
         )
         
         # Generate reports per format so one failing renderer does not discard all output.
@@ -158,7 +161,8 @@ class ReportGenerator:
         topology_result: TopologyResult,
         literature_evidence: LiteratureEvidence,
         comprehensive_topology: Any = None,
-        top_genes: List[Dict[str, Any]] = None
+        top_genes: List[Dict[str, Any]] = None,
+        run_metadata: Dict[str, Any] = None,
     ) -> Dict[str, Any]:
         """Build comprehensive report data structure."""
         
@@ -179,6 +183,9 @@ class ReportGenerator:
             "testable_hypotheses": self._build_testable_hypotheses(scored_hypotheses),
             "conclusion": self._build_conclusion(scored_hypotheses)
         }
+
+        if run_metadata is not None:
+            report_dict["run_metadata"] = run_metadata
         
         # Add Stage 7 comprehensive topology if available
         if comprehensive_topology is not None:
@@ -411,7 +418,10 @@ class ReportGenerator:
                 "evidence_count": pathway_obj.evidence_count,
                 "support_count": h.aggregated_pathway.support_count,
                 "seed_genes": seed_genes,
+                # Backward-compatible alias plus two unambiguous evidence flags.
                 "literature_support": lit_support,
+                "seed_tracing_literature_support": lit_support,
+                "strict_query_citation_support": bool(citation_summaries),
                 "citations": citation_summaries,
                 "citation_count": len(citations),
                 "n_relevant_citations": n_relevant_cits,
@@ -421,6 +431,12 @@ class ReportGenerator:
                 "novelty_tier": novelty_tier,
                 "literature_saturation": literature_sat,
                 "discovery_score": discovery_score,
+                "literature_query": sc.get("literature_query"),
+                "literature_query_genes": list(
+                    sc.get("literature_query_genes") or []
+                ),
+                "literature_concept_query": sc.get("literature_concept_query"),
+                "query_tier": sc.get("query_tier"),
                 "score_components": {
                     k: v for k, v in sc.items()
                     if not isinstance(v, (dict, list))
@@ -466,7 +482,7 @@ class ReportGenerator:
             return (
                 f"Analysis prioritized {total_hypotheses} cardiac-relevant pathway hypotheses. "
                 f"The top-ranked pathway is '{top_name}' (PPS: {top_nes:.3f}). "
-                f"Automated PubMed co-mention searches found direct support for "
+                f"A secondary seed-tracing PubMed check found co-mention support for "
                 f"{supported_hypotheses} of {total_hypotheses} final pathways. "
                 f"These results should be treated as candidate associations pending expert review."
             )
@@ -500,21 +516,24 @@ class ReportGenerator:
 
 Ranked by Discovery Score. Column definitions are given in the Methods note below.
 
-| Rank | Pathway | Source | Discovery | Novelty | PPS | Enrich. p<sub>adj</sub> | Fold | Perm. q | Genes | PubMed hits |
+| Rank | Pathway | Source | Discovery | Novelty | PPS | Combined p* | Fold | Perm. q | Genes | PubMed hits |
 |------|---------|--------|-----------|---------|-----|--------------|------|---------|-------|-------------|
 {% for h in ranked_hypotheses[:20] -%}
 | {{ h.rank }} | {{ h.pathway_name }} | {{ h.source_db }} | {{ "%.3f"|format(h.discovery_score) if h.discovery_score is not none else "-" }} | {{ h.novelty_tier or "-" }} | {{ "%.3f"|format(h.nes_score) }} | {{ "%.2e"|format(h.p_adj) }} | {{ "%.1f"|format(h.fold_enrichment) if h.fold_enrichment is not none else "-" }} | {{ "%.3g"|format(h.empirical_qvalue) if h.empirical_qvalue is not none else "n/t" }} | {{ h.evidence_count }} | {{ h.pubmed_hit_count if h.pubmed_hit_count is not none and h.pubmed_hit_count >= 0 else "-" }} |
 {% endfor %}
 
 **Column definitions.**
-`Discovery` = PPS x literature novelty; the primary ranking metric, high for pathways
-that are both well supported and under-reported.
-`Novelty` = literature tier derived from `PubMed hits`.
-`PPS` = Pathway Prioritization Score, a weighted composite of significance (0.30),
-fold enrichment (0.30), gene-set specificity (0.25) and cross-source replication
-(0.15), scaled by database weight and seed proximity. **This is not a GSEA
+`Discovery` = PPS x composite novelty; the primary ranking metric. Composite novelty
+weights exact-query literature novelty 2:1 over low seed-gene overlap.
+`Novelty` = composite novelty tier. It is not proof of global biological novelty.
+`PPS` = Pathway Prioritization Score: a base weighted composite of significance
+(0.30), fold enrichment (0.30), gene-set specificity (0.25), and upstream support
+(0.15), scaled by database weight, then adjusted by the
+bounded semantic cardiovascular-relevance multiplier. **This is not a GSEA
 normalized enrichment score.**
-`Enrich. p_adj` = FDR-adjusted enrichment p-value from g:Profiler.
+`Combined p*` = Fisher upper-tail probability computed from the per-query
+g:Profiler adjusted enrichment values. Because upstream expansion branches can
+overlap, treat this as a ranking input rather than an independent confirmatory test.
 `Fold` = observed / expected overlap.
 `Perm. q` = Benjamini-Hochberg corrected empirical p-value from a size-matched
 uniform null over the pinned protein-coding background; `n/t` means the test was not run.
@@ -563,7 +582,7 @@ uniform null over the pinned protein-coding background; `n/t` means the test was
 ## Literature Evidence
 
 - **Total citations analyzed:** {{ ranked_hypotheses | sum(attribute='citation_count') }}
-- **Pathways with literature support:** {{ ranked_hypotheses | selectattr('literature_support') | list | length }} / {{ ranked_hypotheses | length }}
+- **Pathways with retrieved strict-query citations:** {{ ranked_hypotheses | selectattr('strict_query_citation_support') | list | length }} / {{ ranked_hypotheses | length }}
 
 {% for h in ranked_hypotheses[:10] if h.citations %}
 ### {{ h.pathway_name }}
@@ -630,10 +649,10 @@ uniform null over the pinned protein-coding background; `n/t` means the test was
         <tr>
             <th>Rank</th>
             <th>Pathway</th>
-            <th title="PPS x literature novelty">Discovery</th>
+            <th title="PPS x composite novelty; literature novelty weighted 2:1 over low seed overlap">Discovery</th>
             <th>Novelty</th>
             <th title="Pathway Prioritization Score - not a GSEA NES">PPS</th>
-            <th title="FDR-adjusted enrichment p-value (g:Profiler)">Enrich. p-adj</th>
+            <th title="Fisher-combined probability from per-query g:Profiler adjusted enrichment values; overlapping branches are not independent">Combined p*</th>
             <th title="Benjamini-Hochberg corrected permutation p-value">Perm. q</th>
             <th>Evidence</th>
             <th>Seed Genes</th>
@@ -727,6 +746,10 @@ uniform null over the pinned protein-coding background; `n/t` means the test was
         def sp(h=8):
             return Spacer(1, h)
 
+        def safe(value: Any) -> str:
+            """Escape external text before passing it to ReportLab Paragraph."""
+            return escape(str(value or ""))
+
         def base_tbl_style():
             return TableStyle([
                 ("BACKGROUND", (0, 0), (-1, 0), UAB_GREEN),
@@ -763,7 +786,7 @@ uniform null over the pinned protein-coding background; `n/t` means the test was
             ["Pathways Identified", str(report_data.get("stage_3", {}).get("total_hypotheses", 0))],
         ]
         meta_tbl = Table(
-            [[Paragraph(f"<b>{k}</b>", small_style), Paragraph(v, small_style)]
+            [[Paragraph(f"<b>{safe(k)}</b>", small_style), Paragraph(safe(v), small_style)]
              for k, v in meta_rows],
             colWidths=[1.6*inch, 4.5*inch])
         meta_tbl.setStyle(TableStyle([
@@ -783,7 +806,7 @@ uniform null over the pinned protein-coding background; `n/t` means the test was
                    report_data.get("conclusion") or "No summary available.")
         for para in summary.split("\n\n"):
             if para.strip():
-                els.append(Paragraph(para.strip(), body_style))
+                els.append(Paragraph(safe(para.strip()), body_style))
         els.append(sp())
 
         # ── Ranked Pathways Table ────────────────────────────────────────
@@ -800,10 +823,10 @@ uniform null over the pinned protein-coding background; `n/t` means the test was
             for h in hypotheses[:30]:
                 tbl_data.append([
                     str(h.get("rank", "")),
-                    Paragraph(str(h.get("pathway_name", ""))[:60], small_style),
+                    Paragraph(safe(str(h.get("pathway_name", ""))[:60]), small_style),
                     str(h.get("source_db", ""))[:6],
                     _fmt(h.get("discovery_score"), ".3f"),
-                    Paragraph(str(h.get("novelty_tier") or "-"), small_style),
+                    Paragraph(safe(str(h.get("novelty_tier") or "-")), small_style),
                     _fmt(h.get("nes_score"), ".3f"),
                     _fmt(h.get("p_adj"), ".0e"),
                     _fmt(h.get("empirical_qvalue"), ".2g", blank="n/t"),
@@ -818,11 +841,14 @@ uniform null over the pinned protein-coding background; `n/t` means the test was
             els.append(t)
             els.append(sp(6))
             els.append(Paragraph(
-                "<b>Disc.</b> Discovery Score = PPS x literature novelty (primary ranking). "
-                "<b>PPS</b> Pathway Prioritization Score: weighted composite of significance (0.30), "
-                "fold enrichment (0.30), gene-set specificity (0.25) and replication (0.15) - "
-                "not a GSEA normalized enrichment score. "
-                "<b>Enr. p</b> FDR-adjusted enrichment p-value (g:Profiler). "
+                "<b>Disc.</b> Discovery Score = PPS x composite novelty; exact-query "
+                "literature novelty is weighted 2:1 over low seed-gene overlap. "
+                "<b>PPS</b> Pathway Prioritization Score: base weighted composite of significance "
+                "(0.30), fold enrichment (0.30), specificity (0.25), and upstream support (0.15), "
+                "followed by bounded semantic cardiovascular relevance; not a GSEA normalized "
+                "enrichment score. "
+                "<b>Comb. p*</b> Fisher upper-tail probability from per-query g:Profiler "
+                "adjusted enrichment values; overlapping branches are not independent. "
                 "<b>Perm. q</b> Benjamini-Hochberg corrected empirical p-value from a "
                 "size-matched uniform protein-coding genome null; n/t = not tested. "
                 "<b>PubMed</b> records at the pathway x seed genes x disease intersection.",
@@ -839,22 +865,25 @@ uniform null over the pinned protein-coding background; `n/t` means the test was
             for i, item in enumerate(ai_interps[:5], 1):
                 pw    = item.get("pathway", {})
                 interp = item.get("interpretation", "")
-                els.append(Paragraph(f"{i}. {pw.get('name', 'Unknown')}", h2_style))
+                els.append(Paragraph(safe(f"{i}. {pw.get('name', 'Unknown')}"), h2_style))
                 stats = (f"PPS = {pw.get('nes_score', 0):.3f}  |  "
                          f"p = {pw.get('p_value', 1):.2e}  |  "
                          f"DB: {pw.get('database', '')}  |  "
                          f"Citations: {pw.get('citation_count', 0)}")
-                els.append(Paragraph(stats, caption_style))
+                els.append(Paragraph(safe(stats), caption_style))
                 if interp:
-                    els.append(Paragraph(interp, body_style))
+                    els.append(Paragraph(safe(interp), body_style))
                 genes = pw.get("evidence_genes", [])
                 if genes:
                     els.append(Paragraph(
-                        "<b>Evidence genes:</b> " + ", ".join(genes[:12]),
+                        "<b>Evidence genes:</b> " + safe(", ".join(genes[:12])),
                         small_style))
                 for c in pw.get("citations", [])[:3]:
                     els.append(Paragraph(
-                        f"• {c.get('title','')[:90]} - PMID {c.get('pmid','')} ({c.get('year','')})",
+                        safe(
+                            f"• {c.get('title','')[:90]} - PMID "
+                            f"{c.get('pmid','')} ({c.get('year','')})"
+                        ),
                         caption_style))
                 els.append(sp(6))
 
@@ -868,7 +897,7 @@ uniform null over the pinned protein-coding background; `n/t` means the test was
             if ai_ther:
                 for para in ai_ther.split("\n\n"):
                     if para.strip():
-                        els.append(Paragraph(para.strip(), body_style))
+                        els.append(Paragraph(safe(para.strip()), body_style))
                 els.append(sp())
             gene_data = [["Gene", "Druggability", "PPS", "Pathways"]]
             for g in top_genes[:20]:
@@ -889,22 +918,30 @@ uniform null over the pinned protein-coding background; `n/t` means the test was
             els.append(Paragraph("Literature Evidence", h1_style))
             els.append(hr())
             total_cit = sum(h.get("citation_count", 0) for h in hypotheses)
-            lit_n = sum(1 for h in hypotheses if h.get("literature_support"))
+            lit_n = sum(
+                1 for h in hypotheses if h.get("strict_query_citation_support")
+            )
             pct = lit_n / max(len(hypotheses), 1) * 100
             els.append(Paragraph(
                 f"<b>{total_cit}</b> PubMed citations analyzed across "
                 f"<b>{len(hypotheses)}</b> pathways. "
-                f"<b>{lit_n}</b> pathways ({pct:.0f}%) have direct literature support.",
+                f"<b>{lit_n}</b> pathways ({pct:.0f}%) yielded retrieved citations "
+                f"under their strict intersection queries.",
                 body_style))
             els.append(sp())
             for h in hypotheses[:10]:
                 cits = h.get("citations", [])
                 if not cits:
                     continue
-                els.append(Paragraph(f"<b>{h.get('pathway_name','')}</b>", small_style))
+                els.append(Paragraph(
+                    f"<b>{safe(h.get('pathway_name', ''))}</b>", small_style
+                ))
                 for c in cits[:3]:
                     els.append(Paragraph(
-                        f"• {c.get('title','')}. PMID: {c.get('pmid','')} ({c.get('year','')})",
+                        safe(
+                            f"• {c.get('title','')}. PMID: "
+                            f"{c.get('pmid','')} ({c.get('year','')})"
+                        ),
                         caption_style))
                 els.append(sp(4))
 
@@ -914,7 +951,7 @@ uniform null over the pinned protein-coding background; `n/t` means the test was
         els.append(hr())
         conclusion = report_data.get("conclusion", "")
         if conclusion:
-            els.append(Paragraph(conclusion, body_style))
+            els.append(Paragraph(safe(conclusion), body_style))
         els.append(sp(20))
         els.append(Paragraph(
             "Generated by CardioXNet NETS Pipeline \u00b7 "

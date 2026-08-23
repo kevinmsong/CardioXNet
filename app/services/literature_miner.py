@@ -59,6 +59,9 @@ class LiteratureMiner:
         # harvested into the LiteratureEvidence result.
         self._last_hit_counts: Dict[str, int] = {}
         self._last_query_tier: Dict[str, str] = {}
+        self._last_queries: Dict[str, str] = {}
+        self._last_query_genes: Dict[str, List[str]] = {}
+        self._last_concept_queries: Dict[str, str] = {}
         # Corpus size of the pathway concept on its own, recorded only when the
         # full intersection returns nothing, to tell a real gap from a pathway
         # name that PubMed cannot match at all.
@@ -98,6 +101,17 @@ class LiteratureMiner:
         Returns:
             LiteratureEvidence with citations for each hypothesis
         """
+        # Provenance belongs to one validation invocation.  The miner instance
+        # is retained by the pipeline, so failing to clear these maps lets a
+        # later run reuse a previous count, concept prerequisite, query, or tier
+        # when the corresponding lookup fails before recording fresh evidence.
+        self._last_hit_counts.clear()
+        self._last_query_tier.clear()
+        self._last_queries.clear()
+        self._last_query_genes.clear()
+        self._last_concept_queries.clear()
+        self._last_concept_counts.clear()
+
         # If top_n is None, process ALL hypotheses; otherwise use specified limit or config default
         if top_n is None:
             hypotheses_to_process = hypotheses
@@ -118,18 +132,22 @@ class LiteratureMiner:
             pathway_name = hypothesis.aggregated_pathway.pathway.pathway_name
             
             # Get contributing seed genes for this specific hypothesis
-            contributing_seed_symbols = getattr(hypothesis, 'traced_seed_genes', [])
+            contributing_seed_symbols = (
+                getattr(hypothesis.aggregated_pathway, 'contributing_seed_genes', None)
+                or getattr(hypothesis, 'traced_seed_genes', None)
+                or []
+            )
             if not contributing_seed_symbols:
-                # Fallback to all seed genes if tracing not available
+                # Legacy records may not carry pathway-level contributors.
                 contributing_seed_symbols = [gene.symbol for gene in seed_genes]
-            else:
-                pass
             
             # Convert symbols back to GeneInfo objects for the contributing genes
             contributing_genes = [
                 gene for gene in seed_genes 
                 if gene.symbol in contributing_seed_symbols
             ]
+            if not contributing_genes:
+                contributing_genes = list(seed_genes)
             
             tasks.append((i, pathway_id, pathway_name, contributing_genes))
         
@@ -181,6 +199,17 @@ class LiteratureMiner:
             query_tier={
                 pid: self._last_query_tier.get(pid, "unknown") for pid in hypothesis_citations
             },
+            hypothesis_queries={
+                pid: self._last_queries.get(pid, "") for pid in hypothesis_citations
+            },
+            hypothesis_query_genes={
+                pid: list(self._last_query_genes.get(pid, []))
+                for pid in hypothesis_citations
+            },
+            concept_queries={
+                pid: self._last_concept_queries.get(pid, "")
+                for pid in hypothesis_citations
+            },
             concept_hit_counts={
                 pid: self._last_concept_counts[pid]
                 for pid in hypothesis_citations if pid in self._last_concept_counts
@@ -227,14 +256,17 @@ class LiteratureMiner:
         # Show which seed genes are being used for this specific hypothesis
         gene_symbols = [gene.symbol for gene in contributing_seed_genes]
         
-        # Construct targeted query with only contributing seed genes.
-        # The strict query is the intersection (genes x pathway x disease). When
-        # the pathway name carries no distinctive concept the clause comes back
-        # empty and the constructor degrades to the broad query on its own,
-        # which is the correct answer for a generic pathway.
+        # Construct the prespecified intersection query with only contributing
+        # seed genes. Even a pathway label composed entirely of generic tokens
+        # is retained as a quoted phrase, so a pathway-specific count can never
+        # silently degrade to the broader gene x disease corpus.
         query = self._construct_hypothesis_query(
             pathway_name, contributing_seed_genes, disease_context, disease_synonyms
         )
+        self._last_query_genes[hypothesis_id] = gene_symbols
+        concept_clause = self._pathway_clause(pathway_name)
+        concept_query = f"({concept_clause})" if concept_clause else ""
+        self._last_concept_queries[hypothesis_id] = concept_query
 
         logger.debug(f"Hypothesis literature query for {hypothesis_id}: {query}")
 
@@ -243,6 +275,7 @@ class LiteratureMiner:
         # bounded by the retrieval cap.
         hit_count = self.pubmed_client.count_hits(query)
         self._last_hit_counts[hypothesis_id] = hit_count
+        self._last_queries[hypothesis_id] = query
         self._last_query_tier[hypothesis_id] = (
             "strict" if " AND " in query and query.count(" AND ") >= 2 else "broad"
         )
@@ -259,10 +292,9 @@ class LiteratureMiner:
         # is a real gap; a concept with no corpus means the query cannot measure
         # anything and the novelty must be marked unverified.
         if hit_count == 0:
-            concept_clause = self._pathway_clause(pathway_name)
             concept_hits = (
-                self.pubmed_client.count_hits(f"({concept_clause})")
-                if concept_clause else 0
+                self.pubmed_client.count_hits(concept_query)
+                if concept_query else 0
             )
             if concept_hits >= 0:
                 self._last_concept_counts[hypothesis_id] = concept_hits
@@ -386,10 +418,10 @@ class LiteratureMiner:
         and collapses the pathway clause back into the disease clause, which is
         exactly the defect this method exists to prevent.
 
-        A pathway whose name is entirely generic ("multicellular organism
-        development") yields an empty clause. The caller then falls back to the
-        broad query, which correctly records such a pathway as saturated rather
-        than novel.
+        A pathway whose informative-token expansion is empty (for example,
+        "multicellular organism development") is searched as its complete
+        quoted phrase. This preserves the pathway clause and lets the separate
+        concept-corpus check determine whether a zero is interpretable.
         """
         import re as _re
         name = (pathway_name or "").strip()
@@ -404,7 +436,8 @@ class LiteratureMiner:
             if len(t) >= 3 and t.lower() not in cls._PATHWAY_STOPWORDS
         ]
         if not informative:
-            return ""
+            safe_name = name.replace('"', "").strip()
+            return f'"{safe_name}"[Title/Abstract]' if safe_name else ""
 
         phrases: List[str] = []
         if len(informative) >= 2:
@@ -427,7 +460,8 @@ class LiteratureMiner:
                 seen.add(key)
                 uniq.append(ph)
         if not uniq:
-            return ""
+            safe_name = name.replace('"', "").strip()
+            return f'"{safe_name}"[Title/Abstract]' if safe_name else ""
         return " OR ".join(
             (f'"{ph}"[Title/Abstract]' if " " in ph else f'{ph}[Title/Abstract]')
             for ph in uniq[:8]
@@ -584,17 +618,25 @@ class LiteratureMiner:
         return min(score, 1.0)
     
     
-    def _search_pubmed(self, query: str, max_results: int = 30) -> List[Dict]:
+    def _search_pubmed(
+        self,
+        query: str,
+        max_results: Optional[int] = None,
+    ) -> List[Dict]:
         """
         Search PubMed with constructed query.
 
         Args:
             query: PubMed query string
-            max_results: Maximum papers to retrieve (default 30)
+            max_results: Maximum papers to retrieve. When omitted, use the
+                validated per-run ``pubmed_max_results`` setting.
 
         Returns:
             List of paper dictionaries
         """
+        if max_results is None:
+            max_results = self.settings.nets.pubmed_max_results
+
         try:
             papers = self.pubmed_client._search_pubmed(query, max_results=max_results)
             

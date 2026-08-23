@@ -65,6 +65,7 @@ class HypothesisValidator:
         pubmed_hit_count: Optional[int] = None,
         concept_hit_count: Optional[int] = None,
         seed_disease_corpus: Optional[int] = None,
+        query_tier: Optional[str] = None,
     ) -> Dict[str, float]:
         """
         Calculate comprehensive validation score combining multiple evidence types.
@@ -167,8 +168,13 @@ class HypothesisValidator:
         # abstracts actually downloaded. Retrieval is capped at a few dozen
         # records, so counting downloaded citations makes saturation hit its
         # ceiling for every pathway and destroys the novelty signal entirely.
-        if pubmed_hit_count is not None and pubmed_hit_count >= 0:
-            corpus_size = pubmed_hit_count
+        raw_pubmed_hit_count = (
+            pubmed_hit_count
+            if pubmed_hit_count is not None and pubmed_hit_count >= 0
+            else None
+        )
+        if raw_pubmed_hit_count is not None:
+            corpus_size = raw_pubmed_hit_count
             saturation_basis = 'pubmed_corpus'
 
             # An empty intersection only counts as evidence of a gap if the
@@ -187,15 +193,36 @@ class HypothesisValidator:
             # random gene panels produced *more* Highly Novel calls (13/13 and
             # 21/23) than any real cardiovascular panel, purely because nobody
             # has written about those genes in heart failure.
-            if (seed_disease_corpus is not None
-                    and 0 <= seed_disease_corpus < self.MIN_SEED_DISEASE_CORPUS):
+            if query_tier != 'strict':
+                # Only the prespecified three-clause query measures the
+                # pathway x seeds x disease intersection.  Missing provenance
+                # is not equivalent to strict provenance: legacy or partial
+                # records must remain explicitly unverified.
+                scores['novelty_confidence'] = 'unverified_query_scope'
+                corpus_size = self.UNVERIFIED_CORPUS_PROXY
+                saturation_basis = 'unverified_query_scope'
+            elif seed_disease_corpus is None or seed_disease_corpus < 0:
+                # A failed or absent seed-corpus lookup removes the denominator
+                # needed to interpret a sparse intersection.  It must never be
+                # allowed to promote a zero into a verified literature gap.
+                scores['novelty_confidence'] = 'unverified_seed_corpus'
+                corpus_size = self.UNVERIFIED_CORPUS_PROXY
+                saturation_basis = 'unverified_seed_corpus'
+            elif seed_disease_corpus < self.MIN_SEED_DISEASE_CORPUS:
                 scores['novelty_confidence'] = 'ungrounded_seeds'
                 scores['seed_disease_corpus'] = seed_disease_corpus
                 corpus_size = max(corpus_size, self.UNVERIFIED_CORPUS_PROXY)
                 saturation_basis = 'ungrounded_seeds'
-            elif pubmed_hit_count == 0 and concept_hit_count is not None and concept_hit_count >= 0:
-                if concept_hit_count < self.MIN_CONCEPT_CORPUS:
-                    scores['novelty_confidence'] = 'unverified'
+            elif raw_pubmed_hit_count == 0:
+                if concept_hit_count is None or concept_hit_count < 0:
+                    # A concept-corpus lookup is a required prerequisite for
+                    # interpreting a zero.  Failure or missing provenance is
+                    # not evidence that the intersection is empty.
+                    scores['novelty_confidence'] = 'unverified_concept'
+                    corpus_size = self.UNVERIFIED_CORPUS_PROXY
+                    saturation_basis = 'unverified_concept'
+                elif concept_hit_count < self.MIN_CONCEPT_CORPUS:
+                    scores['novelty_confidence'] = 'unverified_concept'
                     scores['concept_hit_count'] = concept_hit_count
                     # Treat as mid-corpus rather than unstudied: the claim is
                     # "we cannot tell", not "nobody has looked".
@@ -204,6 +231,8 @@ class HypothesisValidator:
                 else:
                     scores['novelty_confidence'] = 'verified_gap'
                     scores['concept_hit_count'] = concept_hit_count
+            else:
+                scores['novelty_confidence'] = 'verified'
         else:
             # The corpus size was never measured for this pathway -- either the
             # count lookup failed or the pathway fell outside the literature
@@ -212,12 +241,19 @@ class HypothesisValidator:
             # earned, floating unmeasured pathways to the top of the ranking.
             corpus_size = max(n_relevant, self.UNVERIFIED_CORPUS_PROXY)
             saturation_basis = 'not_measured'
-            scores['novelty_confidence'] = 'unverified'
+            scores['novelty_confidence'] = 'unverified_measurement'
+
+        if seed_disease_corpus is not None and seed_disease_corpus >= 0:
+            scores['seed_disease_corpus'] = seed_disease_corpus
 
         literature_saturation = math.log10(corpus_size + 1) / math.log10(self.SATURATION_CEILING + 1)
         literature_saturation = max(0.0, min(literature_saturation, 1.0))
         literature_novelty = 1.0 - literature_saturation
-        scores['pubmed_hit_count'] = corpus_size
+        # Never render a conservative proxy as if it were the measured PubMed
+        # count. Keep the raw count and the scoring basis as separate fields.
+        scores['pubmed_hit_count'] = raw_pubmed_hit_count
+        scores['saturation_corpus_size'] = corpus_size
+        scores['query_tier'] = query_tier or 'unknown'
         scores['saturation_basis'] = saturation_basis
 
         # Secondary novelty signal: low seed gene overlap in pathway evidence
@@ -228,12 +264,17 @@ class HypothesisValidator:
         seed_gene_symbols = {gene.symbol for gene in seed_genes}
         if pathway_genes:
             overlap_ratio = len(pathway_genes & seed_gene_symbols) / len(pathway_genes)
-            gene_novelty = 1.0 - min(overlap_ratio * 2, 1.0)  # penalise heavy overlap
+            gene_novelty = 1.0 - min(overlap_ratio * 2, 1.0)  # penalize heavy overlap
         else:
             gene_novelty = 0.5
 
         # Composite novelty (literature novelty weighted 2:1 over gene novelty)
         composite_novelty = (2 * literature_novelty + gene_novelty) / 3.0
+        # Persist each term explicitly so retrospective analyses can reproduce
+        # the deployed score without inferring a component from a rounded total.
+        scores['literature_novelty'] = round(literature_novelty, 4)
+        scores['gene_novelty'] = round(gene_novelty, 4)
+        scores['composite_novelty'] = round(composite_novelty, 4)
         scores['novelty_score'] = composite_novelty * 0.15
         scores['literature_saturation'] = round(literature_saturation, 4)
         scores['n_relevant_citations'] = n_relevant
@@ -242,8 +283,11 @@ class HypothesisValidator:
         # on the same scale as a grounded call invites exactly the
         # misinterpretation the negative controls produced. It is labelled as
         # undefined instead.
-        if scores.get('novelty_confidence') == 'ungrounded_seeds':
+        novelty_confidence = scores.get('novelty_confidence', '')
+        if novelty_confidence == 'ungrounded_seeds':
             scores['novelty_tier'] = 'Ungrounded'
+        elif novelty_confidence.startswith('unverified'):
+            scores['novelty_tier'] = 'Unverified'
         else:
             scores['novelty_tier'] = (
                 'Highly Novel' if composite_novelty >= 0.80 else
@@ -253,8 +297,9 @@ class HypothesisValidator:
             )
 
         # ── Discovery Score (NES × novelty) ─────────────────────────────────
-        # Surfaces pathways that are strongly enriched AND under-reported -
-        # the primary scientific goal of this tool.
+        # Composite novelty weights exact-query literature novelty 2:1 over
+        # low seed-gene overlap. The score is a prioritization signal, not proof
+        # that a pathway or mechanism is globally unreported.
         nes = hypothesis.nes_score if hasattr(hypothesis, 'nes_score') else 0.0
         scores['discovery_score'] = round(nes * composite_novelty, 4)
 

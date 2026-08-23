@@ -1,7 +1,7 @@
 # CardioXNet benchmark report
 
 The main benchmark and temporal holdout were regenerated from fresh retrievals.
-The holdout included all 133 real-panel hypotheses.
+The holdout included all 124 real-panel hypotheses.
 
 External resources recorded for the main run were STRING v12.0, the configured
 g:Profiler identifier `e104_eg51_p15`, GTEx v8, optional live Open Targets, and
@@ -29,15 +29,15 @@ analysis used five seeds and the `balanced` preset.
 
 | Run | Kind | Seed genes | Disease context | Runtime | Hypotheses |
 |-----|------|------------|-----------------|--------:|-----------:|
-| `hf_inflammatory` | Real | VEGFA, MMP9, IL6, TNF, ACE | Heart failure | 257 s | 21 |
+| `hf_inflammatory` | Real | VEGFA, MMP9, IL6, TNF, ACE | Heart failure | 257 s | 19 |
 | `dcm_structural` | Real | MYH7, TTN, LMNA, MYBPC3, TNNT2 | Cardiomyopathy | 181 s | 34 |
-| `arrhythmia_channels` | Real | SCN5A, KCNQ1, KCNH2, RYR2, CACNA1C | Arrhythmia | 355 s | 41 |
-| `mi_ischemic` | Real | LDLR, APOB, PCSK9, NOS3, EDN1 | Myocardial infarction | 323 s | 37 |
-| `olfactory` | Control | OR51E2, OR2W1, OR1A1, OR5K1, OR10A4 | Heart failure | 96 s | 12 |
-| `random_1` | Control | RPF2, CLRN3, PRKAG1, OR8U9, CACNA1D | Heart failure | 202 s | 19 |
-| `random_2` | Control | C2CD4A, GORASP1, CHIC1, VCY, PLCD4 | Heart failure | 144 s | 9 |
+| `arrhythmia_channels` | Real | SCN5A, KCNQ1, KCNH2, RYR2, CACNA1C | Arrhythmia | 355 s | 36 |
+| `mi_ischemic` | Real | LDLR, APOB, PCSK9, NOS3, EDN1 | Myocardial infarction | 323 s | 35 |
+| `olfactory` | Control | OR51E2, OR2W1, OR1A1, OR5K1, OR10A4 | Heart failure | 96 s | 9 |
+| `random_1` | Control | RPF2, CLRN3, PRKAG1, OR8U9, CACNA1D | Heart failure | 202 s | 18 |
+| `random_2` | Control | C2CD4A, GORASP1, CHIC1, VCY, PLCD4 | Heart failure | 144 s | 13 |
 
-The four real panels produced 133 hypotheses and the controls produced 40.
+The four real panels produced 124 hypotheses and the controls produced 40.
 These outputs were regenerated in full after the semantic-filter change because
 that filter changes the pathways eligible for secondary expansion.
 
@@ -51,17 +51,18 @@ expression and druggability are separate annotations. They do not enter PPS or
 the Discovery Score.
 
 On `hf_inflammatory`, the final-PPS-ranked top term contained 6 annotated genes,
-and the top 15 ranged from 5 to 103 genes. Within those 15, term size and final
-PPS were inversely rank-associated (Spearman rho = -0.9293; n = 15). Because
+and the top 15 ranged from 5 to 72 genes. Within those 15, term size and final
+PPS were inversely associated (Spearman rho = -0.81; n = 15). Because
 gene-set specificity is an explicit PPS component, this is a descriptive
 consistency check rather than independent validation.
 
 ## 3. Uncapped literature counts
 
 For `hf_inflammatory`, the uncapped PubMed title/abstract counts at the exact
-pathway, contributing-gene, and disease intersections ranged from 31 to 10,868,
-a 350.6-fold span. The abstract sets retained for display ranged only from 26 to
-30 records because retrieval was capped, a 1.15-fold span. The uncapped count
+pathway, contributing-gene, and disease intersections ranged from 8 to 4,746
+across the 17 of 19 hypotheses with a positive count, a 593.2-fold span. The
+abstract sets retained for display ranged only from 8 to 30 records because
+retrieval was capped, a 3.75-fold span. The uncapped count
 therefore preserves discrimination that the displayed evidence set cannot.
 
 This distinction repairs two earlier measurement errors. Literature saturation
@@ -73,23 +74,24 @@ inspection, not the saturation denominator.
 
 ## 4. Verified exact-query gaps
 
-Seven of 133 real-panel hypotheses met the prespecified verified-gap rule in
+Eight of 124 real-panel hypotheses met the prespecified verified-gap rule in
 the regenerated benchmark. The rule requires a grounded seed-disease corpus, a searchable
 pathway concept with at least 20 PubMed records, and zero records at the exact
 pathway, contributing-gene, and disease intersection.
 
 | Panel | Candidate | Discovery Score | Fold enrichment | Empirical q | Exact-query records | Pathway-concept records |
 |-------|-----------|----------------:|----------------:|------------:|--------------------:|------------------------:|
-| DCM structural | GAB1 signalosome | 2.0087 | 15.824 | 0.001617 | 0 | 1,785 |
-| DCM structural | NTRK2 (TRKB) signaling | 1.9840 | 17.549 | 0.001617 | 0 | 817 |
-| Arrhythmia channels | cGMP-PKG signaling | 1.9070 | 7.908 | 0.001241 | 0 | 1,361 |
-| Arrhythmia channels | GPER1 signaling | 1.8645 | 8.376 | 0.001241 | 0 | 563 |
-| MI ischemic | P2Y12 signaling | 1.8077 | 8.062 | 0.001275 | 0 | 1,854 |
-| MI ischemic | GPER1 signaling | 1.7996 | 6.719 | 0.001275 | 0 | 563 |
-| MI ischemic | Oxytocin signaling | 1.7488 | 6.995 | 0.001275 | 0 | 29,242 |
+| DCM structural | GAB1 signalosome | 1.3391 | 15.824 | 0.001698 | 0 | 1,785 |
+| DCM structural | Signaling by NTRK2 (TRKB) | 1.3227 | 17.549 | 0.001698 | 0 | 817 |
+| Arrhythmia channels | cGMP-PKG signaling pathway | 1.2713 | 7.908 | 0.001284 | 0 | 1,361 |
+| MI ischemic | ADP signalling through P2Y purinoceptor 12 | 1.2285 | 9.082 | 0.001399 | 0 | 1,854 |
+| MI ischemic | GPER1 signaling | 1.2231 | 7.568 | 0.001399 | 0 | 563 |
+| MI ischemic | HIF-1 signaling pathway | 1.2199 | 10.760 | 0.001399 | 0 | 851 |
+| MI ischemic | cAMP signaling pathway | 1.2133 | 9.168 | 0.001399 | 0 | 1,282 |
+| MI ischemic | Oxytocin signaling pathway | 1.1849 | 7.686 | 0.001399 | 0 | 29,242 |
 
-These candidates combine 6.7- to 17.5-fold enrichment with empirical q-values
-of 0.00124 to 0.00162 under the uniform genome-scale null. They are rank-leading
+These candidates combine 7.6- to 17.5-fold enrichment with empirical q-values
+of 0.00128 to 0.00170 under the uniform genome-scale null. They are rank-leading
 literature-sparse intersections for review, not experimentally validated
 mechanisms. For P2Y12, the contribution is not the pathway name in isolation.
 Its zero applies only to the exact query connecting the pathway to the
@@ -110,46 +112,47 @@ interpreted.
 | `random_1` | 6 | Ungrounded |
 | `random_2` | 1 | Ungrounded |
 
-All 40 control hypotheses were Ungrounded and none of the 133 real-panel
+All 40 control hypotheses were Ungrounded and none of the 124 real-panel
 hypotheses was Ungrounded. Both invariants held exactly after regeneration.
 This test catches the prior failure in which literature-naive controls appeared
 maximally novel. Because these controls helped motivate the grounding gate and
-were retained during development, the 40/40 versus 0/133 separation is a
+were retained during development, the 40/40 versus 0/124 separation is a
 development regression invariant. It is not an unbiased estimate of
 out-of-sample specificity.
 
 ## 6. Temporal holdout
 
-The temporal holdout included all 133 real-panel hypotheses. Pre-cutoff PubMed
+The temporal holdout included all 124 real-panel hypotheses. Pre-cutoff PubMed
 records were censored at 2020-12-31. Post-cutoff records began on 2021-01-01
 and extended through the follow-up retrieval snapshot. Relative growth was defined as
-`post_count / (pre_count + 1)`. Eleven intersections met the verified-gap rule
-at the cutoff, and none was Ungrounded.
+`post_count / (pre_count + 1)`. Fifteen intersections had zero pre-cutoff
+records, and none was Ungrounded.
 
 | Comparison with post-cutoff growth | Spearman rho | n |
 |------------------------------------|-------------:|--:|
-| Discovery Score, all hypotheses | -0.0635 | 133 |
-| Composite novelty, all hypotheses | -0.0283 | 133 |
-| PPS, all hypotheses | -0.1462 | 133 |
-| Discovery Score, nonzero pre-cutoff count only | +0.0225 | 122 |
+| Discovery Score, all hypotheses | -0.1189 | 124 |
+| Composite novelty, all hypotheses | -0.0693 | 124 |
+| PPS, all hypotheses | -0.1587 | 124 |
+| Discovery Score, nonzero pre-cutoff count only | +0.0132 | 109 |
 
 Panel-specific Discovery Score associations were heterogeneous.
 
 | Panel | Spearman rho |
 |-------|-------------:|
-| Arrhythmia channels | +0.0485 |
-| DCM structural | -0.2235 |
-| Heart failure | +0.7165 |
-| Myocardial infarction | -0.3826 |
+| Arrhythmia channels | +0.1704 |
+| DCM structural | -0.2360 |
+| Heart failure | +0.2712 |
+| Myocardial infarction | -0.5360 |
 
 Operational-tier sizes and median growth were:
 
 | Tier at the cutoff | n | Median growth |
 |--------------------|--:|--------------:|
-| Established | 12 | 0.5413 |
-| Emerging | 48 | 0.6061 |
-| Novel | 55 | 0.6970 |
-| Highly Novel | 18 | 0.0000 |
+| Unverified | 3 | 0.0000 |
+| Established | 9 | 0.5460 |
+| Emerging | 38 | 0.6401 |
+| Novel | 55 | 0.7027 |
+| Highly Novel | 19 | 0.0000 |
 
 The overall association was negligible, and panel-specific associations varied
 in direction. The holdout therefore does not validate the Discovery Score as a

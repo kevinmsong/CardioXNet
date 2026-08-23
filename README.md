@@ -1,19 +1,21 @@
 # CardioXNet
 
-**CardioXNet** is a cardiovascular pathway-discovery platform that reasons from *known* seed
-genes to *unreported* cardiac pathways. Given a handful of genes, it assembles their functional
-neighborhood, finds primary enriched pathways, then expands through the literature into
-**secondary pathways** - surfacing cardiac mechanisms not already annotated for the seeds, each
-traced back to its network evidence and PubMed citations.
+**CardioXNet** is a cardiovascular pathway-discovery platform that reasons outward from known seed
+genes to auditable, literature-sparse pathway-gene-disease intersections. Given a focused panel, it
+assembles a functional neighborhood, identifies primary enriched pathways, then expands through the
+literature into secondary pathways. Each result is traced to its network, enrichment, and PubMed
+evidence. A zero count means the prespecified exact query was unreported on the run date, not that
+the underlying pathway is globally unknown.
 
 It implements the **NETS** pipeline (Network Expansion & Topology Scoring): protein-interaction
 expansion, multi-database enrichment, literature-driven secondary discovery, pathway prioritization
 scoring, cardiac semantic filtering, permutation-based validation, literature-saturation novelty
 scoring, and network topology analysis.
 
-The headline output is the **Discovery Score** = pathway prioritization score x literature novelty,
-which ranks pathways that are both well supported by the enrichment evidence *and* under-reported
-at the intersection of (pathway x seed genes x disease context).
+The headline output is the **Discovery Score** = pathway prioritization score x composite novelty.
+The composite weights exact-query literature novelty 2:1 over low seed-gene overlap, ranking
+pathways that are both supported by enrichment evidence and comparatively literature-sparse under
+the prespecified (pathway x seed genes x disease context) title/abstract query.
 
 > **Lightweight & no-build.** The UI is server-rendered by FastAPI (Jinja2 + htmx + Alpine.js,
 > with vendored JS - no CDN required). There is **no Node/npm/bundler build step** and no separate
@@ -45,19 +47,19 @@ Optional: create a `.env` with `GROQ_API_KEY=...` to enable AI-assisted report n
 | **Seed validation** | Map gene symbols to NCBI Entrez IDs. |
 | **Functional neighborhood** | High-confidence STRING interaction partners around the seeds. |
 | **Primary pathways** | g:Profiler enrichment (GO/KEGG/Reactome/WikiPathways); pathways *already known* for the seeds (per Reactome) are filtered out. |
-| **Secondary expansion** | For each primary pathway, mine PubMed for co-mentioned genes; the expanded gene set reveals **unreported** secondary pathways. |
-| **Aggregation & scoring** | Deduplicate pathway instances, combine evidence (Fisher's method), and score with the **Pathway Prioritization Score (PPS)** - a weighted composite of significance (0.30), fold enrichment (0.30), gene-set specificity (0.25) and cross-source replication (0.15). PPS is *not* a GSEA normalized enrichment score. |
-| **Cardiac filtering** | Semantic filter keeps cardiovascular-relevant hypotheses, focused by the chosen disease context. |
-| **Validation** | Size-matched permutation tests against the HGNC protein-coding genome with Benjamini–Hochberg FDR control, GTEx v8 cardiac expression, ChEMBL/DrugBank druggability. |
+| **Secondary expansion** | Re-enrich primary-pathway member genes, optionally augmented with PubMed-derived genes for the highest-priority primaries. |
+| **Aggregation & scoring** | Deduplicate pathway instances, combine evidence (Fisher's method), and compute a base PPS from significance (0.30), fold enrichment (0.30), gene-set specificity (0.25), and upstream support (0.15), scaled by database weight. |
+| **Cardiac filtering** | Apply a bounded lexical cardiovascular-relevance multiplier and progressive retention. The multiplier and base PPS remain inspectable; this heuristic is not a validated biological classifier. |
+| **Supporting evidence** | Size-matched permutation tests against the HGNC protein-coding genome with Benjamini-Hochberg FDR control, GTEx v8 cardiac expression, an embedded curated drug-target snapshot, and optional live Open Targets evidence. |
 | **Literature mining** | Attach ranked PubMed citations to each hypothesis. |
 | **Topology** | Hub genes and prioritized druggable therapeutic targets. |
-| **Novelty & discovery** | PubMed corpus size at the (pathway x seeds x disease) intersection gives literature saturation; **Discovery Score = PPS x novelty** produces the final ranking. |
+| **Novelty & discovery** | PubMed corpus size at the (pathway x seeds x disease) intersection gives literature saturation; **Discovery Score = PPS x composite novelty**, with literature novelty weighted 2:1 over low seed overlap, produces the final ranking. |
 
 Two distinct properties are reported and must not be conflated:
 
-- **Literature novelty** (`novelty_tier`, Highly Novel → Established) is derived from the *number of
-  PubMed records* at the (pathway x seed genes x disease) intersection. This is what the Discovery
-  Score weights.
+- **Literature novelty** is derived from the *number of PubMed records* at the (pathway x seed genes
+  x disease) intersection. The reported `novelty_tier` comes from composite novelty, which weights
+  that literature signal 2:1 over low seed-gene overlap. The Discovery Score uses the composite.
 - **Seed-independent** is a *structural* flag: seed genes are a minority (<50%) of the pathway's
   evidence genes, so the pathway was reached by network expansion rather than being one the seeds
   are already annotated to. It says nothing about the literature.
@@ -120,16 +122,17 @@ the app:
 npx playwright test ui
 ```
 
-**Live "known → unknown" discovery** (runs the real pipeline against STRING/g:Profiler/PubMed so you
-can watch genuine discovery - slow, network-dependent). Run it **headed** to watch:
+**Live hypothesis-generation workflow** (runs the real pipeline against STRING, g:Profiler, and
+PubMed; slow and network-dependent). Run it **headed** to watch:
 
 ```bash
 npx playwright test discovery --headed
 ```
 
-The discovery test asserts the science: the run produces pathway hypotheses, at least one is **novel**
-for the seeds, secondary expansion occurred, and top hypotheses carry literature citations with
-full seed → primary → secondary → final lineage. Screenshots are saved to `e2e/artifacts/`.
+The test checks pipeline invariants: the run produces pathway hypotheses, at least one receives a
+non-Established operational literature tier, secondary expansion occurs, and top hypotheses carry
+literature citations with full seed → primary → secondary → final lineage. Screenshots are saved
+to `e2e/artifacts/`.
 
 Tune it via env vars: `DISCOVERY_SEEDS`, `DISCOVERY_DISEASE`, `DISCOVERY_TIMEOUT_MS`.
 
@@ -154,13 +157,10 @@ docker compose up --build      # serves UI + API on :8000
 | Reactome | Known-pathway filtering (novelty) |
 | GTEx | Cardiac tissue expression |
 | PubMed / NCBI E-utilities | Literature evidence |
-| ChEMBL / curated lists | Druggability |
+| Embedded DrugBank / TTD / ChEMBL-derived snapshot | Baseline druggability annotation |
+| Open Targets | Optional live drug-target evidence with explicit completion status |
 
 ---
-
-## Citation
-
-> Yajing Wang & Jay Zhang Labs, University of Alabama at Birmingham. CardioXNet (2026).
 
 ## License
 

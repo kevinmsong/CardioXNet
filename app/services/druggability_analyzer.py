@@ -31,6 +31,10 @@ class DruggabilityScore:
     external_clinical_target_count: int = 0        # targets in active clinical trials
     cardiovascular_target_count: int = 0           # targets with CV disease indication
     target_evidence: List[Dict[str, Any]] = field(default_factory=list)  # per-gene detail
+    external_lookup_attempted: int = 0
+    external_lookup_failures: int = 0
+    external_lookup_complete: Optional[bool] = None
+    external_lookup_error: Optional[str] = None
 
 
 class DruggabilityAnalyzer:
@@ -53,15 +57,24 @@ class DruggabilityAnalyzer:
     in this class for performance. Data current as of November 2023.
     """
     
-    # Open Targets Platform GraphQL endpoint
-    _OT_GRAPHQL_URL = "https://api.platform.opentargets.org/api/v4/graphql"
+    # Resource identifiers are public constants so run metadata can preserve
+    # the exact external endpoint and embedded snapshot versions.
+    OPEN_TARGETS_GRAPHQL_URL = "https://api.platform.opentargets.org/api/v4/graphql"
+    OPEN_TARGETS_API_FAMILY = "GraphQL API v4"
+    EMBEDDED_RESOURCE_VERSIONS = {
+        "drugbank": "5.1.10",
+        "ttd": "2023 Update 2",
+        "chembl": "31",
+        "snapshot_date": "2023-11",
+    }
+    _OT_GRAPHQL_URL = OPEN_TARGETS_GRAPHQL_URL
     # 10s was the tightest budget in the system on the heaviest GraphQL payload,
     # with no retry, so a slow-but-healthy response was discarded silently.
     _OT_TIMEOUT = 30
     # Minimum spacing between Open Targets requests. This fires one POST per gene
     # per pathway, which without pacing is a burst of thousands.
     _OT_MIN_INTERVAL = 0.05
-    # Open Targets schema, verified against the live API on 2026-08-22.
+    # Open Targets schema, verified against the live API during benchmark regeneration.
     #
     # The previous query asked for `knownDrugs(size: 10)` with `phase`, `status`,
     # `disease { name }` and `drug { maximumClinicalTrialPhase }`. None of those
@@ -108,6 +121,7 @@ class DruggabilityAnalyzer:
         # genuine "no approved drugs" from a failed query.
         self.last_lookup_failures = 0
         self.last_lookup_attempted = 0
+        self.last_lookup_error: Optional[str] = None
         self._last_ot_request = 0.0
 
         logger.info(
@@ -158,6 +172,7 @@ class DruggabilityAnalyzer:
 
         self.last_lookup_failures = failures
         self.last_lookup_attempted = len(gene_symbols)
+        self.last_lookup_error = first_error
         if failures:
             logger.warning(
                 f"Open Targets lookup failed for {failures}/{len(gene_symbols)} genes "
@@ -407,6 +422,8 @@ class DruggabilityAnalyzer:
                     if (r.get("drug") or {}).get("name")
                 ][:5]
                 target_evidence.append({"gene_symbol": gene_sym, "top_drugs": top_drugs})
+        elif use_external and not self.last_lookup_failures:
+            druggability_source = "Open Targets (0 matched targets) + curated"
 
         druggable_list = list(druggable)
         approved_list = list(approved)
@@ -441,6 +458,12 @@ class DruggabilityAnalyzer:
             external_clinical_target_count=ot_clinical_count,
             cardiovascular_target_count=ot_cv_count,
             target_evidence=target_evidence,
+            external_lookup_attempted=(self.last_lookup_attempted if use_external else 0),
+            external_lookup_failures=(self.last_lookup_failures if use_external else 0),
+            external_lookup_complete=(
+                self.last_lookup_failures == 0 if use_external else None
+            ),
+            external_lookup_error=(self.last_lookup_error if use_external else None),
         )
     
     

@@ -1,6 +1,6 @@
 """Configuration management using Pydantic settings."""
 
-from typing import Dict, List, Optional
+from typing import Dict, List, Literal, Optional
 from functools import lru_cache
 from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -73,10 +73,10 @@ class NETSConfig(BaseSettings):
     )
     
     # Database Weights
-    db_weight_reactome: float = Field(default=1.5, description="Reactome database weight")
-    db_weight_kegg: float = Field(default=1.5, description="KEGG database weight")
-    db_weight_wikipathways: float = Field(default=1.2, description="WikiPathways weight")
-    db_weight_gobp: float = Field(default=1.0, description="GO:BP weight")
+    db_weight_reactome: float = Field(default=1.5, ge=0.0, le=10.0, description="Reactome database weight")
+    db_weight_kegg: float = Field(default=1.5, ge=0.0, le=10.0, description="KEGG database weight")
+    db_weight_wikipathways: float = Field(default=1.2, ge=0.0, le=10.0, description="WikiPathways weight")
+    db_weight_gobp: float = Field(default=1.0, ge=0.0, le=10.0, description="GO:BP weight")
     
     # API Endpoints (Per official documentation)
     string_api_url: str = Field(
@@ -84,8 +84,8 @@ class NETSConfig(BaseSettings):
         description="STRING Database API (https://stringdb.readthedocs.io/)"
     )
     gprofiler_api_url: str = Field(
-        default="https://biit.cs.ut.ee/gprofiler/api",
-        description="g:Profiler API"
+        default="https://biit.cs.ut.ee/gprofiler",
+        description="g:Profiler service base URL"
     )
     reactome_api_url: str = Field(
         default="https://reactome.org/ContentService",
@@ -93,18 +93,48 @@ class NETSConfig(BaseSettings):
     )
     
     # Retry Configuration
-    max_retries: int = Field(default=2, description="Maximum API retry attempts")
-    retry_backoff_factor: float = Field(default=1.5, description="Exponential backoff factor")
-    request_timeout: int = Field(default=15, description="API request timeout in seconds")
+    max_retries: int = Field(
+        default=2,
+        ge=0,
+        le=5,
+        description="Maximum API retry attempts after the initial request",
+    )
+    retry_backoff_factor: float = Field(
+        default=1.5,
+        ge=0.0,
+        le=60.0,
+        description="Initial exponential retry backoff in seconds",
+    )
+    request_timeout: int = Field(
+        default=15,
+        ge=1,
+        le=300,
+        description="API request timeout in seconds",
+    )
+    gprofiler_timeout_seconds: float = Field(
+        default=120.0,
+        ge=1.0,
+        le=600.0,
+        description=(
+            "Hard wall-clock deadline for one g:Profiler enrichment request. "
+            "The official library exposes no HTTP timeout, so CardioXNet runs "
+            "each call in a spawned process and terminates it at this deadline."
+        ),
+    )
     
     # Clinical Evidence API Timeouts (Stage 3: HPA, GWAS, Epigenomic)
-    hpa_timeout: int = Field(default=30, description="Human Protein Atlas API timeout in seconds")
-    gwas_timeout: int = Field(default=45, description="GWAS Catalog API timeout in seconds")
-    epigenomic_timeout: int = Field(default=30, description="ENCODE Epigenomics API timeout in seconds")
-    clinical_api_max_retries: int = Field(default=2, description="Maximum retry attempts for clinical evidence APIs")
+    hpa_timeout: int = Field(default=30, ge=1, le=300, description="Human Protein Atlas API timeout in seconds")
+    gwas_timeout: int = Field(default=45, ge=1, le=300, description="GWAS Catalog API timeout in seconds")
+    epigenomic_timeout: int = Field(default=30, ge=1, le=300, description="ENCODE Epigenomics API timeout in seconds")
+    clinical_api_max_retries: int = Field(
+        default=2,
+        ge=0,
+        le=5,
+        description="Maximum retry attempts for clinical evidence APIs",
+    )
     
     # Aggregation Configuration
-    aggregation_strategy: str = Field(
+    aggregation_strategy: Literal["intersection", "frequency", "weighted"] = Field(
         default="frequency",
         description="Pathway aggregation strategy: intersection, frequency, or weighted"
     )
@@ -177,6 +207,8 @@ class NETSConfig(BaseSettings):
     # Novelty Filtering Configuration
     seed_overlap_threshold: float = Field(
         default=0.5,
+        ge=0.0,
+        le=1.0,
         description="Maximum seed gene overlap ratio for novelty filtering (0.5 = 50%)"
     )
     
@@ -257,13 +289,13 @@ class NETSConfig(BaseSettings):
 
     # Stage 8 limits - how many top pathways each validation step processes
     gtex_top_pathways: int = Field(
-        default=20, ge=0, description="Pathways to validate with GTEx (0 = all)"
+        default=20, ge=0, le=1000, description="Pathways to validate with GTEx (0 = all)"
     )
     permutation_top_pathways: int = Field(
-        default=20, ge=0, description="Pathways to run permutation testing on (0 = all)"
+        default=20, ge=0, le=1000, description="Pathways to run permutation testing on (0 = all)"
     )
     external_druggability_top_pathways: int = Field(
-        default=20, ge=0, description="Pathways to query external druggability APIs (0 = all)"
+        default=20, ge=0, le=1000, description="Pathways to query external druggability APIs (0 = all)"
     )
     external_druggability_enabled: bool = Field(
         default=True, description="Enable external druggability lookup (Open Targets / ChEMBL)"
@@ -276,7 +308,7 @@ class NETSConfig(BaseSettings):
     )
     
     # Output Configuration
-    output_formats: List[str] = Field(
+    output_formats: List[Literal["pdf", "json", "markdown", "html"]] = Field(
         default=["pdf", "json"],
         description="Report output formats"
     )

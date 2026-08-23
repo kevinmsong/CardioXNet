@@ -8,15 +8,17 @@ reproducible.
 
 ## 1. Goal: known → unknown
 
-CardioXNet starts from a small set of **seed genes** (what is *known*) and reasons outward to
-**unreported cardiac pathways** (the *unknown*). The core idea is a two-level expansion:
+CardioXNet starts from a small set of **seed genes** and reasons outward to pathway hypotheses that
+can be screened for prespecified, literature-sparse pathway-gene-disease intersections. The core
+idea is a two-level expansion:
 
 1. **Network expansion** around the seeds (protein–protein interactions), then
-2. **Literature-driven expansion** of each primary pathway, which introduces genes the seeds are
-   not directly connected to and therefore reveals pathways unreachable from the seeds alone.
+2. **Secondary expansion** from primary-pathway member genes, optionally augmented with
+   literature-derived genes for the highest-priority primaries.
 
 Pathways already annotated to the seeds (per Reactome) are explicitly filtered out so the output
-concentrates on new biology.
+concentrates on expansion-derived connections. This structural filter does not establish that a
+connection is unreported; that question is evaluated separately with the grounded PubMed query.
 
 ---
 
@@ -28,15 +30,15 @@ concentrates on new biology.
 | Functional neighborhood | Union of high-confidence STRING partners of seeds | `string_neighbor_count` (default 75), `string_score_threshold` (0.60) |
 | Primary enrichment | Over-representation analysis across GO:BP, KEGG, Reactome, WikiPathways | g:Profiler; `fdr_threshold` (0.05) |
 | Known-pathway filter | Remove pathways where seeds are ≥50% of pathway genes / already Reactome-annotated | Reactome |
-| Secondary expansion | For top primary pathways, mine PubMed for co-mentioned genes; re-enrich the expanded set | `pubmed_max_results`, `semantic_max_hypotheses_for_literature` |
-| Aggregation | Deduplicate pathway instances; combine p-values (Fisher's method); weight by replication support | `min_support_threshold`, `aggregation_strategy` |
-| Pathway prioritization | Weighted composite of significance, effect size, specificity, replication (below) | `db_weights` |
-| Cardiac semantic filtering | Curated cardiovascular term scoring + disease-context focus | `semantic_relevance_threshold`, `disease_context`, `enforce_final_name_filter` (default off) |
-| Enhanced validation | Size-matched permutation null vs the protein-coding genome + Benjamini-Hochberg FDR, GTEx v8 cardiac expression, ChEMBL/DrugBank druggability | `n_permutations` (default 1000) |
+| Secondary expansion | Re-enrich primary member genes; optionally augment the top primaries with PubMed-derived genes | `pubmed_max_results`, `semantic_max_hypotheses_for_literature` |
+| Aggregation | Deduplicate pathway instances; combine per-query adjusted enrichment values with Fisher's method; record recurrence across upstream branches | `min_support_threshold`, `aggregation_strategy` |
+| Pathway prioritization | Base weighted composite of significance, effect size, specificity, and upstream support, followed by the bounded semantic multiplier below | `db_weights` |
+| Cardiac semantic filtering | Deterministic lexical cardiovascular relevance plus disease-context focus and progressive retention | `semantic_relevance_threshold`, `semantic_max_results`, `disease_context`, `enforce_final_name_filter` (default off) |
+| Enhanced validation | Size-matched permutation null vs the protein-coding genome + Benjamini-Hochberg FDR, GTEx v8 cardiac expression, an embedded curated drug-target snapshot, and optional live Open Targets evidence | `n_permutations` (default 1000) |
 | Literature mining | Per-hypothesis PubMed query (pathway + contributing seed genes + disease context); relevance scoring | `pubmed_max_results` |
 | Seed-gene tracing | Record full seed → primary → secondary → final lineage per hypothesis | - |
 | Topology | Centrality (degree, betweenness, closeness, eigenvector, PageRank), modules, crosstalk, druggable targets | NetworkX |
-| Novelty & discovery | PubMed corpus size at (pathway x seeds x disease) -> literature saturation -> Discovery Score | NCBI E-utilities `esearch` |
+| Novelty & discovery | PubMed corpus size at (pathway x seeds x disease) -> literature saturation -> composite novelty -> Discovery Score | NCBI E-utilities `esearch` |
 
 ---
 
@@ -44,7 +46,7 @@ concentrates on new biology.
 
 Two different properties are computed. They are reported separately and must not be conflated.
 
-**Literature novelty** is the quantity the Discovery Score weights. For each hypothesis a PubMed
+**Literature novelty** is the primary component of the composite novelty term. For each hypothesis a PubMed
 query is built for the *intersection* of the pathway concept, the contributing seed genes and the
 disease context:
 
@@ -58,8 +60,9 @@ The three clauses are combined with `AND`. This matters: an earlier revision OR-
 into the same clause as a broad cardiac fallback, which made the pathway clause inert. Every pathway
 then resolved to the same query and returned the same ~30 papers (mean pairwise Jaccard 0.55 across
 citation sets), leaving novelty with no signal to read. Generic unigrams ("heart", "muscle", "rate")
-are never emitted alone for the same reason. A pathway whose name is entirely generic yields an empty
-pathway clause and is correctly recorded as saturated rather than novel.
+are never emitted alone for the same reason. When informative-token expansion is empty, the complete
+pathway name is retained as a quoted title/abstract phrase. A nominal strict query therefore never
+silently degrades to the broader gene-by-disease corpus.
 
 Saturation uses the **total number of matching records** (the `esearch` `Count` field), not the
 number of abstracts downloaded. Retrieval is capped at a few dozen records, so counting retrieved
@@ -67,12 +70,14 @@ citations pins saturation at its ceiling for every pathway:
 
 ```
 saturation = log10(hits + 1) / log10(1001)          # 0 at no records, 1.0 at >= 1000 records
-novelty    = (2 x (1 - saturation) + gene_novelty) / 3
-tier       = Highly Novel >= 0.80 | Novel >= 0.55 | Emerging >= 0.30 | Established
+literature_novelty = 1 - saturation
+composite_novelty  = (2 x literature_novelty + gene_novelty) / 3
+tier               = Highly Novel >= 0.80 | Novel >= 0.55 | Emerging >= 0.30 | Established
 ```
 
-**Discovery Score = PPS x novelty** is the final ranking. It surfaces pathways that are both well
-supported by the enrichment evidence and under-reported for these seeds in this disease context.
+**Discovery Score = PPS x composite novelty** is the final ranking. It surfaces pathways that are both well
+supported by enrichment evidence and literature-sparse under the prespecified title/abstract query
+for these seeds and this disease context.
 
 **Seed-independent** is a separate *structural* flag: seed genes account for fewer than 50% of the
 pathway evidence genes, so the pathway was reached by expansion rather than being one the seeds are
@@ -86,10 +91,12 @@ not proof of biological novelty.
 ## 4. Pathway Prioritization Score (PPS)
 
 ```
-PPS = db_weight x centrality_weight x ( 0.30 x significance
-                                      + 0.30 x effect_size
-                                      + 0.25 x specificity
-                                      + 0.15 x replication )
+base_PPS = db_weight x ( 0.30 x significance
+                       + 0.30 x effect_size
+                       + 0.25 x specificity
+                       + 0.15 x upstream_support )
+
+PPS = base_PPS x (1 + semantic_cardiovascular_relevance)
 ```
 
 Each term is normalized to [0, 1] before weighting:
@@ -101,9 +108,23 @@ Each term is normalized to [0, 1] before weighting:
   recovered fraction of the term when the enrichment test does not report the sizes.
 - **specificity** = `1 - min(log10(term_size) / log10(500), 1)` - 1.0 for a tightly scoped term,
   0.0 for a term of 500+ genes.
-- **replication** = `min(support_count / 5, 1)` - agreement across independent primary enrichments.
+- **upstream support** = `min(support_count / 5, 1)` - recurrence across primary expansion
+  branches. Those branches can overlap and this term is not independent replication.
 - **db_weight** - source reliability (Reactome/KEGG 1.5, WikiPathways 1.2, GO:BP 1.0).
-- **centrality_weight** = `1 + 0.5 x seed_proximity + 0.3 x pagerank_percentile` (range 1.0-1.8).
+- **network topology** is reported separately and does not enter PPS. One-hop proximity is not used
+  as a multiplier because the enriched evidence genes were selected from that same functional
+  neighborhood; rewarding the overlap again would reuse rather than independently corroborate the
+  enrichment evidence. PageRank is calculated later for topology interpretation.
+- **semantic_cardiovascular_relevance** is a bounded lexical heuristic in [0, 1], derived from
+  pathway terminology, optional disease-context terms, and explicit noncardiac penalties. The
+  multiplier is therefore bounded in [1, 2]. Both the base PPS and multiplier are retained in the
+  score breakdown. This term is not a trained or externally validated classifier.
+
+The balanced benchmark uses an initial semantic threshold of 0.001. After semantic adjustment and
+reranking, the first 30 candidates are retained without a further pathway-name condition. Positions
+31-100 require either semantic relevance of at least 0.30 or an explicit cardiovascular or disease
+term. Lower positions require relevance of at least 0.50 until the configured result cap is filled.
+The final strict cardiac-name gate is separate and disabled by default.
 
 > **PPS is not a GSEA normalized enrichment score.** There is no running-sum statistic and no
 > permutation-derived normalization behind it. The value is stored under the field name `nes_score`
@@ -111,11 +132,11 @@ Each term is normalized to [0, 1] before weighting:
 
 **Why this replaced the previous formula.** The earlier score was
 `log10(-log10(p_adj) x evidence_count x db_weight x agg_weight x centrality_weight + 1)`. Because
-`-log10(p_adj)` was capped at 50 and essentially every top term reached that cap, the ranking reduced
-to sorting by gene count, and maximally generic terms won every run. On the reference
-VEGFA/MMP9/IL6/TNF/ACE panel the top hits were "cell surface receptor signaling pathway" (187 genes),
-"multicellular organism development" (152) and "developmental process" (202) - terms true of almost
-any gene list. Weighting effect size and specificity against significance removes that bias.
+`-log10(p_adj)` was capped at 50, the ranking could reduce to sorting largely by gene count and favor
+generic terms. Weighting effect size and specificity against significance directly counters that
+structural bias. In the regenerated heart-failure benchmark, term size was inversely rank-associated
+with final PPS among the top 15. Because term-size specificity enters PPS, that observation is an
+internal consistency check rather than independent validation.
 
 The **expansion screen** that chooses which primary pathways are re-expanded is deliberately a
 different, recall-oriented score, `min(-log10(p_adj), 20) x sqrt(evidence_count) x db_weight`.
@@ -130,12 +151,12 @@ that stage starved the candidate pool and cut the reference run from 22 hypothes
 - **Evidence combination:** when a pathway is supported by multiple primaries, p-values are combined
   with **Fisher's method**; a consistency score captures agreement across sources.
 - **Empirical significance:** a **size-matched permutation null** estimates an empirical p-value and
-  z-score for the overlap between each pathway and the functional neighbourhood. Null sets are drawn
+  z-score for the overlap between each pathway and the functional neighborhood. Null sets are drawn
   uniformly from the HGNC protein-coding genome (19,410 symbols, snapshotted in
-  `app/data/protein_coding_genes.txt`), *not* from the neighbourhood: sampling from the neighbourhood
-  makes every permuted set the neighbourhood again and returns p close to 1 for every pathway.
+  `app/data/protein_coding_genes.txt`), *not* from the neighborhood: sampling from the neighborhood
+  makes every permuted set the neighborhood again and returns p close to 1 for every pathway.
   Degree matching is deliberately **not** applied - STRING degrees are known only for genes inside
-  the neighbourhood, so degree bins would draw replacements almost exclusively from it and
+  the neighborhood, so degree bins would draw replacements almost exclusively from it and
   reintroduce the same degeneracy. The statistics record `degree_preserved: false`, so no control is
   claimed that was not applied.
 - **Multiple testing on the empirical p-values:** Benjamini-Hochberg FDR across every reported
@@ -149,8 +170,9 @@ that stage starved the candidate pool and cut the reference run from 22 hypothes
 
 ## 6. Reproducibility
 
-- Pin external database versions where possible (STRING release, g:Profiler/Reactome version) -
-  configured in `app/core/config.py`.
+- Pin external database versions where possible. Each result stores the configured STRING release,
+  declared g:Profiler and Reactome identifiers, endpoints, retrieval timestamps, and whether an
+  identifier was verified from a live response.
 - Results are persisted under `outputs/{analysis_id}/results.json` and are re-loadable by the API
   and UI, so any run can be re-opened and re-exported deterministically.
 - The committed fixture (`outputs/analysis_fixture/`) provides a deterministic dataset for UI tests.
@@ -166,21 +188,25 @@ that stage starved the candidate pool and cut the reference run from 22 hypothes
 - **External API variability:** STRING/g:Profiler/PubMed availability and rate limits affect recall
   and runtime. Every client now carries an explicit failure sentinel, so a failed call is reported
   as unmeasured rather than as a measurement of zero, and PubMed count lookups retry on HTTP 429.
-- **g:Profiler has no request timeout.** The official `gprofiler` library calls `requests.post`
-  internally and exposes no timeout parameter, so a hung connection can stall a run indefinitely.
-  There is no clean fix at the library boundary. A thread watchdog cannot cancel the blocked
-  request and leaks the worker and its network resources, so it is not presented as a workaround.
-  When bounded runtime is required, isolate the analysis in a separate process and enforce the
-  timeout at the process or orchestration boundary.
+- **g:Profiler requires process isolation for a hard deadline.** The official `gprofiler` library
+  calls `requests.post` internally and exposes no request-timeout parameter. CardioXNet runs every
+  profile call in a fresh spawned process with a configurable wall-clock deadline (120 seconds by
+  default). The parent terminates, reaps, and, if necessary, kills an overdue worker. By default,
+  at most two transient retries are attempted; both the deadline and retry count are configurable.
+  Exhaustion fails the enrichment stage explicitly. An unreadable, malformed, partial, or interrupted
+  response is never treated as enrichment data; a complete empty result remains a valid enrichment
+  outcome. This controls the hang but adds process-start overhead, and frozen Windows and macOS
+  builds still require smoke testing.
 - **Schemas drift silently.** The Open Targets query returned HTTP 400 for an extended period after
   the API renamed `knownDrugs`, and the caller swallowed it, so external druggability read zero
   throughout. An opt-in `pytest -m live` test now asserts the query still matches the schema; run it
   before trusting a druggability number.
 - **Permutation budget:** the empirical p cannot fall below `1/(n_permutations + 1)`. The default of
   1000 gives a floor of 1.0e-3; raise `n_permutations` if finer resolution is required.
-- **Permutation power:** because the null samples the whole protein-coding genome, a genuinely
-  enriched pathway usually clears it by a wide margin. The test confirms that an overlap is not
-  chance; it does not discriminate among strong hypotheses and should not be read as a ranking.
+- **Permutation power:** because the null samples the whole protein-coding genome, a strongly
+  enriched pathway usually clears it by a wide margin. The test provides evidence that an overlap
+  exceeds the uniform random gene-set expectation; it does not discriminate among strong hypotheses
+  and should not be read as a ranking.
 - **Cardiac name filtering is off by default:** `enforce_final_name_filter` requires a cardiac or
   disease term in the pathway name. It is disabled because it is circular for a discovery tool - on
   the reference panel it cut 66 hypotheses to 23 and removed all 6 Highly Novel pathways. Enabling it

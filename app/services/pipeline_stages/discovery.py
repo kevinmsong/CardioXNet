@@ -99,10 +99,10 @@ class DiscoveryStagesMixin:
         Run Stage 8: Multi-Evidence Validation, Novelty and Discovery Scoring.
 
         Combines statistical strength, replication, literature evidence, network
-        topology and literature novelty into a validation score, and computes the
-        Discovery Score = PPS x novelty, which surfaces pathways that are both
-        well supported by the enrichment evidence and under-reported in the
-        literature at the (pathway x seed genes x disease) intersection.
+        topology and novelty into a validation score, and computes the Discovery
+        Score = PPS x composite novelty. Composite novelty weights exact-query
+        literature novelty 2:1 over low seed-gene overlap, so the ranking
+        prioritizes supported, comparatively literature-sparse intersections.
 
         Hypotheses are re-ranked by Discovery Score and their ``rank`` fields are
         renumbered contiguously from 1.
@@ -121,6 +121,16 @@ class DiscoveryStagesMixin:
 
             hit_counts = getattr(literature_evidence, 'hypothesis_hit_counts', {}) or {}
             concept_counts = getattr(literature_evidence, 'concept_hit_counts', {}) or {}
+            query_tiers = getattr(literature_evidence, 'query_tier', {}) or {}
+            hypothesis_queries = (
+                getattr(literature_evidence, 'hypothesis_queries', {}) or {}
+            )
+            hypothesis_query_genes = (
+                getattr(literature_evidence, 'hypothesis_query_genes', {}) or {}
+            )
+            concept_queries = (
+                getattr(literature_evidence, 'concept_queries', {}) or {}
+            )
 
             # Literature mining runs on a capped window of hypotheses, but more
             # than that can survive to the report. Any pathway without a measured
@@ -128,8 +138,21 @@ class DiscoveryStagesMixin:
             # so measure the missing ones here. This is one cached esearch per
             # pathway -- far cheaper than the abstract retrieval mining does.
             self._backfill_corpus_counts(
-                scored_hypotheses, hit_counts, concept_counts, seed_genes
+                scored_hypotheses,
+                hit_counts,
+                concept_counts,
+                query_tiers,
+                hypothesis_queries,
+                hypothesis_query_genes,
+                concept_queries,
+                seed_genes,
             )
+            literature_evidence.hypothesis_hit_counts = hit_counts
+            literature_evidence.concept_hit_counts = concept_counts
+            literature_evidence.query_tier = query_tiers
+            literature_evidence.hypothesis_queries = hypothesis_queries
+            literature_evidence.hypothesis_query_genes = hypothesis_query_genes
+            literature_evidence.concept_queries = concept_queries
 
             # Literature footprint of the seed genes themselves in this disease.
             # Novelty is expressed relative to it: if the seeds have no presence
@@ -164,6 +187,7 @@ class DiscoveryStagesMixin:
                     pubmed_hit_count=hit_counts.get(pathway_id),
                     concept_hit_count=concept_counts.get(pathway_id),
                     seed_disease_corpus=seed_disease_corpus,
+                    query_tier=query_tiers.get(pathway_id),
                 )
 
                 validation_scores[pathway_id] = validation_score
@@ -182,9 +206,20 @@ class DiscoveryStagesMixin:
                     'novelty_tier', 'literature_saturation', 'discovery_score',
                     'pubmed_hit_count', 'saturation_basis', 'n_relevant_citations',
                     'novelty_confidence', 'concept_hit_count', 'seed_disease_corpus',
+                    'literature_novelty', 'gene_novelty', 'composite_novelty',
+                    'saturation_corpus_size', 'query_tier',
                 ):
                     if key in validation_score:
                         hypothesis.score_components[key] = validation_score[key]
+                hypothesis.score_components['literature_query'] = (
+                    hypothesis_queries.get(pathway_id)
+                )
+                hypothesis.score_components['literature_query_genes'] = list(
+                    hypothesis_query_genes.get(pathway_id, [])
+                )
+                hypothesis.score_components['literature_concept_query'] = (
+                    concept_queries.get(pathway_id)
+                )
                 hypothesis.score_components['validation_score'] =                     validation_score['total_validation_score']
 
             # Re-rank by Discovery Score and renumber contiguously. Ranks were

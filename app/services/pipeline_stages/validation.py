@@ -175,6 +175,16 @@ class ValidationStagesMixin:
                             hypothesis.score_components['approved_drug_count'] = drug_score.approved_drug_count
                             hypothesis.score_components['clinical_trial_count'] = drug_score.clinical_trial_count
                             hypothesis.score_components['druggability_tier'] = drug_score.druggability_tier
+                            hypothesis.score_components['druggability_source'] = drug_score.druggability_source
+                            hypothesis.score_components['external_target_count'] = drug_score.external_target_count
+                            hypothesis.score_components['external_approved_target_count'] = drug_score.external_approved_target_count
+                            hypothesis.score_components['external_clinical_target_count'] = drug_score.external_clinical_target_count
+                            hypothesis.score_components['cardiovascular_target_count'] = drug_score.cardiovascular_target_count
+                            hypothesis.score_components['external_lookup_attempted'] = drug_score.external_lookup_attempted
+                            hypothesis.score_components['external_lookup_failures'] = drug_score.external_lookup_failures
+                            hypothesis.score_components['external_lookup_complete'] = drug_score.external_lookup_complete
+                            hypothesis.score_components['external_lookup_error'] = drug_score.external_lookup_error
+                            hypothesis.score_components['target_evidence'] = drug_score.target_evidence
 
                             if drug_score.druggability_tier == 'high':
                                 high_druggability += 1
@@ -261,8 +271,7 @@ class ValidationStagesMixin:
         """PubMed records matching (seed genes AND disease context).
 
         One query per run. Returns None if the lookup fails, in which case
-        novelty is scored without the grounding check rather than being
-        wrongly suppressed.
+        novelty is marked unverified and scored with the conservative proxy.
         """
         try:
             miner = self.literature_miner
@@ -271,9 +280,18 @@ class ValidationStagesMixin:
                 self.disease_context, self.disease_synonyms
             )
             query = f"({gene_clause}) AND ({disease_clause})"
+            self.results['seed_disease_query'] = query
+            self.results.setdefault('run_metadata', {})['literature_grounding'] = {
+                'query': query,
+                'query_genes': [gene.symbol for gene in seed_genes],
+                'disease_context': self.disease_context,
+                'count': None,
+            }
             count = miner.pubmed_client.count_hits(query)
             if count < 0:
-                logger.warning("Seed-disease corpus lookup failed; novelty ungated")
+                logger.warning(
+                    "Seed-disease corpus lookup failed; novelty will be unverified"
+                )
                 return None
             logger.info(
                 f"Seed-disease literature corpus: {count} records "
@@ -281,6 +299,7 @@ class ValidationStagesMixin:
                 f"{self.hypothesis_validator.MIN_SEED_DISEASE_CORPUS})"
             )
             self.results['seed_disease_corpus'] = count
+            self.results['run_metadata']['literature_grounding']['count'] = count
             return count
         except Exception as e:
             logger.warning(f"Seed-disease corpus lookup failed: {str(e)}")
@@ -291,6 +310,10 @@ class ValidationStagesMixin:
         scored_hypotheses: ScoredHypotheses,
         hit_counts: Dict[str, int],
         concept_counts: Dict[str, int],
+        query_tiers: Dict[str, str],
+        hypothesis_queries: Dict[str, str],
+        hypothesis_query_genes: Dict[str, List[str]],
+        concept_queries: Dict[str, str],
         seed_genes: List[GeneInfo],
     ) -> None:
         """Measure the PubMed corpus for reported pathways literature mining skipped."""
@@ -298,7 +321,10 @@ class ValidationStagesMixin:
         # count lookup was attempted and failed. Both need measuring.
         missing = [
             h for h in scored_hypotheses.hypotheses
-            if (hit_counts.get(h.aggregated_pathway.pathway.pathway_id) or -1) < 0
+            if (
+                hit_counts.get(h.aggregated_pathway.pathway.pathway_id) is None
+                or hit_counts[h.aggregated_pathway.pathway.pathway_id] < 0
+            )
         ]
         if not missing:
             return
@@ -308,8 +334,14 @@ class ValidationStagesMixin:
         n_ok = 0
         for hypothesis in missing:
             pathway = hypothesis.aggregated_pathway.pathway
-            traced = getattr(hypothesis, 'traced_seed_genes', None) or []
-            contributing = [g for g in seed_genes if g.symbol in traced] or seed_genes
+            contributor_symbols = (
+                getattr(hypothesis.aggregated_pathway, 'contributing_seed_genes', None)
+                or getattr(hypothesis, 'traced_seed_genes', None)
+                or []
+            )
+            contributing = [
+                g for g in seed_genes if g.symbol in contributor_symbols
+            ] or seed_genes
             try:
                 query = miner._construct_hypothesis_query(
                     pathway.pathway_name, contributing,
@@ -319,12 +351,24 @@ class ValidationStagesMixin:
                 if count < 0:
                     continue
                 hit_counts[pathway.pathway_id] = count
+                hypothesis_queries[pathway.pathway_id] = query
+                hypothesis_query_genes[pathway.pathway_id] = [
+                    gene.symbol for gene in contributing
+                ]
+                concept_clause = miner._pathway_clause(pathway.pathway_name)
+                concept_queries[pathway.pathway_id] = (
+                    f"({concept_clause})" if concept_clause else ""
+                )
+                query_tiers[pathway.pathway_id] = (
+                    "strict" if query.count(" AND ") >= 2 else "broad"
+                )
                 n_ok += 1
                 if count == 0:
-                    concept_clause = miner._pathway_clause(pathway.pathway_name)
                     concept = (
-                        miner.pubmed_client.count_hits(f"({concept_clause})")
-                        if concept_clause else 0
+                        miner.pubmed_client.count_hits(
+                            concept_queries[pathway.pathway_id]
+                        )
+                        if concept_queries[pathway.pathway_id] else 0
                     )
                     if concept >= 0:
                         concept_counts[pathway.pathway_id] = concept

@@ -105,7 +105,11 @@ async def run_analysis(
         
         logger.info("[DEBUG] Preparing config overrides")
         # Merge disease_context into config_overrides if provided
-        config_overrides = request.config_overrides or {}
+        config_overrides = (
+            request.config_overrides.model_dump(exclude_none=True)
+            if request.config_overrides is not None
+            else {}
+        )
         if request.disease_context:
             config_overrides['disease_context'] = request.disease_context
         
@@ -488,6 +492,7 @@ async def get_analysis_results(analysis_id: str):
         topology=topology,
         network_topology=network_topology,
         top_genes=top_genes,
+        run_metadata=results.get("run_metadata"),
         report_urls=sanitized_report_urls or None
     )
 

@@ -4,11 +4,13 @@ import contextlib
 import logging
 import asyncio
 import json
+import subprocess
 import time
 from pathlib import Path
 from typing import List, Dict, Any, Optional, Callable
-from datetime import datetime
+from datetime import datetime, timezone
 
+from app import __version__
 from app.models import (
     GeneInfo,
     ValidationResult,
@@ -48,6 +50,43 @@ from app.services.pipeline_stages import (
 logger = logging.getLogger(__name__)
 
 
+def _software_provenance() -> Dict[str, Optional[str]]:
+    """Return stable software identifiers without making startup fail.
+
+    Source archives may not include ``.git``. In that case an explicit null is
+    retained rather than inventing a revision.
+    """
+    repository_root = Path(__file__).resolve().parents[2]
+    revision: Optional[str] = None
+    try:
+        completed = subprocess.run(
+            [
+                "git",
+                "-c",
+                f"safe.directory={repository_root.as_posix()}",
+                "rev-parse",
+                "HEAD",
+            ],
+            cwd=repository_root,
+            capture_output=True,
+            text=True,
+            timeout=2,
+            check=False,
+        )
+        if completed.returncode == 0:
+            candidate = completed.stdout.strip()
+            if candidate:
+                revision = candidate
+    except (OSError, subprocess.SubprocessError):
+        pass
+
+    return {
+        "name": "CardioXNet",
+        "version": __version__,
+        "git_revision": revision,
+    }
+
+
 
 
 class Pipeline(EnrichmentStagesMixin, ValidationStagesMixin, DiscoveryStagesMixin):
@@ -70,24 +109,36 @@ class Pipeline(EnrichmentStagesMixin, ValidationStagesMixin, DiscoveryStagesMixi
         self.disease_context = None
         self.disease_synonyms = []
 
-        # Apply config overrides if provided
+        # Apply config overrides as one validated model update. Direct setattr
+        # bypasses Pydantic's bounds, which previously allowed an out-of-range
+        # timeout or retry count to enter a run even though NETSConfig declared
+        # validation constraints.
         if config_overrides:
             logger.info(f"Applying {len(config_overrides)} configuration overrides: {config_overrides}")
+            nets_overrides = {}
             for key, value in config_overrides.items():
-                if hasattr(self.settings.nets, key):
-                    old_value = getattr(self.settings.nets, key)
-                    setattr(self.settings.nets, key, value)
-                    logger.info(f"Override: {key} = {old_value} -> {value}")
+                if key in type(self.settings.nets).model_fields:
+                    nets_overrides[key] = value
                 elif key == 'disease_context':
-                    # Store disease context for semantic filtering
                     self.disease_context = value
                     logger.info(f"Disease context set: {value}")
                 elif key == 'disease_synonyms':
-                    # Store disease synonyms for literature search
                     self.disease_synonyms = value or []
                     logger.info(f"Disease synonyms set: {value}")
                 else:
                     logger.warning(f"Unknown configuration parameter: {key}")
+
+            if nets_overrides:
+                previous = self.settings.nets.model_dump()
+                merged = {**previous, **nets_overrides}
+                self.settings.nets = type(self.settings.nets).model_validate(merged)
+                for key in nets_overrides:
+                    logger.info(
+                        "Override: %s = %r -> %r",
+                        key,
+                        previous[key],
+                        getattr(self.settings.nets, key),
+                    )
         
         self.analysis_id = analysis_id or self._generate_analysis_id()
         
@@ -133,17 +184,69 @@ class Pipeline(EnrichmentStagesMixin, ValidationStagesMixin, DiscoveryStagesMixi
         logger.info(f"CardioXNetPipeline initialized (ID: {self.analysis_id})")
 
     def _sync_settings_to_services(self) -> None:
-        """Push pipeline-level settings overrides into sub-services."""
+        """Push per-run settings into every service and derived client field.
+
+        Services are constructed from the cached global settings, while a
+        pipeline deliberately holds a deep-copied settings object so one run's
+        preset cannot affect another. Merely changing ``self.settings`` left
+        several advertised preset values, including STRING breadth, secondary
+        expansion depth, FDR, and permutation count, at global defaults. Keep
+        all service instances on the per-run copy and refresh fields captured
+        during their constructors.
+        """
         nets = self.settings.nets
 
-        # Literature miner and its PubMed client
-        self.literature_miner.settings = self.settings
-        if hasattr(self.literature_miner, 'pubmed_client'):
-            self.literature_miner.pubmed_client.max_results = nets.pubmed_max_results
+        # Walk the pipeline services plus their direct clients. Most consumers
+        # read settings lazily, so assigning the same per-run object is enough.
+        objects = []
+        seen = set()
+        frontier = [
+            value for value in vars(self).values()
+            if hasattr(value, "__dict__") and hasattr(value, "settings")
+        ]
+        for _depth in range(3):
+            next_frontier = []
+            for obj in frontier:
+                if id(obj) in seen:
+                    continue
+                seen.add(id(obj))
+                objects.append(obj)
+                obj.settings = self.settings
+                next_frontier.extend(
+                    value for value in vars(obj).values()
+                    if hasattr(value, "__dict__") and hasattr(value, "settings")
+                )
+            frontier = next_frontier
 
-        # Seed gene tracer PubMed client
-        if hasattr(self.seed_gene_tracer, 'pubmed_client'):
-            self.seed_gene_tracer.pubmed_client.max_results = nets.pubmed_max_results
+        # A few clients cache configuration-derived scalars at construction.
+        # Refresh those fields explicitly after assigning the per-run settings.
+        from app.services.gprofiler_client import (
+            GProfilerClient,
+            _normalize_gprofiler_base_url,
+        )
+        from app.services.pubmed_client import PubMedClient
+        from app.services.string_client import STRINGClient
+        from app.services.reactome_client import ReactomeClient
+
+        for obj in objects:
+            if isinstance(obj, GProfilerClient):
+                obj.timeout_seconds = nets.gprofiler_timeout_seconds
+                obj.base_url = _normalize_gprofiler_base_url(
+                    nets.gprofiler_api_url
+                )
+            elif isinstance(obj, PubMedClient):
+                obj.max_results = nets.pubmed_max_results
+            elif isinstance(obj, STRINGClient):
+                version_slug = nets.string_version.replace(".", "-")
+                obj.base_url = f"https://version-{version_slug}.string-db.org/api"
+            elif isinstance(obj, ReactomeClient):
+                obj.base_url = nets.reactome_api_url.rstrip("/")
+
+        # SeedGeneTracer intentionally has no settings attribute of its own, so
+        # its PubMed client is not reached by the generic settings walk above.
+        self.seed_gene_tracer.pubmed_client.settings = self.settings
+        self.seed_gene_tracer.pubmed_client.max_results = nets.pubmed_max_results
+        self.permutation_tester.n_permutations = nets.n_permutations
 
     @contextlib.asynccontextmanager
     async def _timed(self, label: str):
@@ -191,6 +294,63 @@ class Pipeline(EnrichmentStagesMixin, ValidationStagesMixin, DiscoveryStagesMixi
         pipeline_start_time = time.time()
         self._pipeline_started = pipeline_start_time
         stage_start_time = pipeline_start_time
+        self.results["run_metadata"] = {
+            "analysis_id": self.analysis_id,
+            "started_at_utc": datetime.now(timezone.utc).isoformat(),
+            "software": _software_provenance(),
+            "resource_identifiers": {
+                "string": {
+                    "configured_release": self.settings.nets.string_version,
+                    "endpoint": self.settings.nets.string_api_url,
+                    "configured_endpoint": self.settings.nets.string_api_url,
+                    "effective_endpoint": self.fn_builder.string_client.base_url,
+                },
+                "gprofiler": {
+                    "configured_identifier": self.settings.nets.gprofiler_version,
+                    "endpoint": self.settings.nets.gprofiler_api_url,
+                    "configured_endpoint": self.settings.nets.gprofiler_api_url,
+                    "effective_endpoint": (
+                        self.primary_analyzer.gprofiler_client.base_url
+                    ),
+                    "verified_from_response": False,
+                },
+                "reactome": {
+                    "configured_identifier": self.settings.nets.reactome_version,
+                    "endpoint": self.settings.nets.reactome_api_url,
+                    "configured_endpoint": self.settings.nets.reactome_api_url,
+                    "effective_endpoint": (
+                        self.primary_analyzer.reactome_client.base_url
+                    ),
+                    "effective_analysis_endpoint": (
+                        self.primary_analyzer.reactome_client.analysis_base_url
+                    ),
+                    "verified_from_response": False,
+                },
+                "gtex": {"configured_release": "v8"},
+                "pubmed": {
+                    "service": "NCBI E-utilities",
+                    "retrieval": "live",
+                    "corpus_release": None,
+                    "corpus_pinned": False,
+                },
+                "druggability": {
+                    "embedded_snapshot": dict(
+                        DruggabilityAnalyzer.EMBEDDED_RESOURCE_VERSIONS
+                    ),
+                    "open_targets": {
+                        "endpoint": DruggabilityAnalyzer.OPEN_TARGETS_GRAPHQL_URL,
+                        "api_family": DruggabilityAnalyzer.OPEN_TARGETS_API_FAMILY,
+                        "retrieval": "live when enabled",
+                    },
+                },
+                "permutation_background": BACKGROUND_SOURCE,
+                "permutation_background_retrieved": BACKGROUND_RETRIEVED,
+            },
+            "configured_gprofiler_timeout_seconds": (
+                self.settings.nets.gprofiler_timeout_seconds
+            ),
+            "configured_max_retries": self.settings.nets.max_retries,
+        }
         
         logger.info(
             f"Starting NETS pipeline analysis (ID: {self.analysis_id}) "
@@ -234,15 +394,15 @@ class Pipeline(EnrichmentStagesMixin, ValidationStagesMixin, DiscoveryStagesMixi
             logger.info(f"[TIMING] Stage 2c completed in {elapsed:.2f}s (Total: {time.time() - pipeline_start_time:.2f}s)")
             await self._update_progress("pathway_aggregation", 60, f"Pathway aggregation complete: {final_result.total_count} pathways")
             
-            # Stage 5a: Final NES Scoring
-            await self._update_progress("nes_scoring", 65, "Calculating NES scores")
+            # Stage 5a: Base Pathway Prioritization Score
+            await self._update_progress("nes_scoring", 65, "Calculating pathway prioritization scores")
             stage_start_time = time.time()
             logger.info(f"[PIPELINE] Calling Stage 5a with {final_result.total_count} pathways")
             scored_hypotheses = await self._run_stage_5_scoring(final_result, fn_result=fn_result)
             elapsed = time.time() - stage_start_time
             logger.info(f"Stage 5a complete: {scored_hypotheses.total_count} scored hypotheses")
             logger.info(f"[TIMING] Stage 5a completed in {elapsed:.2f}s (Total: {time.time() - pipeline_start_time:.2f}s)")
-            await self._update_progress("nes_scoring", 70, f"NES scoring complete: {scored_hypotheses.total_count} hypotheses")
+            await self._update_progress("nes_scoring", 70, f"PPS scoring complete: {scored_hypotheses.total_count} hypotheses")
             
             # Stage 4a: Semantic Filtering (Cardiac Relevance Boost)
             await self._update_progress("semantic_filtering", 72, "Applying semantic cardiac relevance filtering")
@@ -438,6 +598,21 @@ class Pipeline(EnrichmentStagesMixin, ValidationStagesMixin, DiscoveryStagesMixi
                 logger.exception(f"Stage 8 discovery scoring failed but continuing: {str(e)}")
                 self.warnings.append(f"Stage 8 discovery scoring failed: {str(e)}")
 
+            # Freeze analytical completion metadata before serializing reports
+            # so the downloadable JSON contains a meaningful end timestamp and
+            # elapsed duration. Final pipeline completion, including report
+            # serialization and result persistence, is recorded separately.
+            analytical_completion = datetime.now(timezone.utc).isoformat()
+            analytical_elapsed = round(time.time() - pipeline_start_time, 3)
+            self.results["run_metadata"].update({
+                "analysis_completed_at_utc": analytical_completion,
+                "analysis_elapsed_seconds": analytical_elapsed,
+                # Reports are serialized next, so these stable aliases ensure
+                # their metadata contains a complete analytical interval.
+                "completed_at_utc": analytical_completion,
+                "elapsed_seconds": analytical_elapsed,
+            })
+
             # Generate Reports
             await self._update_progress("report_generation", 97, "Generating reports")
             stage_start_time = time.time()
@@ -462,28 +637,44 @@ class Pipeline(EnrichmentStagesMixin, ValidationStagesMixin, DiscoveryStagesMixi
                 )
                 elapsed = time.time() - stage_start_time
                 logger.info(f"[PIPELINE DEBUG] Generated report files: {list(report_files.keys()) if report_files else 'None'}")
-                logger.info("  [TIMING] Report generation completed in {elapsed:.2f}s (Total: {time.time() - pipeline_start_time:.2f}s)")
+                logger.info(
+                    f"[TIMING] Report generation completed in {elapsed:.2f}s "
+                    f"(Total: {time.time() - pipeline_start_time:.2f}s)"
+                )
             except Exception as e:
                 elapsed = time.time() - stage_start_time
                 logger.info(f"[PIPELINE DEBUG] Report generation failed: {str(e)}")
                 logger.error(f"Report generation failed: {str(e)}")
-                logger.info("  [TIMING] Report generation failed after {elapsed:.2f}s (Total: {time.time() - pipeline_start_time:.2f}s)")
+                logger.info(
+                    f"[TIMING] Report generation failed after {elapsed:.2f}s "
+                    f"(Total: {time.time() - pipeline_start_time:.2f}s)"
+                )
                 self.warnings.append(f"Report generation failed: {str(e)}")
                 report_files = {}
             
             # Save final results
             await self._update_progress("complete", 100, "Analysis complete")
             stage_start_time = time.time()
+            self.results["run_metadata"].update({
+                "report_finalized_at_utc": datetime.now(timezone.utc).isoformat(),
+                "total_elapsed_seconds": round(time.time() - pipeline_start_time, 3),
+            })
             
             try:
                 await self._save_results()
                 elapsed = time.time() - stage_start_time
-                logger.info("  [TIMING] Save results completed in {elapsed:.2f}s (Total: {time.time() - pipeline_start_time:.2f}s)")
+                logger.info(
+                    f"[TIMING] Save results completed in {elapsed:.2f}s "
+                    f"(Total: {time.time() - pipeline_start_time:.2f}s)"
+                )
             except Exception as e:
                 elapsed = time.time() - stage_start_time
                 logger.info(f"[PIPELINE DEBUG] Error saving results: {str(e)}")
                 logger.error(f"Error saving results: {str(e)}")
-                logger.info("  [TIMING] Save results failed after {elapsed:.2f}s (Total: {time.time() - pipeline_start_time:.2f}s)")
+                logger.info(
+                    f"[TIMING] Save results failed after {elapsed:.2f}s "
+                    f"(Total: {time.time() - pipeline_start_time:.2f}s)"
+                )
             
             # Final timing summary
             total_elapsed = time.time() - pipeline_start_time
@@ -519,7 +710,8 @@ class Pipeline(EnrichmentStagesMixin, ValidationStagesMixin, DiscoveryStagesMixi
             report_files = self.report_generator.generate_report(
                 self.analysis_id,
                 *args,
-                output_formats=self.settings.nets.output_formats
+                output_formats=self.settings.nets.output_formats,
+                run_metadata=self.results.get("run_metadata"),
             )
             
             return report_files

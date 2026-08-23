@@ -1,5 +1,6 @@
-# CardioXNet Configuration Example
-# Copy this file to config.yaml and customize as needed
+# CardioXNet configuration schema reference.
+# Runtime settings come from NETS_ environment variables or request-level
+# config_overrides; this YAML file is not loaded automatically.
 
 # Application Settings
 app_name: "CardioXNet"
@@ -26,7 +27,7 @@ config_dir: "config"
 # NETS Pipeline Configuration
 nets:
   # API Versions - Update if newer versions are available
-  string_version: "11.5"
+  string_version: "12.0"
   gprofiler_version: "e104_eg51_p15"
   reactome_version: "79"
   
@@ -43,13 +44,14 @@ nets:
   
   # API Endpoints - Typically don't need to change these
   string_api_url: "https://string-db.org/api"
-  gprofiler_api_url: "https://biit.cs.ut.ee/gprofiler/api"
+  gprofiler_api_url: "https://biit.cs.ut.ee/gprofiler"
   reactome_api_url: "https://reactome.org/ContentService"
   
   # Retry Configuration
   max_retries: 3
   retry_backoff_factor: 2.0
   request_timeout: 30
+  gprofiler_timeout_seconds: 120  # Hard deadline per isolated g:Profiler attempt
   
   # Aggregation Configuration
   aggregation_strategy: "intersection"  # Options: intersection, frequency, weighted

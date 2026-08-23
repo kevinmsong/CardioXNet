@@ -1,15 +1,16 @@
 # Configuration Guide
 
-CardioXNet now exposes a small preset-based configuration in the frontend, but the backend still supports direct overrides through `config/config.yaml`, environment variables, and `config_overrides` in the analysis request.
+CardioXNet exposes a small preset-based configuration in the frontend. The backend supports environment variables and per-analysis `config_overrides`. The YAML files under `config/` document the configuration schema but are not loaded automatically.
 
 ## Configuration Order
 
 Settings are applied in this order:
 
 1. Backend defaults from code
-2. `config/config.yaml`
-3. Environment variables
-4. Per-request `config_overrides`
+2. Environment variables, including values in `.env`
+3. Per-request `config_overrides`
+
+To turn a value from `config/config.example.yaml` into a runtime setting, use its `NETS_` environment-variable form or pass it in `config_overrides`.
 
 ## Frontend Presets
 
@@ -40,7 +41,7 @@ These are the settings that most directly shape the funnel:
 | `string_neighbor_count` | Controls how broadly the seed neighborhood expands |
 | `primary_pathways_to_expand` | Controls how many leading primary pathways seed the secondary discovery stage |
 | `fdr_threshold` | Sets statistical strictness during enrichment filtering |
-| `min_support_threshold` | Requires replication across pathway branches before promotion |
+| `min_support_threshold` | Requires recurrence across pathway branches before promotion |
 | `semantic_relevance_threshold` | Controls how much cardiac semantic evidence is needed |
 | `semantic_max_results` | Caps the final returned pathway set |
 | `semantic_max_hypotheses_for_literature` | Limits how many final pathways receive PubMed screening |
@@ -48,6 +49,7 @@ These are the settings that most directly shape the funnel:
 | `permutation_test_enabled` | Enables or disables empirical validation |
 | `n_permutations` | Sets the depth of permutation-based testing |
 | `seed_overlap_threshold` | Controls how close final candidates can remain to the original seed list |
+| `gprofiler_timeout_seconds` | Sets the hard wall-clock deadline for each process-isolated g:Profiler attempt |
 
 ## Example `config_overrides`
 

@@ -12,15 +12,13 @@ logger = logging.getLogger(__name__)
 
 
 class SemanticFilter:
-    """Filters and scores pathways based on semantic cardiac relevance with expanded criteria.
-    
-    Scientific Rigor Enhancements:
-    - Multi-category semantic scoring (700+ curated cardiovascular terms)
-    - Disease context weighting provides up to +30% boost for disease-specific pathways
-    - 75% priority to cardiovascular disease category ensures clinical relevance
-    - Negative penalty system (-50% max) filters non-cardiac pathways
-    - Fuzzy pattern matching captures complex terminology variations
-    - Progressive thresholding balances sensitivity and specificity for novel discovery
+    """Apply a deterministic, heuristic cardiovascular relevance screen.
+
+    The score is lexical rather than a validated biological classifier. It uses
+    pathway terminology, optional disease-context terms, explicit noncardiac
+    penalties, and pattern matching. Progressive retention preserves the
+    highest-scoring pathways even when their labels lack cardiovascular words,
+    which limits circular name-based exclusion during discovery.
     """
     
     def __init__(self):
@@ -745,21 +743,16 @@ class SemanticFilter:
         disease_context: Optional[str] = None,
         disease_synonyms: Optional[List[str]] = None
     ) -> Dict[str, float]:
-        """
-        Calculate comprehensive cardiac relevance score with CARDIOVASCULAR DISEASE-FOCUSED scoring.
-        
-        New scoring system prioritizing cardiovascular disease and phenotype awareness:
-        - Cardiovascular disease context: 60% (MAXIMUM priority for disease-specific pathways)
-        - Pathway name cardiac context: 20% (BONUS for pathways with cardiac terms in names)
-        - Cardiac processes: 25% (cardiac-specific processes)
-        - Direct cardiac terms: 15% (general cardiac context)
-        - Negative penalty: -50% (for non-cardiac terms)
-        - Fuzzy pattern boost: +10% (distributed across categories)
-        
-        Total range: -50% to 130% (normalized to 0-1 scale)
-        
-        Pathways with cardiac-related terms in their names receive a scoring bonus,
-        but all pathways with sufficient cardiac semantic relevance can be included.
+        """Calculate a bounded lexical cardiovascular relevance score.
+
+        Positive evidence is accumulated in four capped categories: disease
+        terminology (0.40), cardiac processes (0.15), direct cardiac terms
+        (0.10), and cardiac terminology in the pathway name (0.15). Fuzzy
+        matches and optional disease-context matches are distributed into those
+        same categories. Unqualified noncardiac terms can contribute a penalty
+        as low as -0.50. The nonnegative total is scaled and transformed to a
+        value in [0, 1]. This is a transparent prioritization heuristic, not a
+        trained or externally validated classifier.
         
         Args:
             pathway_name: Pathway name
@@ -853,15 +846,11 @@ class SemanticFilter:
                 scores["cardiac_processes"] = min(scores["cardiac_processes"] + (disease_boost * 0.08), 0.15)
                 scores["direct_cardiac"] = min(scores["direct_cardiac"] + (disease_boost * 0.04), 0.10)
         
-        # Calculate total score (STRICTER NORMALIZATION)
-        # New range: -50% to +85% (40+15+10+15+5 = 85% max positive)
+        # Calculate a bounded heuristic score. Positive category caps sum to
+        # 0.80; the 0.85 scaling constant leaves headroom before clamping.
         total_raw = sum(scores.values())  # Can be negative due to penalties
-        
-        # STRICTER NORMALIZATION: Require more matches for high scores
-        # Normalize from -0.5 to +0.85 range to 0-1 scale
-        # First shift to positive: add 0.5 to make range 0 to 1.35
-        # Then normalize: divide by 1.35 to get 0-1 range
-        # ADDITIONAL: Apply power function to penalize low scores more (x^1.2)
+
+        # Apply a power transform so small lexical matches remain small.
         # Normalise over the POSITIVE range only, after clamping the penalty at
         # zero. A previous revision shifted the raw total by +0.5 before
         # dividing by 1.35, to accommodate the negative penalty. That shift gave
@@ -874,11 +863,7 @@ class SemanticFilter:
         # Malaria, Leishmaniasis and Melanoma at the same relevance as
         # Inflammasomes, leaving pathway-name matching as the only real gate.
         total_normalized = min(max(0.0, total_raw) / 0.85, 1.0)
-        # Apply power function to make scoring stricter (requires more terms for high scores)
         total_normalized = total_normalized ** 1.2
-        
-        # NO baseline for pathways with no matches - force them to score low
-        # This ensures only truly cardiac-relevant pathways get high scores
         
         result = {
             "overall": total_normalized,
@@ -930,8 +915,11 @@ class SemanticFilter:
             logger.warning("Empty hypotheses list provided to semantic filter")
             return hypotheses
         
+        nets_settings = getattr(self.settings, "nets", self.settings)
         if min_threshold is None:
-            min_threshold = getattr(self.settings, 'semantic_relevance_threshold', 0.1)
+            min_threshold = getattr(
+                nets_settings, "semantic_relevance_threshold", 0.1
+            )
         
         # Get max_workers from performance configuration
         if max_workers is None:
@@ -995,6 +983,7 @@ class SemanticFilter:
             
             hypothesis.score_components['cardiac_relevance'] = overall_relevance
             hypothesis.score_components['semantic_boost'] = boost_factor
+            hypothesis.score_components['base_pps'] = original_nes
             hypothesis.score_components['relevance_breakdown'] = relevance_breakdown
             
             logger.debug(
@@ -1070,14 +1059,15 @@ class SemanticFilter:
            - Next 70 pathways: cardiac_relevance >= 0.30 (moderate threshold)
            - Remaining 50: cardiac_relevance >= 0.50 (strict threshold)
         4. Pathway name filtering: Ranks 31+ require cardiac term in name OR cardiac_relevance >= 0.50
-        5. Final limit: 150 pathways total
+        5. Final limit: ``semantic_max_results`` pathways (100 by default)
         
         Rationale: Prioritizes cardiac-specific pathways while allowing some novel discoveries.
         Stricter thresholds ensure cardiovascular disease context relevance.
         
         Args:
             hypotheses: List of scored hypotheses
-            max_results: Maximum number of results to return (default 150)
+            max_results: Maximum number of results to return. When omitted,
+                use ``settings.nets.semantic_max_results``.
             disease_context: Optional disease context for targeted filtering
             disease_synonyms: Optional list of disease synonyms for enhanced matching
             
@@ -1087,7 +1077,9 @@ class SemanticFilter:
         if not hypotheses:
             return []
         
-        max_results = max_results or 150
+        if max_results is None:
+            nets_settings = getattr(self.settings, "nets", self.settings)
+            max_results = getattr(nets_settings, "semantic_max_results", 150)
         
         # Get disease synonyms from cardiac context if disease_context provided but no synonyms
         if disease_context and not disease_synonyms:
@@ -1100,7 +1092,7 @@ class SemanticFilter:
                 )
                 logger.info(f"Using {len(disease_synonyms)} cardiac disease synonyms for context '{disease_context}'")
         
-        # Sort by NES first (higher NES = more statistically significant)
+        # Sort by the semantically adjusted PPS before progressive retention.
         hypotheses_sorted = sorted(hypotheses, key=lambda h: h.nes_score, reverse=True)
         
         logger.info(f"Applying adaptive tiered semantic filtering on {len(hypotheses_sorted)} pathways")
@@ -1141,7 +1133,7 @@ class SemanticFilter:
                 # Tier 1: Top 30 by NES - Always include (very high-NES novel discovery tier)
                 filtered_hypotheses.append(hypothesis)
                 if i < 3:
-                    logger.debug(f"  Tier 1 (Top 30 NES): {pathway_name} | NES={hypothesis.nes_score:.2f} | Cardiac={cardiac_relevance:.3f}")
+                    logger.debug(f"  Tier 1 (Top 30 PPS): {pathway_name} | PPS={hypothesis.nes_score:.2f} | Cardiac={cardiac_relevance:.3f}")
             elif i < 100 and (cardiac_relevance >= 0.30 or has_cardiac_term_in_name):
                 # Tier 2: Next 70 - Moderate threshold (0.30) OR has cardiac term in name
                 filtered_hypotheses.append(hypothesis)

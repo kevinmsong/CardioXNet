@@ -275,8 +275,10 @@ class RigorousPathwayAggregator:
         chi_squared = -2 * sum(math.log(p) for p in p_values)
         df = 2 * len(p_values)
         
-        # Calculate combined p-value from chi-squared distribution
-        combined_p = 1 - stats.chi2.cdf(chi_squared, df)
+        # Use the survival function directly. Subtracting the CDF from one
+        # catastrophically cancels to a false zero in the extreme tail even
+        # when the combined probability is representable in double precision.
+        combined_p = float(stats.chi2.sf(chi_squared, df))
         
         return combined_p
     

@@ -68,6 +68,10 @@ def test_calculate_druggability_score_includes_live_target_evidence(monkeypatch)
     assert score.approved_drug_count >= 1
     assert score.target_evidence[0]["gene_symbol"] == "SRC"
     assert score.target_evidence[0]["top_drugs"][0]["name"] == "Drug A"
+    assert score.external_lookup_attempted == 2
+    assert score.external_lookup_failures == 0
+    assert score.external_lookup_complete is True
+    assert score.external_lookup_error is None
 
 
 def test_calculate_druggability_score_falls_back_when_live_lookup_fails(monkeypatch):
@@ -90,6 +94,10 @@ def test_calculate_druggability_score_falls_back_when_live_lookup_fails(monkeypa
     assert score.druggability_source != "curated"
     assert "unavailable" in score.druggability_source
     assert analyzer.last_lookup_failures == 1
+    assert score.external_lookup_attempted == 1
+    assert score.external_lookup_failures == 1
+    assert score.external_lookup_complete is False
+    assert "boom" in score.external_lookup_error
 
 
 def test_query_does_not_use_fields_open_targets_removed():

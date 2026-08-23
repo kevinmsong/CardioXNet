@@ -29,6 +29,7 @@ from .results import (
 from .api import (
     GeneValidationRequest,
     GeneValidationResponse,
+    AnalysisConfigOverrides,
     AnalysisRequest,
     AnalysisResponse,
     AnalysisStatusResponse,
@@ -73,6 +74,7 @@ __all__ = [
     # API models
     "GeneValidationRequest",
     "GeneValidationResponse",
+    "AnalysisConfigOverrides",
     "AnalysisRequest",
     "AnalysisResponse",
     "AnalysisStatusResponse",

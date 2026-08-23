@@ -13,7 +13,15 @@ import threading
 import time
 import socket
 import signal
+import multiprocessing
 from pathlib import Path
+
+# PyInstaller multiprocessing children re-execute this module. Dispatch them
+# before redirecting streams, changing directory, or opening the application log;
+# otherwise every g:Profiler worker can repeat launcher side effects and truncate
+# CardioXNet.log. This is a no-op for a normal, non-frozen launch.
+if __name__ == "__main__":
+    multiprocessing.freeze_support()
 
 # PyInstaller windowed mode: sys.stdout/stderr are fake closed objects.
 # Real writes raise "I/O operation on closed file". In frozen mode redirect to

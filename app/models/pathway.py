@@ -150,9 +150,10 @@ class ScoredPathway(BaseModel):
     nes_score: float = Field(
         ...,
         description=(
-            "Pathway Prioritization Score. Field name retained for backwards "
-            "compatibility with persisted reports; this is NOT a GSEA normalized "
-            "enrichment score."
+            "Final Pathway Prioritization Score, including the bounded semantic "
+            "cardiovascular-relevance multiplier when that stage has run. Field "
+            "name retained for backwards compatibility with persisted reports; "
+            "this is NOT a GSEA normalized enrichment score."
         ),
     )
     rank: int = Field(..., description="Rank by Discovery Score after Stage 8, else by PPS")

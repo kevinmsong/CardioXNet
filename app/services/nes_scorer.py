@@ -3,8 +3,14 @@
 The score is stored on ``ScoredPathway.nes_score`` for backwards compatibility
 with the persisted reports and the JSON API, but it is *not* a GSEA normalized
 enrichment score and must not be described as one: there is no running-sum
-statistic and no permutation-derived normalisation behind it. It is a weighted
-composite of significance, effect size, gene-set specificity and replication.
+statistic and no permutation-derived normalization behind it. This stage
+computes the base PPS from significance, effect size, gene-set specificity,
+replication, and database weight. Network topology is deliberately excluded:
+the functional-neighborhood genes are also the genes submitted for enrichment,
+so rewarding one-hop overlap would reuse the evidence that generated each
+candidate. The downstream semantic stage applies the bounded
+cardiovascular-relevance multiplier and preserves the base score in
+``score_components``.
 """
 
 import logging
@@ -24,12 +30,12 @@ logger = logging.getLogger(__name__)
 
 
 class NESScorer:
-    """Computes the Pathway Prioritization Score for each aggregated pathway.
+    """Compute the base Pathway Prioritization Score for each pathway.
 
     The score balances four normalised, independently interpretable terms:
     statistical significance, effect size (fold enrichment), gene-set
-    specificity, and cross-source replication. Weighting them -- rather than
-    multiplying significance by raw gene count, as an earlier revision did --
+    specificity, and cross-source replication. Weighting them, rather than
+    multiplying significance by raw gene count, as an earlier revision did,
     is what stops maximally generic gene sets from dominating the ranking.
     """
     
@@ -41,13 +47,13 @@ class NESScorer:
     def score(
         self,
         final_result: FinalPathwayResult,
-        fn_result = None,
-        topology_result = None
+        fn_result=None,
+        topology_result=None,
     ) -> ScoredHypotheses:
         """
         Score and rank aggregated pathways.
 
-        PPS = db_weight * centrality_weight * (
+        PPS = db_weight * (
                  0.30 * significance + 0.30 * effect_size
                + 0.25 * specificity  + 0.15 * replication )
 
@@ -56,9 +62,8 @@ class NESScorer:
 
         Args:
             final_result: Final pathway result from Stage 2c
-            fn_result: Optional functional neighborhood, for seed-proximity weighting
-            topology_result: Optional topology result, for PageRank weighting
-
+            fn_result: Deprecated compatibility argument. It is not used in PPS.
+            topology_result: Deprecated compatibility argument. It is not used in PPS.
         Returns:
             ScoredHypotheses with ranked pathway hypotheses
         """
@@ -69,14 +74,11 @@ class NESScorer:
         
         scored_pathways = []
         
-        # Pre-calculate seed genes and 1-hop neighbors for proximity scoring
-        seed_gene_symbols = set()
-        seed_neighbors_1hop = set()
-        if fn_result:
-            seed_gene_symbols = {g.symbol for g in fn_result.seed_genes}
-            # All direct neighbors are 1-hop from seed genes
-            seed_neighbors_1hop = {g.symbol for g in fn_result.neighbors}
-            seed_neighbors_1hop.update(seed_gene_symbols)  # Include seed genes themselves
+        # ``fn_result`` and ``topology_result`` remain accepted so older callers
+        # do not break, but neither is allowed to affect the deployed PPS. The
+        # enriched evidence genes were selected from ``fn_result`` itself, which
+        # makes a seed-neighborhood multiplier circular rather than independent
+        # network support.
         
         min_fold = getattr(self.settings.nets, 'min_fold_enrichment', 0.0) or 0.0
         n_below_fold = 0
@@ -93,12 +95,11 @@ class NESScorer:
                 n_below_fold += 1
                 continue
 
-            # Calculate final NES with optional centrality
+            # Calculate PPS without reusing functional-neighborhood evidence.
             nes_score, components = self._calculate_nes(
                 agg_pathway,
                 fn_result=fn_result,
                 topology_result=topology_result,
-                seed_neighbors_1hop=seed_neighbors_1hop
             )
             
             # Calculate cardiac disease score based on evidence genes
@@ -162,14 +163,14 @@ class NESScorer:
     def _calculate_nes(
         self,
         agg_pathway: AggregatedPathway,
-        fn_result = None,
-        topology_result = None,
-        seed_neighbors_1hop: Optional[set] = None
-    ) -> tuple[float, Dict[str, float]]:
+        fn_result=None,
+        topology_result=None,
+        seed_neighbors_1hop: Optional[set] = None,
+    ) -> tuple[float, Dict]:
         """
         Compute the Pathway Prioritization Score (PPS) with a component breakdown.
 
-        PPS = db_weight * centrality_weight * (
+        PPS = db_weight * (
                  0.30 * significance
                + 0.30 * effect_size
                + 0.25 * specificity
@@ -245,14 +246,17 @@ class NESScorer:
             + self.W_REPLICATION * replication
         )
 
+        # The network-related arguments are accepted for API compatibility but
+        # intentionally ignored. One-hop proximity is tautological here because
+        # these pathways were enriched from that same functional neighborhood;
+        # PageRank is calculated only after PPS selection. Neither is an
+        # independent source of ranking evidence.
+        _ = fn_result, topology_result, seed_neighbors_1hop
+
         db_weights = self.settings.nets.db_weights
         db_weight = db_weights.get(pathway.source_db, 1.0)
 
-        centrality_weight = self._calculate_centrality_weight(
-            pathway, fn_result, topology_result, seed_neighbors_1hop
-        )
-
-        nes_score = composite * db_weight * centrality_weight
+        nes_score = composite * db_weight
 
         components = {
             "significance": round(significance, 4),
@@ -261,7 +265,13 @@ class NESScorer:
             "replication": round(replication, 4),
             "composite": round(composite, 4),
             "db_weight": db_weight,
-            "centrality_weight": round(centrality_weight, 4),
+            # Compatibility keys remain numeric, but their neutral value and
+            # explicit applied flag make clear that topology did not change PPS.
+            "seed_proximity": None,
+            "network_proximity_weight": 1.0,
+            "network_proximity_applied": False,
+            "centrality_weight": 1.0,
+            "topology_in_pps": False,
             "raw_p_adj": pathway.p_adj,
             "neg_log10_p_adj": round(neg_log_p, 4),
             "fold_enrichment": round(fold_reported, 3) if fold_reported else None,
@@ -277,64 +287,29 @@ class NESScorer:
 
         return nes_score, components
 
-    def _calculate_centrality_weight(
+    def _calculate_proximity_weight(
         self,
         pathway,
         fn_result,
-        topology_result,
         seed_neighbors_1hop: Optional[set]
-    ) -> float:
+    ) -> tuple[float, None]:
         """
-        Calculate network centrality weight based on seed proximity and PageRank.
-        
-        Centrality Weight = 1.0 + (0.5 × proximity_score) + (0.3 × pagerank_score)
-        
-        Where:
-        - proximity_score: % of pathway genes within 1-hop of seed genes (0-1)
-        - pagerank_score: Average PageRank percentile of pathway genes (0-1)
-        
-        Range: 1.0 (no centrality data) to 1.8 (perfect proximity + high PageRank)
+        Return the neutral compatibility multiplier used by deployed PPS.
+
+        This helper previously rewarded overlap with the same one-hop
+        functional neighborhood used to generate the enriched pathways. That
+        was circular evidence, so network proximity is now descriptive only and
+        is not calculated in this scoring stage.
         
         Args:
             pathway: Pathway entry with evidence genes
             fn_result: Functional neighborhood result
-            topology_result: Topology result with PageRank scores
             seed_neighbors_1hop: Pre-calculated set of seed genes + 1-hop neighbors
             
         Returns:
-            Centrality weight (1.0 - 1.8)
+            ``(1.0, None)``. No proximity measurement is made here.
         """
-        if not fn_result or not seed_neighbors_1hop:
-            return 1.0  # No bonus if no network data
-        
-        pathway_genes = set(pathway.evidence_genes)
-        
-        # Calculate seed proximity (% within 1-hop)
-        proximal_genes = pathway_genes & seed_neighbors_1hop
-        proximity_score = len(proximal_genes) / len(pathway_genes) if pathway_genes else 0.0
-        
-        # Calculate average PageRank percentile
-        pagerank_score = 0.0
-        if topology_result and hasattr(topology_result, 'gene_pageranks'):
-            pagerank_dict = topology_result.gene_pageranks
-            if pagerank_dict:
-                # Get PageRank values for pathway genes
-                pathway_pageranks = [pagerank_dict.get(g, 0.0) for g in pathway_genes]
-                
-                if pathway_pageranks:
-                    # Calculate average PageRank
-                    avg_pagerank = sum(pathway_pageranks) / len(pathway_pageranks)
-                    
-                    # Calculate percentile relative to all genes
-                    all_pageranks = list(pagerank_dict.values())
-                    if all_pageranks:
-                        # Simple percentile: % of genes with lower PageRank
-                        lower_count = sum(1 for pr in all_pageranks if pr < avg_pagerank)
-                        pagerank_score = lower_count / len(all_pageranks)
-        
-        # Combined centrality weight
-        centrality_weight = 1.0 + (0.5 * proximity_score) + (0.3 * pagerank_score)
-        
-        return centrality_weight
+        _ = pathway, fn_result, seed_neighbors_1hop
+        return 1.0, None
     
     

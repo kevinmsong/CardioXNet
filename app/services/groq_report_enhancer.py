@@ -103,17 +103,18 @@ Write concise, scientific English. 3 paragraphs, ~80 words each."""
             f"({genes_str}) to identify disease-relevant molecular pathways in the context of {disease_context}. "
             f"Using the NETS pipeline, seed genes were expanded through STRING v12.0 protein-protein interaction "
             f"networks and subjected to multi-database pathway enrichment analysis.\n\n"
-            f"The analysis identified {len(pathway_names)} statistically significant pathways after semantic "
-            f"cardiac filtering and permutation-based validation. Key discoveries include: {pathways_str}. "
+            f"The analysis retained {len(pathway_names)} pathway hypotheses after enrichment and semantic "
+            f"cardiovascular screening. Rank-leading hypotheses include: {pathways_str}. "
             f"These pathways were prioritized by the Discovery Score: a Pathway Prioritization "
-            f"Score (a weighted composite of statistical significance, fold enrichment, gene-set "
-            f"specificity and cross-source replication) multiplied by a literature-novelty term "
-            f"derived from the number of PubMed records at the pathway x seed gene x disease "
-            f"intersection. It is not a GSEA normalized enrichment score, and a high novelty term "
-            f"means a topic is under-reported, not that it is important.\n\n"
-            f"Druggability analysis identified pathway genes with existing FDA-approved therapeutic interventions "
-            f"or active clinical development programs, representing immediate translational opportunities for "
-            f"cardiovascular disease management."
+            f"Score (a weighted base composite of statistical significance, fold enrichment, gene-set "
+            f"specificity and upstream support, followed by a bounded semantic relevance multiplier) "
+            f"multiplied by a composite novelty term that weights exact-query literature "
+            f"novelty 2:1 over low seed-gene overlap. The literature term uses the number "
+            f"of PubMed records at the pathway x seed gene x disease intersection. It is "
+            f"not a GSEA normalized enrichment score, and a high value is a triage signal, "
+            f"not proof that the biology is globally unreported or important.\n\n"
+            f"Druggability annotations identify pathway genes with targetability evidence for expert review; "
+            f"they do not establish therapeutic efficacy, safety, or clinical readiness."
         )
 
     def generate_pathway_interpretation(self, pathway: Dict[str, Any], rank: int) -> str:
@@ -155,9 +156,10 @@ Write one concise scientific paragraph explaining the biological significance of
         medium_names = [g.get("gene_symbol", g.get("symbol", "")) for g in medium_tier]
 
         system = (
-            "You are a cardiovascular pharmacology expert. Write a scientific discussion "
-            "of therapeutic targets discovered in a pathway analysis. "
-            "2 short paragraphs, ~70 words each, scientific tone."
+            "You are a cardiovascular pharmacology expert. Write a conservative scientific "
+            "discussion of targetability annotations from a pathway analysis. Do not infer "
+            "efficacy, safety, indication-specific validation, or clinical readiness from a "
+            "database match. Write 2 short paragraphs of about 70 words each."
         )
 
         user = f"""Write a therapeutic targets discussion for a CardioXNet report:
@@ -165,8 +167,8 @@ Write one concise scientific paragraph explaining the biological significance of
 FDA-approved drug targets identified: {', '.join(high_names) or 'None'}
 Clinical trial targets identified: {', '.join(medium_names) or 'None'}
 
-Paragraph 1: Discuss the significance of the FDA-approved targets in cardiovascular therapy.
-Paragraph 2: Discuss clinical trial opportunities and future therapeutic development."""
+Paragraph 1: Explain what FDA-approved-drug target annotations do and do not establish.
+Paragraph 2: Describe clinical-development annotations as review leads, with explicit evidence boundaries."""
 
         result = self._call(system, user, max_tokens=350)
         if result:
@@ -174,13 +176,13 @@ Paragraph 2: Discuss clinical trial opportunities and future therapeutic develop
 
         if not result:
             result = (
-                f"The analysis identified {len(high_tier)} genes targeted by FDA-approved cardiovascular drugs"
+                f"The analysis identified {len(high_tier)} genes with curated FDA-approved-drug target annotations"
                 f"{(': ' + ', '.join(high_names)) if high_names else ''}, "
-                f"providing immediate translational relevance. These represent validated drug targets "
-                f"with established clinical efficacy in cardiovascular disease management.\n\n"
-                f"Additionally, {len(medium_tier)} genes are currently in active clinical development"
+                f"which indicates targetability but does not establish efficacy, safety, or relevance "
+                f"to the analyzed cardiovascular context.\n\n"
+                f"Additionally, {len(medium_tier)} genes carry clinical-development annotations"
                 f"{(': ' + ', '.join(medium_names)) if medium_names else ''}, "
-                f"representing emerging therapeutic opportunities that may yield new cardiovascular treatments."
+                f"which are leads for indication-specific review rather than evidence of a treatment opportunity."
             )
         return result
 

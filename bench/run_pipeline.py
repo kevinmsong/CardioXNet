@@ -33,8 +33,23 @@ async def main():
     out = Path(args.out)
     out.parent.mkdir(parents=True, exist_ok=True)
     payload = results if isinstance(results, dict) else results.model_dump()
-    payload["_bench"] = {"elapsed_s": elapsed, "seed_genes": genes,
-                         "disease": args.disease, "preset": args.preset}
+    stage_0 = (payload.get("results") or {}).get("stage_0") or {}
+    effective_genes = [
+        gene.get("symbol")
+        for gene in stage_0.get("valid_genes", [])
+        if isinstance(gene, dict) and gene.get("symbol")
+    ]
+    payload["_bench"] = {
+        "elapsed_s": elapsed,
+        # Retain the legacy key for existing consumers while making requested
+        # versus effective inputs explicit.
+        "seed_genes": effective_genes,
+        "requested_seed_genes": genes,
+        "effective_seed_genes": effective_genes,
+        "disease": args.disease,
+        "preset": args.preset,
+        "requested_output_formats": list(pipe.settings.nets.output_formats),
+    }
     out.write_text(json.dumps(payload, indent=1, default=str), encoding="utf-8")
     print(f"\nWROTE {out}  ({elapsed:.1f}s)")
 

@@ -9,7 +9,9 @@
   <div>
     <p class="eyebrow">Ranked evidence report</p>
     <h1 class="results-heading" style="margin:0;">Cardiovascular pathway hypotheses</h1>
-    <div class="run-tag">Analysis {{ analysis_id }}</div>
+    <div class="run-tag">
+      {% if analysis_id == 'analysis_fixture' %}Deterministic demonstration fixture{% else %}Analysis {{ analysis_id }}{% endif %}
+    </div>
   </div>
   <div class="spacer"></div>
   <a class="btn btn-sm" href="/results/{{ analysis_id }}/export.csv" data-testid="export-csv">⬇ CSV</a>
@@ -21,7 +23,7 @@
 <!-- Summary -->
 <div class="stats" style="margin-bottom: 22px;" data-testid="summary-stats">
   <div class="stat accent"><div class="v num">{{ summary.pathway_count }}</div><div class="k">Ranked hypotheses</div></div>
-  <div class="stat novel"><div class="v num">{{ summary.novel_count }}</div><div class="k" title="Pathways in the Novel or Highly Novel literature tier: few PubMed records exist at the intersection of this pathway, the seed genes, and the disease context">Literature-sparse</div></div>
+  <div class="stat novel"><div class="v num">{{ summary.novel_count }}</div><div class="k" title="Verified pathways in the Novel or Highly Novel tier, based on a strict pathway by seed genes by disease query with completed seed-corpus and concept prerequisites">Verified literature-sparse</div></div>
   <div class="stat"><div class="v num">{{ summary.fdr_significant }}</div><div class="k" title="Permutation q ≤ 0.05 after Benjamini–Hochberg correction across all tested pathways">Permutation FDR ≤ 0.05</div></div>
   <div class="stat"><div class="v num">{{ summary.seed_independent_count }}</div><div class="k" title="Seed genes are a minority of the pathway's evidence genes, so the pathway is carried by network expansion rather than by the seeds themselves">Expansion-led</div></div>
   <div class="stat"><div class="v num">{{ summary.expanded_count }}</div><div class="k">Secondary expansion</div></div>
@@ -39,12 +41,14 @@
 {% endif %}
 
 <!-- Pathway table -->
-<div class="card" style="margin-bottom: 20px;">
+<div class="card" style="margin-bottom: 20px;" data-testid="hypotheses-card">
   <div class="card-title"><h2 style="margin:0;">Pathway hypotheses</h2></div>
   <p class="muted small">
-    Ranked by <strong>Discovery Score</strong>, the Pathway Prioritization Score multiplied by literature novelty.
+    Ranked by <strong>Discovery Score</strong>, the Pathway Prioritization Score multiplied by a composite novelty term
+    weighted 2:1 toward exact-query literature novelty over low seed overlap.
     Higher values identify statistically supported, comparatively under-examined intersections for this gene panel
-    and disease context. Open a row to audit its full evidence and lineage.
+    and disease context. Unverified literature evidence uses a conservative scoring proxy and is excluded from the
+    verified literature-sparse count. Open a row to audit its full evidence and lineage.
   </p>
 
   {% if rows %}
@@ -54,9 +58,9 @@
         <tr>
           <th>#</th>
           <th>Pathway</th>
-          <th class="sortable num" data-col="discovery" data-type="num" title="Discovery Score = PPS × literature novelty. The primary ranking metric: high means strongly enriched and under-reported.">Discovery ▾</th>
-          <th title="Literature novelty tier from the number of PubMed records at the pathway × seed genes × disease intersection">Novelty</th>
-          <th class="sortable num" data-col="pps" data-type="num" title="Pathway Prioritization Score and g:Profiler FDR-adjusted enrichment p-value">Enrichment</th>
+          <th class="sortable num" data-col="discovery" data-type="num" title="Discovery Score = PPS × composite novelty, weighted 2:1 toward exact-query literature novelty over low seed overlap. It is a triage metric, not proof of biological novelty.">Discovery ▾</th>
+          <th title="Composite novelty tier, weighted 2:1 toward exact-query literature novelty over low seed overlap">Novelty tier</th>
+          <th class="sortable num" data-col="pps" data-type="num" title="Pathway Prioritization Score and Fisher-combined probability from per-query adjusted enrichment values">Enrichment</th>
           <th class="sortable num" data-col="permq" data-type="num" title="Permutation q-value: empirical p from a size-matched uniform null over the pinned protein-coding background, Benjamini-Hochberg corrected across all tested pathways. Blank when the test could not be run.">Perm. q</th>
           <th class="sortable num" data-col="fold" data-type="num" title="Fold enrichment, evidence-gene count, and semantic cardiovascular relevance">Biological support</th>
           <th class="sortable num" data-col="cardiac_expr" data-type="num" title="Cardiac expression and therapeutic druggability">Translation</th>
@@ -83,9 +87,9 @@
             </div>
           </td>
           <td class="num"><strong>{{ '%.3f'|format(r.discovery_score) if r.discovery_score is not none else '-' }}</strong></td>
-          <td>{% if r.novelty_tier and r.novelty_tier != '-' %}<span class="badge tier-novelty">{{ r.novelty_tier }}</span>{% if r.pubmed_hit_count is not none and r.pubmed_hit_count >= 0 %}<div class="pw-id">{{ r.pubmed_hit_count }} PubMed hits</div>{% endif %}
-            {% if r.novelty_confidence == 'unverified' %}<div class="pw-id" title="The pathway name has almost no lexical footprint in PubMed, so the empty result cannot be read as a literature gap">unverified</div>{% endif %}{% else %}<span class="meter-na">n/a</span>{% endif %}</td>
-          <td class="num score-stack"><strong>PPS {{ '%.3f'|format(r.pps_score) }}</strong><span>p<sub>adj</sub> {{ r.p_adj_fmt }}</span></td>
+          <td>{% if r.novelty_tier and r.novelty_tier != '-' %}<span class="badge tier-novelty">{{ r.novelty_tier }}</span>{% if r.pubmed_hit_count is not none and r.pubmed_hit_count >= 0 %}<div class="pw-id">{{ r.pubmed_hit_count }} PubMed hits</div>{% endif %}{% else %}<span class="meter-na">n/a</span>{% endif %}
+            {% if not r.novelty_interpretable and (r.novelty_confidence or (r.novelty_tier and r.novelty_tier != '-')) %}<div class="pw-id" data-testid="novelty-evidence-status" title="This record is excluded from verified literature-sparse counts and uses a conservative scoring corpus">{{ r.novelty_evidence_label }}</div>{% endif %}</td>
+          <td class="num score-stack"><strong>PPS {{ '%.3f'|format(r.pps_score) }}</strong><span>combined p* {{ r.p_adj_fmt }}</span></td>
           <td class="num">{% if r.empirical_qvalue is not none %}{{ r.empirical_q_fmt }}{% else %}<span class="meter-na">n/t</span>{% endif %}</td>
           <td class="support-cell">
             <div><strong>{{ '%.1f'|format(r.fold_enrichment) if r.fold_enrichment is not none else 'n/a' }}x</strong> <span class="muted small">fold; {{ r.evidence_count }} genes</span></div>

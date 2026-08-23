@@ -156,11 +156,17 @@ class SecondaryPathwayAnalyzer:
                     )
 
                 except Exception as e:
-                    logger.warning(
+                    logger.error(
                         f"[STAGE 2B] Failed to process primary pathway "
                         f"{primary_pathway.pathway_name}: {str(e)}"
                     )
-                    continue
+                    # A partial secondary expansion changes support counts,
+                    # redundancy collapse, and the final candidate universe.
+                    # Cancel work that has not started and fail the stage so an
+                    # API failure can never masquerade as zero enrichment.
+                    for pending in future_to_primary:
+                        pending.cancel()
+                    raise
         
         # Aggregate pathways and calculate support metrics
         logger.info(f"[STAGE 2B] Aggregating {len(all_secondary_pathways)} total secondary pathways")
@@ -403,13 +409,11 @@ class SecondaryPathwayAnalyzer:
             return pathways
             
         except APIClientError as e:
-            logger.warning(f"g:Profiler enrichment query failed: {str(e)}")
-            
-            # If g:Profiler is unavailable, continue with empty results
-            if "temporarily unavailable" in str(e).lower() or "503" in str(e):
-                pass
-            
-            return []
+            logger.error(f"g:Profiler enrichment query failed: {str(e)}")
+            # Empty enrichment and failed enrichment are scientifically
+            # distinct. Propagate the typed failure so the run is marked
+            # incomplete instead of aggregating a biased partial result.
+            raise
     
     def _calculate_nes_scores(
         self,
@@ -588,8 +592,9 @@ class SecondaryPathwayAnalyzer:
             chi_square = -2 * sum(math.log(p) for p in valid_pvalues)
             degrees_of_freedom = 2 * len(valid_pvalues)
             
-            # Calculate combined p-value from chi-square distribution
-            combined_pvalue = float(1 - stats.chi2.cdf(chi_square, degrees_of_freedom))
+            # Evaluate the upper tail directly. ``1 - cdf`` loses precision and
+            # can serialize a nonzero Fisher probability as exactly zero.
+            combined_pvalue = float(stats.chi2.sf(chi_square, degrees_of_freedom))
             
             logger.debug(
                 f"Fisher's method: {len(valid_pvalues)} p-values combined | "

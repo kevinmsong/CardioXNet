@@ -343,8 +343,8 @@ class LiteratureEvidence(BaseModel):
     hypothesis_hit_counts: Dict[str, int] = Field(
         default_factory=dict,
         description=(
-            "Total PubMed records matching the (seed genes x pathway concept x "
-            "disease context) query per pathway ID. This is the esearch Count "
+            "Total PubMed records matching the strict (seed genes x pathway "
+            "concept x disease context) query per pathway ID. This is the esearch Count "
             "field and is NOT capped by the retrieval limit, so it is the "
             "quantity literature saturation must be computed from. -1 means the "
             "count lookup failed and saturation is undefined for that pathway."
@@ -354,6 +354,31 @@ class LiteratureEvidence(BaseModel):
     query_tier: Dict[str, str] = Field(
         default_factory=dict,
         description="Which query specificity tier produced the hits for each pathway ID"
+    )
+
+    hypothesis_queries: Dict[str, str] = Field(
+        default_factory=dict,
+        description=(
+            "Exact PubMed query string executed for each pathway ID. Stored so "
+            "the reported count and query scope can be audited directly."
+        ),
+    )
+
+    hypothesis_query_genes: Dict[str, List[str]] = Field(
+        default_factory=dict,
+        description=(
+            "Ordered seed-gene symbols used in the executed PubMed query for "
+            "each pathway ID. This is persisted independently of later lineage "
+            "rendering so the query can be reproduced exactly."
+        ),
+    )
+
+    concept_queries: Dict[str, str] = Field(
+        default_factory=dict,
+        description=(
+            "Pathway-concept-only PubMed query paired with each hypothesis. "
+            "Persisted for the zero-count searchability gate and temporal audit."
+        ),
     )
 
     concept_hit_counts: Dict[str, int] = Field(

@@ -1,4 +1,7 @@
+import json
 from pathlib import Path
+
+import pytest
 
 from app.models import (
     AggregatedPathway,
@@ -99,11 +102,23 @@ def test_generate_report_keeps_json_when_pdf_unavailable(tmp_path, monkeypatch):
         topology_result=TopologyResult(hypothesis_networks={}),
         literature_evidence=LiteratureEvidence(hypothesis_citations={}),
         output_formats=["pdf", "json"],
+        run_metadata={
+            "resource_identifiers": {
+                "string": {
+                    "configured_endpoint": "https://string-db.org/api",
+                    "effective_endpoint": "https://version-12-0.string-db.org/api",
+                }
+            }
+        },
     )
 
     assert "json" in output_files
     assert "pdf" not in output_files
     assert Path(output_files["json"]).exists()
+    report_data = json.loads(Path(output_files["json"]).read_text(encoding="utf-8"))
+    assert report_data["run_metadata"]["resource_identifiers"]["string"][
+        "effective_endpoint"
+    ] == "https://version-12-0.string-db.org/api"
 
 
 def test_build_conclusion_avoids_claiming_novelty_without_literature_support():
@@ -176,4 +191,46 @@ def test_build_conclusion_reports_supported_final_pathways():
         ScoredHypotheses(hypotheses=[scored], total_count=1)
     )
 
-    assert "direct support for 1 of 1 final pathways" in conclusion
+    assert "co-mention support for 1 of 1 final pathways" in conclusion
+
+
+@pytest.mark.skipif(
+    not report_module.REPORTLAB_AVAILABLE,
+    reason="ReportLab is not installed",
+)
+def test_pdf_escapes_unbalanced_pubmed_markup(tmp_path):
+    generator = ReportGenerator()
+    generator.settings.output_dir = str(tmp_path)
+    report_data = {
+        "seed_genes": ["CACNA1C"],
+        "stage_3": {"total_hypotheses": 1},
+        "conclusion": "Computational hypothesis for review.",
+        "ranked_hypotheses": [
+            {
+                "rank": 1,
+                "pathway_name": "Calcium <super>2+ signaling",
+                "source_db": "TEST",
+                "discovery_score": 1.0,
+                "novelty_tier": "Novel",
+                "nes_score": 1.1,
+                "p_adj": 0.01,
+                "empirical_qvalue": 0.02,
+                "evidence_count": 1,
+                "pubmed_hit_count": 1,
+                "citation_count": 1,
+                "literature_support": True,
+                "citations": [
+                    {
+                        "title": "An unclosed <super> tag from an external abstract",
+                        "pmid": "12345",
+                        "year": 2026,
+                    }
+                ],
+            }
+        ],
+    }
+
+    output = generator._generate_pdf("analysis_markup", report_data)
+
+    assert Path(output).exists()
+    assert Path(output).stat().st_size > 0

@@ -5,8 +5,8 @@ suite, and so per-run wall time is measured cleanly.
 
 Seed sets
 ---------
-Three cardiovascular seed panels with distinct biology (inflammatory, structural
-cardiomyopathy, electrophysiology) plus two negative controls:
+Four cardiovascular seed panels with distinct biology (inflammatory, structural
+cardiomyopathy, electrophysiology, and ischemic disease) plus three controls:
 
   * ``random_genes``  -- protein-coding genes drawn at random. A discovery tool
     must not return a confident cardiac story for these.
@@ -35,7 +35,7 @@ SEED_SETS = {
         "genes": ["VEGFA", "MMP9", "IL6", "TNF", "ACE"],
         "disease": "heart_failure",
         "kind": "real",
-        "note": "Inflammatory/remodelling axis in heart failure.",
+        "note": "Inflammatory/remodeling axis in heart failure.",
     },
     "dcm_structural": {
         "genes": ["MYH7", "TTN", "LMNA", "MYBPC3", "TNNT2"],
@@ -53,7 +53,7 @@ SEED_SETS = {
         "genes": ["LDLR", "APOB", "PCSK9", "NOS3", "EDN1"],
         "disease": "myocardial_infarction",
         "kind": "real",
-        "note": "Lipid handling and endothelial tone in ischaemic heart disease.",
+        "note": "Lipid handling and endothelial tone in ischemic heart disease.",
     },
 }
 
@@ -66,12 +66,22 @@ NEGATIVE_CONTROLS = {
     },
 }
 
+# HGNC symbols that are absent from the pinned STRING release cannot form a
+# five-gene connectivity-controlled panel. Keep the random draw reproducible
+# while rejecting only documented resource incompatibilities.
+STRING_INCOMPATIBLE_SYMBOLS = {"OR8U9"}
+
 
 def random_control(seed: int, n: int = 5) -> dict:
     rng = random.Random(seed)
     pool = protein_coding_background()
+    genes = []
+    while len(genes) < n:
+        candidate = rng.choice(pool)
+        if candidate not in STRING_INCOMPATIBLE_SYMBOLS and candidate not in genes:
+            genes.append(candidate)
     return {
-        "genes": rng.sample(pool, n),
+        "genes": genes,
         "disease": "heart_failure",
         "kind": "negative",
         "note": f"Random protein-coding genes (seed={seed}).",
@@ -118,13 +128,34 @@ def main() -> None:
                                   timeout=args.timeout, cwd=ROOT)
         elapsed = time.time() - t0
 
+        wrapper = {}
+        if out_json.exists():
+            try:
+                wrapper = json.loads(out_json.read_text(encoding="utf-8"))
+            except (OSError, json.JSONDecodeError):
+                wrapper = {}
+        bench_meta = wrapper.get("_bench", {}) if isinstance(wrapper, dict) else {}
+        requested_formats = bench_meta.get("requested_output_formats", [])
+        report_files = wrapper.get("report_files", {}) if isinstance(wrapper, dict) else {}
+        missing_formats = [
+            fmt for fmt in requested_formats
+            if not report_files.get(fmt) or not Path(report_files[fmt]).exists()
+        ]
+        process_ok = proc.returncode == 0 and out_json.exists()
+
         manifest[name] = {
             **spec,
             "returncode": proc.returncode,
             "elapsed_s": round(elapsed, 1),
             "json": str(out_json),
             "log": str(out_log),
-            "ok": proc.returncode == 0 and out_json.exists(),
+            "requested_seed_genes": bench_meta.get("requested_seed_genes", spec["genes"]),
+            "effective_seed_genes": bench_meta.get("effective_seed_genes", []),
+            "warnings": wrapper.get("warnings", []) if isinstance(wrapper, dict) else [],
+            "report_files": report_files,
+            "missing_report_formats": missing_formats,
+            "process_ok": process_ok,
+            "ok": process_ok and not missing_formats,
         }
         print(f"    -> rc={proc.returncode} in {elapsed:.0f}s", flush=True)
 

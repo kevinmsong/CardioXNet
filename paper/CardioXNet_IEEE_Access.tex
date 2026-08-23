@@ -23,16 +23,16 @@
 % IEEE replaces the value at production.
 \doi{}
 
-\title{CardioXNet: Evidence-Weighted Network Expansion for Auditable Discovery of Cardiovascular Literature Gaps}
+\title{CardioXNet: Validity-Gated Literature-Gap Detection for Cardiovascular Pathway Hypotheses}
 \author{}
 \address{Department of Biomedical Engineering, The University of Alabama at Birmingham, Birmingham, AL 35294 USA}
 
 \markboth
-{CardioXNet: Auditable Discovery of Cardiovascular Literature Gaps}
-{CardioXNet: Auditable Discovery of Cardiovascular Literature Gaps}
+{CardioXNet: Validity-Gated Literature-Gap Detection}
+{CardioXNet: Validity-Gated Literature-Gap Detection}
 
 \begin{abstract}
-Pathway enrichment ranks overrepresentation but does not indicate whether a pathway-gene-disease connection has been reported. CardioXNet is an auditable workflow that expands cardiovascular gene panels through protein associations, performs multi-resource enrichment, and combines a specificity-aware Pathway Prioritization Score with uncapped PubMed counts for prespecified pathway, contributing-gene, and disease title/abstract queries; cardiac expression and druggability remain separate annotations. A grounding gate withholds novelty labels when the seed-disease corpus holds fewer than 100 records, and a pathway-concept check separates searchable zero-count gaps from vocabulary failures. In a regenerated development benchmark of four cardiovascular panels and three controls, CardioXNet returned 133 real-panel hypotheses (0/133 Ungrounded) and 40 control hypotheses (40/40 Ungrounded). Heart-failure query counts spanned 350.6-fold, from 31 to 10,868 records, while capped abstract retrieval spanned only 26 to 30. Seven real-panel hypotheses met the prespecified verified-gap rule, including GAB1 signalosome and NTRK2 signaling in structural cardiomyopathy, cGMP-PKG and GPER1 signaling in arrhythmia, and P2Y12 and GPER1 signaling in myocardial infarction. These combined 6.7- to 17.5-fold enrichment with empirical $q$-values of 0.00124 to 0.00162, yet returned zero records for the prespecified queries: unreported query intersections, not globally unreported biology. In an all-hypothesis temporal holdout, the Discovery Score showed negligible association with post-cutoff publication growth (Spearman $\rho=-0.0635$; $n=133$). CardioXNet converts broad enrichment output into an inspectable shortlist of statistically supported, literature-sparse cardiovascular connections for expert review, without claiming biological validation or forecasting impact.
+Pathway enrichment ranks overrepresentation but does not indicate whether a pathway-gene-disease connection has been reported. CardioXNet is an auditable workflow that expands cardiovascular gene panels through protein associations, performs multi-resource enrichment, and combines a specificity-aware Pathway Prioritization Score with uncapped PubMed counts for prespecified pathway, contributing-gene, and disease title/abstract queries; cardiac expression and druggability remain separate annotations. A grounding gate withholds novelty labels when the seed-disease corpus holds fewer than 100 records, and a pathway-concept check separates searchable zero-count gaps from vocabulary failures. In a regenerated development benchmark of four cardiovascular panels and three controls, CardioXNet returned 124 real-panel hypotheses (0/124 Ungrounded) and 40 control hypotheses (40/40 Ungrounded). Among heart-failure hypotheses with a positive count, query counts spanned 593.2-fold, from 8 to 4,746 records, while the capped abstract display set spanned only 8 to 30. Eight real-panel hypotheses met the prespecified verified-gap rule, including GAB1 signalosome and NTRK2 signaling in structural cardiomyopathy, cGMP-PKG signaling in arrhythmia, and P2Y12, GPER1, HIF-1, cAMP, and oxytocin signaling in myocardial infarction. These combined 7.6- to 17.5-fold enrichment with empirical $q$-values of 0.00128 to 0.00170, yet returned zero records for the prespecified queries: unreported query intersections, not globally unreported biology. In an all-hypothesis temporal holdout, the Discovery Score showed negligible association with post-cutoff publication growth (Spearman $\rho=-0.1189$; $n=124$). CardioXNet converts broad enrichment output into an inspectable shortlist of statistically supported, literature-sparse cardiovascular connections for expert review, without claiming biological validation or forecasting impact.
 \end{abstract}
 
 \begin{keywords}
@@ -52,7 +52,7 @@ CardioXNet addresses these problems as an evidence-weighted hypothesis-triage sy
 
 This work makes four contributions. First, the Pathway Prioritization Score (PPS), whose base score balances significance, effect size, gene-set specificity, and upstream support instead of multiplying significance by raw set size, with a bounded and explicitly reported semantic multiplier for cardiovascular relevance. Second, a Discovery Score integrating PPS with exact-query literature novelty and explicit grounding states. Third, a regenerated development benchmark spanning four cardiovascular panels, three controls, a genome-scale permutation null, and an all-hypothesis temporal holdout. Fourth, a web interface exposing the evidence chain, in which cardiac expression, druggability, permutation support, and lineage remain separate annotations rather than being folded into the Discovery Score.
 
-Seven of 133 real-panel hypotheses met the prespecified verified-gap rule, including rank-leading GAB1 and NTRK2 connections in structural cardiomyopathy and cGMP-PKG and GPER1 connections in arrhythmia. All 40 control hypotheses were Ungrounded and none of the 133 real-panel hypotheses were. The temporal holdout showed negligible overall association with later publication growth, bounding the Discovery Score as a triage heuristic rather than a forecast. Section~\ref{sec:discussion} states the scope of these claims.
+Eight of 124 real-panel hypotheses met the prespecified verified-gap rule, including rank-leading GAB1 and NTRK2 connections in structural cardiomyopathy and a cGMP-PKG connection in arrhythmia. All 40 control hypotheses were Ungrounded and none of the 124 real-panel hypotheses were. The temporal holdout showed negligible overall association with later publication growth, bounding the Discovery Score as a triage heuristic rather than a forecast. Section~\ref{sec:discussion} states the scope of these claims.
 
 \begin{figure*}[t]
   \centering
@@ -78,13 +78,13 @@ The benchmark used five seed genes per panel and the balanced preset. The four r
 \toprule
 Panel & Type & Seed genes & Disease context & Hypotheses \\
 \midrule
-HF inflammatory & Real & VEGFA, MMP9, IL6, TNF, ACE & Heart failure & 21 \\
+HF inflammatory & Real & VEGFA, MMP9, IL6, TNF, ACE & Heart failure & 19 \\
 DCM structural & Real & MYH7, TTN, LMNA, MYBPC3, TNNT2 & Cardiomyopathy & 34 \\
-Arrhythmia channels & Real & SCN5A, KCNQ1, KCNH2, RYR2, CACNA1C & Arrhythmia & 41 \\
-MI ischemic & Real & LDLR, APOB, PCSK9, NOS3, EDN1 & Myocardial infarction & 37 \\
-Olfactory & Off-target control & OR51E2, OR2W1, OR1A1, OR5K1, OR10A4 & Heart failure & 12 \\
-Random 1 & Random control & RPF2, CLRN3, PRKAG1, OR8U9, CACNA1D & Heart failure & 19 \\
-Random 2 & Random control & C2CD4A, GORASP1, CHIC1, VCY, PLCD4 & Heart failure & 9 \\
+Arrhythmia channels & Real & SCN5A, KCNQ1, KCNH2, RYR2, CACNA1C & Arrhythmia & 36 \\
+MI ischemic & Real & LDLR, APOB, PCSK9, NOS3, EDN1 & Myocardial infarction & 35 \\
+Olfactory & Off-target control & OR51E2, OR2W1, OR1A1, OR5K1, OR10A4 & Heart failure & 9 \\
+Random 1 & Random control & RPF2, CLRN3, PRKAG1, OR8U9, CACNA1D & Heart failure & 18 \\
+Random 2 & Random control & C2CD4A, GORASP1, CHIC1, VCY, PLCD4 & Heart failure & 13 \\
 \bottomrule
 \end{tabular}
 \end{table*}
@@ -131,7 +131,7 @@ D_j=\mathrm{PPS}_jN_j.
 
 Two safeguards constrain interpretation. First, the seed genes must return at least 100 PubMed records in the specified disease before pathway-level novelty is grounded; panels below this threshold receive the categorical state \emph{Ungrounded} and are not placed on the same novelty scale. Second, an empty pathway intersection counts as a verified gap only when the pathway concept itself has at least 20 records; otherwise it is flagged unverified and assigned a conservative proxy corpus rather than maximal novelty. A failed count request is recorded as not measured and can never become a zero.
 
-The terms Highly Novel, Novel, Emerging, and Established are operational tiers for the composite novelty value, not claims of biological originality. In the main text, ``zero records'' always means that no PubMed title/abstract record matched the prespecified query in the corresponding retrieval snapshot. It does not mean that related biology is absent under other terminology or in full text.
+The terms Highly Novel, Novel, Emerging, and Established are operational tiers for the composite novelty value, not claims of biological originality; hypotheses whose zero count fails the pathway-concept check are reported separately as Unverified. In the main text, ``zero records'' always means that no PubMed title/abstract record matched the prespecified query in the corresponding retrieval snapshot. It does not mean that related biology is absent under other terminology or in full text.
 
 \subsection{Permutation, Tissue, and Druggability Evidence}
 Each pathway overlap is tested against 1,000 size-matched random neighborhoods. The baseline is a pinned snapshot of 19,410 human protein-coding symbols; analysis genes absent from that snapshot are added so the observed set is drawable from the null. Effective run-specific pools therefore contained 19,410 to 19,415 genes. The empirical value is calculated with the finite-sampling correction \cite{phipson2010permutation}:
@@ -153,18 +153,18 @@ The user interface separates setup, ranked comparison, and pathway audit. Figure
 \label{sec:benchmark}
 
 \subsection{Regenerated Benchmark}
-All benchmark analyses were regenerated after corrections that affected filtering, query construction, and seeded permutation sampling because carrying forward previous values would have mixed incompatible candidate sets. The regenerated runs used STRING v12.0, the configured g:Profiler identifier \texttt{e104\_eg51\_p15}, GTEx v8, an embedded curated drug-target snapshot with optional Open Targets evidence, and PubMed. The g:Profiler identifier is declared configuration metadata rather than a build value verified from the response. The four real panels produced 133 hypotheses and the three controls produced 40.
+All benchmark analyses were regenerated after corrections that affected filtering, query construction, and seeded permutation sampling because carrying forward previous values would have mixed incompatible candidate sets. The regenerated runs used STRING v12.0, the configured g:Profiler identifier \texttt{e104\_eg51\_p15}, GTEx v8, an embedded curated drug-target snapshot with optional Open Targets evidence, and PubMed. The g:Profiler identifier is declared configuration metadata rather than a build value verified from the response. The four real panels produced 124 hypotheses and the three controls produced 40.
 
 The benchmark tests four questions. First, is the PPS ranking behavior consistent with its specificity-aware design? Second, do uncapped exact-query counts discriminate among hypotheses better than the number of abstracts retrieved? Third, does the grounding rule preserve the intended real-panel and control invariants after regeneration? Fourth, is novelty measured at the end of 2020 associated with subsequent publication activity?
 
 \subsection{Temporal Holdout}
-The temporal holdout included all 133 real-panel hypotheses. Literature was censored at December 31, 2020, and records from January 1, 2021 through the follow-up snapshot were counted separately. Composite novelty, operational tier, grounding, and Discovery Score were recomputed from pre-cutoff measurements under the same rules. Eleven hypotheses met the verified-gap rule at the cutoff and none was Ungrounded. Relative growth was $H_{\mathrm{post}}/(H_{\mathrm{pre}}+1)$, compared with cutoff scores by Spearman rank correlation; a sensitivity analysis excluded the 11 intersections with zero pre-cutoff records. Pathways overlap within panels, so these correlations are descriptive and $n$ denotes hypotheses rather than independent biological replicates.
+The temporal holdout included all 124 real-panel hypotheses. Literature was censored at December 31, 2020, and records from January 1, 2021 through the follow-up snapshot were counted separately. Composite novelty, operational tier, grounding, and Discovery Score were recomputed from pre-cutoff measurements under the same rules. Fifteen intersections had zero pre-cutoff records and none was Ungrounded. Relative growth was $H_{\mathrm{post}}/(H_{\mathrm{pre}}+1)$, compared with cutoff scores by Spearman rank correlation; a sensitivity analysis excluded those 15 intersections. Pathways overlap within panels, so these correlations are descriptive and $n$ denotes hypotheses rather than independent biological replicates.
 
 \section{Results}
 \label{sec:results}
 
 \subsection{PPS Ranking Was Consistent With Its Specificity-Aware Design}
-The previous score multiplied statistical significance by raw evidence-gene count and so structurally favored larger annotations. In the regenerated heart-failure benchmark the highest final-PPS pathway contained six annotated genes, and the 15 highest-PPS pathways spanned 5 to 103 genes, with term size inversely rank-associated with final PPS (Spearman $\rho=-0.9293$; Fig.~\ref{fig:specificity}). Gene-set specificity is an explicit PPS component, so this is a consistency check rather than independent validation or a paired comparison with the previous score.
+The previous score multiplied statistical significance by raw evidence-gene count and so structurally favored larger annotations. In the regenerated heart-failure benchmark the highest final-PPS pathway contained six annotated genes, and the 15 highest-PPS pathways spanned 5 to 72 genes, with term size inversely associated with final PPS (Spearman $\rho=-0.81$; Fig.~\ref{fig:specificity}). Gene-set specificity is an explicit PPS component, so this is a consistency check rather than independent validation or a paired comparison with the previous score.
 
 \begin{figure*}[t]
   \centering
@@ -174,7 +174,7 @@ The previous score multiplied statistical significance by raw evidence-gene coun
 \end{figure*}
 
 \subsection{Seven Cardiovascular Intersections Met the Verified-Gap Rule}
-Seven of 133 real-panel hypotheses met the prespecified verified-gap rule: a grounded seed-disease panel, a searchable pathway concept, and zero records for the exact title/abstract query (Table~\ref{tab:candidates}, Fig.~\ref{fig:gaps}). In structural cardiomyopathy, GAB1 signalosome and NTRK2 signaling returned zero records at 15.8-fold and 17.5-fold enrichment, with evidence genes SRC, EGFR, EGF and SRC, CDK5, CDK5R1 respectively. In arrhythmia, cGMP-PKG and GPER1 signaling returned zero records at 7.9-fold and 8.4-fold. In the ischemic panel, P2Y12, GPER1, and oxytocin signaling met the rule, while inflammasomes returned one record.
+Eight of 124 real-panel hypotheses met the prespecified verified-gap rule: a grounded seed-disease panel, a searchable pathway concept, and zero records for the exact title/abstract query (Table~\ref{tab:candidates}, Fig.~\ref{fig:gaps}). In structural cardiomyopathy, GAB1 signalosome and NTRK2 signaling returned zero records at 15.8-fold and 17.5-fold enrichment. In arrhythmia, cGMP-PKG signaling returned zero records at 7.9-fold. The ischemic panel contributed five: P2Y12 (9.1-fold), HIF-1 (10.8-fold), cAMP (9.2-fold), oxytocin (7.7-fold), and GPER1 (7.6-fold) signaling.
 
 These are panel-level literature gaps, not claims about a pathway in isolation. For P2Y12, CardioXNet asks whether that pathway has been reported jointly with the contributing genes of the LDLR, APOB, PCSK9, NOS3, and EDN1 panel in the specified myocardial-infarction context; the zero identifies an unreported intersection between defined domains rather than an unknown pathway. Each candidate remains a computational hypothesis requiring synonym-expanded review and experimental assessment.
 
@@ -188,32 +188,33 @@ These are panel-level literature gaps, not claims about a pathway in isolation. 
 \toprule
 Panel & Pathway candidate & Discovery & Fold & Empirical $q$ & Exact-query records & Interpretation \\
 \midrule
-DCM structural & GAB1 signalosome & 2.009 & 15.8 & 0.00162 & 0 & Growth-factor adaptor bridge \\
-DCM structural & NTRK2 (TRKB) signaling & 1.984 & 17.5 & 0.00162 & 0 & Neurotrophin-signaling bridge \\
-Arrhythmia channels & cGMP-PKG signaling & 1.907 & 7.9 & 0.00124 & 0 & Cyclic-nucleotide regulation \\
-Arrhythmia channels & GPER1 signaling & 1.865 & 8.4 & 0.00124 & 0 & Hormone-responsive signaling \\
-MI ischemic & P2Y12 signaling & 1.808 & 8.1 & 0.00127 & 0 & Platelet signaling linked to seed panel \\
-MI ischemic & GPER1 signaling & 1.800 & 6.7 & 0.00127 & 0 & Shared vascular-signaling candidate \\
-MI ischemic & Oxytocin signaling & 1.749 & 7.0 & 0.00127 & 0 & Hormone-responsive signaling candidate \\
-HF inflammatory & MET activates PTK2 signaling & 1.098 & 21.0 & 0.00105 & 92 & Less sparse but high-effect remodeling candidate \\
+DCM structural & GAB1 signalosome & 1.339 & 15.8 & 0.00170 & 0 & Growth-factor adaptor bridge \\
+DCM structural & Signaling by NTRK2 (TRKB) & 1.323 & 17.5 & 0.00170 & 0 & Neurotrophin-signaling bridge \\
+Arrhythmia channels & cGMP-PKG signaling & 1.271 & 7.9 & 0.00128 & 0 & Cyclic-nucleotide regulation \\
+MI ischemic & ADP signaling through P2Y purinoceptor 12 & 1.228 & 9.1 & 0.00140 & 0 & Platelet signaling linked to seed panel \\
+MI ischemic & GPER1 signaling & 1.223 & 7.6 & 0.00140 & 0 & Hormone-responsive signaling candidate \\
+MI ischemic & HIF-1 signaling & 1.220 & 10.8 & 0.00140 & 0 & Hypoxia response linked to lipid seeds \\
+MI ischemic & cAMP signaling & 1.213 & 9.2 & 0.00140 & 0 & Cyclic-nucleotide regulation \\
+MI ischemic & Oxytocin signaling & 1.185 & 7.7 & 0.00140 & 0 & Hormone-responsive signaling candidate \\
+HF inflammatory & IL-17 signaling & 0.971 & 17.3 & 0.00112 & 8 & High-effect candidate with existing literature \\
 \bottomrule
 \end{tabular}
 \end{table*}
 
 \subsection{Uncapped Exact-Query Counts Preserved Discrimination}
-For the heart-failure panel, uncapped exact-query counts spanned 31 to 10,868 records (350.6-fold), whereas retrieved abstracts varied only from 26 to 30 because retrieval is capped. Figure~\ref{fig:saturation} shows why the query count and the displayed evidence set are not interchangeable: deriving saturation from retrieved items compresses a 350.6-fold range into 1.15-fold, removing most of the signal.
+For the 17 of 19 heart-failure hypotheses with a positive count, uncapped exact-query counts spanned 8 to 4,746 records (593.2-fold), whereas their retrieved abstracts spanned only 8 to 30 (3.75-fold) because retrieval is capped. Figure~\ref{fig:saturation} shows why the query count and the displayed evidence set are not interchangeable: deriving saturation from retrieved items compresses a 593.2-fold range into 3.75-fold, removing most of the signal.
 
 \begin{figure*}[t]
   \centering
   \includegraphics[width=0.94\textwidth]{figures/fig3_literature_saturation.pdf}
-  \caption{Exact-query literature counts for the 20 highest-ranked heart-failure hypotheses. Bars show the uncapped PubMed title/abstract count plus one on a logarithmic scale, hatched by operational literature tier; the diamond-marked line shows the capped display set plus one. Labels give untransformed query counts.}
+  \caption{Exact-query literature counts for the 17 heart-failure hypotheses evaluated under the strict three-clause query. Bars show the uncapped PubMed title/abstract count plus one on a logarithmic scale, hatched by operational literature tier; the diamond-marked line shows the capped display set plus one. Labels give untransformed query counts.}
   \label{fig:saturation}
 \end{figure*}
 
 \subsection{Grounding Separated Real Panels From Controls}
-The real-panel seed-disease corpora held 10,868, 2,487, 1,538, and 2,373 records, all at least 15 times the grounding threshold; the control corpora held 0, 6, and 1. All 40 control hypotheses were Ungrounded and none of the 133 real-panel hypotheses was. Both invariants held exactly after regeneration (Fig.~\ref{fig:controls}).
+The real-panel seed-disease corpora held 10,868, 2,487, 1,538, and 2,373 records, all at least 15 times the grounding threshold; the control corpora held 0, 6, and 1. All 40 control hypotheses were Ungrounded and none of the 124 real-panel hypotheses was. Both invariants held exactly after regeneration (Fig.~\ref{fig:controls}).
 
-This test addresses a specific failure mode. Before grounding, off-target and random panels produced more Highly Novel calls than the cardiovascular panels, because every empty intersection received maximal novelty. The corrected system treats insufficient seed literature as undefined novelty rather than strong evidence. Since this failure motivated the gate and the same panels were retained for regression testing, the 40/40 versus 0/133 separation is a correctness invariant, not an unbiased specificity estimate.
+This test addresses a specific failure mode. Before grounding, off-target and random panels produced more Highly Novel calls than the cardiovascular panels, because every empty intersection received maximal novelty. The corrected system treats insufficient seed literature as undefined novelty rather than strong evidence. Since this failure motivated the gate and the same panels were retained for regression testing, the 40/40 versus 0/124 separation is a correctness invariant, not an unbiased specificity estimate.
 
 \begin{figure*}[t]
   \centering
@@ -223,35 +224,35 @@ This test addresses a specific failure mode. Before grounding, off-target and ra
 \end{figure*}
 
 \subsection{Temporal Holdout Showed Negligible Overall Association}
-Across all 133 hypotheses, the Discovery Score at the 2020 cutoff showed negligible rank association with publication growth in the follow-up retrieval snapshot ($\rho=-0.0635$). Composite novelty alone was similarly near zero ($\rho=-0.0283$), and PPS alone was weakly negative ($\rho=-0.1462$). Among the 122 hypotheses with nonzero pre-cutoff counts, the Discovery Score association remained near zero ($\rho=0.0225$).
+Across all 124 hypotheses, the Discovery Score at the 2020 cutoff showed negligible rank association with publication growth in the follow-up retrieval snapshot ($\rho=-0.1189$). Composite novelty alone was similarly near zero ($\rho=-0.0693$), and PPS alone was weakly negative ($\rho=-0.1587$). Among the 109 hypotheses with nonzero pre-cutoff counts, the Discovery Score association remained near zero ($\rho=0.0132$).
 
-Within-panel values were heterogeneous ($\rho=0.7165$ heart failure, $0.0485$ arrhythmia, $-0.2235$ structural cardiomyopathy, $-0.3826$ myocardial infarction) and four descriptive panel results do not support a general forecasting claim. At the cutoff, the Highly Novel, Novel, Emerging, and Established tiers held 18, 55, 48, and 12 hypotheses with median growth 0, 0.6970, 0.6061, and 0.5413. Figure~\ref{fig:holdout} therefore bounds the Discovery Score as a triage measure: sparse intersections are not necessarily where publication activity will increase.
+Within-panel values were heterogeneous ($\rho=0.2712$ heart failure, $0.1704$ arrhythmia, $-0.2360$ structural cardiomyopathy, $-0.5360$ myocardial infarction) and four descriptive panel results do not support a general forecasting claim. At the cutoff, the Highly Novel, Novel, Emerging, Established, and Unverified tiers held 19, 55, 38, 9, and 3 hypotheses with median growth 0, 0.7027, 0.6401, 0.5460, and 0. Figure~\ref{fig:holdout} therefore bounds the Discovery Score as a triage measure: sparse intersections are not necessarily where publication activity will increase.
 
 \begin{figure*}[t]
   \centering
   \includegraphics[width=0.96\textwidth]{figures/fig4_temporal_holdout.pdf}
-  \caption{Temporal holdout using all 133 real-panel hypotheses, with literature censored at December 31, 2020 and follow-up records counted in a separate snapshot. (A) Discovery Score versus post-cutoff growth ($\rho=-0.0635$); the measurable-only sensitivity result was $\rho=0.0225$ ($n=122$). (B) Growth stratified by operational tier at the cutoff: boxes span the interquartile range, center lines are medians, whiskers extend to 1.5$\times$ IQR, points are outliers, and diamonds are means. Pathways overlap within panels, so correlations are descriptive and do not establish predictive validity.}
+  \caption{Temporal holdout using all 124 real-panel hypotheses, with literature censored at December 31, 2020 and follow-up records counted in a separate snapshot. (A) Discovery Score versus post-cutoff growth ($\rho=-0.1189$); the measurable-only sensitivity result was $\rho=0.0132$ ($n=109$). (B) Growth stratified by operational tier at the cutoff: boxes span the interquartile range, center lines are medians, whiskers extend to 1.5$\times$ IQR, points are outliers, and diamonds are means. Pathways overlap within panels, so correlations are descriptive and do not establish predictive validity.}
   \label{fig:holdout}
 \end{figure*}
 
 \begin{figure*}[t]
   \centering
   \includegraphics[width=0.96\textwidth]{figures/fig6a_application_ranked_results.pdf}
-  \caption{Ranked-results application view, comparing Discovery Score, operational literature tier and evidence status, PPS, empirical $q$-value, fold enrichment, and cardiovascular relevance without collapsing them into one metric. This cropped deterministic cardiomyopathy fixture demonstrates interface behavior only.}
+  \caption{Ranked-results application view, comparing Discovery Score, operational literature tier and evidence status, PPS, empirical $q$-value, fold enrichment, and cardiovascular relevance without collapsing them into one metric. This cropped deterministic cardiomyopathy fixture demonstrates interface behavior only; its held-fixed values are not the benchmark results of Table~\ref{tab:candidates} and should not be compared with them.}
   \label{fig:ui-results}
 \end{figure*}
 
 \begin{figure*}[t]
   \centering
   \includegraphics[width=0.94\textwidth]{figures/fig6b_application_pathway_audit.pdf}
-  \caption{Pathway-audit application view. The score card exposes the measured PubMed record count, query scope and exact query, scoring components, enrichment and permutation statistics, cardiac expression, and druggability provenance. The deterministic fixture demonstrates inspectability only.}
+  \caption{Pathway-audit application view. The score card exposes the measured PubMed record count, query scope and exact query, scoring components, enrichment and permutation statistics, cardiac expression, and druggability provenance. The deterministic fixture demonstrates inspectability only; its values are held fixed for reproducible capture and are not benchmark results.}
   \label{fig:ui-audit}
 \end{figure*}
 
 \begin{figure*}[t]
   \centering
   \includegraphics[width=0.98\textwidth]{figures/fig7_cardiovascular_discovery_gaps.pdf}
-  \caption{The seven cardiovascular hypotheses meeting the verified exact-query gap rule. Horizontal position gives fold enrichment; labels report the empirical $q$-value, exact-query record count, and Discovery Score ($D$). Color and marker shape redundantly encode disease panel. Counts are specific to the prespecified query in the benchmark snapshot and do not establish global biological novelty.}
+  \caption{The eight cardiovascular hypotheses meeting the verified exact-query gap rule; all eight returned zero records by construction. Horizontal position gives fold enrichment; labels report the empirical $q$-value and Discovery Score ($D$). Color and marker shape redundantly encode disease panel. Counts are specific to the prespecified query in the benchmark snapshot and do not establish global biological novelty.}
   \label{fig:gaps}
 \end{figure*}
 
@@ -264,7 +265,7 @@ One paired back-to-back comparison returned identical functional neighborhoods (
 \subsection{Novelty and Practical Meaning}
 CardioXNet's main contribution is separating three concepts that are often conflated: evidence-weighted cardiovascular prioritization, literature saturation, and whether a novelty estimate is interpretable at all. PPS asks whether a pathway has statistical, annotation-specific, upstream, source, and lexical cardiovascular support. Literature saturation asks how much has been indexed at one defined intersection. Grounding asks whether a low count can be interpreted at all. Keeping literature saturation and grounding separate from pathway support makes a zero auditable and prevents an irrelevant panel from appearing more innovative than a well-grounded cardiovascular panel.
 
-The benchmark nominates several cardiovascular connections for manual review. GAB1 and NTRK2 signaling in the structural cardiomyopathy panel suggest growth-factor-adaptor and neurotrophin routes linking sarcomeric or nuclear-envelope seeds to downstream signaling genes; cGMP-PKG and GPER1 in the arrhythmia panel suggest modulation beyond the input ion channels; P2Y12 and GPER1 in the ischemic panel connect platelet and hormone-responsive signaling with lipid and endothelial seeds. These are testable pathway-level hypotheses from enrichment evidence and a prespecified exact-query gap, not verified mechanisms, causal claims, or guarantees of clinical relevance.
+The benchmark nominates several cardiovascular connections for manual review. GAB1 and NTRK2 signaling in the structural cardiomyopathy panel suggest growth-factor-adaptor and neurotrophin routes linking sarcomeric or nuclear-envelope seeds to downstream signaling genes; cGMP-PKG in the arrhythmia panel suggests modulation beyond the input ion channels; P2Y12, HIF-1, cAMP, oxytocin, and GPER1 in the ischemic panel connect platelet, hypoxia, and hormone-responsive signaling with lipid and endothelial seeds. These are testable pathway-level hypotheses from enrichment evidence and a prespecified exact-query gap, not verified mechanisms, causal claims, or guarantees of clinical relevance.
 
 The temporal holdout marks this boundary rather than validating a forecast. The overall association with later growth was negligible and panel-specific associations varied in direction. Low saturation can indicate a productive opportunity, a vocabulary mismatch, a deliberately narrow intersection, or an unproductive question, so expert review and experimental validation remain necessary. The defensible use is to reduce a large enrichment output to a transparent shortlist for mechanistic evaluation.
 
@@ -285,7 +286,7 @@ The temporal analysis is likewise descriptive. Pathways overlap within panels an
 Finally, GTEx expression is bulk-tissue context rather than cell-type or disease-state evidence, druggability indicates targetability rather than therapeutic benefit, and semantic cardiovascular relevance can miss mechanisms described with distant vocabulary. Every CardioXNet output remains a hypothesis for independent validation.
 
 \section{Conclusion}
-CardioXNet provides an auditable path from a focused cardiovascular gene panel to statistically supported, literature-sparse query intersections. Its specificity-aware PPS reduces generic-term dominance, uncapped PubMed counts preserve a 350.6-fold literature range that capped retrieval compresses to 1.15-fold, and the grounding gate maintains the 0/133 real-panel and 40/40 control invariants. Seven hypotheses met the verified exact-query gap rule, while the all-hypothesis temporal holdout showed negligible association with later publication growth ($\rho=-0.0635$). CardioXNet is therefore suited to prioritizing under-examined cardiovascular connections for expert review and experiment, with query provenance, evidence components, and validity boundaries kept visible.
+CardioXNet provides an auditable path from a focused cardiovascular gene panel to statistically supported, literature-sparse query intersections. Its specificity-aware PPS reduces generic-term dominance, uncapped PubMed counts preserve a 593.2-fold literature range that capped retrieval compresses to 3.75-fold, and the grounding gate maintains the 0/124 real-panel and 40/40 control invariants. Eight hypotheses met the verified exact-query gap rule, while the all-hypothesis temporal holdout showed negligible association with later publication growth ($\rho=-0.1189$). CardioXNet is therefore suited to prioritizing under-examined cardiovascular connections for expert review and experiment, with query provenance, evidence components, and validity boundaries kept visible.
 
 \section*{Data and Code Availability}
 The manuscript workspace includes the benchmark manifest, generation scripts, vector and 600 dpi raster figures, structured tables, and a deterministic application fixture. Each analysis is stored as machine-readable JSON with ranked results exported as CSV. Live resources should be re-queried with the run date recorded; the pinned 19,410-symbol baseline, run-specific background augmentation, and random seed preserve the permutation design.

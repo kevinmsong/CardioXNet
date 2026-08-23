@@ -2,6 +2,8 @@
 {% block title %}{{ hyp.pathway_name }} - CardioXNet{% endblock %}
 
 {% block content %}
+{% set novelty_confidence = score_components.get('novelty_confidence', '') %}
+{% set novelty_interpretable = score_components.get('query_tier') == 'strict' and novelty_confidence in ['verified', 'verified_gap'] %}
 <div class="breadcrumb"><a href="/">New analysis</a> / <a href="/results/{{ analysis_id }}">Results</a> / Pathway</div>
 
 <div class="toolbar">
@@ -12,13 +14,20 @@
   {% if hyp.source_db %}<span class="badge badge-db">{{ hyp.source_db }}</span>{% endif %}
   {% if score_components.get('novelty_tier') %}<span class="badge tier-novelty">{{ score_components.get('novelty_tier') }}</span>{% endif %}
   {% if is_novel %}<span class="badge badge-unreported" data-testid="novel-badge">seed-independent</span>{% endif %}
+  {% if analysis_id == 'analysis_fixture' %}<span class="badge badge-db">demonstration fixture</span>{% endif %}
 </div>
 
 <div class="evidence-callout">
   <div><div class="label">Discovery score</div><div class="value">{{ '%.3f'|format(score_components.get('discovery_score')) if score_components.get('discovery_score') is not none else 'n/a' }}</div></div>
-  <div><div class="label">Literature intersection</div><div class="value">{{ score_components.get('pubmed_hit_count') if score_components.get('pubmed_hit_count') is not none and score_components.get('pubmed_hit_count') >= 0 else 'Not measured' }} PubMed records</div></div>
-  <div><div class="label">Evidence status</div><div class="value">{{ score_components.get('novelty_tier') or 'Not classified' }}</div></div>
+  <div><div class="label">{{ 'Strict-query literature' if score_components.get('query_tier') == 'strict' else 'Literature count' }}</div><div class="value">{{ score_components.get('pubmed_hit_count') if score_components.get('pubmed_hit_count') is not none and score_components.get('pubmed_hit_count') >= 0 else 'Not measured' }} PubMed records</div></div>
+  <div><div class="label">{{ 'Literature tier' if novelty_interpretable else 'Evidence status' }}</div><div class="value">{{ score_components.get('novelty_tier') or 'Not classified' if novelty_interpretable else 'Unverified' }}</div></div>
 </div>
+{% if novelty_confidence and not novelty_interpretable %}
+<p class="hint" data-testid="novelty-evidence-status">
+  Literature novelty is unverified ({{ novelty_confidence|replace('_', ' ') }}).
+  The measured raw count is retained for audit, but a conservative corpus is used for scoring and this result is excluded from verified literature-sparse counts.
+</p>
+{% endif %}
 
 <!-- Lineage -->
 <div class="card" style="margin-bottom: 20px;">
@@ -53,23 +62,26 @@
 
 <div class="grid-2">
   <!-- Metrics -->
-  <div class="card">
+  <div class="card" data-testid="metrics-card">
     <div class="card-title"><h2 style="margin:0;">Scores &amp; statistics</h2></div>
     <dl class="kv" data-testid="metrics">
       {% if score_components.get('discovery_score') is not none %}
-      <dt title="Pathway Prioritization Score × literature novelty. The primary ranking metric.">Discovery Score</dt>
+      <dt title="Pathway Prioritization Score × composite novelty, weighted 2:1 toward exact-query literature novelty over low seed overlap. A triage metric, not proof of biological novelty.">Discovery Score</dt>
       <dd><strong>{{ '%.3f'|format(score_components.get('discovery_score')) }}</strong></dd>
       {% endif %}
-      <dt title="Weighted composite of significance (0.30), fold enrichment (0.30), gene-set specificity (0.25) and replication (0.15), scaled by database weight and seed proximity. Not a GSEA normalized enrichment score.">Pathway Prioritization Score</dt>
+      <dt title="Base weighted composite of significance, fold enrichment, specificity, and upstream support, scaled by database weight, then adjusted by bounded semantic cardiovascular relevance. Network topology is reported separately. Not a GSEA normalized enrichment score.">Pathway Prioritization Score</dt>
       <dd><strong>{{ '%.3f'|format(hyp.nes_score or 0) }}</strong>
         {% if score_components.get('significance') is not none %}
         <div class="pw-id">sig {{ '%.2f'|format(score_components.get('significance')) }} ·
           eff {{ '%.2f'|format(score_components.get('effect_size', 0)) }} ·
           spec {{ '%.2f'|format(score_components.get('specificity', 0)) }} ·
-          rep {{ '%.2f'|format(score_components.get('replication', 0)) }}</div>
+          upstream {{ '%.2f'|format(score_components.get('replication', 0)) }}</div>
+        {% if score_components.get('semantic_boost') is not none %}
+        <div class="pw-id">base {{ '%.3f'|format(score_components.get('base_pps', (hyp.nes_score or 0) / score_components.get('semantic_boost'))) }} · semantic multiplier {{ '%.3f'|format(score_components.get('semantic_boost')) }}</div>
+        {% endif %}
         {% endif %}
       </dd>
-      <dt title="FDR-adjusted enrichment p-value from g:Profiler">Enrichment p<sub>adj</sub></dt>
+      <dt title="Fisher-combined probability from per-query g:Profiler adjusted enrichment values; overlapping expansion branches are not independent">Combined enrichment p*</dt>
       <dd>{{ '%.2e'|format(hyp.p_adj) if hyp.p_adj is not none else '-' }}</dd>
       {% if score_components.get('fold_enrichment') is not none %}
       <dt title="Observed overlap ÷ overlap expected from term size, query size and annotation universe">Fold enrichment</dt>
@@ -90,13 +102,20 @@
       {% if score_components.get('cardiac_specificity_ratio') is not none %}<dt>Cardiac specificity</dt><dd>{{ '%.1f'|format(score_components.get('cardiac_specificity_ratio')) }}× vs other tissues</dd>{% endif %}
       {% if score_components.get('mean_cardiac_tpm') is not none %}<dt>Mean cardiac TPM</dt><dd>{{ '%.1f'|format(score_components.get('mean_cardiac_tpm')) }}</dd>{% endif %}
       {% if score_components.get('literature_saturation') is not none %}
-      <dt title="log10(PubMed hits + 1) ÷ log10(1001). 0 = nothing published at this intersection, 1 = ≥1000 records.">Literature saturation</dt>
+      <dt title="log10(scoring corpus + 1) ÷ log10(1001). The scoring corpus equals the measured strict-query count unless a stated safeguard substitutes a conservative proxy.">Literature saturation</dt>
       <dd>{{ '%.2f'|format(score_components.get('literature_saturation')) }}
-        {% if score_components.get('pubmed_hit_count') is not none and score_components.get('pubmed_hit_count') >= 0 %}
-        <div class="pw-id">{{ score_components.get('pubmed_hit_count') }} PubMed records at pathway × seeds × disease</div>
+        {% if novelty_confidence %}
+        <div class="pw-id">evidence status {{ novelty_confidence|replace('_', ' ') }}</div>
         {% endif %}
-        {% if score_components.get('saturation_basis') == 'retrieved_citations' %}
-        <div class="pw-id">count lookup unavailable - derived from retrieved citations, treat as a lower bound</div>
+        {% if score_components.get('pubmed_hit_count') is not none and score_components.get('pubmed_hit_count') >= 0 %}
+        <div class="pw-id">{{ score_components.get('pubmed_hit_count') }} measured PubMed records · query scope {{ score_components.get('query_tier', 'unknown') }}</div>
+        {% endif %}
+        {% if score_components.get('saturation_corpus_size') is not none and score_components.get('saturation_corpus_size') != score_components.get('pubmed_hit_count') %}
+        <div class="pw-id">conservative scoring corpus {{ score_components.get('saturation_corpus_size') }} · {{ score_components.get('saturation_basis') }}</div>
+        {% endif %}
+        {% if score_components.get('literature_query') %}
+        {% if score_components.get('literature_query_genes') %}<div class="pw-id">query genes: {{ score_components.get('literature_query_genes') | join(', ') }}</div>{% endif %}
+        <details style="margin-top:6px;"><summary class="pw-id" style="cursor:pointer;">Show exact PubMed query</summary><div class="mono small" style="overflow-wrap:anywhere;margin-top:5px;">{{ score_components.get('literature_query') }}</div></details>
         {% endif %}
       </dd>
       {% endif %}
@@ -116,6 +135,8 @@
         <span class="badge tier-{{ score_components.get('druggability_tier', 'low') }}">{{ score_components.get('druggability_tier', '-') }}</span>
         {% if score_components.get('approved_drug_count') %}· {{ score_components.get('approved_drug_count') }} approved{% endif %}
         {% if score_components.get('clinical_trial_count') %}· {{ score_components.get('clinical_trial_count') }} in trials{% endif %}
+        {% if score_components.get('druggability_source') %}<div class="pw-id">{{ score_components.get('druggability_source') }}</div>{% endif %}
+        {% if score_components.get('external_lookup_complete') is false %}<div class="pw-id">Open Targets incomplete: {{ score_components.get('external_lookup_failures', 0) }} lookup failure(s); external counts are lower bounds</div>{% endif %}
       </dd>
     </dl>
   </div>

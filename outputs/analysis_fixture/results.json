@@ -1,4 +1,29 @@
 {
+ "run_metadata": {
+  "analysis_id": "analysis_fixture",
+  "resource_identifiers": {
+   "string": {
+    "configured_release": "12.0",
+    "configured_endpoint": "https://string-db.org/api",
+    "effective_endpoint": "https://version-12-0.string-db.org/api"
+   },
+   "gprofiler": {
+    "configured_identifier": "e104_eg51_p15",
+    "configured_endpoint": "https://biit.cs.ut.ee/gprofiler",
+    "effective_endpoint": "https://biit.cs.ut.ee/gprofiler",
+    "verified_from_response": false
+   },
+   "reactome": {
+    "configured_identifier": "79",
+    "configured_endpoint": "https://reactome.org/ContentService",
+    "effective_endpoint": "https://reactome.org/ContentService",
+    "effective_analysis_endpoint": "https://reactome.org/AnalysisService",
+    "verified_from_response": false
+   }
+  },
+  "configured_gprofiler_timeout_seconds": 120.0,
+  "configured_max_retries": 2
+ },
  "stage_0": {
   "valid_genes": [
    {
@@ -150,6 +175,10 @@
      "approved_drug_count": 0,
      "clinical_trial_count": 0,
      "druggability_tier": "medium",
+     "druggability_source": "embedded curated snapshot",
+     "external_lookup_attempted": 0,
+     "external_lookup_failures": 0,
+     "external_lookup_complete": null,
      "empirical_qvalue": 0.0016347289074561803,
      "empirical_significant": true,
      "total_validation_score": 0.4011515711548295,
@@ -163,6 +192,18 @@
      "literature_saturation": 0.0,
      "discovery_score": 2.0087,
      "pubmed_hit_count": 0,
+     "saturation_corpus_size": 0,
+     "query_tier": "strict",
+     "literature_query": "(LMNA[Title/Abstract] OR MYBPC3[Title/Abstract] OR TTN[Title/Abstract]) AND (\"GAB1 signalosome\"[Title/Abstract]) AND (\"cardiomyopathy\"[Title/Abstract])",
+     "literature_query_genes": [
+      "LMNA",
+      "MYBPC3",
+      "TTN"
+     ],
+     "literature_concept_query": "(\"GAB1 signalosome\"[Title/Abstract])",
+     "literature_novelty": 1.0,
+     "gene_novelty": 1.0,
+     "composite_novelty": 1.0,
      "saturation_basis": "pubmed_corpus",
      "n_relevant_citations": 0,
      "novelty_confidence": "verified_gap",
@@ -312,6 +353,10 @@
      "approved_drug_count": 0,
      "clinical_trial_count": 0,
      "druggability_tier": "medium",
+     "druggability_source": "embedded curated snapshot",
+     "external_lookup_attempted": 0,
+     "external_lookup_failures": 0,
+     "external_lookup_complete": null,
      "empirical_qvalue": 0.0016347289074561803,
      "empirical_significant": true,
      "total_validation_score": 0.41414812328865463,
@@ -325,6 +370,12 @@
      "literature_saturation": 0.0,
      "discovery_score": 1.984,
      "pubmed_hit_count": 0,
+     "saturation_corpus_size": 0,
+     "query_tier": "strict",
+     "literature_query": "(LMNA[Title/Abstract] OR MYBPC3[Title/Abstract] OR TTN[Title/Abstract]) AND (NTRK2[Title/Abstract] OR TRKB[Title/Abstract]) AND (\"cardiomyopathy\"[Title/Abstract])",
+     "literature_novelty": 1.0,
+     "gene_novelty": 1.0,
+     "composite_novelty": 1.0,
      "saturation_basis": "pubmed_corpus",
      "n_relevant_citations": 0,
      "novelty_confidence": "verified_gap",
@@ -485,6 +536,10 @@
      "approved_drug_count": 0,
      "clinical_trial_count": 0,
      "druggability_tier": "low",
+     "druggability_source": "embedded curated snapshot",
+     "external_lookup_attempted": 0,
+     "external_lookup_failures": 0,
+     "external_lookup_complete": null,
      "empirical_qvalue": 0.0016347289074561803,
      "empirical_significant": true,
      "total_validation_score": 0.5620593351657786,
@@ -498,6 +553,12 @@
      "literature_saturation": 0.3597,
      "discovery_score": 1.6293,
      "pubmed_hit_count": 11,
+     "saturation_corpus_size": 11,
+     "query_tier": "strict",
+     "literature_query": "(LMNA[Title/Abstract] OR MYBPC3[Title/Abstract] OR TTN[Title/Abstract]) AND (Cardiogenesis[Title/Abstract]) AND (\"cardiomyopathy\"[Title/Abstract])",
+     "literature_novelty": 0.6403,
+     "gene_novelty": 1.0,
+     "composite_novelty": 0.7602,
      "saturation_basis": "pubmed_corpus",
      "n_relevant_citations": 11,
      "validation_score": 0.5620593351657786
@@ -834,6 +895,10 @@
      "approved_drug_count": 0,
      "clinical_trial_count": 0,
      "druggability_tier": "medium",
+     "druggability_source": "embedded curated snapshot",
+     "external_lookup_attempted": 0,
+     "external_lookup_failures": 0,
+     "external_lookup_complete": null,
      "empirical_qvalue": 0.0016347289074561803,
      "empirical_significant": true,
      "total_validation_score": 0.46804673187751994,
@@ -847,6 +912,12 @@
      "literature_saturation": 0.4336,
      "discovery_score": 1.4322,
      "pubmed_hit_count": 19,
+     "saturation_corpus_size": 19,
+     "query_tier": "strict",
+     "literature_query": "(LMNA[Title/Abstract] OR MYBPC3[Title/Abstract] OR TTN[Title/Abstract]) AND (\"Signal transduction by L1\"[Title/Abstract]) AND (\"cardiomyopathy\"[Title/Abstract])",
+     "literature_novelty": 0.5664,
+     "gene_novelty": 1.0,
+     "composite_novelty": 0.7109,
      "saturation_basis": "pubmed_corpus",
      "n_relevant_citations": 19,
      "validation_score": 0.46804673187751994

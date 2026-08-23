@@ -1,5 +1,6 @@
 """Permutation-based empirical p-value calculation for pathway enrichment."""
 
+import hashlib
 import logging
 import random
 from typing import Any, Dict, List, Optional, Tuple
@@ -50,22 +51,46 @@ class PermutationTester:
         """Initialize permutation tester.
 
         Args:
-            random_seed: Seed for the dedicated RNG. A private ``random.Random``
-                instance is used rather than the module-level functions so that
-                empirical p-values are reproducible and are not perturbed by
-                unrelated callers consuming from the global random stream.
+            random_seed: Base seed used to derive a separate deterministic RNG
+                stream for each canonical pathway. Per-call streams make the
+                result independent of pathway evaluation order and unrelated
+                use of the module-level random stream.
         """
         self.settings = get_settings()
         self.n_permutations = self.settings.nets.n_permutations if hasattr(
             self.settings.nets, 'n_permutations'
         ) else 1000
-        self._rng = random.Random(random_seed)
         self.random_seed = random_seed
 
         logger.info(
             f"PermutationTester initialized with {self.n_permutations} permutations "
             f"(seed={random_seed}, resolution floor p={1/(self.n_permutations+1):.2g})"
         )
+
+    def _pathway_seed(
+        self,
+        pathway_genes: List[str],
+        pathway_identity: Optional[str] = None,
+    ) -> int:
+        """Derive a stable local RNG seed for one canonical pathway.
+
+        Python's built-in ``hash`` is intentionally randomized between
+        processes, so it cannot be used for scientific reproducibility. SHA-256
+        over the configured base seed, normalized identity, and sorted unique
+        gene symbols is stable across processes, input order, and
+        ``PYTHONHASHSEED`` values.
+        """
+        identity = str(pathway_identity or "").strip().casefold()
+        genes = sorted(
+            {
+                str(gene).strip().upper()
+                for gene in pathway_genes
+                if str(gene).strip()
+            }
+        )
+        canonical = "\x1f".join((str(self.random_seed), identity, *genes))
+        digest = hashlib.sha256(canonical.encode("utf-8")).digest()
+        return int.from_bytes(digest[:16], byteorder="big", signed=False)
 
     def _validate_universe(
         self, fn_genes: List[str], all_genes: List[str]
@@ -105,7 +130,8 @@ class PermutationTester:
         pathway_genes: List[str],
         fn_genes: List[str],
         all_genes: List[str],
-        n_permutations: Optional[int] = None
+        n_permutations: Optional[int] = None,
+        pathway_identity: Optional[str] = None,
     ) -> Tuple[float, Dict]:
         """
         Calculate empirical p-value for pathway enrichment.
@@ -115,6 +141,8 @@ class PermutationTester:
             fn_genes: Genes in functional neighborhood
             all_genes: Universe of all possible genes
             n_permutations: Number of permutations (default from config)
+            pathway_identity: Stable pathway identifier or name. If omitted,
+                the sorted unique pathway genes define the local RNG stream.
             
         Returns:
             Tuple of (empirical_pvalue, statistics_dict)
@@ -151,10 +179,19 @@ class PermutationTester:
         
         # Generate null distribution
         null_overlaps = []
-        
+        # A set's iteration order changes with Python hash randomization. Sort
+        # once so the private RNG seed identifies the same draws in every
+        # process, not merely within one interpreter session.
+        sampling_universe = sorted(all_genes_set)
+        permutation_seed = self._pathway_seed(pathway_genes, pathway_identity)
+        local_rng = random.Random(permutation_seed)
+
         for i in range(n_permutations):
             # Randomly sample same number of genes from universe
-            permuted_fn = set(self._rng.sample(list(all_genes_set), min(len(fn_genes), len(all_genes_set))))
+            permuted_fn = set(local_rng.sample(
+                sampling_universe,
+                min(len(fn_set), len(sampling_universe)),
+            ))
             null_overlap = len(pathway_set & permuted_fn)
             null_overlaps.append(null_overlap)
         
@@ -186,6 +223,8 @@ class PermutationTester:
             'null_model': 'size_matched_uniform',
             'p_resolution_floor': 1.0 / (n_permutations + 1),
             'universe_size': len(all_genes_set),
+            'base_random_seed': self.random_seed,
+            'pathway_random_seed': permutation_seed,
         }
 
         return empirical_p, statistics
@@ -270,7 +309,12 @@ class PermutationTester:
                 pathway_genes,
                 fn_genes,
                 all_genes,
-                n_permutations
+                n_permutations,
+                pathway_identity=(
+                    getattr(pathway, 'pathway_id', None)
+                    or getattr(pathway, 'pathway_name', None)
+                    or getattr(pathway, 'name', None)
+                ),
             )
             
             # Add to pathway object

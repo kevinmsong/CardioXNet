@@ -11,6 +11,13 @@ degenerate case the assertions were meant to catch. The methods have been
 removed; these tests cover the remaining guarded path.
 """
 
+import json
+import os
+from pathlib import Path
+import subprocess
+import sys
+import textwrap
+
 import pytest
 
 from app.services.gene_background import protein_coding_background
@@ -87,3 +94,78 @@ def test_adjust_pvalues_over_a_pathway_list():
 
     assert len(result) == 2
     assert getattr(result[0], "empirical_pvalue", None) is not None
+
+
+def test_pathway_stream_is_independent_of_evaluation_order():
+    """Each pathway must receive the same null draws in any call order."""
+    fn_genes = [f"U{i}" for i in range(60)]
+    universe = [f"U{i}" for i in range(600)]
+    pathways = {
+        "PATH:A": fn_genes[:8] + ["U100", "U101", "U102"],
+        "PATH:B": fn_genes[10:17] + ["U200", "U201", "U202"],
+        "PATH:C": fn_genes[25:31] + ["U300", "U301", "U302"],
+    }
+
+    def evaluate(order):
+        tester = PermutationTester(random_seed=314159)
+        results = {}
+        for pathway_id in order:
+            pvalue, stats = tester.calculate_empirical_pvalue(
+                pathways[pathway_id],
+                fn_genes,
+                universe,
+                n_permutations=80,
+                pathway_identity=pathway_id,
+            )
+            results[pathway_id] = (
+                pvalue,
+                stats["null_overlaps"],
+                stats["pathway_random_seed"],
+            )
+        return results
+
+    forward = evaluate(list(pathways))
+    reverse = evaluate(list(reversed(pathways)))
+    assert forward == reverse
+
+
+def test_reproducible_across_python_hash_seeds():
+    """Scientific outputs must not depend on interpreter hash randomization."""
+    script = textwrap.dedent(
+        """
+        import json
+        from app.services.permutation_tester import PermutationTester
+
+        fn_genes = list({f"U{i}" for i in range(60)})
+        universe = list({f"U{i}" for i in range(600)})
+        pathway = list({f"U{i}" for i in range(7)} | {"U100", "U101"})
+        pvalue, stats = PermutationTester(random_seed=271828).calculate_empirical_pvalue(
+            pathway,
+            fn_genes,
+            universe,
+            n_permutations=80,
+            pathway_identity="PATH:HASH",
+        )
+        print(json.dumps({
+            "pvalue": pvalue,
+            "null_overlaps": stats["null_overlaps"],
+            "pathway_random_seed": stats["pathway_random_seed"],
+        }, sort_keys=True))
+        """
+    )
+    project_root = Path(__file__).resolve().parents[1]
+
+    def run(hash_seed):
+        env = os.environ.copy()
+        env["PYTHONHASHSEED"] = str(hash_seed)
+        completed = subprocess.run(
+            [sys.executable, "-c", script],
+            cwd=project_root,
+            env=env,
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+        return json.loads(completed.stdout.strip().splitlines()[-1])
+
+    assert run(1) == run(8675309)

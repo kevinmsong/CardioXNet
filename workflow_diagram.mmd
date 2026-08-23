@@ -5,17 +5,17 @@ flowchart TD
 
     START([/"Seed genes + disease context"/])
 
-    S0["<b>Stage 0 - Input Validation</b> <i>(5%)</i><br/>HGNC symbol normalisation<br/>invalid identifiers dropped"]
+    S0["<b>Stage 0 - Input Validation</b> <i>(5%)</i><br/>HGNC symbol normalization<br/>invalid identifiers dropped"]
 
-    S1["<b>Stage 1 - Functional Neighbourhood</b> <i>(15%)</i><br/>STRING v12.0 PPI expansion<br/>75 neighbours · combined score ≥ 0.60"]
+    S1["<b>Stage 1 - Functional Neighborhood</b> <i>(15%)</i><br/>STRING v12.0 PPI expansion<br/>75 neighbors · combined score ≥ 0.60"]
 
     S2a["<b>Stage 2a - Primary Enrichment</b> <i>(25%)</i><br/>g:Profiler over REAC · KEGG · WP · GO:BP<br/>FDR ≤ 0.05<br/>screen = 0.40·sig + 0.35·effect + 0.25·specificity"]
 
-    S2b["<b>Stage 2b - Secondary Discovery</b> <i>(40%)</i><br/>top 20 primaries re-expanded<br/>per-primary neighbour re-enrichment"]
+    S2b["<b>Stage 2b - Secondary Discovery</b> <i>(40%)</i><br/>top 20 primaries re-expanded<br/>member-gene re-enrichment<br/>optional literature-gene augmentation"]
 
     S2c["<b>Stage 2c - Aggregation</b> <i>(55%)</i><br/>frequency-based across primaries<br/>Fisher-combined p · Jaccard ≥ 0.70 redundancy filter"]
 
-    S3["<b>Stage 3 - Pathway Prioritization Score</b> <i>(65%)</i><br/>PPS = db_weight × centrality × (<br/>0.30·significance + 0.30·effect size<br/>+ 0.25·specificity + 0.15·replication)<br/><i>not a GSEA NES</i>"]
+    S3["<b>Stage 3 - Pathway Prioritization Score</b> <i>(65%)</i><br/>base PPS = db_weight × (<br/>0.30·significance + 0.30·effect size<br/>+ 0.25·specificity + 0.15·upstream support)<br/><i>not a GSEA NES</i>"]
 
     S35["<b>Stage 3.5 - Semantic Cardiac Filter</b> <i>(72%)</i><br/>curated cardiovascular term scoring<br/>3-tier disease-context thresholds"]
 
@@ -23,11 +23,11 @@ flowchart TD
 
     S6["<b>Stage 6 - Literature Mining</b> <i>(85%)</i><br/>PubMed query = genes <b>AND</b> pathway concept <b>AND</b> disease<br/>esearch <i>Count</i> gives the true corpus size<br/>seed-gene → pathway traceability"]
 
-    S6c["<b>Stage 6c - Final Cardiac Filter</b> <i>(88%)</i><br/>cardiac/disease term in pathway name<br/><b>or</b> semantic rescue (relevance + replication + significance)"]
+    S6c["<b>Stage 6c - Final Cardiac Filter</b> <i>(88%)</i><br/>cardiac/disease term in pathway name<br/><b>or</b> semantic rescue (relevance + upstream support + significance)"]
 
     S7["<b>Stage 7 - Network Topology</b> <i>(91%)</i><br/>hub score = 0.35·betweenness + 0.25·PageRank<br/>+ 0.20·degree + 0.15·eigenvector + 0.05·closeness"]
 
-    S8["<b>Stage 8 - Novelty &amp; Discovery</b> <i>(96%)</i><br/>saturation = log₁₀(hits+1) / log₁₀(1001)<br/>novelty = (2·(1−saturation) + gene novelty) / 3<br/><b>Discovery = PPS × novelty</b> - final ranking"]
+    S8["<b>Stage 8 - Novelty &amp; Discovery</b> <i>(96%)</i><br/>PPS = base PPS × (1 + semantic relevance)<br/>saturation = log₁₀(hits+1) / log₁₀(1001)<br/>composite novelty = (2·literature novelty + gene novelty) / 3<br/><b>Discovery = PPS × composite novelty</b>"]
 
     S9["<b>Stage 9 - Report Generation</b> <i>(100%)</i><br/>JSON · PDF · Markdown · CSV<br/>ranked hypotheses · hub genes · target candidates"]
 

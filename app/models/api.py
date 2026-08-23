@@ -1,7 +1,8 @@
 """API request and response models."""
 
-from typing import List, Optional, Dict
-from pydantic import BaseModel, ConfigDict, Field
+from typing import Any, Dict, List, Literal, Optional
+
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 from .gene import GeneInfo
 from .results import ValidationResult, ScoredHypotheses
 
@@ -45,12 +46,94 @@ class GeneValidationResponse(BaseModel):
     )
 
 
+class AnalysisConfigOverrides(BaseModel):
+    """Bounded per-analysis settings accepted by the public API.
+
+    Service endpoints and resource-version identifiers are intentionally not
+    request-configurable. Operators can still configure those trusted values
+    through ``NETS_*`` environment variables, while an API caller is limited to
+    analysis behavior and bounded resilience settings.
+    """
+
+    graceful_degradation: Optional[bool] = None
+    require_all_apis: Optional[bool] = None
+
+    string_neighbor_count: Optional[int] = Field(None, ge=10, le=200)
+    string_score_threshold: Optional[float] = Field(None, ge=0.4, le=0.95)
+    fdr_threshold: Optional[float] = Field(None, ge=0.001, le=0.2)
+    top_hypotheses_count: Optional[int] = Field(None, ge=5, le=100)
+
+    db_weight_reactome: Optional[float] = Field(None, ge=0.0, le=10.0)
+    db_weight_kegg: Optional[float] = Field(None, ge=0.0, le=10.0)
+    db_weight_wikipathways: Optional[float] = Field(None, ge=0.0, le=10.0)
+    db_weight_gobp: Optional[float] = Field(None, ge=0.0, le=10.0)
+
+    max_retries: Optional[int] = Field(None, ge=0, le=5)
+    retry_backoff_factor: Optional[float] = Field(None, ge=0.0, le=60.0)
+    request_timeout: Optional[int] = Field(None, ge=1, le=300)
+    gprofiler_timeout_seconds: Optional[float] = Field(None, ge=1.0, le=600.0)
+    hpa_timeout: Optional[int] = Field(None, ge=1, le=300)
+    gwas_timeout: Optional[int] = Field(None, ge=1, le=300)
+    epigenomic_timeout: Optional[int] = Field(None, ge=1, le=300)
+    clinical_api_max_retries: Optional[int] = Field(None, ge=0, le=5)
+
+    aggregation_strategy: Optional[Literal["intersection", "frequency", "weighted"]] = None
+    min_support_threshold: Optional[int] = Field(None, ge=1, le=10)
+    primary_pathways_to_expand: Optional[int] = Field(None, ge=1, le=200)
+    pubmed_max_results: Optional[int] = Field(None, ge=10, le=500)
+    literature_relevance_threshold: Optional[float] = Field(None, ge=0.05, le=0.7)
+
+    semantic_relevance_threshold: Optional[float] = Field(None, ge=0.0, le=0.7)
+    semantic_max_hypotheses_for_literature: Optional[int] = Field(None, ge=1, le=100)
+    semantic_max_results: Optional[int] = Field(None, ge=15, le=1000)
+    seed_overlap_threshold: Optional[float] = Field(None, ge=0.0, le=1.0)
+
+    tissue_expression_validation: Optional[bool] = None
+    min_cardiac_expression_ratio: Optional[float] = Field(None, ge=0.1, le=0.8)
+    permutation_test_enabled: Optional[bool] = None
+    n_permutations: Optional[int] = Field(None, ge=10, le=10000)
+    min_fold_enrichment: Optional[float] = Field(None, ge=1.0, le=10.0)
+
+    enforce_final_name_filter: Optional[bool] = None
+    filter_generic_pathways: Optional[bool] = None
+    redundancy_jaccard_threshold: Optional[float] = Field(None, ge=0.0, le=1.0)
+    gtex_top_pathways: Optional[int] = Field(None, ge=0, le=1000)
+    permutation_top_pathways: Optional[int] = Field(None, ge=0, le=1000)
+    external_druggability_top_pathways: Optional[int] = Field(None, ge=0, le=1000)
+    external_druggability_enabled: Optional[bool] = None
+    druggability_analysis: Optional[bool] = None
+    output_formats: Optional[
+        List[Literal["pdf", "json", "markdown", "html"]]
+    ] = Field(None, min_length=1, max_length=4)
+
+    # These two values are run context, not service configuration. They remain
+    # accepted here for compatibility with older clients that supplied them in
+    # config_overrides rather than using AnalysisRequest.disease_context.
+    disease_context: Optional[str] = Field(None, min_length=1, max_length=120)
+    disease_synonyms: Optional[List[str]] = Field(None, max_length=20)
+
+    @field_validator("disease_synonyms")
+    @classmethod
+    def validate_disease_synonyms(cls, values: Optional[List[str]]) -> Optional[List[str]]:
+        if values is not None and any(not value.strip() or len(value) > 120 for value in values):
+            raise ValueError("disease synonyms must contain 1 to 120 characters")
+        return values
+
+    model_config = ConfigDict(extra="forbid")
+
+
 class AnalysisRequest(BaseModel):
     """Request to start a new analysis."""
     
     seed_genes: List[str] = Field(..., description="Seed gene identifiers")
     disease_context: Optional[str] = Field(None, description="Optional disease context for analysis")
-    config_overrides: Optional[Dict] = Field(None, description="Configuration overrides")
+    config_overrides: Optional[AnalysisConfigOverrides] = Field(
+        None,
+        description=(
+            "Bounded analysis overrides. Service endpoints and resource-version "
+            "identifiers are operator-controlled and cannot be overridden per request."
+        ),
+    )
     
     model_config = ConfigDict(
         json_schema_extra={
@@ -118,6 +201,10 @@ class AnalysisResultsResponse(BaseModel):
     topology: Optional[Dict] = Field(None, description="Network topology analysis results")
     network_topology: Optional[Dict] = Field(None, description="Comprehensive network topology (hub genes, centrality, network summary)")
     top_genes: Optional[List[Dict]] = Field(None, description="Top genes aggregated across pathways")
+    run_metadata: Optional[Dict[str, Any]] = Field(
+        None,
+        description="Optional reproducibility and configured-resource metadata for the run",
+    )
     report_urls: Optional[Dict[str, str]] = Field(None, description="URLs to download reports")
     
     model_config = ConfigDict(

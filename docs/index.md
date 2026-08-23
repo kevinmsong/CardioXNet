@@ -17,16 +17,18 @@ CardioXNet follows a staged discovery funnel:
 3. Primary pathway enrichment creates the first candidate set.
 4. Secondary pathway enrichment broadens discovery beyond the original seed list.
 5. Pathway aggregation produces a replicated candidate set.
-6. The Pathway Prioritization Score (PPS) scores aggregated pathways on significance, effect size,
-   gene-set specificity and replication.
-7. Semantic cardiac filtering and redundancy reduction narrow the shortlist.
+6. A base Pathway Prioritization Score (PPS) scores aggregated pathways on significance, effect
+   size, gene-set specificity, upstream support, and database weight.
+7. A bounded lexical cardiovascular-relevance multiplier, progressive retention, and redundancy
+   reduction produce the final PPS shortlist.
 8. Enhanced validation adds GTEx cardiac expression, a size-matched permutation null with
    Benjamini-Hochberg FDR control, and therapeutic target evidence.
 9. Literature mining measures the PubMed corpus size at the (pathway x seed genes x disease)
    intersection and traces each hypothesis back to its seed genes.
 10. An optional cardiac-name filter can be enabled for confirmatory work; it is **off by default**
-    because it removes exactly the under-reported pathways the tool exists to surface.
-11. Novelty and the **Discovery Score** (PPS x literature novelty) produce the final ranking.
+    because it can remove pathways that are literature-sparse under the prespecified query.
+11. Composite novelty and the **Discovery Score** (PPS x composite novelty, weighted 2:1 toward
+    exact-query literature novelty over low seed overlap) produce the final ranking.
 12. Important genes are generated from top pathways.
 13. Reports and exports are generated.
 
@@ -41,9 +43,9 @@ The exact current implementation workflow is captured in [workflow_diagram.mmd](
 - **Literature novelty** (`novelty_tier`) and **seed-independence** measure different things. The
   first is about how much has been published at the intersection; the second is a structural property
   of where the pathway came from. A pathway can be either without being the other.
-- The permutation q-value confirms an overlap is not chance. Because the null samples the whole
-  protein-coding genome, most genuinely enriched pathways clear it comfortably, so it should not be
-  read as a ranking among strong hypotheses.
+- The permutation q-value provides evidence that overlap exceeds the uniform random gene-set
+  expectation. Because the null samples the whole protein-coding genome, most strongly enriched
+  pathways clear it comfortably, so it should not be read as a ranking among strong hypotheses.
 - Important genes highlight recurrence across highly ranked pathways and may include therapeutic evidence from curated annotations and Open Targets.
 
 ## Where To Look In The App

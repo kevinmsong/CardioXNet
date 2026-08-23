@@ -91,6 +91,23 @@ test.describe('Scientific rigor (fixture)', () => {
     await expect(page.getByText(/\d+ PubMed hits/).first()).toBeVisible();
   });
 
+  test('unverified novelty is labelled and excluded from the headline count', async ({ page }) => {
+    await page.goto(`/results/${FIXTURE}`);
+
+    // Two legacy fixture rows carry a literature tier but lack completed
+    // confidence provenance. They must be visible as unverified, not silently
+    // included with the two verified rows in the headline.
+    const statuses = page.getByTestId('novelty-evidence-status');
+    await expect(statuses.first()).toBeVisible();
+    for (const label of await statuses.allInnerTexts()) {
+      expect(label.trim().toLowerCase()).toContain('unverified');
+    }
+
+    const sparseStat = page.getByTestId('summary-stats').locator('.stat.novel');
+    await expect(sparseStat.locator('.k')).toHaveText('Verified literature-sparse');
+    await expect(sparseStat.locator('.v')).toHaveText('2');
+  });
+
   test('CSV export header and rows have equal width and correct labels', async ({ page }) => {
     // This defect shipped: novelty_confidence was written into every row but
     // omitted from the header, so every column after it was mislabelled in the
@@ -121,7 +138,8 @@ test.describe('Scientific rigor (fixture)', () => {
     }
 
     for (const column of ['discovery_score', 'novelty_tier', 'novelty_confidence',
-                          'pubmed_hit_count', 'perm_q_value', 'pps_score']) {
+                          'pubmed_hit_count', 'query_tier', 'composite_novelty',
+                          'perm_q_value', 'pps_score']) {
       expect(header, `${column} must be present in the header`).toContain(column);
     }
 
@@ -140,7 +158,7 @@ test.describe('Scientific rigor (fixture)', () => {
     await expect(metrics).toContainText('Discovery Score');
     await expect(metrics).toContainText('Pathway Prioritization Score');
     // The component breakdown that justifies the score.
-    await expect(metrics).toContainText(/sig[\s\S]*eff[\s\S]*spec[\s\S]*rep/);
+    await expect(metrics).toContainText(/sig[\s\S]*eff[\s\S]*spec[\s\S]*upstream/);
     await expect(metrics).toContainText('Fold enrichment');
 
     // PPS is not a GSEA normalized enrichment score and the page must not imply it.
