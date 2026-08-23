@@ -72,16 +72,16 @@ biology.
   or hatching where category distinctions matter.
 - Plot text uses regular sans serif fonts and defines abbreviations or encoded
   quantities in the caption.
+- Every figure file is named for the number it compiles to, so `figN_*` is
+  Figure N. Keep it that way: if a float moves, renumber the file with it.
 - Figure 4 is the grounding development benchmark. Its 40/40 control and 0/124
   real-panel results are regression invariants, not unbiased specificity.
-  Its source file is `fig5_negative_controls.pdf`: the manuscript includes the
-  controls float before the holdout float, so the compiled figure numbers are
-  swapped relative to these two filenames. Cite the compiled number.
-- Figure 5 is the all-hypothesis temporal holdout
-  (`fig4_temporal_holdout.pdf`). Correlations are descriptive because pathways
-  overlap within panels.
-- Figures 6a and 6b demonstrate interface behavior and are not additional
-  scientific evidence.
+- Figure 5 is the all-hypothesis temporal holdout. Correlations are descriptive
+  because pathways overlap within panels.
+- Figures 6 and 7 demonstrate interface behavior and are not additional
+  scientific evidence. They render a fixed demonstration fixture, so their
+  values are deliberately not the benchmark values in Table 2.
+- Figure 8 is the verified exact-query gap set.
 
 ## Building and checking the manuscript
 

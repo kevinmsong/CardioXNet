@@ -253,8 +253,8 @@ def fig_interface(out_dir: Path) -> None:
         return
 
     outputs = [
-        (images[0], "fig6a_application_ranked_results"),
-        (images[1], "fig6b_application_pathway_audit"),
+        (images[0], "fig6_application_ranked_results"),
+        (images[1], "fig7_application_pathway_audit"),
     ]
     for path, name in outputs:
         screenshot = plt.imread(path)
@@ -561,7 +561,7 @@ def fig_holdout(holdout: dict, out_dir: Path) -> None:
     despine(ax2)
 
     fig.tight_layout()
-    save(fig, out_dir, "fig4_temporal_holdout")
+    save(fig, out_dir, "fig5_temporal_holdout")
 
 
 # --------------------------------------------------------------------------
@@ -702,7 +702,7 @@ def fig_controls(reports: Dict[str, dict], manifest: dict, out_dir: Path) -> Non
         edgecolor=GRID,
         framealpha=1.0,
     )
-    save(fig, out_dir, "fig5_negative_controls")
+    save(fig, out_dir, "fig4_negative_controls")
 
 
 # --------------------------------------------------------------------------
@@ -817,7 +817,7 @@ def fig_discovery_gaps(
     ax.set_xlim(0.8, max(folds) * 1.62)
     ax.grid(axis="y", visible=False)
     despine(ax)
-    save(fig, out_dir, "fig7_cardiovascular_discovery_gaps")
+    save(fig, out_dir, "fig8_cardiovascular_discovery_gaps")
 
 
 # --------------------------------------------------------------------------

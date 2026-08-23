@@ -218,7 +218,7 @@ This test addresses a specific failure mode. Before grounding, off-target and ra
 
 \begin{figure*}[t]
   \centering
-  \includegraphics[width=0.94\textwidth]{figures/fig5_negative_controls.pdf}
+  \includegraphics[width=0.94\textwidth]{figures/fig4_negative_controls.pdf}
   \caption{Grounding regression benchmark. Diagonal hatching denotes an interpretable literature tier; cross-hatching denotes Ungrounded hypotheses whose seed panels had insufficient disease literature. Labels give grounded over total hypotheses. These development-set invariants test implementation behavior and do not estimate out-of-sample specificity.}
   \label{fig:controls}
 \end{figure*}
@@ -230,28 +230,28 @@ Within-panel values were heterogeneous ($\rho=0.2712$ heart failure, $0.1704$ ar
 
 \begin{figure*}[t]
   \centering
-  \includegraphics[width=0.96\textwidth]{figures/fig4_temporal_holdout.pdf}
+  \includegraphics[width=0.96\textwidth]{figures/fig5_temporal_holdout.pdf}
   \caption{Temporal holdout using all 124 real-panel hypotheses, with literature censored at December 31, 2020 and follow-up records counted in a separate snapshot. (A) Discovery Score versus post-cutoff growth ($\rho=-0.1189$); the measurable-only sensitivity result was $\rho=0.0132$ ($n=109$). (B) Growth stratified by operational tier at the cutoff: boxes span the interquartile range, center lines are medians, whiskers extend to 1.5$\times$ IQR, points are outliers, and diamonds are means. Pathways overlap within panels, so correlations are descriptive and do not establish predictive validity.}
   \label{fig:holdout}
 \end{figure*}
 
 \begin{figure*}[t]
   \centering
-  \includegraphics[width=0.96\textwidth]{figures/fig6a_application_ranked_results.pdf}
+  \includegraphics[width=0.96\textwidth]{figures/fig6_application_ranked_results.pdf}
   \caption{Ranked-results application view, comparing Discovery Score, operational literature tier and evidence status, PPS, empirical $q$-value, fold enrichment, and cardiovascular relevance without collapsing them into one metric. This cropped deterministic cardiomyopathy fixture demonstrates interface behavior only; its held-fixed values are not the benchmark results of Table~\ref{tab:candidates} and should not be compared with them.}
   \label{fig:ui-results}
 \end{figure*}
 
 \begin{figure*}[t]
   \centering
-  \includegraphics[width=0.94\textwidth]{figures/fig6b_application_pathway_audit.pdf}
+  \includegraphics[width=0.94\textwidth]{figures/fig7_application_pathway_audit.pdf}
   \caption{Pathway-audit application view. The score card exposes the measured PubMed record count, query scope and exact query, scoring components, enrichment and permutation statistics, cardiac expression, and druggability provenance. The deterministic fixture demonstrates inspectability only; its values are held fixed for reproducible capture and are not benchmark results.}
   \label{fig:ui-audit}
 \end{figure*}
 
 \begin{figure*}[t]
   \centering
-  \includegraphics[width=0.98\textwidth]{figures/fig7_cardiovascular_discovery_gaps.pdf}
+  \includegraphics[width=0.98\textwidth]{figures/fig8_cardiovascular_discovery_gaps.pdf}
   \caption{The eight cardiovascular hypotheses meeting the verified exact-query gap rule; all eight returned zero records by construction. Horizontal position gives fold enrichment; labels report the empirical $q$-value and Discovery Score ($D$). Color and marker shape redundantly encode disease panel. Counts are specific to the prespecified query in the benchmark snapshot and do not establish global biological novelty.}
   \label{fig:gaps}
 \end{figure*}
