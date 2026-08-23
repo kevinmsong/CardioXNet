@@ -8,6 +8,12 @@
 \usepackage{url}
 \usepackage{textcomp}
 
+% ieeeaccess.cls selects series `n' for body text, which Courier (pcr) does not
+% define, so a bare \texttt triggers a font-shape substitution warning. Pin the
+% medium weight for inline literals instead of redeclaring the font shape,
+% which would have to run after t1pcr.fd loads.
+\newcommand{\code}[1]{{\fontseries{m}\selectfont\texttt{#1}}}
+
 % Draft metadata. Replace the volume placeholder after IEEE assigns final metadata.
 \def\thevol{XX}
 \def\theyear{2026}
@@ -70,7 +76,7 @@ CardioXNet accepts human gene symbols, an optional cardiovascular disease contex
 The benchmark used five seed genes per panel and the balanced preset. The four real panels covered inflammatory remodeling in heart failure, sarcomeric and nuclear-envelope biology in cardiomyopathy, inherited arrhythmia channels, and lipid or endothelial biology in myocardial infarction; the three controls comprised one coherent off-target olfactory-receptor panel and two random protein-coding panels (Table~\ref{tab:panels}).
 
 \begin{table*}[t]
-\caption{Regenerated benchmark design and output counts. All analyses used five human seed genes and the balanced configuration.}
+\caption{Regenerated benchmark design and output counts. All analyses used five human seed genes and the balanced configuration. HF, heart failure; DCM, dilated cardiomyopathy; MI, myocardial infarction.}
 \label{tab:panels}
 \centering
 \small
@@ -97,7 +103,7 @@ Primary pathways already annotated to the seed genes are removed so the expansio
 Cardiovascular relevance $A_j\in[0,1]$ is a deterministic lexical heuristic derived from pathway terminology, optional disease-context terms, and explicit noncardiac penalties; it is not a trained or externally validated classifier. Candidates below $A_j=0.001$ were removed. After reranking, the first 30 candidates were retained without a name condition to preserve vocabulary-divergent hypotheses; positions 31--100 required $A_j\geq0.30$ or an explicit cardiovascular or disease term, and lower positions required $A_j\geq0.50$ up to a 100-candidate cap. The final strict pathway-name gate was disabled because universally requiring a cardiovascular word would be circular for discovery. Semantic terminology therefore influences selection and ranking, but no retained candidate is required to carry a cardiovascular term in its label.
 
 \subsection{Bounded g:Profiler Execution}
-The official g:Profiler Python library calls \texttt{requests.post} internally without exposing a request timeout. CardioXNet therefore runs each profile call in a fresh spawned process under a configurable hard wall-clock deadline (120 s by default). The worker writes a complete response to a private temporary file and emits a completion sentinel only after that write succeeds; if the deadline expires, the parent terminates and reaps the worker. Transient failures receive bounded retries with exponential backoff (two by default), and exhaustion raises an explicit pipeline error. An interrupted, unreadable, malformed, or partial response is never treated as enrichment data, whereas a complete empty response is a valid result indicating no enriched terms.
+The official g:Profiler Python library calls \code{requests.post} internally without exposing a request timeout. CardioXNet therefore runs each profile call in a fresh spawned process under a configurable hard wall-clock deadline (120 s by default). The worker writes a complete response to a private temporary file and emits a completion sentinel only after that write succeeds; if the deadline expires, the parent terminates and reaps the worker. Transient failures receive bounded retries with exponential backoff (two by default), and exhaustion raises an explicit pipeline error. An interrupted, unreadable, malformed, or partial response is never treated as enrichment data, whereas a complete empty response is a valid result indicating no enriched terms.
 
 \subsection{Pathway Prioritization Score}
 The PPS replaces an earlier significance-times-gene-count formula that favored generic, large gene sets. The base score for pathway $j$ is
@@ -140,7 +146,7 @@ p_{\mathrm{emp}}=\frac{1+\sum_{b=1}^{B}I(O_b\ge O_{\mathrm{obs}})}{B+1},
 \end{equation}
 where $B=1000$. The resolution floor is therefore $1/1001\approx 9.99\times10^{-4}$. Benjamini-Hochberg correction is applied across all testable reported pathways \cite{benjamini1995fdr}. Untestable pathways retain null values and are excluded from the correction family rather than assigned $p=1$. The null tests whether overlap exceeds a random gene-set expectation and does not rank already strong candidates; Section~\ref{sec:discussion} states its degree limitation.
 
-Cardiac expression is evaluated against GTEx v8 left-ventricular and atrial-appendage data \cite{gtex2020atlas}. Druggability starts from an embedded curated snapshot derived from DrugBank v5.1.10, TTD 2023, ChEMBL v31, and related references, optionally adding live Open Targets evidence \cite{ochoa2021opentargets,zdrazil2024chembl}. Both annotate ranked hypotheses but enter neither PPS nor the Discovery Score. Open Targets completion and failure counts are persisted, so an incomplete lookup cannot be presented as a verified zero.
+Cardiac expression is evaluated against GTEx v8 left-ventricular and atrial-appendage data \cite{gtex2020atlas}. Druggability starts from an embedded curated snapshot derived from DrugBank v5.1.10, the Therapeutic Target Database 2023, ChEMBL v31, and related references, optionally adding live Open Targets evidence \cite{ochoa2021opentargets,zdrazil2024chembl}. Both annotate ranked hypotheses but enter neither PPS nor the Discovery Score. Open Targets completion and failure counts are persisted, so an incomplete lookup cannot be presented as a verified zero.
 
 \subsection{Reproducibility and Software Verification}
 The permutation background, sorted sampling universe, private random-number generator, and default seed (20260821) are pinned. External resources remain live and can drift, so each result records retrieval timestamps, endpoints, configured resource identifiers, and whether identifiers were verified from a live response.
@@ -153,7 +159,7 @@ The user interface separates setup, ranked comparison, and pathway audit. Figure
 \label{sec:benchmark}
 
 \subsection{Regenerated Benchmark}
-All benchmark analyses were regenerated after corrections that affected filtering, query construction, and seeded permutation sampling because carrying forward previous values would have mixed incompatible candidate sets. The regenerated runs used STRING v12.0, the configured g:Profiler identifier \texttt{e104\_eg51\_p15}, GTEx v8, an embedded curated drug-target snapshot with optional Open Targets evidence, and PubMed. The g:Profiler identifier is declared configuration metadata rather than a build value verified from the response. The four real panels produced 124 hypotheses and the three controls produced 40.
+All benchmark analyses were regenerated after corrections that affected filtering, query construction, and seeded permutation sampling because carrying forward previous values would have mixed incompatible candidate sets. The regenerated runs used STRING v12.0, the configured g:Profiler identifier \code{e104\_eg51\_p15}, GTEx v8, an embedded curated drug-target snapshot with optional Open Targets evidence, and PubMed. The g:Profiler identifier is declared configuration metadata rather than a build value verified from the response. The four real panels produced 124 hypotheses and the three controls produced 40.
 
 The benchmark tests four questions. First, is the PPS ranking behavior consistent with its specificity-aware design? Second, do uncapped exact-query counts discriminate among hypotheses better than the number of abstracts retrieved? Third, does the grounding rule preserve the intended real-panel and control invariants after regeneration? Fourth, is novelty measured at the end of 2020 associated with subsequent publication activity?
 
@@ -173,7 +179,7 @@ The previous score multiplied statistical significance by raw evidence-gene coun
   \label{fig:specificity}
 \end{figure*}
 
-\subsection{Seven Cardiovascular Intersections Met the Verified-Gap Rule}
+\subsection{Eight Cardiovascular Intersections Met the Verified-Gap Rule}
 Eight of 124 real-panel hypotheses met the prespecified verified-gap rule: a grounded seed-disease panel, a searchable pathway concept, and zero records for the exact title/abstract query (Table~\ref{tab:candidates}, Fig.~\ref{fig:gaps}). In structural cardiomyopathy, GAB1 signalosome and NTRK2 signaling returned zero records at 15.8-fold and 17.5-fold enrichment. In arrhythmia, cGMP-PKG signaling returned zero records at 7.9-fold. The ischemic panel contributed five: P2Y12 (9.1-fold), HIF-1 (10.8-fold), cAMP (9.2-fold), oxytocin (7.7-fold), and GPER1 (7.6-fold) signaling.
 
 These are panel-level literature gaps, not claims about a pathway in isolation. For P2Y12, CardioXNet asks whether that pathway has been reported jointly with the contributing genes of the LDLR, APOB, PCSK9, NOS3, and EDN1 panel in the specified myocardial-infarction context; the zero identifies an unreported intersection between defined domains rather than an unknown pathway. Each candidate remains a computational hypothesis requiring synonym-expanded review and experimental assessment.
@@ -226,7 +232,7 @@ This test addresses a specific failure mode. Before grounding, off-target and ra
 \subsection{Temporal Holdout Showed Negligible Overall Association}
 Across all 124 hypotheses, the Discovery Score at the 2020 cutoff showed negligible rank association with publication growth in the follow-up retrieval snapshot ($\rho=-0.1189$). Composite novelty alone was similarly near zero ($\rho=-0.0693$), and PPS alone was weakly negative ($\rho=-0.1587$). Among the 109 hypotheses with nonzero pre-cutoff counts, the Discovery Score association remained near zero ($\rho=0.0132$).
 
-Within-panel values were heterogeneous ($\rho=0.2712$ heart failure, $0.1704$ arrhythmia, $-0.2360$ structural cardiomyopathy, $-0.5360$ myocardial infarction) and four descriptive panel results do not support a general forecasting claim. At the cutoff, the Highly Novel, Novel, Emerging, Established, and Unverified tiers held 19, 55, 38, 9, and 3 hypotheses with median growth 0, 0.7027, 0.6401, 0.5460, and 0. Figure~\ref{fig:holdout} therefore bounds the Discovery Score as a triage measure: sparse intersections are not necessarily where publication activity will increase.
+Within-panel values were heterogeneous ($\rho=0.2712$ heart failure, $0.1704$ arrhythmia, $-0.2360$ structural cardiomyopathy, $-0.5360$ myocardial infarction) and four descriptive panel results do not support a general forecasting claim. At the cutoff, the Highly Novel, Novel, Emerging, Established, and Unverified tiers held 19, 55, 38, 9, and 3 hypotheses with median growth 0.0000, 0.7027, 0.6401, 0.5460, and 0.0000. Figure~\ref{fig:holdout} therefore bounds the Discovery Score as a triage measure: sparse intersections are not necessarily where publication activity will increase.
 
 \begin{figure*}[t]
   \centering
