@@ -462,25 +462,3 @@ class GTExClient:
 
         return profiles
     
-    def get_fallback_cardiac_genes(self) -> set:
-        """
-        Get fallback cardiac gene set when GTEx is unavailable.
-        
-        Returns curated list of known cardiac genes for offline use.
-        """
-        return {
-            # Core cardiac transcription factors
-            'NKX2-5', 'GATA4', 'GATA5', 'GATA6', 'MEF2C', 'MEF2A', 'TBX5', 'TBX20',
-            'HAND1', 'HAND2', 'ISL1', 'MYOCD',
-            
-            # Cardiac contractile proteins  
-            'MYH6', 'MYH7', 'MYL2', 'MYL3', 'TNNT2', 'TNNI3', 'TPM1', 'ACTC1',
-            'TTN', 'MYBPC3', 'ACTN2', 'DES', 'VCL',
-            
-            # Cardiac ion channels
-            'SCN5A', 'KCNQ1', 'KCNH2', 'KCNJ2', 'CACNA1C', 'RYR2', 'ATP2A2',
-            'PLN', 'CASQ2', 'JPH2',
-            
-            # Cardiac signaling
-            'NPPA', 'NPPB', 'NPR1', 'NPR2', 'ADRB1', 'ADRB2', 'GRK2', 'GRK5',
-        }

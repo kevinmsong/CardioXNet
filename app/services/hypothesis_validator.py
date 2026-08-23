@@ -284,33 +284,3 @@ class HypothesisValidator:
         )
         return scores
     
-    def rank_by_validation(
-        self,
-        hypotheses: List[ScoredPathway],
-        validation_scores: Dict[str, Dict]
-    ) -> List[ScoredPathway]:
-        """
-        Re-rank hypotheses by validation score.
-        
-        Args:
-            hypotheses: List of scored hypotheses
-            validation_scores: Dictionary mapping pathway_id to validation scores
-            
-        Returns:
-            Re-ranked list of hypotheses
-        """
-        # Sort by validation score
-        ranked = sorted(
-            hypotheses,
-            key=lambda h: validation_scores.get(
-                h.aggregated_pathway.pathway.pathway_id if hasattr(h, 'aggregated_pathway') else h.pathway_id,
-                {}
-            ).get('total_validation_score', 0),
-            reverse=True
-        )
-        
-        # Update ranks
-        for i, hypothesis in enumerate(ranked, 1):
-            hypothesis.rank = i
-        
-        return ranked

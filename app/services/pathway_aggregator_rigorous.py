@@ -155,25 +155,6 @@ class RigorousPathwayAggregator:
         
         return result
     
-    def _group_pathways_by_id(
-        self,
-        secondary_result: SecondaryTriageResult
-    ) -> Dict[str, List[ScoredPathwayEntry]]:
-        """
-        Group pathway instances by pathway ID.
-        
-        Args:
-            secondary_result: Secondary triage result
-            
-        Returns:
-            Dictionary mapping pathway_id to list of instances
-        """
-        pathway_groups = defaultdict(list)
-        
-        for pathway in secondary_result.aggregated_pathways:
-            pathway_groups[pathway.pathway_id].append(pathway)
-        
-        return dict(pathway_groups)
     
     def _aggregate_pathway_instances(
         self,

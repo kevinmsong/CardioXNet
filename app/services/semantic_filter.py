@@ -76,33 +76,6 @@ class SemanticFilter:
         }
         
         # Category 3: Cardiac Pathology (15% weight)
-        self.cardiac_pathology = {
-            "infarction", "failure", "injury", "damage", "disease",
-            "arrhythmia", "fibrillation", "tachycardia", "bradycardia",
-            "cardiomyopathy", "stenosis", "regurgitation", "ischemic",
-            "atherosclerosis", "plaque", "thrombosis", "embolism", "aneurysm",
-            "dissection", "rupture", "perforation", "tamponade", "effusion",
-            "hypertension", "hypotension", "shock", "cardiogenic shock",
-            "edema", "congestion", "pulmonary edema", "peripheral edema",
-            "asystole", "pulseless electrical activity", "pea", "sudden death",
-            "cardiac arrest", "resuscitation", "defibrillation", "cardioversion",
-            "heart block", "bundle branch block", "fascicular block", "atrioventricular block",
-            "long qt syndrome", "short qt syndrome", "brugada syndrome", "wpw syndrome",
-            "hypertrophic cardiomyopathy", "dilated cardiomyopathy", "restrictive cardiomyopathy",
-            "arrhythmogenic right ventricular cardiomyopathy", "takotsubo cardiomyopathy",
-            "peripartum cardiomyopathy", "alcoholic cardiomyopathy", "diabetic cardiomyopathy",
-            "ischemic cardiomyopathy", "non-ischemic cardiomyopathy", "idiopathic cardiomyopathy",
-            "valvular disease", "aortic stenosis", "aortic regurgitation", "mitral stenosis",
-            "mitral regurgitation", "tricuspid regurgitation", "pulmonary stenosis",
-            "congenital defect", "atrial septal defect", "ventricular septal defect",
-            "tetralogy of fallot", "transposition of great arteries", "coarctation of aorta",
-            "patent ductus arteriosus", "ebstein anomaly", "hypoplastic left heart syndrome",
-            "coronary anomaly", "anomalous coronary artery", "myocardial bridge",
-            "pericarditis", "myocarditis", "endocarditis", "pancarditis",
-            "rheumatic fever", "kawasaki disease", "chagas disease", "lyme carditis",
-            "toxic cardiomyopathy", "radiation heart disease", "chemotherapy cardiotoxicity",
-            "autoimmune myocarditis", "giant cell myocarditis", "eosinophilic myocarditis"
-        }
         
         # Category 4: Cardiovascular Disease Context (70% weight - MAXIMUM FOCUS on disease/phenotype)
         self.cardiovascular_disease = {
@@ -669,113 +642,6 @@ class SemanticFilter:
         }
         
         # Disease-specific cardiac contexts for enhanced filtering
-        self.disease_specific_contexts = {
-            "heart_failure": {
-                "high_priority": {
-                    "contractility", "ejection fraction", "systolic dysfunction",
-                    "diastolic dysfunction", "heart failure", "cardiac failure",
-                    "decompensated heart", "acute heart failure", "chronic heart failure",
-                    "hfref", "hfpef", "reduced ejection fraction", "preserved ejection fraction",
-                    "cardiac insufficiency", "ventricular dysfunction", "cardiac output",
-                    "preload", "afterload", "cardiac remodeling", "reverse remodeling"
-                },
-                "moderate": {
-                    "hypertrophy", "ventricular hypertrophy", "cardiac hypertrophy",
-                    "fibrosis", "cardiac fibrosis", "myocardial fibrosis",
-                    "calcium handling", "calcium cycling", "sarcoplasmic reticulum",
-                    "natriuretic peptide", "bnp", "nt-probnp", "anp",
-                    "neurohormonal activation", "raas", "renin-angiotensin",
-                    "sympathetic activation", "adrenergic", "beta-blocker"
-                }
-            },
-            "myocardial_infarction": {
-                "high_priority": {
-                    "ischemia", "ischemic", "myocardial ischemia", "cardiac ischemia",
-                    "reperfusion", "reperfusion injury", "ischemia-reperfusion",
-                    "infarction", "myocardial infarction", "heart attack", "mi", "ami", "stemi", "nstemi",
-                    "coronary occlusion", "coronary artery disease", "coronary syndrome",
-                    "acute coronary", "coronary thrombosis", "plaque rupture",
-                    "cardiac necrosis", "myocardial necrosis", "infarct zone"
-                },
-                "moderate": {
-                    "inflammation", "cardiac inflammation", "myocardial inflammation",
-                    "repair", "cardiac repair", "myocardial repair", "wound healing",
-                    "angiogenesis", "neovascularization", "collateral formation",
-                    "scar", "cardiac scar", "myocardial scar", "scar formation",
-                    "troponin", "cardiac biomarker", "creatine kinase", "ck-mb"
-                }
-            },
-            "cardiomyopathy": {
-                "high_priority": {
-                    "cardiomyopathy", "cardiac myopathy", "myocardial disease",
-                    "dilated cardiomyopathy", "dcm", "hypertrophic cardiomyopathy", "hcm",
-                    "restrictive cardiomyopathy", "rcm", "arrhythmogenic cardiomyopathy",
-                    "arvc", "arvd", "arrhythmogenic right ventricular",
-                    "takotsubo", "stress cardiomyopathy", "broken heart syndrome",
-                    "peripartum cardiomyopathy", "ppcm", "familial cardiomyopathy",
-                    "genetic cardiomyopathy", "inherited cardiomyopathy"
-                },
-                "moderate": {
-                    "sarcomere", "sarcomeric protein", "myosin", "actin", "troponin",
-                    "titin", "myosin binding protein", "cardiac troponin",
-                    "z-disc", "m-line", "sarcomere structure", "sarcomeric mutation"
-                }
-            },
-            "diabetic_cardiomyopathy": {
-                "high_priority": {
-                    "diabetic cardiomyopathy", "diabetic heart disease",
-                    "diabetes cardiac", "diabetic myocardial", "hyperglycemic cardiomyopathy",
-                    "glucose metabolism", "cardiac glucose", "myocardial glucose",
-                    "insulin signaling", "insulin resistance", "cardiac insulin",
-                    "glut4", "glucose transporter", "glucose uptake"
-                },
-                "moderate": {
-                    "metabolic syndrome", "metabolic cardiomyopathy",
-                    "mitochondrial dysfunction", "cardiac mitochondria",
-                    "oxidative stress", "cardiac oxidative", "reactive oxygen species",
-                    "age", "advanced glycation", "protein glycation",
-                    "lipotoxicity", "cardiac lipid", "fatty acid metabolism"
-                }
-            },
-            "arrhythmia": {
-                "high_priority": {
-                    "arrhythmia", "cardiac arrhythmia", "heart rhythm disorder",
-                    "fibrillation", "atrial fibrillation", "afib", "af",
-                    "ventricular fibrillation", "vfib", "vf", "tachycardia",
-                    "ventricular tachycardia", "vt", "supraventricular tachycardia", "svt",
-                    "bradycardia", "heart block", "av block", "bundle branch block",
-                    "long qt", "lqts", "brugada", "catecholaminergic polymorphic",
-                    "cpvt", "sudden cardiac death", "scd", "cardiac arrest"
-                },
-                "moderate": {
-                    "ion channel", "sodium channel", "potassium channel", "calcium channel",
-                    "action potential", "cardiac action potential", "depolarization",
-                    "repolarization", "refractory period", "conduction velocity",
-                    "electrocardiogram", "ecg", "ekg", "electrophysiology"
-                }
-            },
-            "cardiac_regeneration": {
-                "high_priority": {
-                    "cardiac regeneration", "heart regeneration", "myocardial regeneration",
-                    "cardiomyocyte proliferation", "cardiomyocyte renewal",
-                    "cardiac progenitor", "cardiac stem cell", "cardiac precursor",
-                    "heart repair", "myocardial repair", "cardiac repair",
-                    "dedifferentiation", "transdifferentiation", "reprogramming",
-                    "direct reprogramming", "cardiac reprogramming",
-                    "induced cardiomyocyte", "icm", "neonatal heart regeneration",
-                    "zebrafish heart regeneration", "cardiac cell therapy"
-                },
-                "moderate": {
-                    "cell cycle re-entry", "cytokinesis", "cardiomyocyte cell cycle",
-                    "hippo pathway", "yap", "taz", "notch signaling",
-                    "wnt signaling", "cardiac wnt", "fgf signaling",
-                    "epicardium", "epicardial", "epicardial activation",
-                    "endocardial", "cardiac fibroblast", "fibroblast reprogramming",
-                    "extracellular matrix", "cardiac ecm", "cardiac scaffold",
-                    "angiogenesis", "neovascularization", "cardiac vasculature"
-                }
-            }
-        }
         
         logger.info("SemanticFilter initialized with expanded cardiac context and disease-specific filtering")
     
@@ -796,18 +662,58 @@ class SemanticFilter:
         desc_lower = pathway_description.lower() if pathway_description else ""
         combined_text = f"{name_lower} {desc_lower}"
         
-        # Check for generic terms
+        # Anchored match, not substring.
+        #
+        # `term in name_lower` meant the entry "signaling pathway" matched every
+        # KEGG signaling pathway there is -- TNF, NF-kappa B, Toll-like receptor,
+        # RIG-I-like receptor, PI3K-Akt. Those are among the highest-ranked
+        # discoveries this tool produces, and they were being silently denied
+        # literature expansion for containing a common suffix.
+        #
+        # A pathway is generic when its name IS a generic term, or ends in one as
+        # a whole phrase ("regulation of cellular process"), not merely when it
+        # contains one.
+        _PREFIX_STOPWORDS = {
+            "regulation", "of", "positive", "negative", "cellular", "cell",
+            "biological", "single", "organism", "multicellular", "anatomical",
+            "structure", "the", "and", "or", "to", "in", "by", "via",
+        }
         for term in self.generic_pathway_terms:
-            if term in name_lower:
-                logger.debug(f"Pathway '{pathway_name}' is generic (contains '{term}')")
+            if name_lower == term:
+                logger.debug(f"Pathway '{pathway_name}' is generic (name is '{term}')")
                 return True
+            if name_lower.endswith(f" {term}"):
+                # A generic suffix only makes the whole name generic when the
+                # prefix adds nothing. "regulation of cellular process" is
+                # generic; "TNF signaling pathway" is not -- the prefix is the
+                # specificity, and treating the suffix as decisive suppressed
+                # every named KEGG signaling pathway.
+                prefix = name_lower[: -(len(term) + 1)].replace("-", " ").split()
+                if all(tok in _PREFIX_STOPWORDS for tok in prefix):
+                    logger.debug(
+                        f"Pathway '{pathway_name}' is generic "
+                        f"(ends in '{term}' with no distinctive prefix)"
+                    )
+                    return True
         
-        # Additional heuristics
-        # Very short pathway names are often generic (e.g., "Binding", "Signaling")
-        if len(pathway_name.split()) <= 2 and not any(
-            cardiac_term in name_lower 
-            for cardiac_term in ["cardiac", "heart", "myocardial", "cardiovascular"]
-        ):
+        # A short name is not evidence of generality. This heuristic flagged
+        # "Inflammasomes", "Cardiogenesis" and "GAB1 signalosome" as generic --
+        # all highly specific, and all top-ranked hits in the benchmark panels.
+        # It now fires only for names that are short AND carry no distinctive
+        # token, which is the case it was aimed at ("Binding", "Signaling").
+        _NONDISTINCTIVE = {
+            "binding", "signaling", "signalling", "transport", "activity",
+            "regulation", "process", "pathway", "response", "metabolism",
+            "localization", "organization", "development", "differentiation",
+        }
+        tokens = [t for t in name_lower.replace("-", " ").split() if t]
+        if (len(tokens) <= 2
+                and tokens
+                and all(t in _NONDISTINCTIVE for t in tokens)
+                and not any(
+                    cardiac_term in name_lower
+                    for cardiac_term in ["cardiac", "heart", "myocardial", "cardiovascular"]
+                )):
             logger.debug(f"Pathway '{pathway_name}' is likely generic (short name without cardiac context)")
             return True
         
@@ -821,49 +727,6 @@ class SemanticFilter:
         
         return False
     
-    def has_disease_specific_relevance(
-        self,
-        pathway_name: str,
-        pathway_description: str = "",
-        disease_context: Optional[str] = None
-    ) -> Tuple[bool, float]:
-        """
-        Check if pathway has disease-specific cardiac relevance.
-        
-        Args:
-            pathway_name: Name of the pathway
-            pathway_description: Description of the pathway
-            disease_context: Specific disease context (e.g., "heart_failure", "myocardial_infarction")
-            
-        Returns:
-            Tuple of (has_relevance, relevance_score)
-        """
-        if not disease_context or disease_context not in self.disease_specific_contexts:
-            return (False, 0.0)
-        
-        name_lower = pathway_name.lower()
-        desc_lower = pathway_description.lower() if pathway_description else ""
-        combined_text = f"{name_lower} {desc_lower}"
-        
-        disease_terms = self.disease_specific_contexts[disease_context]
-        score = 0.0
-        
-        # High priority terms
-        for term in disease_terms.get("high_priority", set()):
-            if term in combined_text:
-                score += 0.4
-                logger.debug(f"Pathway '{pathway_name}' has high-priority {disease_context} term: '{term}'")
-        
-        # Moderate priority terms
-        for term in disease_terms.get("moderate", set()):
-            if term in combined_text:
-                score += 0.2
-                logger.debug(f"Pathway '{pathway_name}' has moderate-priority {disease_context} term: '{term}'")
-        
-        # Cap score at 1.0
-        score = min(score, 1.0)
-        
-        return (score > 0, score)
     
     # Unambiguous cardiac qualifiers. Their presence means the pathway is about
     # the heart whatever other generic tissue words the name also contains.
@@ -1034,152 +897,6 @@ class SemanticFilter:
         
         return result
     
-    def apply_semantic_boost(
-        self,
-        hypotheses: List[ScoredPathway],
-        min_threshold: Optional[float] = None,
-        disease_context: Optional[str] = None,
-        disease_synonyms: Optional[List[str]] = None
-    ) -> List[ScoredPathway]:
-        """
-        Apply semantic cardiac relevance boost to NES scores with cardiovascular disease awareness.
-        
-        SCIENTIFIC RIGOR:
-        - Validates input hypotheses for completeness
-        - Applies consistent scoring across all pathways
-        - Maintains statistical ordering while boosting cardiovascular disease-relevant pathways
-        - Preserves original NES for transparency
-        - Logs all filtering decisions for reproducibility
-        
-        This is a permissive filter that boosts pathways with cardiovascular disease-relevant
-        terms without strictly excluding others. The boost is multiplicative
-        based on overall semantic relevance:
-        
-        Boost formula: NES_boosted = NES_original * (1 + semantic_relevance)
-        
-        Examples:
-        - High relevance (0.8): 1.8 times boost
-        - Medium relevance (0.5): 1.5 times boost
-        - Low relevance (0.2): 1.2 times boost
-        - Minimal relevance (0.05): 1.05 times boost
-        
-        Args:
-            hypotheses: List of scored hypotheses
-            min_threshold: Optional minimum semantic threshold (default from config)
-            disease_context: Optional disease context for targeted filtering
-            disease_synonyms: Optional list of disease synonyms for enhanced matching
-            
-        Returns:
-            List of hypotheses with semantic boost applied and re-ranked
-            
-        Raises:
-            ValueError: If hypotheses list is invalid or threshold out of range
-        """
-        # Input validation for robustness
-        if not isinstance(hypotheses, list):
-            raise ValueError("Hypotheses must be a list")
-        
-        if len(hypotheses) == 0:
-            logger.warning("Empty hypotheses list provided to semantic filter")
-            return hypotheses
-        
-        if min_threshold is None:
-            min_threshold = getattr(self.settings, 'semantic_relevance_threshold', 0.1)
-        
-        # Validate threshold range
-        if not (isinstance(min_threshold, (int, float)) and 0 <= min_threshold <= 1):
-            logger.warning(f"Invalid threshold {min_threshold}, using default 0.1")
-            min_threshold = 0.1
-        
-        logger.info(
-            f"Applying expanded semantic cardiac relevance boost to {len(hypotheses)} hypotheses "
-            f"(min_threshold={min_threshold})"
-        )
-        
-        boosted_hypotheses = []
-        filtered_count = 0
-        
-        for hypothesis in hypotheses:
-            # Get pathway information
-            if hasattr(hypothesis, 'aggregated_pathway'):
-                pathway_name = hypothesis.aggregated_pathway.pathway.pathway_name
-                pathway_id = hypothesis.aggregated_pathway.pathway.pathway_id
-                evidence_genes = getattr(hypothesis.aggregated_pathway.pathway, 'evidence_genes', [])
-            else:
-                # Fallback for older pathway format
-                pathway_name = getattr(hypothesis, 'pathway_name', 'Unknown')
-                pathway_id = getattr(hypothesis, 'pathway_id', 'unknown')
-                evidence_genes = getattr(hypothesis, 'evidence_genes', [])
-            
-            # Calculate comprehensive cardiac relevance
-            relevance_breakdown = self.calculate_cardiac_relevance(
-                pathway_name,
-                evidence_genes=evidence_genes,
-                disease_context=disease_context,
-                disease_synonyms=disease_synonyms
-            )
-            overall_relevance = relevance_breakdown["overall"]
-            
-            # Debug logging for specific pathways
-            if "heart" in pathway_name.lower():
-                logger.info(
-                    f"[SEMANTIC DEBUG] Pathway '{pathway_name}': "
-                    f"overall_relevance={overall_relevance:.3f}, "
-                    f"direct_cardiac={relevance_breakdown.get('direct_cardiac', 0):.3f}, "
-                    f"processes={relevance_breakdown.get('processes', 0):.3f}"
-                )
-            
-            # Apply minimum threshold filter (very permissive)
-            if overall_relevance < min_threshold:
-                filtered_count += 1
-                logger.debug(
-                    f"Filtered out '{pathway_name}': relevance {overall_relevance:.3f} < {min_threshold}"
-                )
-                continue
-            
-            # Calculate boost factor: NES * (1 + relevance)
-            boost_factor = 1 + overall_relevance
-            
-            # Apply boost to NES score
-            original_nes = hypothesis.nes_score
-            boosted_nes = original_nes * boost_factor
-            hypothesis.nes_score = boosted_nes
-            
-            # Store relevance breakdown in score components (always create if not exists)
-            if not hasattr(hypothesis, 'score_components') or hypothesis.score_components is None:
-                hypothesis.score_components = {}
-            
-            hypothesis.score_components['cardiac_relevance'] = overall_relevance
-            hypothesis.score_components['semantic_boost'] = boost_factor
-            hypothesis.score_components['relevance_breakdown'] = relevance_breakdown
-            
-            boosted_hypotheses.append(hypothesis)
-            
-            logger.debug(
-                f"Pathway '{pathway_name}': relevance={overall_relevance:.3f}, "
-                f"boost={boost_factor:.3f}, NES {original_nes:.2f} → {boosted_nes:.2f}"
-            )
-        
-        # Re-sort by boosted NES scores
-        boosted_hypotheses.sort(key=lambda h: h.nes_score, reverse=True)
-        
-        # Update ranks
-        for i, hypothesis in enumerate(boosted_hypotheses, 1):
-            hypothesis.rank = i
-        
-        # Apply intelligent progressive filtering and result limiting
-        intelligent_filtered = self.apply_intelligent_filtering(
-            boosted_hypotheses,
-            disease_context=disease_context,
-            disease_synonyms=disease_synonyms
-        )
-        
-        logger.info(
-            f"Semantic processing: {len(hypotheses)} -> {len(boosted_hypotheses)} -> {len(intelligent_filtered)} pathways "
-            f"({filtered_count} filtered by threshold {min_threshold}, intelligent filtering applied)"
-        )
-        
-        return intelligent_filtered
     
     def apply_semantic_boost_parallel(
         self,
@@ -1505,58 +1222,6 @@ class SemanticFilter:
             }
         }
     
-    def filter_by_cardiac_relevance(
-        self,
-        hypotheses: List[ScoredPathway],
-        min_relevance: float = 0.1,
-        disease_context: Optional[str] = None,
-        disease_synonyms: Optional[List[str]] = None
-    ) -> List[ScoredPathway]:
-        """
-        Filter pathways by minimum cardiovascular disease relevance (optional strict filter).
-        
-        This is a stricter filter that removes pathways below a threshold.
-        Default threshold is very permissive (0.1) to maintain broad discovery.
-        
-        Args:
-            hypotheses: List of scored hypotheses
-            min_relevance: Minimum cardiovascular disease relevance score (default: 0.1)
-            
-        Returns:
-            Filtered list of hypotheses
-        """
-        filtered = []
-        
-        for hypothesis in hypotheses:
-            if hasattr(hypothesis, 'aggregated_pathway'):
-                pathway_name = hypothesis.aggregated_pathway.pathway.pathway_name
-                evidence_genes = getattr(hypothesis.aggregated_pathway.pathway, 'evidence_genes', [])
-            else:
-                # Fallback for older pathway format
-                pathway_name = getattr(hypothesis, 'pathway_name', 'Unknown')
-                evidence_genes = getattr(hypothesis, 'evidence_genes', [])
-            
-            relevance_breakdown = self.calculate_cardiac_relevance(
-                pathway_name,
-                evidence_genes=evidence_genes,
-                disease_context=disease_context,
-                disease_synonyms=disease_synonyms
-            )
-            overall_relevance = relevance_breakdown["overall"]
-            
-            if overall_relevance >= min_relevance:
-                filtered.append(hypothesis)
-            else:
-                logger.debug(
-                    f"Filtered out '{pathway_name}': relevance {overall_relevance:.3f} < {min_relevance}"
-                )
-        
-        logger.info(
-            f"Semantic filtering: {len(filtered)}/{len(hypotheses)} pathways "
-            f"passed min_relevance={min_relevance}"
-        )
-        
-        return filtered
 
     def pathway_name_contains_cardiac_terms(self, pathway_name: str, disease_context: Optional[str] = None) -> bool:
         """

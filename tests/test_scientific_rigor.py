@@ -617,3 +617,50 @@ class TestGtexPlaceholders:
         assert score.mean_cardiac_specificity_ratio is None
         # The ratio the curated list *can* support is still produced.
         assert score.cardiac_expression_ratio > 0
+
+
+class TestGenericPathwayDetection:
+    """Generic detection must not suppress the tool's best hits.
+
+    `is_generic_pathway` gates literature expansion in Stage 2b. It matched
+    generic terms as substrings, so the entry "signaling pathway" caught every
+    named KEGG signaling pathway (TNF, NF-kappa B, Toll-like receptor, PI3K-Akt),
+    and a "<= 2 words" heuristic caught "Inflammasomes", "Cardiogenesis" and
+    "GAB1 signalosome". All of those are top-ranked discoveries in the benchmark
+    panels.
+    """
+
+    @staticmethod
+    def is_generic(name):
+        from app.services.semantic_filter import SemanticFilter
+        return SemanticFilter().is_generic_pathway(name)
+
+    @pytest.mark.parametrize("name", [
+        "TNF signaling pathway",
+        "NF-kappa B signaling pathway",
+        "Toll-like receptor signaling pathway",
+        "PI3K-Akt signaling pathway",
+        "Inflammasomes",
+        "GAB1 signalosome",
+        "Cardiogenesis",
+        "Cardiac muscle contraction",
+    ])
+    def test_specific_pathways_are_not_suppressed(self, name):
+        assert not self.is_generic(name), f"{name} must keep its literature expansion"
+
+    @pytest.mark.parametrize("name", [
+        "biological process",
+        "cellular process",
+        "developmental process",
+        "regulation of cellular process",
+        "positive regulation of cellular process",
+        "binding",
+        "signaling",
+    ])
+    def test_genuinely_generic_pathways_are_suppressed(self, name):
+        assert self.is_generic(name), f"{name} carries no specific concept"
+
+    def test_a_generic_suffix_alone_does_not_make_a_name_generic(self):
+        # The prefix is where the specificity lives.
+        assert self.is_generic("regulation of cellular process")
+        assert not self.is_generic("TNF signaling pathway")

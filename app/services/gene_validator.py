@@ -558,39 +558,3 @@ class GeneValidator:
             logger.error(f"Error extracting gene info for {input_id}: {str(e)}")
             return None
     
-    def batch_validate(
-        self,
-        gene_ids: List[str],
-        batch_size: int = 100
-    ) -> ValidationResult:
-        """
-        Validate genes in batches for better performance.
-        
-        Args:
-            gene_ids: List of gene identifiers
-            batch_size: Number of genes per batch
-            
-        Returns:
-            ValidationResult
-        """
-        logger.info(f"Batch validating {len(gene_ids)} genes (batch_size={batch_size})")
-        
-        all_valid: List[GeneInfo] = []
-        all_invalid: List[str] = []
-        all_warnings: List[str] = []
-        
-        # Process in batches
-        for i in range(0, len(gene_ids), batch_size):
-            batch = gene_ids[i:i + batch_size]
-            logger.debug(f"Processing batch {i // batch_size + 1}")
-            
-            result = self.validate_genes(batch)
-            all_valid.extend(result.valid_genes)
-            all_invalid.extend(result.invalid_genes)
-            all_warnings.extend(result.warnings)
-        
-        return ValidationResult(
-            valid_genes=all_valid,
-            invalid_genes=all_invalid,
-            warnings=all_warnings
-        )

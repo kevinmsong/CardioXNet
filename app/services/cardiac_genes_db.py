@@ -186,24 +186,6 @@ def get_cardiac_score(gene_symbol: str) -> float:
     return CARDIAC_GENE_SCORES.get(gene_symbol.upper(), 0.0)
 
 
-def get_disease_categories(gene_symbol: str) -> list:
-    """
-    Get cardiac disease categories for a gene.
-    
-    Args:
-        gene_symbol: Gene symbol
-    
-    Returns:
-        List of disease category names
-    """
-    categories = []
-    gene_upper = gene_symbol.upper()
-    
-    for category, genes in CARDIAC_DISEASE_CATEGORIES.items():
-        if gene_upper in genes:
-            categories.append(category)
-    
-    return categories
 
 
 def is_cardiac_gene(gene_symbol: str, threshold: float = 0.5) -> bool:
@@ -280,40 +262,4 @@ def calculate_pathway_cardiac_score(evidence_genes: list) -> float:
     return round(pathway_score, 3)
 
 
-def get_pathway_cardiac_stats(evidence_genes: list) -> dict:
-    """
-    Get detailed cardiac statistics for a pathway.
-    
-    Args:
-        evidence_genes: List of gene symbols in the pathway
-    
-    Returns:
-        Dictionary with cardiac statistics
-    """
-    if not evidence_genes:
-        return {
-            "pathway_score": 0.0,
-            "cardiac_gene_count": 0,
-            "total_gene_count": 0,
-            "cardiac_gene_fraction": 0.0,
-            "top_cardiac_genes": []
-        }
-    
-    # Get scores for all genes
-    gene_scores = {gene: get_cardiac_score(gene) for gene in evidence_genes}
-    cardiac_genes = {gene: score for gene, score in gene_scores.items() if score > 0}
-    
-    # Calculate pathway score
-    pathway_score = calculate_pathway_cardiac_score(evidence_genes)
-    
-    # Get top cardiac genes
-    top_genes = sorted(cardiac_genes.items(), key=lambda x: x[1], reverse=True)[:5]
-    
-    return {
-        "pathway_score": pathway_score,
-        "cardiac_gene_count": len(cardiac_genes),
-        "total_gene_count": len(evidence_genes),
-        "cardiac_gene_fraction": len(cardiac_genes) / len(evidence_genes) if evidence_genes else 0.0,
-        "top_cardiac_genes": [{"gene": gene, "score": score} for gene, score in top_genes]
-    }
 

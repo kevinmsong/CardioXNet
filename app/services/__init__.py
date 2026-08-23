@@ -1,7 +1,13 @@
 """Services for CardioXNet pipeline stages."""
 
 from .gene_validator import GeneValidator
-from .api_client import APIClient, APIClientError, APITimeoutError, APIRateLimitError
+from .api_client import (
+    APIClient,
+    APIClientError,
+    APIConnectionError,
+    APITimeoutError,
+    APIRateLimitError,
+)
 from .string_client import STRINGClient
 from .gprofiler_client import GProfilerClient
 from .reactome_client import ReactomeClient
@@ -27,6 +33,7 @@ __all__ = [
     "GeneValidator",
     "APIClient",
     "APIClientError",
+    "APIConnectionError",
     "APITimeoutError",
     "APIRateLimitError",
     "STRINGClient",

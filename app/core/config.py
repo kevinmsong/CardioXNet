@@ -241,6 +241,14 @@ class NETSConfig(BaseSettings):
         )
     )
 
+    # Skip literature expansion for pathways whose names carry no specific
+    # concept. Read via getattr with a True default before it was declared here,
+    # so it could not be turned off from the UI or API.
+    filter_generic_pathways: bool = Field(
+        default=True,
+        description="Skip literature mining for pathways whose names are purely generic"
+    )
+
     # Redundancy filtering
     redundancy_jaccard_threshold: float = Field(
         default=0.7, ge=0.0, le=1.0,

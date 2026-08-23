@@ -337,44 +337,4 @@ class NESScorer:
         
         return centrality_weight
     
-    def _get_seed_neighbors_1hop(self, fn_result) -> set:
-        """
-        Get set of seed genes and their 1-hop neighbors.
-        
-        Args:
-            fn_result: Functional neighborhood result
-            
-        Returns:
-            Set of gene symbols (seed genes + 1-hop neighbors)
-        """
-        if not fn_result:
-            return set()
-        
-        seed_genes = {g.symbol for g in fn_result.seed_genes}
-        neighbors_1hop = {g.symbol for g in fn_result.neighbors}
-        return seed_genes | neighbors_1hop
     
-    def _calculate_aggregation_weight(self, support_count: int) -> float:
-        """
-        Calculate aggregation weight based on support count.
-        
-        Weight increases with support count using a logarithmic scale:
-        - support_count = 1: weight = 1.0 (baseline)
-        - support_count = 2: weight = 1.2
-        - support_count = 3: weight = 1.35
-        - support_count = 4: weight = 1.45
-        - support_count = 5+: weight = 1.5 (cap)
-        
-        Args:
-            support_count: Number of primary pathways supporting this pathway
-            
-        Returns:
-            Aggregation weight (1.0 - 1.5)
-        """
-        if support_count <= 1:
-            return 1.0
-        
-        # Logarithmic scaling with cap at 1.5
-        weight = 1.0 + (0.5 * math.log(support_count) / math.log(5))
-        
-        return min(weight, 1.5)

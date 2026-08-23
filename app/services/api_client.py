@@ -24,6 +24,10 @@ class APITimeoutError(APIClientError):
     """Raised when API request times out."""
 
 
+class APIConnectionError(APIClientError):
+    """Raised when the transport itself failed (DNS, refused, reset)."""
+
+
 class APIRateLimitError(APIClientError):
     """Raised when API rate limit is exceeded."""
 
@@ -55,10 +59,15 @@ class APIClient:
     @retry(
         stop=stop_after_attempt(3),
         wait=wait_exponential(multiplier=2, min=1, max=10),
+        # These must be the types _request actually lets escape. It translates
+        # requests.Timeout and RequestException into the APIClientError family
+        # *inside* this function, so naming the requests types here meant
+        # tenacity never saw a retryable exception and only 429s were ever
+        # retried -- the timeout and connection retries did nothing.
         retry=retry_if_exception_type((
-            requests.exceptions.Timeout,
-            requests.exceptions.ConnectionError,
-            APIRateLimitError
+            APITimeoutError,
+            APIConnectionError,
+            APIRateLimitError,
         )),
         before_sleep=before_sleep_log(logger, logging.WARNING)
     )
@@ -131,6 +140,10 @@ class APIClient:
             logger.error(f"{self.name} request timeout: {str(e)}")
             raise APITimeoutError(f"Request timeout for {self.name}: {str(e)}")
         
+        except requests.exceptions.ConnectionError as e:
+            logger.error(f"{self.name} connection failed: {str(e)}")
+            raise APIConnectionError(f"Connection failed for {self.name}: {str(e)}")
+
         except requests.exceptions.RequestException as e:
             logger.error(f"{self.name} request failed: {str(e)}")
             raise APIClientError(f"Request failed for {self.name}: {str(e)}")

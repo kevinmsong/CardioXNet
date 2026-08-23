@@ -61,44 +61,6 @@ class SeedGeneTracer:
         logger.info("Pre-computed seed gene tracking complete")
         return scored_hypotheses
     
-    def _build_primary_to_seed_mapping(
-        self,
-        primary_pathways: List[Any],
-        seed_genes: List[GeneInfo]
-    ) -> Dict[str, List[str]]:
-        """
-        Build mapping from primary pathway ID to seed genes.
-        
-        Primary pathways come from functional neighborhood enrichment,
-        so we need to infer which seed gene(s) contributed based on
-        pathway gene overlap with seed genes' neighborhoods.
-        
-        Args:
-            primary_pathways: Primary pathway results
-            seed_genes: Original seed genes
-            
-        Returns:
-            Dictionary mapping primary_pathway_id -> list of seed gene symbols
-        """
-        mapping = {}
-        seed_symbols = {g.symbol for g in seed_genes}
-        
-        for pathway in primary_pathways:
-            pathway_id = pathway.pathway_id
-            evidence_genes = set(pathway.evidence_genes)
-            
-            # Check which seed genes are in the pathway
-            overlapping_seeds = evidence_genes & seed_symbols
-            
-            # If no direct overlap, assume all seeds contributed
-            # (pathway came from their collective neighborhood)
-            if overlapping_seeds:
-                mapping[pathway_id] = list(overlapping_seeds)
-            else:
-                # Pathway from neighborhood, attribute to all seeds
-                mapping[pathway_id] = [g.symbol for g in seed_genes]
-        
-        return mapping
     
     def _is_specific_pathway(self, pathway_name: str) -> bool:
         """
@@ -146,34 +108,6 @@ class SeedGeneTracer:
         
         return True
     
-    @staticmethod
-    def _build_pubmed_query(pathway_name: str, seed_gene: str) -> str:
-        """
-        Build a PubMed query that balances specificity and recall.
-
-        Instead of requiring the exact Reactome/GO pathway name as a phrase
-        (almost never found verbatim in abstracts), we extract the 2-3 most
-        informative content words from the name and OR them with the seed gene
-        plus a cardiovascular context filter.
-        """
-        _STOP = {
-            'pathway', 'signaling', 'signal', 'by', 'in', 'of', 'via', 'the',
-            'a', 'an', 'and', 'or', 'with', 'for', 'from', 'to', 'at', 'into',
-            'regulation', 'regulated', 'process', 'processing', 'response',
-            'activity', 'activation', 'complex', 'system', 'biosynthesis',
-            'metabolism', 'metabolic', 'disease', 'diseases', 'type', 'class',
-        }
-        tokens = re.split(r'[\s\-_/,;:()\[\]]+', pathway_name)
-        key_terms = [
-            t for t in tokens
-            if len(t) >= 3 and t.lower() not in _STOP and re.search(r'[A-Za-z]', t)
-        ][:3]
-
-        if key_terms:
-            term_clause = ' AND '.join(f'{t}[Title/Abstract]' for t in key_terms)
-            return f'({term_clause}) AND "{seed_gene}"[Title/Abstract]'
-        # Fallback: gene only — any paper mentioning this gene is relevant
-        return f'"{seed_gene}"[Title/Abstract]'
 
     def check_literature_associations(
         self,
