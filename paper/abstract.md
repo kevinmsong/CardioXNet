@@ -43,8 +43,8 @@ run-to-run variation comes from the live databases themselves.
 | Significance-times-size promotes generic terms | `benchmark_report.md` §2; the prior formula returned 187-, 152- and 202-gene terms at top rank |
 | PPS returns specific pathways | Figure 2; largest top-15 term is 107 genes |
 | Corpus sizes span three orders of magnitude | Figure 3; tens to ~10,900 records on `hf_inflammatory` |
-| Negative controls yield no interpretable novelty | Figure 5; 0/40 grounded across three control panels, and 132/132 grounded across the four real panels |
-| Temporal holdout is negative | Figure 4; ρ = −0.04 (growth), −0.98 (absolute records), n = 132 |
+| Negative controls yield no interpretable novelty | Figure 5; 0/40 grounded across three control panels, and 133/133 grounded across the four real panels |
+| Temporal holdout is negative | Figure 4; ρ = −0.03 (growth), −0.98 (absolute records), n = 132 |
 
 **Deliberately not claimed.** That the Discovery Score predicts importance; that
 low PubMed counts prove biological novelty; that the permutation test ranks among

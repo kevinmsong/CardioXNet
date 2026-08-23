@@ -17,13 +17,13 @@ controls. Each analysis is five seed genes under the `balanced` preset.
 
 | Run | Kind | Seed genes | Disease context | Runtime | Hypotheses |
 |-----|------|-----------|-----------------|---------|-----------|
-| `hf_inflammatory` | real | VEGFA, MMP9, IL6, TNF, ACE | heart failure | 256 s | 19 |
-| `dcm_structural` | real | MYH7, TTN, LMNA, MYBPC3, TNNT2 | cardiomyopathy | 199 s | 37 |
-| `arrhythmia_channels` | real | SCN5A, KCNQ1, KCNH2, RYR2, CACNA1C | arrhythmia | 350 s | 40 |
-| `mi_ischemic` | real | LDLR, APOB, PCSK9, NOS3, EDN1 | myocardial infarction | 322 s | 36 |
-| `olfactory` | negative | OR51E2, OR2W1, OR1A1, OR5K1, OR10A4 | heart failure | 100 s | 12 |
-| `random_1` | negative | RPF2, CLRN3, PRKAG1, OR8U9, CACNA1D | heart failure | 287 s | 21 |
-| `random_2` | negative | C2CD4A, GORASP1, CHIC1, VCY, PLCD4 | heart failure | 100 s | 7 |
+| `hf_inflammatory` | real | VEGFA, MMP9, IL6, TNF, ACE | heart failure | 257 s | 21 |
+| `dcm_structural` | real | MYH7, TTN, LMNA, MYBPC3, TNNT2 | cardiomyopathy | 181 s | 34 |
+| `arrhythmia_channels` | real | SCN5A, KCNQ1, KCNH2, RYR2, CACNA1C | arrhythmia | 355 s | 41 |
+| `mi_ischemic` | real | LDLR, APOB, PCSK9, NOS3, EDN1 | myocardial infarction | 323 s | 37 |
+| `olfactory` | negative | OR51E2, OR2W1, OR1A1, OR5K1, OR10A4 | heart failure | 96 s | 12 |
+| `random_1` | negative | RPF2, CLRN3, PRKAG1, OR8U9, CACNA1D | heart failure | 202 s | 19 |
+| `random_2` | negative | C2CD4A, GORASP1, CHIC1, VCY, PLCD4 | heart failure | 144 s | 9 |
 
 ---
 
@@ -56,7 +56,7 @@ broad cardiac fallback instead of AND-ed.
 ## 4. Negative controls (Figure 5)
 
 **Every one of the 40 hypotheses returned by the three negative controls is
-flagged `Ungrounded`; none of the 132 hypotheses from the four real panels is.**
+flagged `Ungrounded`; none of the 133 hypotheses from the four real panels is.**
 The separation is complete, in both directions.
 
 The discriminating quantity is the seed genes' own literature footprint in the
@@ -67,7 +67,7 @@ chosen disease — one PubMed query per run:
 | hf_inflammatory | 10,868 |
 | dcm_structural | 2,487 |
 | arrhythmia_channels | 1,538 |
-| mi_ischemic | 2,371 |
+| mi_ischemic | 2,373 |
 | olfactory (negative) | 0 |
 | random_1 (negative) | 6 |
 | random_2 (negative) | 1 |
@@ -96,20 +96,20 @@ records only, and each pathway's 2021–2026 publication record measured
 
 | Comparison | Spearman ρ |
 |------------|-----------:|
-| Discovery Score (2020) vs post-cutoff growth rate | −0.04 |
-| Novelty (2020) vs post-cutoff growth rate | −0.03 |
+| Discovery Score (2020) vs post-cutoff growth rate | −0.03 |
+| Novelty (2020) vs post-cutoff growth rate | −0.01 |
 | Novelty (2020) vs absolute post-cutoff records | **−0.98** |
-| PPS (2020) vs post-cutoff growth rate | −0.14 |
-| Discovery vs growth, measurable pathways only (n = 121) | +0.04 |
+| PPS (2020) vs post-cutoff growth rate | −0.15 |
+| Discovery vs growth, measurable pathways only (n = 121) | +0.06 |
 
 Mean post-cutoff growth by the tier assigned at the cutoff:
 
 | Tier at 2020 | n | Mean growth | Median growth |
 |--------------|--:|------------:|--------------:|
 | Highly Novel | 17 | **0.33** | 0.00 |
-| Novel | 23 | 0.86 | 0.75 |
-| Emerging | 41 | 0.78 | 0.74 |
-| Established | 51 | 0.63 | 0.55 |
+| Novel | 24 | 0.89 | 0.83 |
+| Emerging | 41 | 0.75 | 0.70 |
+| Established | 50 | 0.61 | 0.55 |
 
 Pathways called **Highly Novel grew the least**, and half of them gained no
 publications at all in five years. The ρ = −0.98 against absolute record counts
@@ -176,7 +176,7 @@ Score should be read as a triage heuristic, not as a forecast.
 
 ## 7. Regression suite
 
-71 tests (`tests/test_scientific_rigor.py` plus the pre-existing suite) pin each
+87 tests (`tests/test_scientific_rigor.py` plus the pre-existing suite) pin each
 defect found in the audit: the degenerate permutation universe, BH correctness
 against a reference implementation, generic-term dominance, pathway-specific
 query construction, saturation from corpus size, novelty-confidence gating, seed

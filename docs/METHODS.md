@@ -164,7 +164,15 @@ that stage starved the candidate pool and cut the reference run from 22 hypothes
 - **Keyword-based relevance:** cardiac semantic and literature relevance use curated term lists,
   which can miss semantically related but lexically different evidence.
 - **External API variability:** STRING/g:Profiler/PubMed availability and rate limits affect recall
-  and runtime; PubMed throttling (HTTP 429) can reduce citation counts without an NCBI API key.
+  and runtime. Every client now carries an explicit failure sentinel, so a failed call is reported
+  as unmeasured rather than as a measurement of zero, and PubMed count lookups retry on HTTP 429.
+- **g:Profiler has no request timeout.** The official `gprofiler` library calls `requests.post`
+  internally and exposes no timeout parameter, so a hung connection can stall a run indefinitely.
+  There is no clean fix at the library boundary; if this bites, run with a watchdog.
+- **Schemas drift silently.** The Open Targets query returned HTTP 400 for an extended period after
+  the API renamed `knownDrugs`, and the caller swallowed it, so external druggability read zero
+  throughout. An opt-in `pytest -m live` test now asserts the query still matches the schema; run it
+  before trusting a druggability number.
 - **Permutation budget:** the empirical p cannot fall below `1/(n_permutations + 1)`. The default of
   1000 gives a floor of 1.0e-3; raise `n_permutations` if finer resolution is required.
 - **Permutation power:** because the null samples the whole protein-coding genome, a genuinely
