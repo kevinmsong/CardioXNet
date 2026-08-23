@@ -30,7 +30,7 @@ DISEASE_OPTIONS: List[Dict[str, str]] = [
 PRESETS: Dict[str, Dict[str, Any]] = {
     "fast": {
         "label": "Fast screening",
-        "desc": "~5 min — quick triage; uses fast offline tissue/druggability estimates instead of slow live validation.",
+        "desc": "~5 min - quick triage; uses fast offline tissue/druggability estimates instead of slow live validation.",
         "values": {
             "string_neighbor_count": 50,
             "string_score_threshold": 0.65,
@@ -53,7 +53,7 @@ PRESETS: Dict[str, Dict[str, Any]] = {
     },
     "balanced": {
         "label": "Balanced",
-        "desc": "~10 min — the recommended default.",
+        "desc": "~10 min - the recommended default.",
         "values": {
             "string_neighbor_count": 75,
             "string_score_threshold": 0.60,
@@ -70,7 +70,7 @@ PRESETS: Dict[str, Dict[str, Any]] = {
     },
     "comprehensive": {
         "label": "Comprehensive",
-        "desc": "~20 min — deepest expansion and literature recall.",
+        "desc": "~20 min - deepest expansion and literature recall.",
         "values": {
             "string_neighbor_count": 100,
             "string_score_threshold": 0.55,

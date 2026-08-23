@@ -1,22 +1,30 @@
 {% extends "base.html" %}
-{% block title %}CardioXNet — Discover cardiac repair pathways{% endblock %}
+{% block title %}CardioXNet | Cardiovascular pathway discovery{% endblock %}
 
 {% block content %}
-<div style="margin-bottom: 22px;">
-  <h1>From known genes to unreported pathways</h1>
-  <p class="muted" style="max-width: 70ch;">
-    Enter a set of seed genes. CardioXNet assembles their functional neighborhood, finds
-    primary enriched pathways, then expands through the literature into <strong>secondary
-    pathways</strong> — surfacing cardiac mechanisms not already reported for your seeds, each
-    traced back to its evidence and citations.
-  </p>
+<div class="hero">
+  <div>
+    <p class="eyebrow">Evidence-guided cardiovascular discovery</p>
+    <h1>Prioritize pathways beyond the familiar literature</h1>
+    <p class="hero-copy">
+      CardioXNet expands a focused gene panel through protein interactions and pathway evidence,
+      then ranks mechanistically specific cardiovascular hypotheses by enrichment support and
+      literature saturation. Every result retains its gene lineage, statistics, and citations.
+    </p>
+  </div>
+  <div class="hero-note">
+    <strong>Interpretation boundary</strong>
+    Low literature saturation identifies an under-examined pathway, gene-panel, and disease
+    intersection. It is a prioritization signal, not proof of biological novelty.
+  </div>
 </div>
 
 <div class="grid-2">
   <div>
     <form class="card" action="/ui/analyze" method="post" data-testid="analyze-form"
           x-data="{ genes: '', get count() { return this.genes.split(/[^A-Za-z0-9._-]+/).filter(Boolean).length } }">
-      <h2 style="margin-top:0;">Seed genes</h2>
+      <p class="section-kicker">Analysis setup</p>
+      <h2 style="margin-top:4px;">Define the biological starting point</h2>
 
       <div class="field">
         <label for="genes">Enter or paste gene symbols</label>
@@ -43,9 +51,9 @@
       <hr class="divider" />
 
       <div class="field">
-        <label for="disease_context">Disease context <span class="muted" style="font-weight:400;">(optional — focuses scoring &amp; literature)</span></label>
+        <label for="disease_context">Disease context <span class="muted" style="font-weight:400;">(optional; focuses scoring and literature)</span></label>
         <select id="disease_context" name="disease_context" data-testid="disease-select">
-          <option value="">General — no specific disease focus</option>
+          <option value="">General - no specific disease focus</option>
           {% for d in disease_options %}
           <option value="{{ d.value }}">{{ d.label }}</option>
           {% endfor %}
@@ -84,24 +92,25 @@
 
       <button type="submit" class="btn btn-primary btn-lg btn-block" data-testid="start-btn"
               :disabled="count === 0">
-        ▶ Start discovery
+        Start pathway analysis
       </button>
       <div class="hint" style="text-align:center;">
-        A run takes ~5–20 minutes depending on depth. You'll watch each stage live.
+        A run usually takes 5 to 20 minutes, depending on depth and external services.
       </div>
     </form>
   </div>
 
   <aside>
     <div class="card">
-      <h3 style="margin-top:0;">How discovery works</h3>
-      <ol style="padding-left: 18px; margin: 0; color: var(--muted);">
-        <li style="margin-bottom:8px;"><strong style="color:var(--text);">Seed genes</strong> — your validated input.</li>
-        <li style="margin-bottom:8px;"><strong style="color:var(--text);">Functional neighborhood</strong> — STRING interaction partners.</li>
-        <li style="margin-bottom:8px;"><strong style="color:var(--text);">Primary pathways</strong> — enrichment, with pathways already known for the seeds filtered out.</li>
-        <li style="margin-bottom:8px;"><strong style="color:var(--text);">Secondary expansion</strong> — literature-mined genes open up <em>unreported</em> pathways.</li>
-        <li style="margin-bottom:8px;"><strong style="color:var(--text);">Scoring &amp; filtering</strong> — NES score + cardiac semantic relevance.</li>
-        <li><strong style="color:var(--text);">Evidence</strong> — PubMed citations + seed-gene lineage for every hypothesis.</li>
+      <p class="section-kicker">Analytical workflow</p>
+      <h3 style="margin-top:4px;">From panel to testable hypothesis</h3>
+      <ol class="workflow-list">
+        <li><strong>Validate inputs.</strong> Normalize gene symbols and record the disease context.</li>
+        <li><strong>Expand the network.</strong> Retrieve high-confidence STRING interaction partners.</li>
+        <li><strong>Resolve pathways.</strong> Enrich across Reactome, KEGG, WikiPathways, and Gene Ontology.</li>
+        <li><strong>Rank the evidence.</strong> Combine significance, effect size, specificity, and replication.</li>
+        <li><strong>Measure saturation.</strong> Count the exact PubMed pathway, seed, and disease corpus.</li>
+        <li><strong>Audit each result.</strong> Review lineage, expression, permutation statistics, and citations.</li>
       </ol>
       <hr class="divider" />
       <p class="small muted" style="margin:0;">

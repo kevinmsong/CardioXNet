@@ -1,10 +1,10 @@
 import { test, expect } from '@playwright/test';
 
 /**
- * LIVE end-to-end discovery test — "known → unknown".
+ * LIVE end-to-end discovery test - "known → unknown".
  *
  * Runs the REAL pipeline against live STRING / g:Profiler / PubMed so you can
- * watch genuine novel-pathway discovery. Slow and network-dependent — run headed:
+ * watch genuine novel-pathway discovery. Slow and network-dependent - run headed:
  *
  *   cd e2e && npx playwright test --headed discovery
  *

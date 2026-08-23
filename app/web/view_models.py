@@ -63,11 +63,11 @@ def _cardiac_expression(sc: Dict[str, Any]) -> float:
 def format_p(value: Optional[float]) -> str:
     """Format a p-value compactly (scientific for small numbers)."""
     if value is None:
-        return "—"
+        return "-"
     try:
         v = float(value)
     except (TypeError, ValueError):
-        return "—"
+        return "-"
     if v <= 0:
         return "<1e-300"
     if v < 0.001:
@@ -94,7 +94,7 @@ def hypothesis_rows(resp: Dict[str, Any]) -> List[Dict[str, Any]]:
             "evidence_count": int(hyp.get("evidence_count") or len(hyp.get("evidence_genes") or [])),
             "cardiac_relevance": float(sc.get("cardiac_relevance") or 0.0),
             "cardiac_expression": _cardiac_expression(sc),
-            "druggability_tier": sc.get("druggability_tier") or "—",
+            "druggability_tier": sc.get("druggability_tier") or "-",
             "empirical_pvalue": sc.get("empirical_pvalue"),
             "empirical_qvalue": sc.get("empirical_qvalue"),
             "empirical_q_fmt": format_p(sc.get("empirical_qvalue")),
@@ -102,7 +102,7 @@ def hypothesis_rows(resp: Dict[str, Any]) -> List[Dict[str, Any]]:
             # Literature novelty / discovery (Stage 8)
             "pubmed_hit_count": sc.get("pubmed_hit_count"),
             "literature_saturation": sc.get("literature_saturation"),
-            "novelty_tier": sc.get("novelty_tier") or "—",
+            "novelty_tier": sc.get("novelty_tier") or "-",
             "novelty_confidence": sc.get("novelty_confidence"),
             "discovery_score": sc.get("discovery_score"),
             "literature_count": _citation_count(hyp),

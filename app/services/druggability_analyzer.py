@@ -99,7 +99,7 @@ class DruggabilityAnalyzer:
         """Initialize druggability analyzer with curated lists + Open Targets live API."""
         self.settings = get_settings()
 
-        # Curated gene sets (DrugBank v5.1.10, TTD 2023, ChEMBL v31 — Nov 2023)
+        # Curated gene sets (DrugBank v5.1.10, TTD 2023, ChEMBL v31 - Nov 2023)
         self.druggable_genes = self._load_druggable_genes()
         self.approved_drug_targets = self._load_approved_drug_targets()
         self.clinical_trial_targets = self._load_clinical_trial_targets()
@@ -150,7 +150,7 @@ class DruggabilityAnalyzer:
                     obj = hit.get("object", {})
                     if obj.get("approvedSymbol", "").upper() == gene.upper():
                         matched.append(obj)
-                        break  # exact symbol match — take first
+                        break  # exact symbol match - take first
             except Exception as e:
                 failures += 1
                 if first_error is None:
@@ -312,7 +312,7 @@ class DruggabilityAnalyzer:
             pathway_genes: List of gene symbols in pathway
             use_external: When True, supplement the curated tiers with a live
                 Open Targets lookup. When False, score is computed entirely from
-                the offline curated drug-target sets (no network calls) — used by
+                the offline curated drug-target sets (no network calls) - used by
                 the fast preset so the druggability column is still populated.
 
         Returns:

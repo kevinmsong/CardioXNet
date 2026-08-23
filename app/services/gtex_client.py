@@ -70,7 +70,7 @@ class GTExClient:
         # Cache for dynamic lookups to avoid repeated API calls
         self._gencode_cache: Dict[str, Optional[str]] = {}
 
-        # Cache for cardiac specificity profiles — avoids redundant GTEx API calls
+        # Cache for cardiac specificity profiles - avoids redundant GTEx API calls
         self._cardiac_specificity_cache: Dict[str, CardiacExpressionProfile] = {}
 
         # Track genes we've already logged warnings for (avoid spam)
@@ -85,7 +85,7 @@ class GTExClient:
         GTEx API v2 ``medianGeneExpression`` requires the *current* versioned
         GENCODE ID (e.g. ENSG00000173020.15). A hardcoded version suffix goes
         stale whenever GTEx bumps the GENCODE patch (e.g. GATA4 was .14, now .17)
-        and then silently returns an empty tissue list — which previously zeroed
+        and then silently returns an empty tissue list - which previously zeroed
         out the cardiac tissue score for every gene in the static map. So we
         resolve the live ID first and fall back to the (best-effort, possibly
         stale) static map only when the lookup endpoint is unreachable.
@@ -165,7 +165,7 @@ class GTExClient:
             'IFT172': 'ENSG00000138619.13',
         }
         
-        # Live lookup is authoritative — it always returns the current versioned
+        # Live lookup is authoritative - it always returns the current versioned
         # ID for the requested symbol. Fall back to the static map only if the
         # endpoint is unreachable.
         gencode_id = self._lookup_gene_id_dynamic(gene_symbol)
@@ -217,14 +217,18 @@ class GTExClient:
                                         logger.info(f"[OK] Dynamic lookup exact match: {gene_symbol} -> {gencode_id}")
                                         return gencode_id
                             
-                            # If no exact match, try the first result (API usually returns most relevant first)
-                            if data['data']:
-                                first_result = data['data'][0]
-                                gencode_id = first_result.get('gencodeId')
-                                api_symbol = first_result.get('geneSymbol', '')
-                                if gencode_id:
-                                    logger.info(f"[OK] Dynamic lookup first result: {gene_symbol} -> {api_symbol} -> {gencode_id}")
-                                    return gencode_id
+                            # No exact match: do NOT fall back to data['data'][0].
+                            # That returned a *different* gene's GENCODE id and
+                            # logged it as "[OK]", so the wrong gene's tissue
+                            # profile was attributed to this one and reported as
+                            # its cardiac expression. An unresolvable symbol must
+                            # stay unresolved.
+                            returned = [g.get('geneSymbol') for g in data['data']][:5]
+                            logger.warning(
+                                f"GTEx returned no exact match for {gene_symbol} "
+                                f"(got {returned}); leaving it unresolved rather than "
+                                f"substituting another gene"
+                            )
                     
                     # If we got here, no valid data found
                     if attempt < 2:
@@ -264,7 +268,14 @@ class GTExClient:
             List of GTExExpression objects for each tissue
         """
         # Convert gene symbol to Ensembl ID
-        gencode_id = self._get_versioned_gencode_id(gene_symbol)
+        # Both the id lookup and the expression fetch below use blocking
+        # `requests` calls. Running them directly inside this coroutine pinned the
+        # event loop for the duration of every HTTP round-trip, which made the
+        # asyncio.Semaphore in batch_cardiac_specificity decorative -- the calls
+        # serialised anyway -- and stalled the WebSocket progress channel while a
+        # run was fetching GTEx. Handing them to a worker thread restores the
+        # concurrency the batch method already asks for.
+        gencode_id = await asyncio.to_thread(self._get_versioned_gencode_id, gene_symbol)
         if not gencode_id:
             # Only log warning once per gene to avoid spam
             if gene_symbol not in self._logged_warnings:
@@ -293,7 +304,7 @@ class GTExClient:
             
             # Build GTEx API call - get all tissues for proper specificity analysis
             full_url = f"{url}?gencodeId={gencode_id}&datasetId={params['datasetId']}"
-            response = self.session.get(full_url, timeout=30)
+            response = await asyncio.to_thread(self.session.get, full_url, timeout=30)
             
             if response.status_code == 200:
                 data = response.json()
@@ -370,13 +381,22 @@ class GTExClient:
             cardiac_median_tpm = max(exp.median_tpm for exp in cardiac_expressions)
             cardiac_mean_tpm = max(exp.mean_tpm for exp in cardiac_expressions)
             
-            # Calculate non-cardiac maximum
-            if non_cardiac_expressions:
-                max_non_cardiac_tpm = max(exp.median_tpm for exp in non_cardiac_expressions)
-            else:
-                max_non_cardiac_tpm = 0.1  # Avoid division by zero
-            
-            # Calculate specificity ratio
+            # Specificity is a comparison, so it needs something to compare
+            # against. A response carrying only cardiac tissues used to divide by
+            # a hardcoded 0.1, which turns a truncated payload into a ~10x
+            # inflated specificity that reads as an extreme finding.
+            if not non_cardiac_expressions:
+                logger.warning(
+                    f"GTEx returned no non-cardiac tissues for {gene_symbol}; "
+                    f"tissue specificity is not measurable for this gene"
+                )
+                return None
+
+            max_non_cardiac_tpm = max(exp.median_tpm for exp in non_cardiac_expressions)
+
+            # The 0.1 floor keeps the ratio finite for genes that are essentially
+            # absent elsewhere. It is a floor on the denominator, not a stand-in
+            # for missing data.
             cardiac_specificity_ratio = cardiac_median_tpm / max(max_non_cardiac_tpm, 0.1)
             
             # Calculate cardiac rank (how cardiac expression ranks among all tissues)

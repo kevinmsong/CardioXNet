@@ -544,12 +544,12 @@ class PubMedClient:
             # Extract PMID
             pmid = str(medline_citation.get("PMID", ""))
             
-            # Extract title — Biopython may return StringElement, dict, or plain str
+            # Extract title - Biopython may return StringElement, dict, or plain str
             title_raw = article.get("ArticleTitle", "")
             if isinstance(title_raw, str):
                 title = title_raw
             elif isinstance(title_raw, dict):
-                # Structured title (e.g. with markup) — join all text values
+                # Structured title (e.g. with markup) - join all text values
                 title = " ".join(str(v) for v in title_raw.values() if v)
             else:
                 title = str(title_raw) if title_raw else ""
@@ -697,7 +697,7 @@ class PubMedClient:
 
             # If biopython parse produced nothing, fall back to HTTP XML parser
             if not papers and batch_pmids:
-                logger.warning(f"Biopython parse returned 0 papers for {len(batch_pmids)} PMIDs — falling back to HTTP fetch")
+                logger.warning(f"Biopython parse returned 0 papers for {len(batch_pmids)} PMIDs - falling back to HTTP fetch")
                 papers = self._fetch_papers_with_http_fallback(batch_pmids)
 
             return papers

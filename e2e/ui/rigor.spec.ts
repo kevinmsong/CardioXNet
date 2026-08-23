@@ -51,7 +51,7 @@ test.describe('Scientific rigor (fixture)', () => {
   test('the Discovery column shows a value, never a placeholder, when one exists', async ({ page }) => {
     await page.goto(`/results/${FIXTURE}`);
     const firstDiscoveryCell = page.getByTestId('pathway-row').first().locator('td').nth(2);
-    await expect(firstDiscoveryCell).not.toHaveText('—');
+    await expect(firstDiscoveryCell).not.toHaveText('-');
     await expect(firstDiscoveryCell).toHaveText(/^\d+\.\d+$/);
   });
 
@@ -127,7 +127,7 @@ test.describe('Scientific rigor (fixture)', () => {
 
     // Values land under their own headers.
     const first = Object.fromEntries(header.map((h, i) => [h, splitCsv(lines[1])[i]]));
-    expect(['Highly Novel', 'Novel', 'Emerging', 'Established', 'Ungrounded', '—'])
+    expect(['Highly Novel', 'Novel', 'Emerging', 'Established', 'Ungrounded', '-'])
       .toContain(first['novelty_tier']);
   });
 

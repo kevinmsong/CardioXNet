@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-// Fast, deterministic — no external APIs. Validation is route-mocked.
+// Fast, deterministic - no external APIs. Validation is route-mocked.
 test.describe('Home / discovery form', () => {
   test('renders the gene-input form with presets and a disabled start button', async ({ page }) => {
     await page.goto('/');

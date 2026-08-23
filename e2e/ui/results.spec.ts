@@ -1,14 +1,14 @@
 import { test, expect } from '@playwright/test';
 
 // Renders the committed deterministic fixture analysis (outputs/analysis_fixture)
-// through the real server load path — no external APIs, no live pipeline.
+// through the real server load path - no external APIs, no live pipeline.
 const FIXTURE = 'analysis_fixture';
 
 test.describe('Results (fixture)', () => {
   test('summary, table, novelty, network and top genes render', async ({ page }) => {
     await page.goto(`/results/${FIXTURE}`);
 
-    await expect(page.getByRole('heading', { name: 'Discovery results' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Cardiovascular pathway hypotheses' })).toBeVisible();
     await expect(page.getByTestId('summary-stats')).toBeVisible();
 
     // Four hypotheses in the fixture, all reached by expansion (seed-independent).

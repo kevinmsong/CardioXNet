@@ -1,4 +1,4 @@
-# CardioXNet — Methods & Scientific Rigor
+# CardioXNet - Methods & Scientific Rigor
 
 This document describes the discovery methodology, scoring, statistical treatment, limitations,
 and a roadmap of design/algorithmic improvements. It is intended to make runs interpretable and
@@ -34,7 +34,7 @@ concentrates on new biology.
 | Cardiac semantic filtering | Curated cardiovascular term scoring + disease-context focus | `semantic_relevance_threshold`, `disease_context`, `enforce_final_name_filter` (default off) |
 | Enhanced validation | Size-matched permutation null vs the protein-coding genome + Benjamini-Hochberg FDR, GTEx v8 cardiac expression, ChEMBL/DrugBank druggability | `n_permutations` (default 1000) |
 | Literature mining | Per-hypothesis PubMed query (pathway + contributing seed genes + disease context); relevance scoring | `pubmed_max_results` |
-| Seed-gene tracing | Record full seed → primary → secondary → final lineage per hypothesis | — |
+| Seed-gene tracing | Record full seed → primary → secondary → final lineage per hypothesis | - |
 | Topology | Centrality (degree, betweenness, closeness, eigenvector, PageRank), modules, crosstalk, druggable targets | NetworkX |
 | Novelty & discovery | PubMed corpus size at (pathway x seeds x disease) -> literature saturation -> Discovery Score | NCBI E-utilities `esearch` |
 
@@ -92,7 +92,7 @@ PPS = db_weight x centrality_weight x ( 0.30 x significance
                                       + 0.15 x replication )
 ```
 
-Each term is normalised to [0, 1] before weighting:
+Each term is normalized to [0, 1] before weighting:
 
 - **significance** = `min(-log10(p_adj) / 10, 1)` - saturates at p_adj = 1e-10, beyond which
   differences reflect annotation bias and the numerical floor of the test rather than biology.
@@ -106,7 +106,7 @@ Each term is normalised to [0, 1] before weighting:
 - **centrality_weight** = `1 + 0.5 x seed_proximity + 0.3 x pagerank_percentile` (range 1.0-1.8).
 
 > **PPS is not a GSEA normalized enrichment score.** There is no running-sum statistic and no
-> permutation-derived normalisation behind it. The value is stored under the field name `nes_score`
+> permutation-derived normalization behind it. The value is stored under the field name `nes_score`
 > for backwards compatibility with persisted reports and the JSON API only.
 
 **Why this replaced the previous formula.** The earlier score was
@@ -149,7 +149,7 @@ that stage starved the candidate pool and cut the reference run from 22 hypothes
 
 ## 6. Reproducibility
 
-- Pin external database versions where possible (STRING release, g:Profiler/Reactome version) —
+- Pin external database versions where possible (STRING release, g:Profiler/Reactome version) -
   configured in `app/core/config.py`.
 - Results are persisted under `outputs/{analysis_id}/results.json` and are re-loadable by the API
   and UI, so any run can be re-opened and re-exported deterministically.
@@ -168,7 +168,10 @@ that stage starved the candidate pool and cut the reference run from 22 hypothes
   as unmeasured rather than as a measurement of zero, and PubMed count lookups retry on HTTP 429.
 - **g:Profiler has no request timeout.** The official `gprofiler` library calls `requests.post`
   internally and exposes no timeout parameter, so a hung connection can stall a run indefinitely.
-  There is no clean fix at the library boundary; if this bites, run with a watchdog.
+  There is no clean fix at the library boundary. A thread watchdog cannot cancel the blocked
+  request and leaks the worker and its network resources, so it is not presented as a workaround.
+  When bounded runtime is required, isolate the analysis in a separate process and enforce the
+  timeout at the process or orchestration boundary.
 - **Schemas drift silently.** The Open Targets query returned HTTP 400 for an extended period after
   the API renamed `knownDrugs`, and the caller swallowed it, so external druggability read zero
   throughout. An opt-in `pytest -m live` test now asserts the query still matches the schema; run it
@@ -204,13 +207,13 @@ Recommendations to raise performance and scientific rigor. ⚡ marks low-risk qu
 - ⚡ **Provenance capture.** Seed the RNG and record external DB versions + timestamps in every
   report for full reproducibility.
 - **Network propagation.** Replace the raw STRING neighbor union with **Random Walk with Restart /
-  heat diffusion** from seeds — a principled, hub-bias-aware neighborhood.
+  heat diffusion** from seeds - a principled, hub-bias-aware neighborhood.
 - **Empirical null as a core output.** Promote degree-preserving permutation testing (and random
   gene-set nulls) from optional to standard, reported alongside FDR q-values.
 - **Graded novelty score.** Replace the binary known/unknown filter with a continuous metric:
   seed↔pathway PubMed co-occurrence baseline, publication recency, and network distance.
 - **Embedding-based relevance.** Swap curated keyword scoring (semantic filter, literature
-  relevance) for PubMedBERT / sentence-transformer cosine similarity — fewer false negatives and
+  relevance) for PubMedBERT / sentence-transformer cosine similarity - fewer false negatives and
   defensible, data-driven thresholds.
 - **Consensus tiers.** Require ≥2 supporting databases and `min_support ≥ 2` for a "high-confidence"
   tier, surfaced in the UI.

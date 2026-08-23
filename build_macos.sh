@@ -29,7 +29,7 @@ echo "[2/3] Running PyInstaller…"
 "$PY" -m PyInstaller cardioxnet-macos.spec --clean --noconfirm
 
 if [[ ! -d "dist/CardioXNet.app" ]]; then
-  echo "ERROR: build failed — dist/CardioXNet.app was not produced." >&2
+  echo "ERROR: build failed - dist/CardioXNet.app was not produced." >&2
   exit 1
 fi
 echo "    Built dist/CardioXNet.app"

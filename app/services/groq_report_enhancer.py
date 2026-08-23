@@ -28,14 +28,14 @@ class GroqReportEnhancer:
         """Initialize Groq client from env variable."""
         api_key = os.getenv("GROQ_API_KEY")
         if not api_key:
-            logger.warning("GROQ_API_KEY not set — AI narrative generation disabled")
+            logger.warning("GROQ_API_KEY not set - AI narrative generation disabled")
             return
         try:
             from groq import Groq
             self.client = Groq(api_key=api_key)
             logger.info(f"GroqReportEnhancer initialized (model: {self.MODEL})")
         except ImportError:
-            logger.warning("groq package not installed — install with: pip install groq")
+            logger.warning("groq package not installed - install with: pip install groq")
         except Exception as e:
             logger.warning(f"Groq client init failed: {e}")
 
@@ -74,7 +74,7 @@ class GroqReportEnhancer:
         system = (
             "You are a cardiovascular disease research scientist writing a structured "
             "bioinformatics report. Be precise, scientific, and concise. "
-            "Write in the third person. Do not use bullet points — write prose paragraphs."
+            "Write in the third person. Do not use bullet points - write prose paragraphs."
         )
 
         user = f"""Write a 3-paragraph executive summary for a CardioXNet pathway analysis.

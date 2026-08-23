@@ -1,10 +1,10 @@
 {% extends "base.html" %}
-{% block title %}Documentation — CardioXNet{% endblock %}
+{% block title %}Documentation - CardioXNet{% endblock %}
 
 {% block content %}
 <h1>Documentation</h1>
 <p class="muted" style="max-width: 75ch;">
-  CardioXNet discovers cardiac repair pathways by reasoning outward from a set of seed genes —
+  CardioXNet discovers cardiac repair pathways by reasoning outward from a set of seed genes -
   from what is <em>known</em> about them to <em>unreported</em> pathway hypotheses, each backed by
   network evidence and literature. This page explains the pipeline, how to run an analysis, and how
   to read every column of the results.
@@ -30,12 +30,12 @@
   <h2 style="margin-top:0;">Running an analysis</h2>
   <ol style="padding-left: 20px;">
     <li><strong>Enter seed genes</strong> on the <a href="/">Discover</a> page (space-, comma-, or newline-separated). Use <em>Validate genes</em> to confirm they map to known symbols.</li>
-    <li><strong>Pick a disease context</strong> (optional) to focus semantic and literature scoring &mdash; e.g. heart failure or diabetic cardiomyopathy.</li>
+    <li><strong>Pick a disease context</strong> (optional) to focus semantic and literature scoring - e.g. heart failure or diabetic cardiomyopathy.</li>
     <li><strong>Choose analysis depth:</strong>
       <ul>
-        <li><strong>Fast screening</strong> (~5 min) &mdash; quick triage. Skips the slow <em>live</em> GTEx and Open Targets calls and the permutation null, substituting fast offline curated estimates for the tissue-specificity and druggability columns.</li>
-        <li><strong>Balanced</strong> (~10 min) &mdash; recommended default; full live validation.</li>
-        <li><strong>Comprehensive</strong> (~20 min) &mdash; deepest expansion, literature recall, and validation.</li>
+        <li><strong>Fast screening</strong> (~5 min) - quick triage. Skips the slow <em>live</em> GTEx and Open Targets calls and the permutation null, substituting fast offline curated estimates for the tissue-specificity and druggability columns.</li>
+        <li><strong>Balanced</strong> (~10 min) - recommended default; full live validation.</li>
+        <li><strong>Comprehensive</strong> (~20 min) - deepest expansion, literature recall, and validation.</li>
       </ul>
       Advanced parameters (STRING neighbors, FDR threshold, PubMed depth, permutations) can override any preset.</li>
     <li><strong>Start discovery</strong> and watch the live stage timeline. You'll be taken to the results automatically.</li>
@@ -51,9 +51,9 @@
         <tr><th>Column</th><th>Meaning</th></tr>
       </thead>
       <tbody>
-        <tr style="cursor:default;"><td><strong>Discovery</strong></td><td style="white-space:normal;">Discovery Score &mdash; the primary ranking. PPS &times; literature novelty: high for pathways that are well supported by the enrichment evidence <em>and</em> under-reported for these seed genes in this disease context.</td></tr>
-        <tr style="cursor:default;"><td><strong>Novelty</strong></td><td style="white-space:normal;">Literature tier from the number of PubMed records at the pathway &times; seed genes &times; disease intersection: Highly Novel, Novel, Emerging, Established. <em>Ungrounded</em> means the seed genes have too little literature in this disease for any novelty call to be meaningful &mdash; it is an undefined result, not a weak one.</td></tr>
-        <tr style="cursor:default;"><td><strong>PPS</strong></td><td style="white-space:normal;">Pathway Prioritization Score &mdash; a weighted composite of significance, fold enrichment, gene-set specificity and replication. <strong>Not</strong> a GSEA normalized enrichment score.</td></tr>
+        <tr style="cursor:default;"><td><strong>Discovery</strong></td><td style="white-space:normal;">Discovery Score is the primary ranking. PPS &times; literature novelty is high for pathways that are well supported by the enrichment evidence <em>and</em> under-reported for these seed genes in this disease context.</td></tr>
+        <tr style="cursor:default;"><td><strong>Novelty</strong></td><td style="white-space:normal;">Literature tier from the number of PubMed records at the pathway &times; seed genes &times; disease intersection: Highly Novel, Novel, Emerging, Established. <em>Ungrounded</em> means the seed genes have too little literature in this disease for any novelty call to be meaningful. It is an undefined result, not a weak one.</td></tr>
+        <tr style="cursor:default;"><td><strong>PPS</strong></td><td style="white-space:normal;">Pathway Prioritization Score is a weighted composite of significance, fold enrichment, gene-set specificity, and replication. It is <strong>not</strong> a GSEA normalized enrichment score.</td></tr>
         <tr style="cursor:default;"><td><strong>Perm. q</strong></td><td style="white-space:normal;">Benjamini&ndash;Hochberg corrected empirical p-value from a size-matched permutation null. <em>n/t</em> means the null could not be built. Most enriched pathways clear this null comfortably, so it confirms an overlap is not chance rather than ranking among strong hypotheses.</td></tr>
         <tr style="cursor:default;"><td><strong>p<sub>adj</sub></strong></td><td style="white-space:normal;">Multiple-testing&ndash;corrected enrichment p-value (Benjamini&ndash;Hochberg).</td></tr>
         <tr style="cursor:default;"><td><strong>Genes</strong></td><td style="white-space:normal;">Number of evidence genes supporting the pathway hypothesis.</td></tr>
@@ -62,7 +62,7 @@
         <tr style="cursor:default;"><td><strong>Druggability</strong></td><td style="white-space:normal;">Therapeutic tractability tier (<span class="badge tier-high">high</span> / <span class="badge tier-medium">medium</span> / <span class="badge tier-low">low</span>) from curated DrugBank / ChEMBL / TTD target sets, refined with live Open Targets evidence when enabled.</td></tr>
         <tr style="cursor:default;"><td><strong>Lit.</strong></td><td style="white-space:normal;">Count of supporting PubMed citations attached to the hypothesis.</td></tr>
         <tr style="cursor:default;"><td><strong>Traced seeds</strong></td><td style="white-space:normal;">Which of your seed genes this hypothesis was reached from during expansion.</td></tr>
-        <tr style="cursor:default;"><td><span class="badge badge-unreported">unreported</span></td><td style="white-space:normal;">Flagged when seed genes are a minority (&lt;50%) of the pathway's evidence &mdash; i.e. it was reached through expansion rather than already being annotated to the seeds.</td></tr>
+        <tr style="cursor:default;"><td><span class="badge badge-unreported">unreported</span></td><td style="white-space:normal;">Flagged when seed genes are a minority (&lt;50%) of the pathway's evidence - i.e. it was reached through expansion rather than already being annotated to the seeds.</td></tr>
       </tbody>
     </table>
   </div>
@@ -72,10 +72,10 @@
   <h2 style="margin-top:0;">Reading the results</h2>
   <ul>
     <li><strong>Summary tiles</strong> show how many hypotheses are unreported for your seeds, how many came from secondary expansion, and total literature support.</li>
-    <li><strong>Pathway table</strong> &mdash; click any column header to re-sort by Discovery Score, PPS, adjusted p-value, permutation q, fold enrichment, gene count, cardiac relevance, tissue specificity, or citation count. Click a row to open its detail page.</li>
-    <li><strong>Pathway detail</strong> &mdash; discovery lineage, statistics (permutation-based empirical p-values, cardiac expression and specificity), evidence genes, and ranked PubMed citations with abstracts.</li>
-    <li><strong>Network &amp; targets</strong> &mdash; hub genes and prioritized druggable targets.</li>
-    <li><strong>Export</strong> &mdash; download the full table as CSV, or the report as PDF / Markdown / JSON.</li>
+    <li><strong>Pathway table</strong> - click any column header to re-sort by Discovery Score, PPS, adjusted p-value, permutation q, fold enrichment, gene count, cardiac relevance, tissue specificity, or citation count. Click a row to open its detail page.</li>
+    <li><strong>Pathway detail</strong> - discovery lineage, statistics (permutation-based empirical p-values, cardiac expression and specificity), evidence genes, and ranked PubMed citations with abstracts.</li>
+    <li><strong>Network &amp; targets</strong> - hub genes and prioritized druggable targets.</li>
+    <li><strong>Export</strong> - download the full table as CSV, or the report as PDF / Markdown / JSON.</li>
   </ul>
 </div>
 
@@ -83,7 +83,7 @@
   <h2 style="margin-top:0;">Interpreting the <span class="badge badge-unreported">unreported</span> flag</h2>
   <p style="margin-bottom:0;">
     A hypothesis is flagged <strong>unreported</strong> when the seed genes account for fewer than half of the
-    pathway's evidence genes &mdash; meaning the pathway was reached through neighborhood and literature
+    pathway's evidence genes - meaning the pathway was reached through neighborhood and literature
     expansion rather than being a pathway the seeds are already annotated to. Combine the flag with the Discovery Score,
     replication support count, and literature evidence to prioritize hypotheses for experimental follow-up.
     Novelty here is relative to your seeds and the reference databases; always confirm against the current

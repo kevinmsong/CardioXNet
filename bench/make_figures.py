@@ -2,7 +2,7 @@
 
 Figures are built for print: a single light surface, no dark mode, direct value
 labels on every mark (the palette's low-contrast slots require that relief), and
-vector PDF alongside a 300 dpi PNG.
+vector PDF alongside a 600 dpi PNG.
 
 Usage:
     python bench/make_figures.py --manifest bench/out/manifest.json \
@@ -27,6 +27,7 @@ from matplotlib.ticker import FuncFormatter
 #   -> all hard gates PASS; contrast WARN on slots 3-4 is discharged by the
 #      direct value labels every figure carries.
 BLUE, ORANGE, AQUA, YELLOW = "#2a78d6", "#eb6834", "#1baf7a", "#eda100"
+TEAL, ACCENT_SOFT = "#0f766e", "#f0fdfa"
 INK, INK_2, MUTED = "#0b0b0b", "#52514e", "#8a8880"
 SURFACE = "#ffffff"
 GRID = "#e4e3de"
@@ -77,7 +78,7 @@ def despine(ax, keep=("left", "bottom")) -> None:
 def save(fig, out_dir: Path, name: str) -> None:
     out_dir.mkdir(parents=True, exist_ok=True)
     for ext in ("pdf", "png"):
-        fig.savefig(out_dir / f"{name}.{ext}", dpi=300, bbox_inches="tight")
+        fig.savefig(out_dir / f"{name}.{ext}", dpi=600, bbox_inches="tight")
     plt.close(fig)
     print(f"  wrote {name}.pdf / .png")
 
@@ -93,6 +94,93 @@ def load_report(run_json: Path) -> Optional[dict]:
         report["_results"] = payload.get("results", {})
         return report
     return None
+
+
+# --------------------------------------------------------------------------
+# Figure 1 -- complete analysis workflow
+# --------------------------------------------------------------------------
+def fig_workflow(out_dir: Path) -> None:
+    """Compact overview of the evidence flow and auditable output."""
+    from matplotlib.patches import FancyArrowPatch, FancyBboxPatch
+
+    stages = [
+        ("1", "Seed panel", "Validated genes\nand disease context"),
+        ("2", "Network expansion", "STRING v12\npartners"),
+        ("3", "Pathway evidence", "Multi-source\nenrichment"),
+        ("4", "Secondary expansion", "Literature-linked\ngenes"),
+        ("5", "Evidence ranking", "PPS, permutation,\nGTEx, druggability"),
+        ("6", "Literature saturation", "Exact pathway x seed\nx disease corpus"),
+    ]
+    fig, ax = plt.subplots(figsize=(7.1, 3.15))
+    ax.set_xlim(0, 3)
+    ax.set_ylim(0, 2)
+    ax.axis("off")
+
+    positions = [(0.03, 1.08), (1.03, 1.08), (2.03, 1.08),
+                 (2.03, 0.20), (1.03, 0.20), (0.03, 0.20)]
+    for index, ((number, title, detail), (x, y)) in enumerate(zip(stages, positions)):
+        face = ACCENT_SOFT if index in (0, 5) else SURFACE
+        edge = TEAL if index in (0, 5) else GRID
+        box = FancyBboxPatch(
+            (x, y), 0.84, 0.55,
+            boxstyle="round,pad=0.025,rounding_size=0.045",
+            linewidth=1.1, edgecolor=edge, facecolor=face,
+        )
+        ax.add_patch(box)
+        ax.text(x + 0.08, y + 0.43, number, color=TEAL, fontsize=8,
+                weight="bold", ha="left", va="center")
+        ax.text(x + 0.20, y + 0.43, title, color=INK, fontsize=8,
+                weight="bold", ha="left", va="center")
+        ax.text(x + 0.08, y + 0.22, detail, color=INK_2, fontsize=7,
+                ha="left", va="center", linespacing=1.25)
+
+    arrows = [
+        ((0.88, 1.355), (1.02, 1.355)),
+        ((1.88, 1.355), (2.02, 1.355)),
+        ((2.45, 1.07), (2.45, 0.78)),
+        ((2.02, 0.475), (1.88, 0.475)),
+        ((1.02, 0.475), (0.88, 0.475)),
+    ]
+    for start, end in arrows:
+        ax.add_patch(FancyArrowPatch(start, end, arrowstyle="-|>",
+                                     mutation_scale=10, linewidth=1,
+                                     color=MUTED))
+
+    ax.text(0.03, 1.82,
+            "CardioXNet converts a focused gene panel into auditable pathway hypotheses",
+            color=INK, fontsize=10, weight="bold", ha="left")
+    ax.text(0.03, 0.02,
+            "Output: ranked hypotheses with gene lineage, enrichment effect size, empirical q-value, "
+            "cardiac expression, druggability, and PubMed corpus size.",
+            color=MUTED, fontsize=7, ha="left")
+    save(fig, out_dir, "fig1_cardioxnet_workflow")
+
+
+# --------------------------------------------------------------------------
+# Figure 6 -- key application views
+# --------------------------------------------------------------------------
+def fig_interface(out_dir: Path) -> None:
+    """Pair the ranked-results and pathway-audit views as a manuscript figure."""
+    root = Path(__file__).resolve().parents[1]
+    images = [
+        root / "docs" / "screenshots" / "10-manuscript-ranked-results.png",
+        root / "docs" / "screenshots" / "11-manuscript-pathway-evidence.png",
+    ]
+    if not all(path.exists() for path in images):
+        print("  ! manuscript UI screenshots not found, skipping fig6")
+        return
+
+    fig, axes = plt.subplots(2, 1, figsize=(7.1, 8.6))
+    labels = [
+        "A  Ranked results summarize statistical, literature, and translational evidence",
+        "B  A pathway audit exposes the exact literature gap and discovery lineage",
+    ]
+    for ax, path, label in zip(axes, images, labels):
+        ax.imshow(plt.imread(path))
+        ax.set_title(label, loc="left", pad=7, fontsize=8.5, weight="bold")
+        ax.axis("off")
+    fig.subplots_adjust(hspace=0.12)
+    save(fig, out_dir, "fig6_application_evidence_views")
 
 
 # --------------------------------------------------------------------------
@@ -358,6 +446,9 @@ def main() -> None:
     style()
     out_root = Path(args.out)
     fig_dir, tbl_dir = out_root / "figures", out_root / "tables"
+
+    fig_workflow(fig_dir)
+    fig_interface(fig_dir)
 
     manifest_path = Path(args.manifest)
     manifest = json.loads(manifest_path.read_text(encoding="utf-8")) if manifest_path.exists() else {}

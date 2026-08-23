@@ -2,7 +2,7 @@
 """
 PyInstaller spec for the CardioXNet macOS desktop app.
 
-Build (must run ON macOS — PyInstaller does not cross-compile):
+Build (must run ON macOS - PyInstaller does not cross-compile):
     pip install -r requirements.txt -r requirements-desktop.txt
     pyinstaller cardioxnet-macos.spec --clean --noconfirm
 
@@ -74,7 +74,7 @@ hiddenimports = [
     *collect_submodules("jinja2"),
     # g:Profiler client (package name `gprofiler`)
     "gprofiler",
-    # pywebview — Cocoa/WKWebView backend on macOS
+    # pywebview - Cocoa/WKWebView backend on macOS
     "webview", "webview.platforms.cocoa",
 ]
 
@@ -103,7 +103,7 @@ exe = EXE(
     bootloader_ignore_signals=False,
     strip=False,
     upx=False,                 # UPX is unreliable on macOS dylibs
-    console=False,             # windowed — no terminal
+    console=False,             # windowed - no terminal
     disable_windowed_traceback=False,
     argv_emulation=False,
     target_arch=None,          # host arch; set "universal2"/"arm64"/"x86_64" to pin

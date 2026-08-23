@@ -30,7 +30,7 @@ else:
 # ── Path / working-directory setup ──────────────────────────────────────────
 if getattr(sys, "frozen", False):
     # Running as a PyInstaller bundle.
-    # _MEIPASS holds the extracted Python modules + data — add to sys.path so
+    # _MEIPASS holds the extracted Python modules + data - add to sys.path so
     # `import app...` resolves. Outputs are written next to the executable.
     BUNDLE_DIR = Path(sys._MEIPASS)
     sys.path.insert(0, str(BUNDLE_DIR))
@@ -149,7 +149,7 @@ def main() -> None:
     threading.Thread(target=_start_backend, args=(port,), daemon=True).start()
 
     window = webview.create_window(
-        "CardioXNet — Starting…",
+        "CardioXNet - Starting…",
         html="""
         <html><body style="margin:0;background:#0f766e;display:flex;flex-direction:column;
             align-items:center;justify-content:center;height:100vh;
@@ -167,12 +167,12 @@ def main() -> None:
 
     def _on_shown():
         if _wait_for_server(port, timeout=120):
-            _log("Server ready — opening app")
+            _log("Server ready - opening app")
             window.load_url(f"http://{HOST}:{port}")
             window.set_title("CardioXNet")
             window.resize(1820, 1170)
         else:
-            detail = _START_ERROR or "(no traceback — check CardioXNet.log next to the app)"
+            detail = _START_ERROR or "(no traceback - check CardioXNet.log next to the app)"
             _log("Server did not respond in time")
             safe = detail.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
             window.load_html(

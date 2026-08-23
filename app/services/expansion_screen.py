@@ -1,7 +1,7 @@
 """Screening score that decides which pathways advance to neighbourhood expansion.
 
 Single definition, shared by the primary and secondary analyzers. It previously
-existed as two byte-identical copies, one in each — two copies of a ranking
+existed as two byte-identical copies, one in each - two copies of a ranking
 formula that must stay in sync is a standing correctness hazard.
 """
 
@@ -20,7 +20,7 @@ def preliminary_score(pathway, db_weight: float) -> float:
     (NLRP3 inflammasome, TLR3 cascade, NF-kappa B).
 
     Specificity is applied later instead, in the Pathway Prioritization Score,
-    where it belongs — ranking is the precision step.
+    where it belongs - ranking is the precision step.
 
         screen = min(-log10(p_adj), 20) * sqrt(evidence_count) * db_weight
 

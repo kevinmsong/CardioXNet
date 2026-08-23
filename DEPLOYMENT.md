@@ -4,7 +4,7 @@
 
 CardioXNet is a cardiovascular pathway-discovery platform. The UI is **server-rendered by FastAPI**
 (Jinja2 + htmx + Alpine.js, with vendored JS), so there is **no Node/build step** and **no separate
-frontend service** — one Python process serves the UI and the JSON API on a single port.
+frontend service** - one Python process serves the UI and the JSON API on a single port.
 
 ---
 
@@ -46,7 +46,7 @@ python -m uvicorn app.main:app --host 0.0.0.0 --port 8000 --workers 4
 ```
 
 Put a reverse proxy (nginx/Caddy) in front for TLS and gzip. Static assets are served by FastAPI
-from `app/static/` (vendored JS + CSS — no external CDN required).
+from `app/static/` (vendored JS + CSS - no external CDN required).
 
 ### Docker
 
@@ -61,7 +61,7 @@ that bundles Python, the FastAPI server, and the UI, and opens it in a native
 WKWebView window via [pywebview](https://pywebview.flowlib.org/). No Python
 install is required on the end-user's machine.
 
-> **Build on a Mac.** PyInstaller does not cross-compile — the `.app` must be
+> **Build on a Mac.** PyInstaller does not cross-compile - the `.app` must be
 > built on macOS. Build on an Apple-silicon Mac for an arm64 app, or an Intel
 > Mac (or Rosetta x86_64 Python) for an Intel app.
 
@@ -120,12 +120,12 @@ Since the UI is same-origin with the API, no CORS configuration is needed for no
 
 ## Data sources (used live)
 
-- STRING — protein–protein interactions
-- g:Profiler — GO:BP, KEGG, Reactome, WikiPathways enrichment
-- Reactome — known-pathway filtering (novelty)
-- GTEx — cardiac tissue expression
-- PubMed / NCBI E-utilities — literature evidence
-- ChEMBL / curated lists — druggability
+- STRING - protein–protein interactions
+- g:Profiler - GO:BP, KEGG, Reactome, WikiPathways enrichment
+- Reactome - known-pathway filtering (novelty)
+- GTEx - cardiac tissue expression
+- PubMed / NCBI E-utilities - literature evidence
+- ChEMBL / curated lists - druggability
 
 Results are written to `outputs/{analysis_id}/results.json` and re-loadable by the API and UI.
 
@@ -169,10 +169,10 @@ Get-NetTCPConnection -LocalPort 8000 -State Listen | ForEach-Object { Stop-Proce
 pip install -r requirements.txt --upgrade
 ```
 
-**PubMed returns few citations / HTTP 429** — NCBI is rate-limiting. Configure an NCBI API key (see
+**PubMed returns few citations / HTTP 429** - NCBI is rate-limiting. Configure an NCBI API key (see
 `docs/METHODS.md` §8) and reduce `pubmed_max_results`, or use a shallower preset.
 
-**Static assets 404** — ensure `app/static/` is present (it ships with the repo) and that you launch
+**Static assets 404** - ensure `app/static/` is present (it ships with the repo) and that you launch
 from the repository root so relative paths resolve.
 
 ### Health check

@@ -122,9 +122,9 @@ class ValidationStagesMixin:
                         hypothesis.score_components['tissue_validation_passed'] = False
                         tissue_filtered += 1
                 
-                    # 2. Permutation Testing (Optional for performance - degree-preserving empirical p-value)
-                    # SCIENTIFIC RIGOR: Use degree-preserving permutation to control for network topology
-                    # Reduced from 1000 to 100 permutations for performance while maintaining statistical validity
+                    # 2. Permutation testing against a size-matched uniform
+                    # protein-coding genome null. The configured benchmark uses
+                    # 1,000 permutations, giving a minimum p-value of 1/1001.
                     try:
                         if all_genes and fn_genes and self.settings.nets.permutation_test_enabled:
                             # Size-matched uniform null over the protein-coding

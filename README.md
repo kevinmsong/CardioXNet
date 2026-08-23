@@ -3,7 +3,7 @@
 **CardioXNet** is a cardiovascular pathway-discovery platform that reasons from *known* seed
 genes to *unreported* cardiac pathways. Given a handful of genes, it assembles their functional
 neighborhood, finds primary enriched pathways, then expands through the literature into
-**secondary pathways** — surfacing cardiac mechanisms not already annotated for the seeds, each
+**secondary pathways** - surfacing cardiac mechanisms not already annotated for the seeds, each
 traced back to its network evidence and PubMed citations.
 
 It implements the **NETS** pipeline (Network Expansion & Topology Scoring): protein-interaction
@@ -16,7 +16,7 @@ which ranks pathways that are both well supported by the enrichment evidence *an
 at the intersection of (pathway x seed genes x disease context).
 
 > **Lightweight & no-build.** The UI is server-rendered by FastAPI (Jinja2 + htmx + Alpine.js,
-> with vendored JS — no CDN required). There is **no Node/npm/bundler build step** and no separate
+> with vendored JS - no CDN required). There is **no Node/npm/bundler build step** and no separate
 > frontend server: one Python process serves the UI and the JSON API on a single port.
 
 ---
@@ -30,7 +30,7 @@ pip install -r requirements.txt
 python -m uvicorn app.main:app --port 8000
 ```
 
-Open **http://localhost:8000** — enter seed genes (e.g. `PIK3R1 ITGB1 SRC`), pick an optional
+Open **http://localhost:8000** - enter seed genes (e.g. `PIK3R1 ITGB1 SRC`), pick an optional
 disease context and an analysis depth, and start discovery. You'll watch each pipeline stage live
 and land on the results automatically.
 
@@ -46,7 +46,7 @@ Optional: create a `.env` with `GROQ_API_KEY=...` to enable AI-assisted report n
 | **Functional neighborhood** | High-confidence STRING interaction partners around the seeds. |
 | **Primary pathways** | g:Profiler enrichment (GO/KEGG/Reactome/WikiPathways); pathways *already known* for the seeds (per Reactome) are filtered out. |
 | **Secondary expansion** | For each primary pathway, mine PubMed for co-mentioned genes; the expanded gene set reveals **unreported** secondary pathways. |
-| **Aggregation & scoring** | Deduplicate pathway instances, combine evidence (Fisher's method), and score with the **Pathway Prioritization Score (PPS)** — a weighted composite of significance (0.30), fold enrichment (0.30), gene-set specificity (0.25) and cross-source replication (0.15). PPS is *not* a GSEA normalized enrichment score. |
+| **Aggregation & scoring** | Deduplicate pathway instances, combine evidence (Fisher's method), and score with the **Pathway Prioritization Score (PPS)** - a weighted composite of significance (0.30), fold enrichment (0.30), gene-set specificity (0.25) and cross-source replication (0.15). PPS is *not* a GSEA normalized enrichment score. |
 | **Cardiac filtering** | Semantic filter keeps cardiovascular-relevant hypotheses, focused by the chosen disease context. |
 | **Validation** | Size-matched permutation tests against the HGNC protein-coding genome with Benjamini–Hochberg FDR control, GTEx v8 cardiac expression, ChEMBL/DrugBank druggability. |
 | **Literature mining** | Attach ranked PubMed citations to each hypothesis. |
@@ -105,7 +105,7 @@ Interactive docs at `http://localhost:8000/docs`. See the in-app **[API referenc
 
 ## Testing
 
-Playwright is **dev tooling only** — it lives under `e2e/` and is the *only* place Node is used.
+Playwright is **dev tooling only** - it lives under `e2e/` and is the *only* place Node is used.
 
 ```bash
 cd e2e
@@ -121,7 +121,7 @@ npx playwright test ui
 ```
 
 **Live "known → unknown" discovery** (runs the real pipeline against STRING/g:Profiler/PubMed so you
-can watch genuine discovery — slow, network-dependent). Run it **headed** to watch:
+can watch genuine discovery - slow, network-dependent). Run it **headed** to watch:
 
 ```bash
 npx playwright test discovery --headed

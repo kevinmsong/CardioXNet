@@ -255,7 +255,7 @@ class NETSConfig(BaseSettings):
         description="Jaccard similarity threshold for pathway redundancy filtering"
     )
 
-    # Stage 8 limits — how many top pathways each validation step processes
+    # Stage 8 limits - how many top pathways each validation step processes
     gtex_top_pathways: int = Field(
         default=20, ge=0, description="Pathways to validate with GTEx (0 = all)"
     )

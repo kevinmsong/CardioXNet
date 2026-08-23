@@ -1,8 +1,8 @@
 {% extends "base.html" %}
-{% block title %}{{ hyp.pathway_name }} — CardioXNet{% endblock %}
+{% block title %}{{ hyp.pathway_name }} - CardioXNet{% endblock %}
 
 {% block content %}
-<div class="breadcrumb"><a href="/">Discover</a> / <a href="/results/{{ analysis_id }}">Results</a> / Pathway</div>
+<div class="breadcrumb"><a href="/">New analysis</a> / <a href="/results/{{ analysis_id }}">Results</a> / Pathway</div>
 
 <div class="toolbar">
   <h1 style="margin:0;" data-testid="pathway-title">{{ hyp.pathway_name }}</h1>
@@ -14,6 +14,12 @@
   {% if is_novel %}<span class="badge badge-unreported" data-testid="novel-badge">seed-independent</span>{% endif %}
 </div>
 
+<div class="evidence-callout">
+  <div><div class="label">Discovery score</div><div class="value">{{ '%.3f'|format(score_components.get('discovery_score')) if score_components.get('discovery_score') is not none else 'n/a' }}</div></div>
+  <div><div class="label">Literature intersection</div><div class="value">{{ score_components.get('pubmed_hit_count') if score_components.get('pubmed_hit_count') is not none and score_components.get('pubmed_hit_count') >= 0 else 'Not measured' }} PubMed records</div></div>
+  <div><div class="label">Evidence status</div><div class="value">{{ score_components.get('novelty_tier') or 'Not classified' }}</div></div>
+</div>
+
 <!-- Lineage -->
 <div class="card" style="margin-bottom: 20px;">
   <div class="card-title"><h2 style="margin:0;">Discovery lineage</h2></div>
@@ -23,7 +29,7 @@
   <div class="lineage" data-testid="lineage">
     <div class="lineage-step seed">
       <div class="lstage">Seed genes</div>
-      <div class="lval mono">{{ (lineage.seed_genes or hyp.traced_seed_genes or [])|join(', ') or '—' }}</div>
+      <div class="lval mono">{{ (lineage.seed_genes or hyp.traced_seed_genes or [])|join(', ') or '-' }}</div>
     </div>
     <div class="lineage-step">
       <div class="lstage">Primary pathways</div>
@@ -39,7 +45,7 @@
     </div>
   </div>
   <p class="hint" style="margin-top: 12px;">
-    Discovery method: <strong>{{ lineage.discovery_method or '—' }}</strong> ·
+    Discovery method: <strong>{{ lineage.discovery_method or '-' }}</strong> ·
     Support count: <strong>{{ lineage.support_count if lineage.support_count is defined else (hyp.aggregated_pathway or {}).get('support_count', 0) }}</strong>
     (number of primary pathways independently pointing to this hypothesis)
   </p>
@@ -64,7 +70,7 @@
         {% endif %}
       </dd>
       <dt title="FDR-adjusted enrichment p-value from g:Profiler">Enrichment p<sub>adj</sub></dt>
-      <dd>{{ '%.2e'|format(hyp.p_adj) if hyp.p_adj is not none else '—' }}</dd>
+      <dd>{{ '%.2e'|format(hyp.p_adj) if hyp.p_adj is not none else '-' }}</dd>
       {% if score_components.get('fold_enrichment') is not none %}
       <dt title="Observed overlap ÷ overlap expected from term size, query size and annotation universe">Fold enrichment</dt>
       <dd>{{ '%.2f'|format(score_components.get('fold_enrichment')) }}×
@@ -76,7 +82,7 @@
       <dd>{{ (score_components.get('cardiac_expression_ratio', 0)*100)|round(1) }}%
         {% if score_components.get('gtex_measured') is false %}
         of genes in the curated cardiac gene set
-        <div class="pw-id">GTEx not queried for this pathway — TPM and tissue specificity are not measured</div>
+        <div class="pw-id">GTEx not queried for this pathway - TPM and tissue specificity are not measured</div>
         {% else %}
         of genes expressed in heart (GTEx, median TPM ≥ 1)
         {% endif %}
@@ -90,12 +96,12 @@
         <div class="pw-id">{{ score_components.get('pubmed_hit_count') }} PubMed records at pathway × seeds × disease</div>
         {% endif %}
         {% if score_components.get('saturation_basis') == 'retrieved_citations' %}
-        <div class="pw-id">count lookup unavailable — derived from retrieved citations, treat as a lower bound</div>
+        <div class="pw-id">count lookup unavailable - derived from retrieved citations, treat as a lower bound</div>
         {% endif %}
       </dd>
       {% endif %}
       {% if score_components.get('permutation_testable') %}
-      <dt title="Empirical p from a degree-matched null drawn from the annotated background gene pool">Permutation p</dt>
+      <dt title="Empirical p from a size-matched uniform null drawn from the pinned protein-coding background">Permutation p</dt>
       <dd>{{ '%.4f'|format(score_components.get('empirical_pvalue')) }}
         {% if score_components.get('p_resolution_floor') %}<span class="pw-id">floor {{ '%.1e'|format(score_components.get('p_resolution_floor')) }}</span>{% endif %}</dd>
       {% if score_components.get('empirical_qvalue') is not none %}
@@ -104,10 +110,10 @@
       {% endif %}
       {% if score_components.get('permutation_z_score') is not none %}<dt>Permutation z-score</dt><dd>{{ '%.2f'|format(score_components.get('permutation_z_score')) }}</dd>{% endif %}
       {% elif score_components.get('permutation_skip_reason') %}
-      <dt>Permutation test</dt><dd class="muted">not run — {{ score_components.get('permutation_skip_reason') }}</dd>
+      <dt>Permutation test</dt><dd class="muted">not run - {{ score_components.get('permutation_skip_reason') }}</dd>
       {% endif %}
       <dt>Druggability</dt><dd>
-        <span class="badge tier-{{ score_components.get('druggability_tier', 'low') }}">{{ score_components.get('druggability_tier', '—') }}</span>
+        <span class="badge tier-{{ score_components.get('druggability_tier', 'low') }}">{{ score_components.get('druggability_tier', '-') }}</span>
         {% if score_components.get('approved_drug_count') %}· {{ score_components.get('approved_drug_count') }} approved{% endif %}
         {% if score_components.get('clinical_trial_count') %}· {{ score_components.get('clinical_trial_count') }} in trials{% endif %}
       </dd>
@@ -122,7 +128,7 @@
       {% for g in (hyp.evidence_genes or []) %}
         <span class="gene-tag {{ 'seed' if g in seed_symbols or g in (hyp.traced_seed_genes or []) else '' }}">{{ g }}</span>
       {% endfor %}
-      {% if not hyp.evidence_genes %}<span class="muted">—</span>{% endif %}
+      {% if not hyp.evidence_genes %}<span class="muted">-</span>{% endif %}
     </div>
   </div>
 </div>

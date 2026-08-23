@@ -184,28 +184,41 @@ class STRINGClient:
                     if not data_lines:
                         return pd.DataFrame()
                     
-                    # Parse each line
+                    # Parse each line. Per-row failures are skipped rather than propagated:
+                    # a non-numeric score raises ValueError, which is not a
+                    # RequestException and so escaped the retry loop entirely --
+                    # one malformed row discarded the whole network.
                     parsed_data = []
+                    malformed = 0
                     for line in data_lines:
                         if line.strip():
                             parts = line.split('\t')
                             if len(parts) >= 10:  # Ensure we have all required columns
-                                parsed_data.append({
-                                    'stringId_A': parts[0],
-                                    'stringId_B': parts[1],
-                                    'preferredName_A': parts[2],
-                                    'preferredName_B': parts[3],
-                                    'ncbiTaxonId': parts[4],
-                                    'score': float(parts[5]),
-                                    'nscore': float(parts[6]) if parts[6] else 0.0,
-                                    'fscore': float(parts[7]) if parts[7] else 0.0,
-                                    'pscore': float(parts[8]) if parts[8] else 0.0,
-                                    'ascore': float(parts[9]) if parts[9] else 0.0,
-                                    'escore': float(parts[10]) if len(parts) > 10 and parts[10] else 0.0,
-                                    'dscore': float(parts[11]) if len(parts) > 11 and parts[11] else 0.0,
-                                    'tscore': float(parts[12]) if len(parts) > 12 and parts[12] else 0.0
-                                })
+                              try:
+                                  parsed_data.append({
+                                      'stringId_A': parts[0],
+                                      'stringId_B': parts[1],
+                                      'preferredName_A': parts[2],
+                                      'preferredName_B': parts[3],
+                                      'ncbiTaxonId': parts[4],
+                                      'score': float(parts[5]),
+                                      'nscore': float(parts[6]) if parts[6] else 0.0,
+                                      'fscore': float(parts[7]) if parts[7] else 0.0,
+                                      'pscore': float(parts[8]) if parts[8] else 0.0,
+                                      'ascore': float(parts[9]) if parts[9] else 0.0,
+                                      'escore': float(parts[10]) if len(parts) > 10 and parts[10] else 0.0,
+                                      'dscore': float(parts[11]) if len(parts) > 11 and parts[11] else 0.0,
+                                      'tscore': float(parts[12]) if len(parts) > 12 and parts[12] else 0.0
+                                  })
+                              except (ValueError, IndexError):
+                                  malformed += 1
                     
+                    if malformed:
+                        logger.warning(
+                            f"STRING: skipped {malformed} unparseable interaction row(s); "
+                            f"kept {len(parsed_data)}"
+                        )
+
                     if not parsed_data:
                         return pd.DataFrame()
                     

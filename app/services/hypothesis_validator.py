@@ -253,7 +253,7 @@ class HypothesisValidator:
             )
 
         # ── Discovery Score (NES × novelty) ─────────────────────────────────
-        # Surfaces pathways that are strongly enriched AND under-reported —
+        # Surfaces pathways that are strongly enriched AND under-reported -
         # the primary scientific goal of this tool.
         nes = hypothesis.nes_score if hasattr(hypothesis, 'nes_score') else 0.0
         scores['discovery_score'] = round(nes * composite_novelty, 4)

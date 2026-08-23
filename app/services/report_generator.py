@@ -503,7 +503,7 @@ Ranked by Discovery Score. Column definitions are given in the Methods note belo
 | Rank | Pathway | Source | Discovery | Novelty | PPS | Enrich. p<sub>adj</sub> | Fold | Perm. q | Genes | PubMed hits |
 |------|---------|--------|-----------|---------|-----|--------------|------|---------|-------|-------------|
 {% for h in ranked_hypotheses[:20] -%}
-| {{ h.rank }} | {{ h.pathway_name }} | {{ h.source_db }} | {{ "%.3f"|format(h.discovery_score) if h.discovery_score is not none else "—" }} | {{ h.novelty_tier or "—" }} | {{ "%.3f"|format(h.nes_score) }} | {{ "%.2e"|format(h.p_adj) }} | {{ "%.1f"|format(h.fold_enrichment) if h.fold_enrichment is not none else "—" }} | {{ "%.3g"|format(h.empirical_qvalue) if h.empirical_qvalue is not none else "n/t" }} | {{ h.evidence_count }} | {{ h.pubmed_hit_count if h.pubmed_hit_count is not none and h.pubmed_hit_count >= 0 else "—" }} |
+| {{ h.rank }} | {{ h.pathway_name }} | {{ h.source_db }} | {{ "%.3f"|format(h.discovery_score) if h.discovery_score is not none else "-" }} | {{ h.novelty_tier or "-" }} | {{ "%.3f"|format(h.nes_score) }} | {{ "%.2e"|format(h.p_adj) }} | {{ "%.1f"|format(h.fold_enrichment) if h.fold_enrichment is not none else "-" }} | {{ "%.3g"|format(h.empirical_qvalue) if h.empirical_qvalue is not none else "n/t" }} | {{ h.evidence_count }} | {{ h.pubmed_hit_count if h.pubmed_hit_count is not none and h.pubmed_hit_count >= 0 else "-" }} |
 {% endfor %}
 
 **Column definitions.**
@@ -516,8 +516,8 @@ fold enrichment (0.30), gene-set specificity (0.25) and cross-source replication
 normalized enrichment score.**
 `Enrich. p_adj` = FDR-adjusted enrichment p-value from g:Profiler.
 `Fold` = observed / expected overlap.
-`Perm. q` = Benjamini-Hochberg corrected empirical p-value from a degree-matched
-permutation null over the annotated background; `n/t` means the test was not run.
+`Perm. q` = Benjamini-Hochberg corrected empirical p-value from a size-matched
+uniform null over the pinned protein-coding background; `n/t` means the test was not run.
 `PubMed hits` = total records at the pathway x seed genes x disease intersection.
 
 ---
@@ -568,7 +568,7 @@ permutation null over the annotated background; `n/t` means the test was not run
 {% for h in ranked_hypotheses[:10] if h.citations %}
 ### {{ h.pathway_name }}
 {% for c in h.citations[:3] %}
-- **{{ c.title }}** — PMID: {{ c.pmid }} ({{ c.year }})
+- **{{ c.title }}** - PMID: {{ c.pmid }} ({{ c.year }})
 {% endfor %}
 {% endfor %}
 
@@ -643,14 +643,14 @@ permutation null over the annotated background; `n/t` means the test was not run
         <tr>
             <td>{{ h.rank }}</td>
             <td>{{ h.pathway_name }}</td>
-            <td><strong>{{ "%.3f"|format(h.discovery_score) if h.discovery_score is not none else "—" }}</strong></td>
-            <td>{{ h.novelty_tier or "—" }}</td>
+            <td><strong>{{ "%.3f"|format(h.discovery_score) if h.discovery_score is not none else "-" }}</strong></td>
+            <td>{{ h.novelty_tier or "-" }}</td>
             <td>{{ "%.3f"|format(h.nes_score) }}</td>
             <td>{{ "%.2e"|format(h.p_adj) }}</td>
             <td>{{ "%.3g"|format(h.empirical_qvalue) if h.empirical_qvalue is not none else "n/t" }}</td>
             <td>{{ h.evidence_count }}</td>
             <td>{{ h.seed_genes | join(', ') if h.seed_genes else 'N/A' }}</td>
-            <td>{{ h.pubmed_hit_count if h.pubmed_hit_count is not none and h.pubmed_hit_count >= 0 else "—" }}</td>
+            <td>{{ h.pubmed_hit_count if h.pubmed_hit_count is not none and h.pubmed_hit_count >= 0 else "-" }}</td>
         </tr>
         {% endfor %}
     </table>
@@ -824,7 +824,7 @@ permutation null over the annotated background; `n/t` means the test was not run
                 "not a GSEA normalized enrichment score. "
                 "<b>Enr. p</b> FDR-adjusted enrichment p-value (g:Profiler). "
                 "<b>Perm. q</b> Benjamini-Hochberg corrected empirical p-value from a "
-                "degree-matched permutation null; n/t = not tested. "
+                "size-matched uniform protein-coding genome null; n/t = not tested. "
                 "<b>PubMed</b> records at the pathway x seed genes x disease intersection.",
                 caption_style))
         else:
@@ -854,7 +854,7 @@ permutation null over the annotated background; `n/t` means the test was not run
                         small_style))
                 for c in pw.get("citations", [])[:3]:
                     els.append(Paragraph(
-                        f"• {c.get('title','')[:90]} — PMID {c.get('pmid','')} ({c.get('year','')})",
+                        f"• {c.get('title','')[:90]} - PMID {c.get('pmid','')} ({c.get('year','')})",
                         caption_style))
                 els.append(sp(6))
 
@@ -875,8 +875,8 @@ permutation null over the annotated background; `n/t` means the test was not run
                 gene_data.append([
                     str(g.get("gene_symbol", g.get("symbol", ""))),
                     str(g.get("druggability_tier", "unknown")).capitalize(),
-                    f"{g.get('nes_score', 0):.2f}" if g.get("nes_score") else "—",
-                    str(g.get("pathway_count", "—")),
+                    f"{g.get('nes_score', 0):.2f}" if g.get("nes_score") else "-",
+                    str(g.get("pathway_count", "-")),
                 ])
             gt = Table(gene_data,
                        colWidths=[1.5*inch, 1.4*inch, 1.2*inch, 1.2*inch])
@@ -925,4 +925,3 @@ permutation null over the annotated background; `n/t` means the test was not run
         doc.build(els)
         logger.info(f"PDF report saved to {output_file}")
         return str(output_file)
-

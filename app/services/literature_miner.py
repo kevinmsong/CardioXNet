@@ -300,7 +300,7 @@ class LiteratureMiner:
         else:
             logger.info(
                 f"Hypothesis {hypothesis_id}: 0/{len(citations)} citations "
-                f"above threshold — keeping top 5 as fallback"
+                f"above threshold - keeping top 5 as fallback"
             )
             # Fallback: keep at least top 5 so hypotheses aren't left empty
             filtered = citations[:5]
