@@ -77,7 +77,14 @@ def test_calculate_druggability_score_falls_back_when_live_lookup_fails(monkeypa
     analyzer = DruggabilityAnalyzer()
     score = analyzer.calculate_druggability_score(["SRC"])
 
-    assert score.druggability_source == "curated"
+    # The curated fallback still works...
     assert score.external_target_count == 0
     assert score.target_evidence == []
     assert "SRC" in score.druggable_genes
+
+    # ...but the failure must be recorded, not laundered into a plain "curated"
+    # label. external_approved_target_count == 0 is otherwise read as the finding
+    # "no pathway gene has an approved drug", which a failed lookup cannot support.
+    assert score.druggability_source != "curated"
+    assert "unavailable" in score.druggability_source
+    assert analyzer.last_lookup_failures == 1

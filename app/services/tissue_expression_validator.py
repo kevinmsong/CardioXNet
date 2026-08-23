@@ -19,10 +19,16 @@ class TissueExpressionScore:
     cardiac_expression_ratio: float
     expressed_genes: List[str]
     total_genes: int
-    mean_cardiac_tpm: float
-    mean_cardiac_specificity_ratio: float
+    mean_cardiac_tpm: Optional[float]
+    mean_cardiac_specificity_ratio: Optional[float]
     validation_passed: bool
     gtex_profiles: Dict[str, CardiacExpressionProfile]
+
+    # False when GTEx returned nothing usable and the curated-gene fallback was
+    # used instead. The fallback cannot produce TPM or specificity numbers, so
+    # those two fields are placeholders in that case and must not be presented as
+    # measurements.
+    gtex_measured: bool = True
 
 
 class TissueExpressionValidator:
@@ -192,8 +198,19 @@ class TissueExpressionValidator:
         valid_profiles = {gene: profile for gene, profile in gtex_profiles.items() if profile}
         
         if not valid_profiles:
-            # Fallback to curated gene list if GTEx cardiac tissue API fails
-            logger.debug("GTEx cardiac tissue data unavailable, using fallback cardiac gene list")
+            # GTEx returned nothing usable. Fall back to the curated cardiac gene
+            # list for the expression *ratio*, which that list can support.
+            #
+            # TPM and specificity cannot be derived from a gene list, so they are
+            # reported as None rather than as the synthetic 5.0 / 2.0 constants
+            # this used to emit -- those were rendered in the UI as
+            # "2.0x vs other tissues", presenting a hardcoded placeholder to the
+            # reader as a measured GTEx ratio.
+            logger.warning(
+                "GTEx cardiac expression unavailable for this pathway; falling back "
+                "to the curated cardiac gene list. TPM and tissue-specificity are "
+                "not measured for these genes."
+            )
             expressed_genes = [gene for gene in pathway_genes
                                if gene and gene.upper() in self._curated_cardiac_genes]
 
@@ -204,10 +221,11 @@ class TissueExpressionValidator:
                 cardiac_expression_ratio=cardiac_expression_ratio,
                 expressed_genes=expressed_genes,
                 total_genes=len(pathway_genes),
-                mean_cardiac_tpm=5.0 if expressed_genes else 0.0,
-                mean_cardiac_specificity_ratio=2.0 if expressed_genes else 0.0,
+                mean_cardiac_tpm=None,
+                mean_cardiac_specificity_ratio=None,
                 validation_passed=validation_passed,
-                gtex_profiles={}
+                gtex_profiles={},
+                gtex_measured=False,
             )
             self._expression_cache[cache_key] = score
             return score
@@ -286,10 +304,14 @@ class TissueExpressionValidator:
             cardiac_expression_ratio=ratio,
             expressed_genes=expressed,
             total_genes=total,
-            mean_cardiac_tpm=0.0,
-            mean_cardiac_specificity_ratio=2.0 if expressed else 0.0,
+            # No GTEx call was made, so there is no TPM or specificity to report.
+            # A constant 2.0 here was rendered in the UI as a measured
+            # "2.0x vs other tissues" ratio.
+            mean_cardiac_tpm=None,
+            mean_cardiac_specificity_ratio=None,
             validation_passed=ratio >= min_ratio,
             gtex_profiles={},
+            gtex_measured=False,
         )
 
     async def warm_gene_cache(

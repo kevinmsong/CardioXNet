@@ -25,7 +25,14 @@ class NETSConfig(BaseSettings):
     """
     
     # API Configuration
-    string_version: str = Field(default="11.5", description="STRING API version")
+    string_version: str = Field(
+        default="12.0",
+        description=(
+            "STRING release actually queried. This said 11.5 while the client "
+            "hardcoded the version-12-0 host, so every run used v12.0 while the "
+            "health check and the generated reports claimed v11.5."
+        ),
+    )
     gprofiler_version: str = Field(default="e104_eg51_p15", description="g:Profiler version")
     reactome_version: str = Field(default="79", description="Reactome version")
     

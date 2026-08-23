@@ -44,6 +44,6 @@ figures/tables in this directory are tracked.
 - `PermutationTester` uses a seeded private RNG (default seed 20260821).
 - PubMed counts are cached in `bench/out/pubmed_counts.json`. Delete it to
   re-query live; keep it to reproduce the exact numbers in the manuscript.
-- External resources that are *not* pinned and will drift: STRING v11.5,
+- External resources that are *not* pinned and will drift: STRING v12.0,
   g:Profiler, GTEx v8, ChEMBL and PubMed itself. Record the run date with any
   reported figure.

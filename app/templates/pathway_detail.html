@@ -72,9 +72,17 @@
       {% endif %}
       <dt>Evidence genes</dt><dd>{{ hyp.evidence_count or (hyp.evidence_genes or [])|length }}</dd>
       <dt>Cardiac relevance</dt><dd>{{ (score_components.get('cardiac_relevance', 0)*100)|round(1) }}%</dd>
-      <dt>Cardiac expression</dt><dd>{{ (score_components.get('cardiac_expression_ratio', 0)*100)|round(1) }}% of genes expressed in heart (GTEx, median TPM ≥ 1)</dd>
-      {% if score_components.get('cardiac_specificity_ratio') %}<dt>Cardiac specificity</dt><dd>{{ '%.1f'|format(score_components.get('cardiac_specificity_ratio')) }}× vs other tissues</dd>{% endif %}
-      {% if score_components.get('mean_cardiac_tpm') %}<dt>Mean cardiac TPM</dt><dd>{{ '%.1f'|format(score_components.get('mean_cardiac_tpm')) }}</dd>{% endif %}
+      <dt>Cardiac expression</dt>
+      <dd>{{ (score_components.get('cardiac_expression_ratio', 0)*100)|round(1) }}%
+        {% if score_components.get('gtex_measured') is false %}
+        of genes in the curated cardiac gene set
+        <div class="pw-id">GTEx not queried for this pathway — TPM and tissue specificity are not measured</div>
+        {% else %}
+        of genes expressed in heart (GTEx, median TPM ≥ 1)
+        {% endif %}
+      </dd>
+      {% if score_components.get('cardiac_specificity_ratio') is not none %}<dt>Cardiac specificity</dt><dd>{{ '%.1f'|format(score_components.get('cardiac_specificity_ratio')) }}× vs other tissues</dd>{% endif %}
+      {% if score_components.get('mean_cardiac_tpm') is not none %}<dt>Mean cardiac TPM</dt><dd>{{ '%.1f'|format(score_components.get('mean_cardiac_tpm')) }}</dd>{% endif %}
       {% if score_components.get('literature_saturation') is not none %}
       <dt title="log10(PubMed hits + 1) ÷ log10(1001). 0 = nothing published at this intersection, 1 = ≥1000 records.">Literature saturation</dt>
       <dd>{{ '%.2f'|format(score_components.get('literature_saturation')) }}

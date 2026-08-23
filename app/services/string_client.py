@@ -19,7 +19,11 @@ class STRINGClient:
         """Initialize STRING client."""
         self.settings = get_settings()
         self.species = 9606  # Human NCBI taxonomy ID
-        self.base_url = "https://version-12-0.string-db.org/api"
+        # Derived from config rather than hardcoded. The URL previously pinned
+        # version-12-0 while `string_version` said "11.5", so every run queried
+        # v12.0 while the health check and the generated reports claimed v11.5.
+        version_slug = self.settings.nets.string_version.replace(".", "-")
+        self.base_url = f"https://version-{version_slug}.string-db.org/api"
         self.session = requests.Session()
     
     def get_interactions(
@@ -83,31 +87,42 @@ class STRINGClient:
                     "interactions": [],
                     "contributions": {gene.symbol: 0 for gene in genes},
                     "total_interactions": 0,
-                    "score_threshold": score_threshold
+                    "score_threshold": score_threshold,
+                    "available": True,
                 }
-            
+
             # Parse and filter response
             result = self._parse_network(network_df, genes, score_threshold)
-            
+            result["available"] = True
+
             logger.info(
                 f"Retrieved {len(result['neighbors'])} interacting proteins from STRING"
             )
-            
+
             return result
-            
+
         except Exception as e:
             error_msg = str(e) if str(e) else repr(e)
-            # Only log warning, not error - STRING API is unreliable but non-critical
-            logger.warning(f"STRING API unavailable: {error_msg}. Continuing without STRING interactions.")
-            
-            # Return empty result instead of failing - pipeline can continue
+            # A failed query is NOT the same fact as "these proteins do not
+            # interact", and this method used to return a result shaped
+            # identically to a genuine empty network. Downstream that became
+            # betweenness centrality 0.0 for every gene and a uniform PageRank,
+            # both reported as measurements. `available: False` is the sentinel
+            # callers must check -- the previous `error` key was never read
+            # anywhere in the codebase.
+            logger.warning(
+                f"STRING API unavailable: {error_msg}. "
+                f"Network-derived metrics for this analysis are NOT measured."
+            )
+
             return {
                 "neighbors": [],
                 "interactions": [],
                 "contributions": {gene.symbol: 0 for gene in genes},
                 "total_interactions": 0,
                 "score_threshold": score_threshold,
-                "error": error_msg
+                "available": False,
+                "error": error_msg,
             }
 
     def close(self):

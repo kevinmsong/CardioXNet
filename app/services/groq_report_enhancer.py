@@ -101,7 +101,7 @@ Write concise, scientific English. 3 paragraphs, ~80 words each."""
         return (
             f"This CardioXNet analysis examined {len(seed_genes)} cardiovascular-associated genes "
             f"({genes_str}) to identify disease-relevant molecular pathways in the context of {disease_context}. "
-            f"Using the NETS pipeline, seed genes were expanded through STRING v11.5 protein-protein interaction "
+            f"Using the NETS pipeline, seed genes were expanded through STRING v12.0 protein-protein interaction "
             f"networks and subjected to multi-database pathway enrichment analysis.\n\n"
             f"The analysis identified {len(pathway_names)} statistically significant pathways after semantic "
             f"cardiac filtering and permutation-based validation. Key discoveries include: {pathways_str}. "

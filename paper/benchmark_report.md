@@ -3,7 +3,7 @@
 Run date: 2026-08-22. All figures and tables in `paper/` were generated from these
 runs; regenerate with the commands in `paper/README.md`.
 
-External resources at run time: STRING v11.5, g:Profiler (`e104_eg51_p15`),
+External resources at run time: STRING v12.0, g:Profiler (`e104_eg51_p15`),
 GTEx v8, ChEMBL, DrugBank v5.1.10, PubMed via NCBI E-utilities. The permutation
 background is a pinned HGNC protein-coding snapshot (19,410 symbols, retrieved
 2026-08-21); the permutation RNG seed is 20260821.

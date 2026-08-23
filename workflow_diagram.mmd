@@ -7,7 +7,7 @@ flowchart TD
 
     S0["<b>Stage 0 — Input Validation</b> <i>(5%)</i><br/>HGNC symbol normalisation<br/>invalid identifiers dropped"]
 
-    S1["<b>Stage 1 — Functional Neighbourhood</b> <i>(15%)</i><br/>STRING v11.5 PPI expansion<br/>75 neighbours · combined score ≥ 0.60"]
+    S1["<b>Stage 1 — Functional Neighbourhood</b> <i>(15%)</i><br/>STRING v12.0 PPI expansion<br/>75 neighbours · combined score ≥ 0.60"]
 
     S2a["<b>Stage 2a — Primary Enrichment</b> <i>(25%)</i><br/>g:Profiler over REAC · KEGG · WP · GO:BP<br/>FDR ≤ 0.05<br/>screen = 0.40·sig + 0.35·effect + 0.25·specificity"]
 
@@ -36,7 +36,7 @@ flowchart TD
     START --> S0 --> S1 --> S2a --> S2b --> S2c --> S3 --> S35 --> S4 --> S6 --> S6c --> S7 --> S8 --> S9 --> DONE
 
     %% External data sources
-    DB1[("STRING v11.5<br/>protein interactions")]
+    DB1[("STRING v12.0<br/>protein interactions")]
     DB2[("g:Profiler<br/>REAC · KEGG · WP · GO:BP")]
     DB3[("GTEx v8<br/>cardiac expression")]
     DB4[("PubMed / NCBI E-utilities<br/>corpus sizes + abstracts")]

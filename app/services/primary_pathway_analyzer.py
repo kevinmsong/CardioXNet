@@ -267,16 +267,26 @@ class PrimaryPathwayAnalyzer:
             Set of known pathway IDs
         """
         logger.info(f"Querying known pathways for {len(seed_genes)} seed genes")
-        
+
         known_pathway_ids = set()
-        
+
         known_pathways = self.reactome_client.get_pathways_for_genes(seed_genes)
-        
+
         for pathway in known_pathways:
             known_pathway_ids.add(pathway.pathway_id)
-        
-        logger.info(f"Found {len(known_pathway_ids)} known pathways")
-        
+
+        # An empty set from a failed query is not the same claim as an empty set
+        # from a successful one: the first means the known-pathway filter cannot
+        # run, so pathways the seeds are already annotated to will be reported as
+        # discoveries. Say so loudly rather than proceeding as if nothing were known.
+        if getattr(self.reactome_client, 'last_query_failed', False):
+            logger.warning(
+                "Known-pathway lookup failed; the filter that removes pathways the "
+                "seed genes are already annotated to will not run for this analysis"
+            )
+        else:
+            logger.info(f"Found {len(known_pathway_ids)} known pathways")
+
         return known_pathway_ids
     
     def _filter_known_pathways(

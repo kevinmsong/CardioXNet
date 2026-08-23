@@ -274,9 +274,19 @@ class InputValidator:
             )
             
             result = self.string_client.get_interactions([test_gene])
-            
+
+            # get_interactions does not raise on transport failure, it returns a
+            # result carrying `available: False`. Assigning the result and never
+            # inspecting it -- as this did -- made the health check report
+            # `available: True` unconditionally, so the outage detector could
+            # never detect an outage.
+            if not result.get("available", False):
+                error = result.get("error", "STRING returned no usable response")
+                logger.warning(f"STRING API check failed: {error}")
+                return {"available": False, "version": None, "error": error}
+
             logger.debug("STRING API is available")
-            
+
             return {
                 "available": True,
                 "version": self.settings.nets.string_version,

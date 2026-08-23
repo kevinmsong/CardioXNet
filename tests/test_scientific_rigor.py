@@ -494,3 +494,126 @@ class TestCsvExport:
         assert record["novelty_tier"] == "Novel"
         assert record["novelty_confidence"] == "verified_gap"
         assert record["pubmed_hit_count"] == "12"
+
+
+# ---------------------------------------------------------------------------
+# API failure sentinels
+# ---------------------------------------------------------------------------
+
+class TestApiFailureSentinels:
+    """A failed call must never be indistinguishable from a real measurement.
+
+    This is the defect that made the novelty metric uninformative. `count_hits`
+    returns -1 and every caller checks it. These tests pin the same discipline on
+    the clients that feed centrality, druggability and the known-pathway filter.
+    """
+
+    def test_string_failure_is_flagged_not_reported_as_no_interactions(self, monkeypatch):
+        import requests as _requests
+        from app.services.string_client import STRINGClient
+
+        client = STRINGClient()
+        monkeypatch.setattr(
+            client, "_get_network_data",
+            lambda *a, **k: (_ for _ in ()).throw(_requests.RequestException("down")),
+        )
+        result = client.get_interactions(
+            [GeneInfo(input_id="NKX2-5", entrez_id="1482", symbol="NKX2-5")]
+        )
+
+        # An outage yields an edgeless graph, which scores every gene's
+        # betweenness centrality at 0.0 -- a real-looking measurement.
+        assert result["available"] is False
+        assert result["interactions"] == []
+
+    def test_empty_network_is_still_flagged_available(self, monkeypatch):
+        from app.services.string_client import STRINGClient
+
+        client = STRINGClient()
+        # A query that succeeds and finds nothing is a real result, not a failure.
+        monkeypatch.setattr(client, "_get_network_data", lambda *a, **k: None)
+        result = client.get_interactions(
+            [GeneInfo(input_id="NKX2-5", entrez_id="1482", symbol="NKX2-5")]
+        )
+
+        assert result["available"] is True
+        assert result["interactions"] == []
+
+    def test_string_health_check_reports_an_outage(self, monkeypatch):
+        from app.services.input_validator import InputValidator
+
+        validator = InputValidator()
+        monkeypatch.setattr(
+            validator.string_client, "get_interactions",
+            lambda *a, **k: {"neighbors": [], "interactions": [], "contributions": {},
+                             "total_interactions": 0, "score_threshold": 0.6,
+                             "available": False, "error": "down"},
+        )
+        status = validator._check_string()
+
+        # get_interactions does not raise, so a health check that only catches
+        # exceptions reports available=True during a total outage.
+        assert status["available"] is False
+        assert status["error"]
+
+    def test_string_url_follows_the_configured_version(self):
+        from app.services.string_client import STRINGClient
+        from app.core.config import get_settings
+
+        client = STRINGClient()
+        version = get_settings().nets.string_version
+        assert version.replace(".", "-") in client.base_url, (
+            "the client must query the release the config advertises; a mismatch "
+            "here is a wrong database version in the methods section"
+        )
+
+    def test_open_targets_failure_is_recorded_in_the_source_label(self, monkeypatch):
+        import requests as _requests
+        from app.services.druggability_analyzer import DruggabilityAnalyzer
+
+        analyzer = DruggabilityAnalyzer()
+        monkeypatch.setattr(
+            _requests, "post",
+            lambda *a, **k: (_ for _ in ()).throw(_requests.RequestException("down")),
+        )
+        score = analyzer.calculate_druggability_score(["SRC"], use_external=True)
+
+        assert analyzer.last_lookup_failures == 1
+        assert "unavailable" in score.druggability_source
+        assert score.druggability_source != "curated"
+
+    def test_reactome_failure_is_distinguishable_from_no_known_pathways(self, monkeypatch):
+        import requests as _requests
+        from app.services.reactome_client import ReactomeClient
+
+        client = ReactomeClient()
+        assert client.last_query_failed is False
+        monkeypatch.setattr(
+            client, "_query_analysis_service",
+            lambda *a, **k: (_ for _ in ()).throw(_requests.RequestException("down")),
+        )
+        result = client.get_pathways_for_genes(
+            [GeneInfo(input_id="MYH7", entrez_id="4625", symbol="MYH7")]
+        )
+
+        # An empty set from an outage means the known-pathway filter cannot run,
+        # so already-annotated pathways would be reported as discoveries.
+        assert result == []
+        assert client.last_query_failed is True
+
+
+class TestGtexPlaceholders:
+    """The curated fallback must not emit constants that render as measurements."""
+
+    def test_offline_estimate_reports_no_tpm_or_specificity(self):
+        from app.services.tissue_expression_validator import TissueExpressionValidator
+
+        score = TissueExpressionValidator().calculate_offline_expression_score(
+            ["MYH7", "TTN", "ZZZ9"]
+        )
+        assert score.gtex_measured is False
+        # 5.0 and 2.0 were previously rendered as "2.0x vs other tissues".
+        assert score.mean_cardiac_tpm is None
+        assert score.mean_cardiac_specificity_ratio is None
+        # The ratio the curated list *can* support is still produced.
+        assert score.cardiac_expression_ratio > 0

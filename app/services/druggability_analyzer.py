@@ -1,6 +1,8 @@
 """Druggability analysis using curated DrugBank data + Open Targets Platform API."""
 
 import logging
+import time
+
 import requests
 from typing import List, Dict, Set, Any, Optional
 from dataclasses import dataclass, field
@@ -53,6 +55,12 @@ class DruggabilityAnalyzer:
     
     # Open Targets Platform GraphQL endpoint
     _OT_GRAPHQL_URL = "https://api.platform.opentargets.org/api/v4/graphql"
+    # 10s was the tightest budget in the system on the heaviest GraphQL payload,
+    # with no retry, so a slow-but-healthy response was discarded silently.
+    _OT_TIMEOUT = 30
+    # Minimum spacing between Open Targets requests. This fires one POST per gene
+    # per pathway, which without pacing is a burst of thousands.
+    _OT_MIN_INTERVAL = 0.05
     _OT_QUERY = """
     query SearchTarget($term: String!) {
       search(queryString: $term, entityNames: ["target"], page: {index: 0, size: 5}) {
@@ -88,21 +96,45 @@ class DruggabilityAnalyzer:
         self.approved_drug_targets = self._load_approved_drug_targets()
         self.clinical_trial_targets = self._load_clinical_trial_targets()
 
+        # Outcome of the most recent Open Targets lookup, so callers can tell a
+        # genuine "no approved drugs" from a failed query.
+        self.last_lookup_failures = 0
+        self.last_lookup_attempted = 0
+        self._last_ot_request = 0.0
+
         logger.info(
             f"DruggabilityAnalyzer initialized: "
             f"{len(self.druggable_genes)} curated druggable genes, "
             f"{len(self.approved_drug_targets)} approved targets"
         )
 
+    def _throttle(self) -> None:
+        """Space out Open Targets requests."""
+        wait = self._last_ot_request + self._OT_MIN_INTERVAL - time.monotonic()
+        if wait > 0:
+            time.sleep(wait)
+        self._last_ot_request = time.monotonic()
+
     def _query_open_targets(self, gene_symbols: List[str]) -> List[Dict[str, Any]]:
-        """Query Open Targets Platform GraphQL API for drug target evidence per gene."""
+        """Query Open Targets Platform GraphQL for drug-target evidence per gene.
+
+        Sets ``self.last_lookup_failures`` to the number of genes whose query did
+        not complete. The previous ``except Exception: pass`` meant a total Open
+        Targets outage produced ``external_approved_target_count = 0``, which is
+        emitted as the finding "no pathway gene has an approved drug" -- a real
+        scientific claim, indistinguishable from forty consecutive HTTP 500s.
+        """
         matched: List[Dict[str, Any]] = []
+        failures = 0
+        first_error: Optional[str] = None
+
         for gene in gene_symbols:
             try:
+                self._throttle()
                 resp = requests.post(
                     self._OT_GRAPHQL_URL,
                     json={"query": self._OT_QUERY, "variables": {"term": gene}},
-                    timeout=10,
+                    timeout=self._OT_TIMEOUT,
                 )
                 resp.raise_for_status()
                 hits = resp.json().get("data", {}).get("search", {}).get("hits", [])
@@ -111,8 +143,19 @@ class DruggabilityAnalyzer:
                     if obj.get("approvedSymbol", "").upper() == gene.upper():
                         matched.append(obj)
                         break  # exact symbol match — take first
-            except Exception:
-                pass
+            except Exception as e:
+                failures += 1
+                if first_error is None:
+                    first_error = f"{type(e).__name__}: {e}"
+
+        self.last_lookup_failures = failures
+        self.last_lookup_attempted = len(gene_symbols)
+        if failures:
+            logger.warning(
+                f"Open Targets lookup failed for {failures}/{len(gene_symbols)} genes "
+                f"(first error: {first_error}). External druggability counts are "
+                f"lower bounds, not measurements."
+            )
         return matched
     
     def _load_druggable_genes(self) -> Set[str]:
@@ -294,8 +337,19 @@ class DruggabilityAnalyzer:
         target_evidence: List[Dict[str, Any]] = []
         druggability_source = "curated"
 
+        # Record a failed lookup in the source label so a reader can tell that the
+        # external counts below are lower bounds rather than measurements.
+        if use_external and self.last_lookup_failures:
+            druggability_source = (
+                f"curated (Open Targets unavailable for "
+                f"{self.last_lookup_failures}/{self.last_lookup_attempted} genes)"
+            )
+
         if ot_hits:
-            druggability_source = "Open Targets + curated"
+            druggability_source = (
+                "Open Targets + curated" if not self.last_lookup_failures
+                else f"Open Targets (partial: {self.last_lookup_failures} lookups failed) + curated"
+            )
             _cv_terms = {"cardiovascular", "heart", "cardiac", "coronary", "arrhythmia",
                          "hypertension", "heart failure", "cardiomyopathy"}
             for obj in ot_hits:

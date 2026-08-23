@@ -24,6 +24,9 @@ class ReactomeClient(APIClient):
         self.species_tax_id = "9606"  # Human NCBI taxonomy ID
         # Analysis Service base URL
         self.analysis_base_url = "https://reactome.org/AnalysisService"
+        # Set when a query fails, so callers can tell an empty result caused by
+        # an outage from a genuine "no known pathways for these genes".
+        self.last_query_failed = False
     
     def get_pathways_for_genes(
         self,
@@ -59,14 +62,27 @@ class ReactomeClient(APIClient):
             )
             
             if not pathways:
-                logger.debug("No pathways retrieved from Reactome - will use alternative databases")
+                logger.info(
+                    "Reactome returned no pathways for these genes "
+                    "(a genuine empty result, not a failure)"
+                )
             
             return pathways
             
         except Exception as e:
-            logger.debug(f"Reactome unavailable: {str(e)}")
-            logger.debug("Analysis will continue with gProfiler and other databases")
-            return []  # Return empty list instead of raising critical error
+            # Logged at WARNING, not DEBUG. The project runs at INFO, so the
+            # previous debug-level messages meant a total Reactome outage
+            # produced no log output at all -- while silently emptying the
+            # known-pathway set that _filter_known_pathways uses to remove
+            # pathways the seed genes are ALREADY annotated to. An outage
+            # therefore let well-known pathways through as discoveries, which is
+            # the one failure a novelty tool must not have.
+            logger.warning(
+                f"Reactome unavailable: {str(e)}. The known-pathway filter will "
+                f"not run, so already-annotated pathways may appear as novel."
+            )
+            self.last_query_failed = True
+            return []
     
     def _query_analysis_service(
         self,
@@ -137,7 +153,13 @@ class ReactomeClient(APIClient):
                     p_value=entities.get("pValue", 1.0),
                     p_adj=entities.get("fdr", 1.0),
                     evidence_count=entities.get("found", 0),
-                    evidence_genes=gene_symbols  # Simplified - actual genes in pathway
+                    # NOTE: the query gene list, not the pathway's actual
+                    # intersection -- Reactome's AnalysisService response is not
+                    # unpacked to per-pathway members here. Only `pathway_id` is
+                    # consumed downstream (primary/secondary analyzers use these
+                    # entries solely to build a set of known pathway ids), so
+                    # this does not reach any score. Do not read it as evidence.
+                    evidence_genes=gene_symbols
                 )
                 
                 entries.append(entry)
@@ -145,16 +167,20 @@ class ReactomeClient(APIClient):
             return entries
             
         except requests.exceptions.ConnectionError as e:
-            logger.debug(f"Reactome connection failed (server unavailable): {str(e)}")
+            self.last_query_failed = True
+            logger.warning(f"Reactome connection failed (server unavailable): {str(e)}")
             return []  # Return empty list - gProfiler will provide pathway coverage
         except requests.exceptions.Timeout as e:
-            logger.debug(f"Reactome timeout: {str(e)}")
+            self.last_query_failed = True
+            logger.warning(f"Reactome timeout: {str(e)}")
             return []  # Return empty list - gProfiler will provide pathway coverage
         except requests.exceptions.RequestException as e:
-            logger.debug(f"Reactome API error: {str(e)}")
+            self.last_query_failed = True
+            logger.warning(f"Reactome API error: {str(e)}")
             return []  # Return empty list - gProfiler will provide pathway coverage
         except Exception as e:
-            logger.debug(f"Reactome parsing error: {str(e)}")
+            self.last_query_failed = True
+            logger.warning(f"Reactome parsing error: {str(e)}")
             logger.info("Continuing analysis without Reactome pathways due to parsing issues")
             return []  # Return empty list instead of raising error
     
