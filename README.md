@@ -1,6 +1,8 @@
 # CardioXNet
 
-**CardioXNet** is a cardiovascular pathway discovery platform implementing the NETS (Network Expansion & Topology Scoring) pipeline. It identifies novel cardiac-relevant pathways from seed gene lists by integrating protein interaction networks, multi-database enrichment, semantic filtering, and statistical validation.
+**CardioXNet** is a cardiovascular pathway discovery platform implementing the NETS (Network Expansion & Topology Scoring) pipeline. You give it a short list of seed genes, and it returns ranked candidate cardiac pathways and therapeutic targets. To get there, it expands the gene list through protein–protein interaction networks, runs enrichment across several pathway databases, filters for cardiac relevance, and validates the results statistically.
+
+It has a FastAPI backend (`app/`) and a React/Vite web UI (`frontend/`). The data sources it calls are public APIs, so no API keys are required.
 
 ---
 
@@ -23,6 +25,16 @@ npm install
 npm run dev
 # Runs at http://localhost:3000
 ```
+
+Start the backend first, then open <http://localhost:3000>. For Docker and production setup, see [DEPLOYMENT.md](DEPLOYMENT.md).
+
+### Configuration (optional)
+
+The app runs with the built-in defaults listed under **Default parameters** below, so no `.env` file is needed.
+
+- **Override pipeline settings:** create a `.env` file in the repo root and use `NETS_`-prefixed variables (for example, `NETS_STRING_NEIGHBOR_COUNT=75`).
+- **About `.env.example`:** it is a template, and some of its values differ from the defaults. It sets `NETS_STRING_SCORE_THRESHOLD=0.7` and `NETS_TOP_HYPOTHESES_COUNT=5`. Adjust those values if you copy it to `.env`.
+- **AI narrative text in reports:** set `GROQ_API_KEY` in your shell environment. Without it, that step is skipped.
 
 ---
 
